@@ -1,13 +1,2 @@
-using FarmSimVR.Core.Farming;
-
-namespace FarmSimVR.Interfaces
-{
-    public interface ICropGrowthCalculator
-    {
-        GrowthResult CalculateGrowth(
-            CropData cropData,
-            GrowthConditions conditions,
-            float currentGrowth,
-            float deltaTime);
-    }
-}
+// Interface moved to FarmSimVR.Core.Farming.ICropGrowthCalculator
+// This file kept to avoid missing .meta file warnings

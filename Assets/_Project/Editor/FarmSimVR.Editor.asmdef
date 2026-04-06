@@ -1,0 +1,21 @@
+{
+    "name": "FarmSimVR.Editor",
+    "rootNamespace": "FarmSimVR.Editor",
+    "references": [
+        "FarmSimVR.Core",
+        "FarmSimVR.MonoBehaviours",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

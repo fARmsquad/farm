@@ -1,9 +1,7 @@
 {
     "name": "FarmSimVR.Interfaces",
     "rootNamespace": "FarmSimVR.Interfaces",
-    "references": [
-        "FarmSimVR.Core"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

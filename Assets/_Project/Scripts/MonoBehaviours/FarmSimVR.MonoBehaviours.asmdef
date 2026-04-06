@@ -2,8 +2,7 @@
     "name": "FarmSimVR.MonoBehaviours",
     "rootNamespace": "FarmSimVR.MonoBehaviours",
     "references": [
-        "FarmSimVR.Core",
-        "FarmSimVR.Interfaces"
+        "FarmSimVR.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
