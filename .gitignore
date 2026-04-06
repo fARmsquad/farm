@@ -60,3 +60,21 @@ crashlytics-build.properties
 Thumbs.db
 Desktop.ini
 .plastic
+
+# ═══════════════════════════════════════════
+# Agent OS — personal harness, never pushed
+# ═══════════════════════════════════════════
+.ai/
+AGENTS.md
+
+# Agent coordination artifacts
+flight-board.json
+flight-log.json
+
+# Test results (regenerated on every run)
+TestResults/
+
+# Session-specific symlinks
+run-tests.sh
+preflight.sh
+finalize.sh
