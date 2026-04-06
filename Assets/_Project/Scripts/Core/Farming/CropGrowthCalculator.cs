@@ -1,5 +1,4 @@
 using System;
-using FarmSimVR.Interfaces;
 
 namespace FarmSimVR.Core.Farming
 {

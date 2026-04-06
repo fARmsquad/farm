@@ -1,10 +1,13 @@
 {
-    "name": "FarmSimVR.MonoBehaviours",
-    "rootNamespace": "FarmSimVR.MonoBehaviours",
+    "name": "FarmSimVR.Editor",
+    "rootNamespace": "FarmSimVR.Editor",
     "references": [
-        "FarmSimVR.Core"
+        "FarmSimVR.Core",
+        "FarmSimVR.MonoBehaviours"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
