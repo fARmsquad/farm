@@ -17,18 +17,10 @@ namespace FarmSimVR.Core.Farming
             if (currentGrowth >= cropData.MaxGrowth)
                 return new GrowthResult(0f, true);
 
-            float rate = cropData.BaseGrowthRate;
-
-            // Rain doubles growth
-            if (conditions.Weather == WeatherType.Rain)
-                rate *= 2f;
-
-            // Temperature outside 10-35 range halves growth
-            if (conditions.Temperature < 10f || conditions.Temperature > 35f)
-                rate *= 0.5f;
-
-            // Soil quality multiplier
-            rate *= GetSoilMultiplier(conditions.SoilQuality);
+            float rate = cropData.BaseGrowthRate
+                * GetWeatherMultiplier(conditions.Weather)
+                * GetTemperatureMultiplier(conditions.Temperature)
+                * GetSoilMultiplier(conditions.SoilQuality);
 
             float growth = rate * deltaTime;
 
@@ -40,6 +32,16 @@ namespace FarmSimVR.Core.Farming
             bool isFullyGrown = (currentGrowth + growth) >= cropData.MaxGrowth;
 
             return new GrowthResult(growth, isFullyGrown);
+        }
+
+        private static float GetWeatherMultiplier(WeatherType weather)
+        {
+            return weather == WeatherType.Rain ? 2.0f : 1.0f;
+        }
+
+        private static float GetTemperatureMultiplier(float temperature)
+        {
+            return (temperature < 10f || temperature > 35f) ? 0.5f : 1.0f;
         }
 
         private static float GetSoilMultiplier(SoilQuality quality)
