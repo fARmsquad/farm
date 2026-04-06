@@ -62,10 +62,10 @@ Desktop.ini
 .plastic
 
 # ═══════════════════════════════════════════
-# Agent OS — personal harness, never pushed
+# Agent OS — shared harness for the team
 # ═══════════════════════════════════════════
-.ai/
 AGENTS.md
+.ai/memory/session-memory.md
 
 # Agent coordination artifacts
 flight-board.json
