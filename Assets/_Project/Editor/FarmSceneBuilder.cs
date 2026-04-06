@@ -1,7 +1,10 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+
 namespace FarmSimVR.Editor
 {
     /// <summary>
@@ -30,10 +33,19 @@ namespace FarmSimVR.Editor
         {
             var scene = EditorSceneManager.NewScene(
                 NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
-            BuildFarmLayout();
+            BuildFarmLayoutCore();
+            BuildSkyAndLightingCore();
             EditorSceneManager.SaveScene(scene,
                 "Assets/_Project/Scenes/FarmMain.unity");
             Debug.Log("[FarmSceneBuilder] FarmMain.unity created and saved.");
+        }
+
+        [MenuItem("FarmSim/Apply Sky & Lighting (L1-002)")]
+        public static void ApplySkyAndLighting()
+        {
+            BuildSkyAndLightingCore();
+            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            Debug.Log("[FarmSceneBuilder] L1-002 Sky & Lighting applied.");
         }
 
         [MenuItem("FarmSim/Build Farm Layout (Greybox)")]
@@ -45,6 +57,11 @@ namespace FarmSimVR.Editor
                 "Build", "Cancel"))
                 return;
 
+            BuildFarmLayoutCore();
+        }
+
+        private static void BuildFarmLayoutCore()
+        {
             // Root hierarchy containers
             var farm = CreateEmpty("Farm", Vector3.zero);
             var ground = CreateEmpty("Ground", Vector3.zero, farm);
@@ -352,23 +369,18 @@ namespace FarmSimVR.Editor
             var marker = CreateEmpty($"{name}_Boundary", position, parent);
         }
 
-        // ── Task 8: Lighting ──────────────────────────────────────
+        // ── Task 8 (L1-001): Basic Lighting ──────────────────────
 
         private static void BuildLighting(Transform parent)
         {
-            // Remove existing directional lights
-            foreach (var existingLight in Object.FindObjectsByType<Light>(
-                FindObjectsSortMode.None))
-            {
-                if (existingLight.type == LightType.Directional)
-                    Object.DestroyImmediate(existingLight.gameObject);
-            }
+            // Basic sun — L1-002 BuildSkyAndLightingCore upgrades this
+            RemoveExistingDirectionalLights();
 
             var sunObj = new GameObject("Sun_Directional");
             sunObj.transform.SetParent(parent);
             var light = sunObj.AddComponent<Light>();
             light.type = LightType.Directional;
-            light.color = new Color(1f, 0.95f, 0.85f); // warm white
+            light.color = new Color(1f, 0.95f, 0.85f);
             light.intensity = 1.2f;
             light.shadows = LightShadows.Soft;
             sunObj.transform.rotation = Quaternion.Euler(45f, 30f, 0f);
@@ -379,6 +391,176 @@ namespace FarmSimVR.Editor
             {
                 cam.transform.position = new Vector3(0f, 12f, -14f);
                 cam.transform.rotation = Quaternion.Euler(40f, 0f, 0f);
+            }
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // L1-002: Sky & Lighting
+        // ══════════════════════════════════════════════════════════
+
+        private static void BuildSkyAndLightingCore()
+        {
+            // Task 1: Procedural Skybox
+            BuildProceduralSkybox();
+
+            // Task 2: Sun Light (upgrade from L1-001 basic)
+            ConfigureSunLight();
+
+            // Task 3: Ambient Lighting from Skybox
+            ConfigureAmbientLighting();
+
+            // Task 4: Reflection Probe
+            BuildReflectionProbe();
+
+            // Task 5: Shadow Settings on URP Asset
+            ConfigureShadowSettings();
+
+            Debug.Log("[FarmSceneBuilder] L1-002 Sky & Lighting configured.");
+        }
+
+        // ── L1-002 Task 1: Procedural Skybox ──────────────────────
+
+        private static void BuildProceduralSkybox()
+        {
+            var skyboxMat = new Material(Shader.Find("Skybox/Procedural"));
+            skyboxMat.SetFloat("_SunDisk", 2f); // High Quality sun disk
+            skyboxMat.SetFloat("_SunSize", 0.04f);
+            skyboxMat.SetFloat("_SunSizeConvergence", 5f);
+            skyboxMat.SetFloat("_AtmosphereThickness", 1.0f);
+            skyboxMat.SetFloat("_Exposure", 1.3f);
+            skyboxMat.SetColor("_SkyTint", new Color(0.5f, 0.5f, 0.5f));
+            skyboxMat.SetColor("_GroundColor", new Color(0.37f, 0.35f, 0.31f));
+
+            // Save as asset for persistence
+            const string matPath = "Assets/_Project/Materials/SkyboxProcedural.mat";
+            EnsureDirectoryExists("Assets/_Project/Materials");
+            AssetDatabase.CreateAsset(skyboxMat, matPath);
+
+            RenderSettings.skybox = skyboxMat;
+            DynamicGI.UpdateEnvironment();
+        }
+
+        // ── L1-002 Task 2: Sun Light Configuration ────────────────
+
+        private static void ConfigureSunLight()
+        {
+            RemoveExistingDirectionalLights();
+
+            // Find or create the lighting parent
+            var farm = GameObject.Find("Farm");
+            Transform lightingParent = null;
+            if (farm != null)
+            {
+                var lt = farm.transform.Find("Lighting");
+                if (lt != null) lightingParent = lt;
+            }
+
+            var sunObj = new GameObject("Sun_Directional");
+            if (lightingParent != null)
+                sunObj.transform.SetParent(lightingParent);
+
+            // Spec: rotation (45, -30, 0), color #FFF4E0
+            sunObj.transform.rotation = Quaternion.Euler(45f, -30f, 0f);
+
+            var light = sunObj.AddComponent<Light>();
+            light.type = LightType.Directional;
+            light.color = HexColor("FFF4E0");
+            light.intensity = 1.5f;
+            light.shadows = LightShadows.Soft;
+            light.shadowStrength = 0.8f;
+            light.shadowNearPlane = 0.2f;
+
+            // Set as scene sun source for skybox
+            RenderSettings.sun = light;
+        }
+
+        // ── L1-002 Task 3: Ambient Lighting ───────────────────────
+
+        private static void ConfigureAmbientLighting()
+        {
+            RenderSettings.ambientMode = AmbientMode.Skybox;
+            RenderSettings.ambientIntensity = 1.0f;
+            RenderSettings.defaultReflectionMode =
+                DefaultReflectionMode.Skybox;
+            RenderSettings.defaultReflectionResolution = 256;
+        }
+
+        // ── L1-002 Task 4: Reflection Probe ───────────────────────
+
+        private static void BuildReflectionProbe()
+        {
+            // Remove existing probes from our hierarchy
+            foreach (var existing in Object.FindObjectsByType<ReflectionProbe>(
+                FindObjectsInactive.Exclude))
+            {
+                if (existing.gameObject.name == "FarmReflectionProbe")
+                    Object.DestroyImmediate(existing.gameObject);
+            }
+
+            var farm = GameObject.Find("Farm");
+            Transform lightingParent = null;
+            if (farm != null)
+            {
+                var lt = farm.transform.Find("Lighting");
+                if (lt != null) lightingParent = lt;
+            }
+
+            var probeObj = new GameObject("FarmReflectionProbe");
+            if (lightingParent != null)
+                probeObj.transform.SetParent(lightingParent);
+
+            probeObj.transform.position = new Vector3(0f, 2f, 0f);
+
+            var probe = probeObj.AddComponent<ReflectionProbe>();
+            probe.mode = ReflectionProbeMode.Baked;
+            probe.size = new Vector3(30f, 10f, 30f);
+            probe.resolution = 256;
+            probe.hdr = true;
+            probe.boxProjection = false; // simpler for Quest
+            probe.importance = 1;
+        }
+
+        // ── L1-002 Task 5: Shadow Settings ────────────────────────
+
+        private static void ConfigureShadowSettings()
+        {
+            // Find and configure the URP pipeline asset
+            var urpAsset = GraphicsSettings.currentRenderPipeline
+                as UniversalRenderPipelineAsset;
+
+            if (urpAsset == null)
+            {
+                Debug.LogWarning(
+                    "[FarmSceneBuilder] No URP asset found — " +
+                    "shadow settings not configured.");
+                return;
+            }
+
+            var so = new SerializedObject(urpAsset);
+
+            // Shadow distance = 30m
+            var shadowDist = so.FindProperty("m_MainLightShadowmapResolution");
+            // Set shadow distance via the dedicated property
+            SetSerializedFloat(so, "m_ShadowDistance", 30f);
+
+            // Shadow cascades = 4
+            SetSerializedInt(so, "m_ShadowCascadeCount", 4);
+
+            // Soft shadows on
+            SetSerializedBool(so, "m_SoftShadowsSupported", true);
+
+            so.ApplyModifiedProperties();
+            EditorUtility.SetDirty(urpAsset);
+            AssetDatabase.SaveAssets();
+        }
+
+        private static void RemoveExistingDirectionalLights()
+        {
+            foreach (var existingLight in Object.FindObjectsByType<Light>(
+                FindObjectsInactive.Exclude))
+            {
+                if (existingLight.type == LightType.Directional)
+                    Object.DestroyImmediate(existingLight.gameObject);
             }
         }
 
@@ -403,6 +585,49 @@ namespace FarmSimVR.Editor
                 Shader.Find("Universal Render Pipeline/Lit"));
             mat.color = color;
             renderer.material = mat;
+        }
+
+        private static Color HexColor(string hex)
+        {
+            ColorUtility.TryParseHtmlString($"#{hex}", out var color);
+            return color;
+        }
+
+        private static void EnsureDirectoryExists(string path)
+        {
+            if (!AssetDatabase.IsValidFolder(path))
+            {
+                var parts = path.Split('/');
+                var current = parts[0];
+                for (int i = 1; i < parts.Length; i++)
+                {
+                    var next = $"{current}/{parts[i]}";
+                    if (!AssetDatabase.IsValidFolder(next))
+                        AssetDatabase.CreateFolder(current, parts[i]);
+                    current = next;
+                }
+            }
+        }
+
+        private static void SetSerializedFloat(
+            SerializedObject so, string prop, float value)
+        {
+            var p = so.FindProperty(prop);
+            if (p != null) p.floatValue = value;
+        }
+
+        private static void SetSerializedInt(
+            SerializedObject so, string prop, int value)
+        {
+            var p = so.FindProperty(prop);
+            if (p != null) p.intValue = value;
+        }
+
+        private static void SetSerializedBool(
+            SerializedObject so, string prop, bool value)
+        {
+            var p = so.FindProperty(prop);
+            if (p != null) p.boolValue = value;
         }
 
         private static void EnsureTag(string tag)

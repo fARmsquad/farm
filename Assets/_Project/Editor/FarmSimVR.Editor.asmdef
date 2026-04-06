@@ -3,7 +3,9 @@
     "rootNamespace": "FarmSimVR.Editor",
     "references": [
         "FarmSimVR.Core",
-        "FarmSimVR.MonoBehaviours"
+        "FarmSimVR.MonoBehaviours",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime"
     ],
     "includePlatforms": [
         "Editor"
