@@ -195,5 +195,84 @@ namespace FarmSimVR.Tests.EditMode
 
             Assert.AreEqual(10f, result.GrowthAmount, 0.001f);
         }
+
+        // === Boundary Tests (VERIFY phase) ===
+
+        [Test]
+        public void CalculateGrowth_AllPenaltiesStacked_MinimalGrowth()
+        {
+            // Cold + poor soil = 0.5 * 0.5 = 0.25x
+            var conditions = new GrowthConditions(WeatherType.Sunny, 0f, SoilQuality.Poor);
+
+            var result = _calculator.CalculateGrowth(_defaultCrop, conditions, currentGrowth: 0f, deltaTime: 1f);
+
+            Assert.AreEqual(2.5f, result.GrowthAmount, 0.001f);
+        }
+
+        [Test]
+        public void CalculateGrowth_AllBonusesStacked_MaximalGrowth()
+        {
+            // Rain + rich soil = 2.0 * 1.5 = 3.0x
+            var conditions = new GrowthConditions(WeatherType.Rain, 20f, SoilQuality.Rich);
+
+            var result = _calculator.CalculateGrowth(_defaultCrop, conditions, currentGrowth: 0f, deltaTime: 1f);
+
+            Assert.AreEqual(30f, result.GrowthAmount, 0.001f);
+        }
+
+        [Test]
+        public void CalculateGrowth_VeryLargeDeltaTime_CapsAtMaxGrowth()
+        {
+            var conditions = new GrowthConditions(WeatherType.Rain, 20f, SoilQuality.Rich);
+
+            var result = _calculator.CalculateGrowth(_defaultCrop, conditions, currentGrowth: 0f, deltaTime: 100f);
+
+            Assert.AreEqual(100f, result.GrowthAmount, 0.001f);
+            Assert.IsTrue(result.IsFullyGrown);
+        }
+
+        [Test]
+        public void CalculateGrowth_CurrentGrowthExceedsMax_ReturnsZero()
+        {
+            var conditions = new GrowthConditions(WeatherType.Sunny, 20f, SoilQuality.Normal);
+
+            var result = _calculator.CalculateGrowth(_defaultCrop, conditions, currentGrowth: 150f, deltaTime: 1f);
+
+            Assert.AreEqual(0f, result.GrowthAmount, 0.001f);
+            Assert.IsTrue(result.IsFullyGrown);
+        }
+
+        [Test]
+        public void CalculateGrowth_DifferentCropData_UsesProvidedValues()
+        {
+            var fastCrop = new CropData(baseGrowthRate: 50f, maxGrowth: 200f);
+            var conditions = new GrowthConditions(WeatherType.Sunny, 20f, SoilQuality.Normal);
+
+            var result = _calculator.CalculateGrowth(fastCrop, conditions, currentGrowth: 0f, deltaTime: 1f);
+
+            Assert.AreEqual(50f, result.GrowthAmount, 0.001f);
+            Assert.IsFalse(result.IsFullyGrown);
+        }
+
+        [Test]
+        public void CalculateGrowth_VerySmallDeltaTime_PreciseResult()
+        {
+            var conditions = new GrowthConditions(WeatherType.Sunny, 20f, SoilQuality.Normal);
+
+            var result = _calculator.CalculateGrowth(_defaultCrop, conditions, currentGrowth: 0f, deltaTime: 0.01f);
+
+            Assert.AreEqual(0.1f, result.GrowthAmount, 0.001f);
+        }
+
+        [Test]
+        public void CalculateGrowth_ExactlyReachingMax_IsFullyGrown()
+        {
+            var conditions = new GrowthConditions(WeatherType.Sunny, 20f, SoilQuality.Normal);
+
+            var result = _calculator.CalculateGrowth(_defaultCrop, conditions, currentGrowth: 90f, deltaTime: 1f);
+
+            Assert.AreEqual(10f, result.GrowthAmount, 0.001f);
+            Assert.IsTrue(result.IsFullyGrown);
+        }
     }
 }
