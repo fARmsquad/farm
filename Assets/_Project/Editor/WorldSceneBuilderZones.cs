@@ -97,7 +97,6 @@ namespace FarmSimVR.Editor
         }
 
         // ── Paths ────────────────────────────────────────────────
-
         private static void BuildPaths()
         {
             var pathsRoot = CreateEmpty("Paths", Vector3.zero);
@@ -173,7 +172,6 @@ namespace FarmSimVR.Editor
         }
 
         // ── Farm Zone ────────────────────────────────────────────
-
         private static void BuildFarmZone()
         {
             var farm = GameObject.Find("Farm");
@@ -303,7 +301,6 @@ namespace FarmSimVR.Editor
         }
 
         // ── Town Zone ────────────────────────────────────────────
-
         private static void BuildTownZone()
         {
             var town = GameObject.Find("Town");
@@ -395,11 +392,109 @@ namespace FarmSimVR.Editor
             Debug.Log("[WorldSceneBuilder] Town zone populated (buildings, main street, props, trees).");
         }
 
-        // ── Remaining Stubs (future tasks) ───────────────────────
+        // ── Unpopulated Zones ────────────────────────────────────
 
-        private static void BuildUnpopulatedZones() { }
-        private static void BuildVegetation() { }
-        private static void BuildFX() { }
-        private static void BuildMarkers() { }
+        /// <summary>Finds a zone's Markers child. Returns null if zone or child missing.</summary>
+        private static Transform FindZoneMarkers(string zoneName)
+        {
+            var zone = GameObject.Find(zoneName);
+            return zone != null ? zone.transform.Find("Markers") : null;
+        }
+
+        private static void BuildUnpopulatedZones()
+        {
+            // ── North Field ──
+            var m = FindZoneMarkers("NorthField");
+            if (m != null)
+            {
+                var festival = CreateEmpty("FestivalCenter", new Vector3(-120f, 0f, 150f), m);
+                festival.AddComponent<BoxCollider>().isTrigger = true;
+            }
+
+            // ── Sandy Shores ──
+            m = FindZoneMarkers("SandyShores");
+            if (m != null)
+            {
+                CreateEmpty("TrevorTrailerPosition", new Vector3(120f, 0f, 160f), m);
+                for (int i = 0; i < 5; i++)
+                    InstantiatePrefab("Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Pebbles_01.prefab",
+                        new Vector3(50f + i * 30f, 0f, 118f), Quaternion.identity, m);
+            }
+
+            // ── Meadow ──
+            m = FindZoneMarkers("Meadow");
+            if (m != null)
+            {
+                Vector3[] truffleSpots = { new(-150f,0f,-110f), new(-100f,0f,-130f), new(-170f,0f,-140f) };
+                for (int i = 0; i < truffleSpots.Length; i++)
+                    CreateEmpty($"TruffleSpot_{i}", truffleSpots[i], m);
+                for (int i = 0; i < 5; i++)
+                {
+                    var flower = CreateEmpty($"WildflowerSpecies_{i}",
+                        new Vector3(-180f + i * 25f, 0f, -100f - i * 10f), m);
+                    flower.AddComponent<BoxCollider>().isTrigger = true;
+                }
+            }
+
+            // ── County Fair ──
+            m = FindZoneMarkers("CountyFair");
+            if (m != null)
+            {
+                CreateEmpty("TrainLoopCenter", new Vector3(160f, 0f, -120f), m);
+                CreateEmpty("PettingZooArea", new Vector3(150f, 0f, -100f), m);
+                Vector3 fc = new(160f, 0f, -120f);
+                for (int i = 0; i < 8; i++)
+                {
+                    float angle = i * 45f;
+                    float rad = angle * Mathf.Deg2Rad;
+                    var pos = fc + new Vector3(Mathf.Sin(rad) * 35f, 0f, Mathf.Cos(rad) * 35f);
+                    InstantiatePrefab("Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Fence_Fancy_01.prefab",
+                        pos, Quaternion.Euler(0f, angle, 0f), m);
+                }
+            }
+
+            // ── River ──
+            m = FindZoneMarkers("River");
+            if (m != null)
+                CreateEmpty("TheTruthVanPosition", new Vector3(10f, 0f, -140f), m);
+
+            // ── Wildflower Hills ──
+            m = FindZoneMarkers("WildflowerHills");
+            if (m != null)
+            {
+                CreateEmpty("MichaelEaselPosition", new Vector3(0f, 2f, -175f), m);
+                for (int i = 0; i < 5; i++)
+                    CreateEmpty($"FlowerSpawnPoint_{i}", new Vector3(-150f + i * 75f, 0f, -180f), m);
+            }
+
+            // ── Trail ──
+            m = FindZoneMarkers("Trail");
+            if (m != null)
+                CreateEmpty("TenpennyLampPost", new Vector3(0f, 0f, 60f), m);
+
+            Debug.Log("[WorldSceneBuilder] Unpopulated zone markers placed.");
+        }
+
+        // ── FX ───────────────────────────────────────────────────
+
+        private static void BuildFX()
+        {
+            var fxRoot = CreateEmpty("FX", Vector3.zero);
+            InstantiatePrefab("Assets/Synty/PolygonFarm/Prefabs/FX/FX_Pollen_Wind_01.prefab",
+                new Vector3(-130f, 2f, -120f), Quaternion.identity, fxRoot.transform);
+            InstantiatePrefab("Assets/Synty/PolygonFarm/Prefabs/FX/FX_Dust_Wind_01.prefab",
+                new Vector3(120f, 1f, 160f), Quaternion.identity, fxRoot.transform);
+            Debug.Log("[WorldSceneBuilder] World FX placed (pollen, dust).");
+        }
+
+        // ── Markers ──────────────────────────────────────────────
+
+        private static void BuildMarkers()
+        {
+            var markersRoot = CreateEmpty("Markers", Vector3.zero);
+            var spawn = CreateEmpty("SpawnPoint", new Vector3(50f, 0.5f, 45f), markersRoot.transform);
+            spawn.tag = "SpawnPoint";
+            Debug.Log("[WorldSceneBuilder] Global markers placed (SpawnPoint).");
+        }
     }
 }
