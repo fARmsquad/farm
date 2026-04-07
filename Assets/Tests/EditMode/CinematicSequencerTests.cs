@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using UnityEngine;
 using FarmSimVR.MonoBehaviours.Cinematics;
 
 namespace FarmSimVR.Tests.EditMode
@@ -67,6 +68,39 @@ namespace FarmSimVR.Tests.EditMode
             Assert.AreEqual(2, parts.Length);
             Assert.AreEqual("POLLO LOCO", parts[0]);
             Assert.AreEqual("Capture El Pollo Loco", parts[1]);
+        }
+    }
+
+    [TestFixture]
+    public class CinematicSequenceTests
+    {
+        [Test]
+        public void Sequence_CreatedWithEmptySteps()
+        {
+            var sequence = ScriptableObject.CreateInstance<CinematicSequence>();
+
+            Assert.IsNotNull(sequence);
+            Assert.IsNotNull(sequence.steps);
+            Assert.AreEqual(0, sequence.steps.Length);
+
+            Object.DestroyImmediate(sequence);
+        }
+
+        [Test]
+        public void Sequence_StepsAreAssignable()
+        {
+            var sequence = ScriptableObject.CreateInstance<CinematicSequence>();
+            sequence.steps = new[]
+            {
+                new CinematicStep { type = CinematicStepType.Wait, duration = 1f },
+                new CinematicStep { type = CinematicStepType.Fade, floatParam = 1f, duration = 0.5f }
+            };
+
+            Assert.AreEqual(2, sequence.steps.Length);
+            Assert.AreEqual(CinematicStepType.Wait, sequence.steps[0].type);
+            Assert.AreEqual(CinematicStepType.Fade, sequence.steps[1].type);
+
+            Object.DestroyImmediate(sequence);
         }
     }
 }
