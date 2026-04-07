@@ -6,8 +6,21 @@ at playtest checkpoint only. The developer CAN intervene at any point via
 the inbox or direct interrupt, but the pipeline does not WAIT for them.
 
 ## Prerequisites (auto-checked, not human-verified)
+- [ ] Git sync performed (`.ai/scripts/git_sync.sh verify`)
 - [ ] On a feature branch (not main) — create if needed
+- [ ] Branch pushed to origin with tracking (`-u`)
 - [ ] No conflicting flights on flight-board.json
+
+## Phase 0: Git Setup (MANDATORY, before anything else)
+→ Skill: .ai/skills/git-discipline.md
+→ Run `.ai/scripts/git_sync.sh verify` to check current state
+→ If on main:
+  → `git pull origin main`
+  → `.ai/scripts/git_sync.sh create feature/[story-id]-[short-name]`
+→ If on feature branch:
+  → `.ai/scripts/git_sync.sh sync` (fetch + rebase onto origin/main)
+→ If uncommitted changes: stash or commit before proceeding
+→ GATE: `git_sync.sh verify` must pass before entering Phase 1
 
 ## Phase 1: Intake
 → Check .ai/inbox/ for any pending items related to this feature
@@ -17,14 +30,28 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
 → Auto-proceed to Phase 2
 
 ## Phase 2: Spec Package (AUTONOMOUS)
+→ **Step 2a: Web Research (MANDATORY)**
+→ Skill: .ai/skills/unity-research.md
+→ Search how others implement this feature type in Unity
+→ Extract patterns, code snippets, gotchas from 3+ sources
+→ Save research brief to .ai/memory/research-notes.md
+→ This step CANNOT be skipped — no research = no spec
+
+→ **Step 2b: Spec Generation**
 → Skill: .ai/skills/spec-driven-delivery.md
-→ Generate: Feature Spec → Technical Plan → Task Breakdown
+→ Generate: Feature Spec → Technical Plan (with Research Reference) → Task Breakdown
+→ Technical Plan MUST reference research findings and adopted patterns
 → Save to Assets/Specs/Features/[feature].md
 → Commit: `[spec] add specification for [feature]`
+→ Push: `git push` (keep remote branch up to date)
 → Auto-proceed to Phase 3
 → NOTE: if the spec involves a NEW system boundary, architectural uncertainty,
   or a decision that's hard to reverse, DROP a note in .ai/inbox/needs-eyes/
   and continue. The developer can review async and steer later.
+
+**Git checkpoint between Phase 2 → 3:**
+→ `.ai/scripts/git_sync.sh sync` (rebase onto latest origin/main)
+→ If rebase conflicts: resolve, run tests, then proceed
 
 ## Phase 3: TDD Cycle (AUTONOMOUS, agent-to-agent handoff)
 → Skill: .ai/skills/tdd-cycle.md
@@ -33,12 +60,22 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
 ### 3a. RED → GREEN → VERIFY → REFACTOR (pure C# logic)
 
     ┌─────────────────────────────────────────────────┐
+    │  RESEARCH CHECK (before each task)              │
+    │  If task involves a Unity API, pattern, or      │
+    │  system the agent hasn't used before:           │
+    │  → Skill: .ai/skills/unity-research.md          │
+    │  → Quick search (1-2 queries, task-scoped)      │
+    │  → Append findings to research-notes.md         │
+    │  → Implementer MUST read before writing code    │
+    │  ──────────────── then proceed ─────────────── │
+    │                                                 │
     │  tdd-agent (RED)                                │
     │  writes failing tests, confirms they fail       │
     │  commits: [tests] add failing tests for [task]  │
     │  ──────────────── hands off to ──────────────── │
     │                                                 │
     │  implementer (GREEN)                            │
+    │  reads research brief before writing code       │
     │  writes minimal code, confirms tests pass       │
     │  commits: [feature] implement [task]            │
     │  ──────────────── hands off to ──────────────── │
@@ -110,16 +147,38 @@ If the feature requires new 3D models:
 → Commit: `[asset] ingest [model name]`
 
     → Repeat for next task in breakdown
-    → Between tasks: check .ai/inbox/ for developer steering
+    → Between tasks:
+      → Check .ai/inbox/ for developer steering
+      → `git push` (keep remote up to date after each task)
+      → Every 3rd task: `.ai/scripts/git_sync.sh sync` (rebase onto origin/main)
+      → If rebase conflicts: resolve, run tests, then continue
 
 ## Phase 4: Finalization (AUTONOMOUS)
 → Auto-triggered after last task completes. No "ship it" prompt needed.
 → Delegate to .ai/agents/finalizer.md
+
+**Step 4a: Pre-Finalization Git Sync**
+→ `.ai/scripts/git_sync.sh sync` (final rebase onto origin/main)
+→ Run full test suite after rebase: `.ai/scripts/run-tests.sh all`
+→ If tests fail after rebase: fix conflicts, re-run tests
+→ GATE: tests must be green post-rebase before proceeding
+
+**Step 4b: Preflight**
 → Mark spec acceptance criteria as [x]
-→ Run preflight (14 gates: 9 CLI + 5 MCP) — if fails, fix and retry (up to 3 attempts)
-→ Push branch, create PR with full report
-→ Squash-merge to main
-→ Run post-merge verification
+→ Run preflight (17 gates: 12 CLI + 5 MCP) — if fails, fix and retry (up to 3 attempts)
+→ `.ai/scripts/git_sync.sh verify` must pass (included in preflight as gate 9)
+
+**Step 4c: PR + Merge**
+→ `git push` (final push of rebased branch)
+→ Create PR with full report (via `finalize.sh`)
+→ Squash-merge to main (via `finalize.sh --merge`)
+
+**Step 4d: Post-Merge Verification**
+→ `git checkout main && git pull origin main`
+→ `.ai/scripts/run-tests.sh all`
+→ If red on main: **P0** — investigate immediately, do NOT proceed
+→ If green: update SINGLE_SOURCE_OF_TRUTH.md
+→ Delete feature branch (handled by `--delete-branch` in squash-merge)
 → Auto-proceed to Phase 5
 
 ## Phase 5: Playtest Checkpoint (HUMAN GATE — the only one)

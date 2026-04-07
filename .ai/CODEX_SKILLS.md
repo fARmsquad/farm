@@ -5,6 +5,8 @@ These map to .ai/skills/ files that Codex can invoke:
 
 | Skill | File | Use When |
 |-------|------|----------|
+| Git Discipline | git-discipline.md | **MANDATORY** at every phase boundary — pull, branch, commit, merge |
+| Unity Research | unity-research.md | **MANDATORY** before every spec & implementation — web search for patterns |
 | TDD Cycle | tdd-cycle.md | Writing tests and implementation |
 | Story Lookup | story-lookup.md | Finding story context |
 | Spec Delivery | spec-driven-delivery.md | Generating spec packages |

@@ -10,14 +10,9 @@ This is the central tracker for all feature specs. Before building anything, fin
 |----|---------|-------|--------|----------|------------|
 | L1-001 | [Farm Layout (Greybox)](Assets/Specs/Features/L1-001-farm-layout-greybox.md) | L1 | Done | Youssef | -- |
 | L1-002 | [Sky & Lighting](Assets/Specs/Features/L1-002-sky-and-lighting.md) | L1 | Done | Youssef | L1-001 |
-| L2-001 | [Soil System](Assets/Specs/Features/L2-001-soil-system.md) | L2 | Open | -- | -- |
-| L2-002 | [Crop Growth System](Assets/Specs/Features/L2-002-crop-growth-system.md) | L2 | Open | -- | Crop Growth Calc |
-| L2-003 | [Planting System](Assets/Specs/Features/L2-003-planting-system.md) | L2 | Open | -- | L2-001, L2-006 |
-| L2-004 | [Watering System](Assets/Specs/Features/L2-004-watering-system.md) | L2 | Open | -- | L2-001 |
-| L2-005 | [Harvest System](Assets/Specs/Features/L2-005-harvest-system.md) | L2 | Open | -- | L2-002, L2-006 |
-| L2-006 | [Inventory System](Assets/Specs/Features/L2-006-inventory-system.md) | L2 | Open | -- | -- |
 | -- | [Crop Growth Calculator](Assets/Specs/Features/crop-growth-calculator.md) | Core | Done | Youssef | -- |
 | -- | [Farm Scene Demo](Assets/Specs/Features/farm-scene-demo.md) | Demo | Done | Youssef | Crop Growth Calc |
+| L2-007 | [Hunting Chore (Catch Animals)](Assets/Specs/Features/L2-007-hunting-chore.md) | L2 | Open | -- | L1-001 |
 
 **Status values:** `Open` | `Claimed` | `In Progress` | `In Review` | `Done`
 
@@ -35,15 +30,10 @@ Specs are organized in layers. Lower layers are built first.
 | **Core** | Foundation logic | Calculators, data types, utilities |
 | **Demo** | Playable demos | Quick proof-of-concept scenes |
 
-**Build order:** Core and L1 have no dependencies. L2 specs may depend on each other — check the "Depends On" column. A good starting order for L2:
+**Build order:** Core and L1 have no dependencies. L2 specs may depend on each other — check the "Depends On" column.
 
 ```
-L2-006 Inventory (zero deps)
-  --> L2-001 Soil System (zero deps)
-    --> L2-004 Watering (needs Soil)
-    --> L2-003 Planting (needs Soil + Inventory)
-      --> L2-002 Crop Growth (needs Crop Growth Calc)
-        --> L2-005 Harvest (needs Crop Growth + Inventory)
+L2-007 Hunting Chore (needs Farm Layout)
 ```
 
 ---

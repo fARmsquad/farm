@@ -58,6 +58,12 @@ Full TDD orchestration: RED → GREEN → VERIFY → REFACTOR → ASSEMBLE → X
    - validate_script → all scripts compile
    - Optional: manage_profiler → quick perf check
 
+## Git Discipline (per-task)
+- Each agent commits with the correct `[tag]` prefix after its step
+- Stage only specific files (`git add <files>`), never `git add .`
+- After every 3rd task: `.ai/scripts/git_sync.sh sync` (rebase onto origin/main)
+- `git push` after each completed task to keep remote branch current
+
 ## Exit Criteria
 - All tests pass (including new boundary tests)
 - Code meets Quality Contract
@@ -65,3 +71,5 @@ Full TDD orchestration: RED → GREEN → VERIFY → REFACTOR → ASSEMBLE → X
 - Implementation is clean and readable
 - If MonoBehaviour: scene assembled, prefabs created, console clean
 - If XR: interaction components wired, physics layers configured
+- All commits follow `[tag] message` format
+- Branch pushed to origin and synced with main

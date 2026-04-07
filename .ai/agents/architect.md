@@ -10,6 +10,10 @@ Called when a new system is being created or boundaries are unclear.
 - Write ADRs for significant decisions
 - Review implementations for architectural compliance
 - Enforce the Core/ purity rule (no UnityEngine references)
+- **Ensure web research was performed** before approving any technical plan
+  - Check that `.ai/memory/research-notes.md` has a brief for this feature
+  - Verify the Technical Plan has a populated "Research Reference" section
+  - If research is missing: BLOCK and invoke `.ai/skills/unity-research.md`
 
 ## Architecture Principles
 1. Core/ is the brain — pure C#, fully testable, no Unity
