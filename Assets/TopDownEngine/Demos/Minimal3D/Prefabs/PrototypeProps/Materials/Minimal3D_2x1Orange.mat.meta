@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b0a3ae0f8b8395b4fa158984c3ad916a
+timeCreated: 1450115908
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Materials/Minimal3D_2x1Orange.mat
+  uploadId: 846008

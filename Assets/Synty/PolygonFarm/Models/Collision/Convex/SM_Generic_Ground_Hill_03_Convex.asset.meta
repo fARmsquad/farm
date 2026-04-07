@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9e08adb7125bc754cad57360a0cffe46
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43660746554810274
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Generic_Ground_Hill_03_Convex.asset
+  uploadId: 864500

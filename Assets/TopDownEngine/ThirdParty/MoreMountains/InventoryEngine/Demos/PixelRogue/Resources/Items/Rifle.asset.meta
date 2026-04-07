@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9cb7ee4b9d5371f4eafac88145088a01
+timeCreated: 1463396279
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Resources/Items/Rifle.asset
+  uploadId: 846008

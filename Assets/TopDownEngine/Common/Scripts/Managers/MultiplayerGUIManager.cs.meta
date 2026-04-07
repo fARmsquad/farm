@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: fb67650f8b3c0d24390680d6ffeb41f9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Managers/MultiplayerGUIManager.cs
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ef55da2671b55de42ac772579e5f8a70
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/Weapons/Weapons/LoftSwordFast.prefab
+  uploadId: 846008

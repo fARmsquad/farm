@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ff206234f07a26f4a865e710dbd7859d
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Explodudes/Prefabs/PlayableCharacters/ExplodudeBlue.prefab
+  uploadId: 846008

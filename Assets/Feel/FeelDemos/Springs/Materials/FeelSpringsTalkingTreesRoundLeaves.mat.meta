@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 36b92ddd93b051d4ba81d29eed6e3c58
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Springs/Materials/FeelSpringsTalkingTreesRoundLeaves.mat
+  uploadId: 830868

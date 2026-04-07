@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 7c5467fa0553c064391f36f2c864d975
+timeCreated: 1512703520
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/VerticalGradientBlueToPurple/ButtonSquareChevron.prefab
+  uploadId: 846008

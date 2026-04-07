@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ca5441f64b4031145a497117868cc766
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43857019484523436
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Chilli_01_S_Convex.asset
+  uploadId: 864500

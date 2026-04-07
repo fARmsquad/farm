@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 12b5ede874e698048b6aed355a6066e1
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Letters/Cinemachine/FeelLettersDemoVerticalImpulse.asset
+  uploadId: 830868

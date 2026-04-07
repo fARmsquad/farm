@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c1eaf5d88ec473b4e9700e4ae727ed1f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43777780866050424
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Road_Gravel_Corner_01_Convex.asset
+  uploadId: 864500

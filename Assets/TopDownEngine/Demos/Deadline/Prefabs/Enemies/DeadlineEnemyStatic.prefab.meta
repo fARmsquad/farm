@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f768072491247b6409dcd13de411abc2
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Prefabs/Enemies/DeadlineEnemyStatic.prefab
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2f3dcb1622dd58d4a93fa1b80094e9c5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43895943103161744
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Box_Plum_01_Convex.asset
+  uploadId: 864500

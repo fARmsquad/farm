@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bc99a028cdd0c3a43b448697f7301bb1
+timeCreated: 1450054120
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Materials/Minimal3D_2x2-grey.mat
+  uploadId: 846008

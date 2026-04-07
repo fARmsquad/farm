@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b995ae69aad7a1543bf3f21f1c190dfe
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/Props/LoftCrouchBarrier.prefab
+  uploadId: 846008

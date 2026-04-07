@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 95a84b442e98a37428865aa09f7e9efb
+timeCreated: 1428685688
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal2D/MinimalSandbox2D.unity
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 815522c3c66a5e04ca6deae2c319a928
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/PlayableCharacters/LoftSuspenders.prefab
+  uploadId: 846008

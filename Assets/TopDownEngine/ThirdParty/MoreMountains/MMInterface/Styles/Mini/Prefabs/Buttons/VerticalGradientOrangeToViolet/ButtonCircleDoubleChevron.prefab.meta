@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 98a9de6bb86c9be4d88a01c4f65357a2
+timeCreated: 1512701800
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/VerticalGradientOrangeToViolet/ButtonCircleDoubleChevron.prefab
+  uploadId: 846008

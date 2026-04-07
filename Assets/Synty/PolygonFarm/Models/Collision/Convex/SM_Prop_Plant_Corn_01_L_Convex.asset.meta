@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: efcf590b8631ecb4fb53642b8dbd0fb7
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43780766851904554
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Plant_Corn_01_L_Convex.asset
+  uploadId: 864500

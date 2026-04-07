@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 93b39336c7407ba4cb17a6d77dfa9605
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/Feel/MMTools/Accessories/MMShaders/MMWorldspace.shader
+  uploadId: 846008

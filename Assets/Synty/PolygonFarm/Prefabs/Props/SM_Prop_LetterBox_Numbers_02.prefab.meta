@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5306db913b9a8de49a5ed4cce277e958
+timeCreated: 1555551066
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_LetterBox_Numbers_02.prefab
+  uploadId: 864500

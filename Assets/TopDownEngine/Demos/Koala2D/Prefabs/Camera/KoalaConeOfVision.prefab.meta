@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 538047a3664fb834ca2dfaf3644a6bcd
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Camera/KoalaConeOfVision.prefab
+  uploadId: 846008

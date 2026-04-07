@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 451dcc6c65f7aaa4b904d45d7e5e9b6d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Animations/KoalaDungeonChestOpen.anim
+  uploadId: 846008

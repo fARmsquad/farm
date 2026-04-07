@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 16cc9c38c66c5284fafe24a0a5f5ced2
+timeCreated: 1512435132
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Backgrounds/DemoBackgroundYellow.prefab
+  uploadId: 846008

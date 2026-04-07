@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: a715744943c8b5541bb9f4917c10fd28
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Prefabs/Props/GrasslandsCoin.prefab
+  uploadId: 846008

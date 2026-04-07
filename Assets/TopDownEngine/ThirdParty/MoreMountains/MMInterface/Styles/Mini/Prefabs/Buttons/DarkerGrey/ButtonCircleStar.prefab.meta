@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: f13986c77d6bfd54e9c5248975f45fdc
+timeCreated: 1512704129
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/DarkerGrey/ButtonCircleStar.prefab
+  uploadId: 846008

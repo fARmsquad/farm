@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 61f3ff90924ac2e4c9b756cd443ddfd7
+timeCreated: 1512442321
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/TextSubtitleDark.prefab
+  uploadId: 846008

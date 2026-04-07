@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4b0390819f518774fa1a44198298459a
+timeCreated: 1548814028
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Shaders/SyntyStudios_Trees.shader
+  uploadId: 731838

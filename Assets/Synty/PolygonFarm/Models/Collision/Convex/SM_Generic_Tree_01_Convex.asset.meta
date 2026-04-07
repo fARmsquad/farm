@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9edb1a26e6397fb4b81f3454818dcce4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43931990860459370
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Generic_Tree_01_Convex.asset
+  uploadId: 864500

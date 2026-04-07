@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 7be6312967053e94692000c19fd00461
+timeCreated: 1527651290
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/FX/FX_Prefabs/SM_StreamParticle_Small.prefab
+  uploadId: 731838

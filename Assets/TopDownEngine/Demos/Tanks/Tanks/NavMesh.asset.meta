@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3f2934e76edcc574db4564f8f91d6be6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 23800000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Tanks/Tanks/NavMesh.asset
+  uploadId: 846008

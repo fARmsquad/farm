@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 871bf268df24d8a49943529b60f79880
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Models/Furniture/Materials/lamp.mat
+  uploadId: 846008

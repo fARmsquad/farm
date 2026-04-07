@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6acdc87797a4591429e364b530e9e4f9
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Letters/Materials/FeelLettersDemoMM2DReflection.mat
+  uploadId: 830868

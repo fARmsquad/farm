@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 86108278c48c3044c9d742004a9adf8a
+timeCreated: 1463215409
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Sprites/PixelInventorySelectorIdle.anim
+  uploadId: 846008

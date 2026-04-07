@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: cd3e925c9936b18409faf2e3b55f7e20
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/PlayableCharacters/LoftTie.prefab
+  uploadId: 846008

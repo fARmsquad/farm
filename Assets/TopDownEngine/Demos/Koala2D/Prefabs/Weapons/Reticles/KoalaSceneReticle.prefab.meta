@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: f08bfeb16a6183b4386f121ccf51b56e
+timeCreated: 1522125339
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Weapons/Reticles/KoalaSceneReticle.prefab
+  uploadId: 846008

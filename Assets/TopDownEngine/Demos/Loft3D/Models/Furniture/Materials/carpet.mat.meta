@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f2dd8474c6d2c794bb34bbb7d45ed0d2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Models/Furniture/Materials/carpet.mat
+  uploadId: 846008

@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 9dc3715ceeed93c4ea524deda0b03b42
+timeCreated: 1498483222
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/InventoryEngine/Scripts/GUI/InventorySoundPlayer.cs
+  uploadId: 846008

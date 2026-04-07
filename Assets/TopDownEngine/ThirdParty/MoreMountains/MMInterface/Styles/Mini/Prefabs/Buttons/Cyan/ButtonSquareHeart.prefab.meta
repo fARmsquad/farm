@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: ef1e6a94834068e408b09f2c3d75a15e
+timeCreated: 1512704231
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Cyan/ButtonSquareHeart.prefab
+  uploadId: 846008

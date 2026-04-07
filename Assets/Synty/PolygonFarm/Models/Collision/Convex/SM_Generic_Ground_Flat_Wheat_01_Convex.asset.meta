@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0be4b5486bb66644783da128d0b77d7b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43826663553727930
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Generic_Ground_Flat_Wheat_01_Convex.asset
+  uploadId: 864500

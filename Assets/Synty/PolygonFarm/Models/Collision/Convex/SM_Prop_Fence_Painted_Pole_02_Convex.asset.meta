@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e069661fc4cd05a458e34d642d767eb5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43039658247235488
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Fence_Painted_Pole_02_Convex.asset
+  uploadId: 864500

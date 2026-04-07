@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 57e02a55277772f4e8a2bd2f44f5faa8
+timeCreated: 1523124643
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/ItemPickers/LoftAmmoCrateHandgun.prefab
+  uploadId: 846008

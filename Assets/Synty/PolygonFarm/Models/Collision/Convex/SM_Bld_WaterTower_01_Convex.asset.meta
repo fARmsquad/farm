@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: dc7687b1d11c3bf4880584038fab23e2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43356142777726842
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Bld_WaterTower_01_Convex.asset
+  uploadId: 864500

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 65207112181da7b41bee2bb13af8b883
+timeCreated: 1522535341
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/Weapons/Reticles/LoftUIReticle.prefab
+  uploadId: 846008

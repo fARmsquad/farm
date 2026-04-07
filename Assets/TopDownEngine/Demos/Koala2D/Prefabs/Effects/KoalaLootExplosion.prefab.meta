@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d88b268321284024c91d46a128981f88
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Effects/KoalaLootExplosion.prefab
+  uploadId: 846008

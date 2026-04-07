@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: c057a64b9f42334498c8bf4d35b83cec
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Editor/DefineSymbols/TopDownEngineDefineSymbols.cs
+  uploadId: 846008

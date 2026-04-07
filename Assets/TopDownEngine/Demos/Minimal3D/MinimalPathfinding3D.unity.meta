@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: cf1765d7f98243b4185a616df4e45868
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/MinimalPathfinding3D.unity
+  uploadId: 846008

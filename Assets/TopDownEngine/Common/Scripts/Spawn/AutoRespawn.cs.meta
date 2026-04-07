@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 4bbbe51f9806750489b5fe08d7a19729
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Spawn/AutoRespawn.cs
+  uploadId: 846008

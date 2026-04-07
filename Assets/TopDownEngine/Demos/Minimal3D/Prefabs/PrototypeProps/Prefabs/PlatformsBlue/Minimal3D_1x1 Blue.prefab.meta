@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: fada082eba94c4a43b6723e828602a12
+timeCreated: 1450047899
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Prefabs/PlatformsBlue/Minimal3D_1x1
+    Blue.prefab
+  uploadId: 846008

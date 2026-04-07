@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 641dda5f50d549e4296c32b83ef5ea35
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43156132513123510
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Fence_Wood_Round_Inset_01_Convex.asset
+  uploadId: 864500

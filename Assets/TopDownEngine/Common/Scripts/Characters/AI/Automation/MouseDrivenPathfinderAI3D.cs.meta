@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 54ce676664edd67419385f01ea09f259
+timeCreated: 1523201533
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Characters/AI/Automation/MouseDrivenPathfinderAI3D.cs
+  uploadId: 846008

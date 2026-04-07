@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 155fc19512bc7994f9164ccbc8b7e305
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Brass/Prefabs/VisualizerBlock.prefab
+  uploadId: 830868

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 61145038cdf1b5445bd5e1647208fc03
+timeCreated: 1505825405
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Common/Animations/Buttons/Animations/DefaultPlaceholders/MMI_ButtonPressedFirstTime.anim
+  uploadId: 846008

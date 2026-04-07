@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ef1f777facc2a024c8bc6aecad8c85c1
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/CardsUI/Prefabs/FeelCardsUI_Card_Lady.prefab
+  uploadId: 830868

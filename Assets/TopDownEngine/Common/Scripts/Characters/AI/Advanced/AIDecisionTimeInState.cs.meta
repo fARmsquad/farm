@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: a21818f4def5bf646bec3d25770336cb
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Characters/AI/Advanced/AIDecisionTimeInState.cs
+  uploadId: 846008

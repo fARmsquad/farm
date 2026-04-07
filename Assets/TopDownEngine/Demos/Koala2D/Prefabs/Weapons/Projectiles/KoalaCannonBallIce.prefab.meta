@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d73e20d1c87574a4898c8d17895ba749
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Weapons/Projectiles/KoalaCannonBallIce.prefab
+  uploadId: 846008

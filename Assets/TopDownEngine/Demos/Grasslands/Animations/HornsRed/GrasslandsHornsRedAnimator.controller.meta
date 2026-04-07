@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d616ba57d25945642bd9c634af020114
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Animations/HornsRed/GrasslandsHornsRedAnimator.controller
+  uploadId: 846008

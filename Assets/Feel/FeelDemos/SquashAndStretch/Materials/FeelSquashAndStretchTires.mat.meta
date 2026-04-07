@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 913454faafb0f7447b1c7d1f27b85cab
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/SquashAndStretch/Materials/FeelSquashAndStretchTires.mat
+  uploadId: 830868

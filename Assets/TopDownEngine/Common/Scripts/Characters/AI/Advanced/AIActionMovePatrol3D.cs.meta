@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: ab38fb8d19ed4db48b4e6216a171c08f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Characters/AI/Advanced/AIActionMovePatrol3D.cs
+  uploadId: 846008

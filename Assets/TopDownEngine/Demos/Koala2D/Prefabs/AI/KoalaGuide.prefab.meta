@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 28d887d375ed5dd45a295c6ab7514c38
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/AI/KoalaGuide.prefab
+  uploadId: 846008

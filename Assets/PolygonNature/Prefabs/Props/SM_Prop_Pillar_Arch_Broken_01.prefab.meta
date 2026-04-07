@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: fd921613d01afe147bd4484079e12889
+timeCreated: 1527820967
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Props/SM_Prop_Pillar_Arch_Broken_01.prefab
+  uploadId: 731838

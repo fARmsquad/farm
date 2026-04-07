@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a383debb8fe64614fa95efaf685404ec
+timeCreated: 1528253035
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_Swamp_Growth_03.prefab
+  uploadId: 731838

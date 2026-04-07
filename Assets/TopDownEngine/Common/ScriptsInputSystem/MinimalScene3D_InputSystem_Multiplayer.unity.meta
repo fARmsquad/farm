@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7972c7f028000fa4db9cc7937a354d19
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/ScriptsInputSystem/MinimalScene3D_InputSystem_Multiplayer.unity
+  uploadId: 846008

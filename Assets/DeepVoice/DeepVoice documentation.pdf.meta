@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 50df83c5cb9b2914ea03387459516e49
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 251738
+  packageName: DeepVoice AI - Text To Voice
+  packageVersion: 2.1.5
+  assetPath: Assets/DeepVoice/DeepVoice documentation.pdf
+  uploadId: 883842

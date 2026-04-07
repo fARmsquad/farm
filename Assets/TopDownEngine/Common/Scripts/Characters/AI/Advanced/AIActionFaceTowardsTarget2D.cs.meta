@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 1148b739e4c74b8478868d1834fbcd66
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Characters/AI/Advanced/AIActionFaceTowardsTarget2D.cs
+  uploadId: 846008

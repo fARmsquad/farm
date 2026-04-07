@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 43c50bae6746697438e0125e37685f9d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/SquashAndStretch/Materials/FeelSquashAndStretchSkybox.mat
+  uploadId: 830868

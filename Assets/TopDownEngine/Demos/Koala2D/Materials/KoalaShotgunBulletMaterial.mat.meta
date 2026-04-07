@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3f6b0a334e5a4b44cab8e9afcdf6899a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Materials/KoalaShotgunBulletMaterial.mat
+  uploadId: 846008

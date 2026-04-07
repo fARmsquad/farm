@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b04b20e263db7ca418507b80989d7a36
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43175443575244642
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Hay_Bale_Square_01_Convex.asset
+  uploadId: 864500

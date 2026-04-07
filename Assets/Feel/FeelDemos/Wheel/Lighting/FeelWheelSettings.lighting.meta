@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fba621ea892fe7a4bac828f417cf9d12
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Wheel/Lighting/FeelWheelSettings.lighting
+  uploadId: 830868

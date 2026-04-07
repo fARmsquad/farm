@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 3b44a38ec6f81134ab0f820ac54d6a93
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 625f186215c104763be7675aa2d941aa, type: 3}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonGeneric/Shaders/Generic_Standard.shadergraph
+  uploadId: 864500

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 8ac9dc199fdb4d8479ee2fe42a5923fb
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/KoalaProceduralTilemap.unity
+  uploadId: 846008

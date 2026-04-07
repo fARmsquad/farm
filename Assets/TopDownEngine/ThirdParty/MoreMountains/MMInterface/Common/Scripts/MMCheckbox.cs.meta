@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 6f012248ffc909b4d81f9c2c53b485de
+timeCreated: 1511832035
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Common/Scripts/MMCheckbox.cs
+  uploadId: 846008

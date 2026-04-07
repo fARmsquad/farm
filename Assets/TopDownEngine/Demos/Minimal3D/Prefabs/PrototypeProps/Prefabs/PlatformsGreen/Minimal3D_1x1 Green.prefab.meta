@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e8ae14751350e9441a0d7901c0f1d20c
+timeCreated: 1450047886
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Prefabs/PlatformsGreen/Minimal3D_1x1
+    Green.prefab
+  uploadId: 846008

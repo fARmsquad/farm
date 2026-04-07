@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e37e6ff3582bfef49a5325d28176b278
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 251738
+  packageName: DeepVoice AI - Text To Voice
+  packageVersion: 2.1.5
+  assetPath: Assets/DeepVoice/DeepVoice FAQs.txt
+  uploadId: 883842

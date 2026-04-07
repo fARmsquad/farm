@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c76cdd87437953143bb903878eb09c3a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43620272690677518
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Fence_Fancy_Pole_Spike_01_Convex.asset
+  uploadId: 864500

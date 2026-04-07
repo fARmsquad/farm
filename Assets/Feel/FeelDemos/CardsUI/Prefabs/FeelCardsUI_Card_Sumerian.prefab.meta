@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b3f6473bddc357f499dbcb5855925796
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/CardsUI/Prefabs/FeelCardsUI_Card_Sumerian.prefab
+  uploadId: 830868

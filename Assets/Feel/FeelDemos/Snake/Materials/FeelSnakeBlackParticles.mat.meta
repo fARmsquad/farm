@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bf243365243d66a45824d9d35ef3f4b1
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Snake/Materials/FeelSnakeBlackParticles.mat
+  uploadId: 830868

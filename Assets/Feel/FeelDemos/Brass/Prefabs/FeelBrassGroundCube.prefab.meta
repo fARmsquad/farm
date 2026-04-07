@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f387d7390bcfb5547a998be6fe4911af
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Brass/Prefabs/FeelBrassGroundCube.prefab
+  uploadId: 830868

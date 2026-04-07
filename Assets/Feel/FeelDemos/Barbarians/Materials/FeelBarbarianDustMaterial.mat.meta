@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f9f06616b5d3b9c4ba15f46a02eb14f6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Barbarians/Materials/FeelBarbarianDustMaterial.mat
+  uploadId: 830868

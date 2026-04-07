@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d7ac6b4c983e75e4ca694fecdec954a2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43040884609212402
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Generic_Small_Rocks_03_Convex.asset
+  uploadId: 864500

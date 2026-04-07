@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7bd177d969121b44ea36702fde241983
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Animations/DeadlineDudeIdleUpperUnarmed.anim
+  uploadId: 846008

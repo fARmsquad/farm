@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0789d73a41ec9a84c9ad76fb0ca559c1
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Tactical/Prefabs/FeelTacticalMuzzleflash.prefab
+  uploadId: 830868

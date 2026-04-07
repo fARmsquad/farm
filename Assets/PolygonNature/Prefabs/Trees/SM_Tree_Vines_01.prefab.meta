@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: f3da837e16e9f174c815da408e07d7e7
+timeCreated: 1528163992
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Trees/SM_Tree_Vines_01.prefab
+  uploadId: 731838

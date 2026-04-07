@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c048a8d9edbf48f429f3b6982a5b7f35
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Animations/KoalaJump.anim
+  uploadId: 846008

@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 7ef7cadc24177984fa6b69c84cc314e3
+timeCreated: 1461939201
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Scripts/ChangeLevel.cs
+  uploadId: 846008

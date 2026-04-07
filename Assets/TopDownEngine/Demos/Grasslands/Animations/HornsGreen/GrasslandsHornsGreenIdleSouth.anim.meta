@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7be50abf9cfab1e4ab0f959916403834
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Animations/HornsGreen/GrasslandsHornsGreenIdleSouth.anim
+  uploadId: 846008

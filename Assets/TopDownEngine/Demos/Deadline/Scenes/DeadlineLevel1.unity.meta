@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 85a874a8f26cd3d4baec82b1c6b092cd
+timeCreated: 1428685688
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Scenes/DeadlineLevel1.unity
+  uploadId: 846008

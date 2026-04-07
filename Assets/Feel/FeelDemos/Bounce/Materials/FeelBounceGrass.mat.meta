@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 005f4e5e7a449f44da6e5d9f19273700
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Bounce/Materials/FeelBounceGrass.mat
+  uploadId: 830868

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 90e308199efd77b40a128a80d6f655bb
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Prefabs/Props/DeadlineStairs.prefab
+  uploadId: 846008

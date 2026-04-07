@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e3cd882847f3b274485b6d2e747fea8a
+timeCreated: 1528253033
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_Ice_01.prefab
+  uploadId: 731838

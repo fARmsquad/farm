@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0ec100da9444a5a4e9522ab8e9c82e66
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43992332114777616
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Generic_Ocean_Tile_Bumps_01_Convex.asset
+  uploadId: 864500

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: a493807fdd6e16b498ee2f998e5a34a1
+timeCreated: 1512704523
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Yellow/ButtonMain.prefab
+  uploadId: 846008

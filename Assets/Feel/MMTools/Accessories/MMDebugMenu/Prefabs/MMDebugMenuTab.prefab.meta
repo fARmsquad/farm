@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: a8296d633c27f554a99bbbf94958722e
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/Feel/MMTools/Accessories/MMDebugMenu/Prefabs/MMDebugMenuTab.prefab
+  uploadId: 846008

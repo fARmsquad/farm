@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3020bbafd98a5c24d8c8c5a1def820ee
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43456843676707040
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Dirt_Mound_01_Convex.asset
+  uploadId: 864500

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1be7462334fbf9c458f4871cc7b271f2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Explodudes/Materials/Picker/ExplodudesPickerBombMaterial.mat
+  uploadId: 846008

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: f01eddd4adeecd24bac7e3397aa7c635
+timeCreated: 1528776585
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Materials/LODS/PolygonNature_Tree_Dead_Branch_LOD_01.mat
+  uploadId: 731838

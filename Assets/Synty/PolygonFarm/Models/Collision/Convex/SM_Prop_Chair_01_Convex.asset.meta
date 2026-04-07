@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 69d6a3e2083f45b40a36dd36582d130b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43553120445311096
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Chair_01_Convex.asset
+  uploadId: 864500

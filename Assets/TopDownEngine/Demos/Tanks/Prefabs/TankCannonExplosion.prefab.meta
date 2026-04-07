@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: caa026849e9b13949b4e516dc4926394
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Tanks/Prefabs/TankCannonExplosion.prefab
+  uploadId: 846008

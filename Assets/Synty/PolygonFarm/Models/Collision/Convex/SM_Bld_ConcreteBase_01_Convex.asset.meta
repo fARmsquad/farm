@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 18290ee5017eb9f48a46fd9f6eabfeca
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43538332716131876
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Bld_ConcreteBase_01_Convex.asset
+  uploadId: 864500

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a8abb708fd476134d8cc8ba0e0678d00
+timeCreated: 1527820962
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_Ground_Mound_Large_02.prefab
+  uploadId: 731838

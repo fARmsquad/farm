@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c30f6ae2f51f28749b062a9278ea6d0d
+timeCreated: 1556838251
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Vehicles/SM_Veh_Harvester_01.prefab
+  uploadId: 864500

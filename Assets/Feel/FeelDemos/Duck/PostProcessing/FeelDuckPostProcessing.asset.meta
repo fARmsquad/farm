@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0b5b9dcef5be1c146a350a7bb7912b46
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Duck/PostProcessing/FeelDuckPostProcessing.asset
+  uploadId: 830868

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ecc31760c7cae9a42945623ef5e2269a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43450052808701878
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Lemon_01_Convex.asset
+  uploadId: 864500

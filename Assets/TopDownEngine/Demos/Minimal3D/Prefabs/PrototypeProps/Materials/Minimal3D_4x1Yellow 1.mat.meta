@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: dd8d390e9ab1b1b42bc7f197a9be56c3
+timeCreated: 1450115952
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Materials/Minimal3D_4x1Yellow
+    1.mat
+  uploadId: 846008

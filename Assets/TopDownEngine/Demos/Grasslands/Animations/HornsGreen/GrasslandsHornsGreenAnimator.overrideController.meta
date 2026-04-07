@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4c0f37550a90f3e4384b747de46f1545
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 22100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Animations/HornsGreen/GrasslandsHornsGreenAnimator.overrideController
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: eaea6c76752fa034baf7c636b83e8113
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Brass/Materials/FeelBrassBody.mat
+  uploadId: 830868

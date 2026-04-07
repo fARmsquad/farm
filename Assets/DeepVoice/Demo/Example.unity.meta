@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2a4f966578604094cb1a4d0984b29e6e
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 251738
+  packageName: DeepVoice AI - Text To Voice
+  packageVersion: 2.1.5
+  assetPath: Assets/DeepVoice/Demo/Example.unity
+  uploadId: 883842

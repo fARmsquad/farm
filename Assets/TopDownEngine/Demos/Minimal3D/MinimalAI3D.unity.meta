@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: eca176f2c9bd38a49becfb40aa180fe6
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/MinimalAI3D.unity
+  uploadId: 846008

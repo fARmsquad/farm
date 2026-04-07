@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9edcf7e494cf3e640b18cb7495fb179a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/Camera/Minimal3DCameras
+    --------------------------------------------------------.prefab
+  uploadId: 846008

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 330d6fd22ef1a1740b6f80742ec38783
+timeCreated: 1511398483
+licenseType: Store
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/license.txt
+  uploadId: 846008

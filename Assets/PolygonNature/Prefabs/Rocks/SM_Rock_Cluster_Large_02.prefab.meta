@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3f5c1fbf9d80c004582c417d17255b6d
+timeCreated: 1527820961
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Rocks/SM_Rock_Cluster_Large_02.prefab
+  uploadId: 731838

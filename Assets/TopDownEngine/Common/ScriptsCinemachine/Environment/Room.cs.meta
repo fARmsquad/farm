@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: fae51a15a2f3b284e88ab7b9e26296e1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/ScriptsCinemachine/Environment/Room.cs
+  uploadId: 846008

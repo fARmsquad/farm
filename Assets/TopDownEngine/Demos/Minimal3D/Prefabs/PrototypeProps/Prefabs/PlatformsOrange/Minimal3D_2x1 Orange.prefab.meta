@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5d3c1ce2f6b2450489dce72f431aa1ba
+timeCreated: 1450116234
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Prefabs/PlatformsOrange/Minimal3D_2x1
+    Orange.prefab
+  uploadId: 846008

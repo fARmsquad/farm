@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: ba9b9e1546685ed45b8d54e05f8c41e2
+timeCreated: 1512704443
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Orange/ButtonSquareCross.prefab
+  uploadId: 846008

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 24ff5d9462c103e4fb3c70f4590102c0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Items/InventoryEngineChest.cs
+  uploadId: 846008

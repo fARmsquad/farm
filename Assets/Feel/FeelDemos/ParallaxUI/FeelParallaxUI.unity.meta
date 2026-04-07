@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 75b96fd966e7fdf4293af9c566c41543
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/ParallaxUI/FeelParallaxUI.unity
+  uploadId: 830868

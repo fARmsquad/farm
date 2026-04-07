@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 822e7d95233a6f44f8228c394a95344c
+timeCreated: 1450118404
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Prefabs/Props/Minimal3D_FallingPlatform.prefab
+  uploadId: 846008

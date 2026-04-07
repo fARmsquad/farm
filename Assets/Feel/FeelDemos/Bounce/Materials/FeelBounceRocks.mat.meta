@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d6113590b867fc94ebee0c2351ee5629
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Bounce/Materials/FeelBounceRocks.mat
+  uploadId: 830868

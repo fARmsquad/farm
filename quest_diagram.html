@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quest Mechanic Diagram</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    body {
+      background: #1a1a2e;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+      font-family: sans-serif;
+    }
+    .mermaid {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="mermaid">
+flowchart TD
+    A([Quest Board]) -->|Accept Quest| B[Talk to Elder Maren]
+    B --> C{Received Quest Items?}
+    C -->|No| D[Collect 3 Ancient Shards]
+    D --> D1[Shard 1: Dungeon Chest]
+    D --> D2[Shard 2: Defeat Cave Troll]
+    D --> D3[Shard 3: Buy from Merchant]
+    D1 & D2 & D3 --> E{All Shards Collected?}
+    E -->|No| D
+    E -->|Yes| F[Return to Elder Maren]
+    C -->|Yes| F
+    F --> G[Craft the Amulet of Dawn]
+    G --> H{Shrine Unlocked?}
+    H -->|No| I[Find the Hidden Shrine]
+    I --> J[Solve the Stone Puzzle]
+    J --> H
+    H -->|Yes| K[Place Amulet at Shrine]
+    K --> L{Enemy Ambush!}
+    L -->|Defeated| M[Cutscene: Seal the Rift]
+    L -->|Fled| N[Respawn at Shrine Entrance]
+    N --> K
+    M --> O[Talk to Elder Maren]
+    O --> P([Quest Complete])
+    P --> Q[Rewards: XP + Gold + New Title]
+  </div>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+  </script>
+</body>
+</html>

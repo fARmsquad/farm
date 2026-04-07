@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a38d69d3971833f49ade33861c89bcd6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Models/Characters/Tie/Materials/Skin.mat
+  uploadId: 846008

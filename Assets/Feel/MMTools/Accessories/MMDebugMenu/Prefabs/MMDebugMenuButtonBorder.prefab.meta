@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f2be8011322fbf943a44edc64dedbf2c
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/Feel/MMTools/Accessories/MMDebugMenu/Prefabs/MMDebugMenuButtonBorder.prefab
+  uploadId: 846008

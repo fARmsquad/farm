@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5c72273bb626309448d894165a04778a
+timeCreated: 1556855786
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/FX/FX_Pollen_Wind_01.prefab
+  uploadId: 864500

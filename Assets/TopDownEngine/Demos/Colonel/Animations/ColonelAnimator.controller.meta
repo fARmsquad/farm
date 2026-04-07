@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 412a6930e81dc4c5b8043991ffe0bd94
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Colonel/Animations/ColonelAnimator.controller
+  uploadId: 846008

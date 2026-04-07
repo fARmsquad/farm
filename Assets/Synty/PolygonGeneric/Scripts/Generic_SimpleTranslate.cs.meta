@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 0c4c6015e0d876947938b75428e3cad6
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonGeneric/Scripts/Generic_SimpleTranslate.cs
+  uploadId: 864500

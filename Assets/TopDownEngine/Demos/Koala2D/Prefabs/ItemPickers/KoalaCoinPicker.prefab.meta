@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 78d526a077e4aa341b992c1070338a64
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/ItemPickers/KoalaCoinPicker.prefab
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 93ab16666c9a9b4468643c3af2b8ba78
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43041998693315920
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Plant_Ground_01_L2_Convex.asset
+  uploadId: 864500

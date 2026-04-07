@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 81880a79669ae8144b9731aa792a2dde
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal2D/Prefabs/PlayableCharacters/MinimalSpaceship2D.prefab
+  uploadId: 846008

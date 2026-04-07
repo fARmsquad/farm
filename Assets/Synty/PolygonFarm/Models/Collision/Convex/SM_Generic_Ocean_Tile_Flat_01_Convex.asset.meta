@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7642a1d88e40fee42aee2e48731e4395
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43122353358029728
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Generic_Ocean_Tile_Flat_01_Convex.asset
+  uploadId: 864500

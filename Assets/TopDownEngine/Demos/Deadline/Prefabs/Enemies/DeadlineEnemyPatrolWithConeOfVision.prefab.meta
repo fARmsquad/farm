@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 1c8e72c642ea1874f86c0103313dccf0
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Prefabs/Enemies/DeadlineEnemyPatrolWithConeOfVision.prefab
+  uploadId: 846008

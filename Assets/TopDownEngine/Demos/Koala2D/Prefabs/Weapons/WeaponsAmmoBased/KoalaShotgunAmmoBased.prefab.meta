@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0b3b88a020f3c4d49a7cca12aec62803
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Weapons/WeaponsAmmoBased/KoalaShotgunAmmoBased.prefab
+  uploadId: 846008

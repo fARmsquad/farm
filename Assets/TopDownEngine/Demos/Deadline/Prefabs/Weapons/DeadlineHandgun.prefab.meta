@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 027a63a96f809b443b1fec5f58ad432b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Prefabs/Weapons/DeadlineHandgun.prefab
+  uploadId: 846008

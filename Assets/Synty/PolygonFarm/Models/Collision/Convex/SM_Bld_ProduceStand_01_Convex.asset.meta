@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 560a450a32995584fba96d4a78c21758
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43965640075710556
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Bld_ProduceStand_01_Convex.asset
+  uploadId: 864500

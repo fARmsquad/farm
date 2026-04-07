@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 5368d2e2e3d277e4da4498e2dc72d17f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Characters/AI/Advanced/AIDecisionConditionState.cs
+  uploadId: 846008

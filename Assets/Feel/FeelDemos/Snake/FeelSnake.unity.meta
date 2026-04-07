@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 3c3c000a82c344d4a824451d8abff6b6
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Snake/FeelSnake.unity
+  uploadId: 830868

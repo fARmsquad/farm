@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: dfa4dee83f0eda54d88213d777eae141
+timeCreated: 1512704521
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Yellow/ButtonCircleCoin.prefab
+  uploadId: 846008

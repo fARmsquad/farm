@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2048a0881b76925429f164e9dbf6f45f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43148426249713048
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Lettuce_01_L_Convex.asset
+  uploadId: 864500

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e8d7c9f9d184fc944abddbcd3c4a2fbf
+timeCreated: 1527820967
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Rocks/SM_Rock_Tile_03.prefab
+  uploadId: 731838

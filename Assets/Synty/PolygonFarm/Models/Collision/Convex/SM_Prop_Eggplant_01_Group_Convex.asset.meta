@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c44f62006a4bbbe42a66d7913f6bf1a5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43155885981530336
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Eggplant_01_Group_Convex.asset
+  uploadId: 864500

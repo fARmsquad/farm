@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: abf4c2b1199f01c40aeb6364b98d9ae3
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 60072b568d64c40a485e0fc55012dc9f, type: 3}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonGeneric/Shaders/SubGraphs/DepthFade.shadersubgraph
+  uploadId: 864500

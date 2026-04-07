@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: cd5e7e53c323ff64a9922803f0a5880c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Animations/DeadlineDudeIdleUpperHandgun.anim
+  uploadId: 846008

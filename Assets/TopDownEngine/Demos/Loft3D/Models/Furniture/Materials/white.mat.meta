@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 83db984e9b256a24e99050b94df62fc5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Models/Furniture/Materials/white.mat
+  uploadId: 846008

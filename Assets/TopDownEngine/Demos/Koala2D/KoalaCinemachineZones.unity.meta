@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 620ed5f6bdf67c141a3fc44a9f2f7809
+timeCreated: 1428685688
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/KoalaCinemachineZones.unity
+  uploadId: 846008

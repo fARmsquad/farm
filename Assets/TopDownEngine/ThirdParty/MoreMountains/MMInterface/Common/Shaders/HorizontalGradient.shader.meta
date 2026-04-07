@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 3c08f0cc4997045449242cfed6dd1120
+timeCreated: 1511724682
+licenseType: Store
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Common/Shaders/HorizontalGradient.shader
+  uploadId: 846008

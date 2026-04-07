@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d5924eb9bfba4f046804069cd435ae1e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43800053672166564
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Veh_Attach_Plough_01_Convex.asset
+  uploadId: 864500

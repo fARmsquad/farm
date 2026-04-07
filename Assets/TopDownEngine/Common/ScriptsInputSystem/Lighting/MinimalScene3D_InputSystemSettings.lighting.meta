@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ee1cc72915a84ee4a88d52b64ee5553b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/ScriptsInputSystem/Lighting/MinimalScene3D_InputSystemSettings.lighting
+  uploadId: 846008

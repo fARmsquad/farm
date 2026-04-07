@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 15b8a90a2b0c4d443be1b8f1ed52cc1e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Lighting/Minimal2Settings.lighting
+  uploadId: 846008

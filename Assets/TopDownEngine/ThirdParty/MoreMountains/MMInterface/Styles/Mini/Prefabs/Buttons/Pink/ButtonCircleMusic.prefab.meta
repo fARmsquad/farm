@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 737e139b1b58a0e4a8fc95cbde471ea3
+timeCreated: 1512704404
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Pink/ButtonCircleMusic.prefab
+  uploadId: 846008

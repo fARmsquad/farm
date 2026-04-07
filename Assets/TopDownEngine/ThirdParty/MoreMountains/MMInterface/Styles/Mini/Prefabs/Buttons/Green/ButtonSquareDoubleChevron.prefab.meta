@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 6bb76e34894087343a5da86551cb074f
+timeCreated: 1512704274
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Green/ButtonSquareDoubleChevron.prefab
+  uploadId: 846008

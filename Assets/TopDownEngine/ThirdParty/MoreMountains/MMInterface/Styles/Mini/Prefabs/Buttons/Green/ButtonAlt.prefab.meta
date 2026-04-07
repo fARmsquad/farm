@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 48337c20d0ff5e240b3c160290c17080
+timeCreated: 1512704278
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Green/ButtonAlt.prefab
+  uploadId: 846008

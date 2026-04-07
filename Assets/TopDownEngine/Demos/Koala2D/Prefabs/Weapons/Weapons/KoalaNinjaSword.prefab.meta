@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4069a3a0fab9aa14aa3863708b264eab
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Weapons/Weapons/KoalaNinjaSword.prefab
+  uploadId: 846008

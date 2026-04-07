@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 02440a9491fb1b945a0c2aa15ab9ca1c
+timeCreated: 1512703400
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/VerticalGradientBlueToCyan/ButtonSquareArrow.prefab
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 189e519b4fd6b4f40b754f64cd8ba541
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Animations/HornsYellow/GrasslandsHornsYellowAttackSouth.anim
+  uploadId: 846008

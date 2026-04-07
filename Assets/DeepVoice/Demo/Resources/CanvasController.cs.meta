@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 6fcc1c366b5af3e4290798734b5059b5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 251738
+  packageName: DeepVoice AI - Text To Voice
+  packageVersion: 2.1.5
+  assetPath: Assets/DeepVoice/Demo/Resources/CanvasController.cs
+  uploadId: 883842

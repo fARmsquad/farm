@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4f18e71b4b156c24c84713fca792c27e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Animations/KoalaSwordIdle.anim
+  uploadId: 846008

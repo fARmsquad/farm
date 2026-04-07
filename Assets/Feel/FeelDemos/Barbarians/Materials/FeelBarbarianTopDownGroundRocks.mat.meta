@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ec25b894bde46e04496a23def0906022
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Barbarians/Materials/FeelBarbarianTopDownGroundRocks.mat
+  uploadId: 830868

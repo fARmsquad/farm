@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 57336066c3d7ff5418ae88b7880aafed
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/Feel/MMTools/Accessories/MMDebugMenu/Prefabs/MMDebugMenuTextTiny.prefab
+  uploadId: 846008

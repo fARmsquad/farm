@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 45bb7ffa9fee82d418b17731a2fdad49
+timeCreated: 1512704275
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Green/ButtonSquareSoundOff.prefab
+  uploadId: 846008

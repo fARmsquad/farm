@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 713542e9a64865842abc507d341fbcd7
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Prefabs/ItemsPickers/Revolver.prefab
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4869ccaa0262d2746ba101f901851b0a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43212552186765584
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_SpoolWheel_01_Convex.asset
+  uploadId: 864500

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 363f01559ade430459d27513c866642b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43802381901993584
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Orange_Grown_01_Convex.asset
+  uploadId: 864500

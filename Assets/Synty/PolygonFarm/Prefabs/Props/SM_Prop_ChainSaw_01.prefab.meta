@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 798afac17f9b3ac42ad8a21c6444abcb
+timeCreated: 1555551051
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_ChainSaw_01.prefab
+  uploadId: 864500

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0e7e48dfefd946e4da0f223c43dc16fd
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Explodudes/Prefabs/Weapons/ExplodudesWeapon.prefab
+  uploadId: 846008

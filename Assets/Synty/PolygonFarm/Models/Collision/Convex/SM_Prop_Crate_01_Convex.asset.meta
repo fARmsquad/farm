@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: dfb98c4279d81d44a8f0bb1f556df54c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43655601705514994
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Crate_01_Convex.asset
+  uploadId: 864500

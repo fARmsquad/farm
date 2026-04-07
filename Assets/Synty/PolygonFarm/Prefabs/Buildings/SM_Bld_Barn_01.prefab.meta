@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1135f5bcd489da04cb5f4fcb4355006b
+timeCreated: 1555552536
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Buildings/SM_Bld_Barn_01.prefab
+  uploadId: 864500

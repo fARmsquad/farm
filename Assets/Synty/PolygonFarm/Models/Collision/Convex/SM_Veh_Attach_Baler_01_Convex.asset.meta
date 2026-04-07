@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 819e0e6310f8f1445a717590e575861d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43694663851747366
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Veh_Attach_Baler_01_Convex.asset
+  uploadId: 864500

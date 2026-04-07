@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fc9d5ab849d193b42bc783c5c3ee9e87
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43952430067227860
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Generic_Mountains_Soft_01_Convex.asset
+  uploadId: 864500

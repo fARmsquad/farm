@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 288603256b604154a87380ee4a7a31db
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Tanks/Materials/TankWheelSmoke.mat
+  uploadId: 846008

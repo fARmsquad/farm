@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: ba7ff45352f37dc4f8f15e4f479d8b34
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Characters/Weapons/ChargeWeapon.cs
+  uploadId: 846008

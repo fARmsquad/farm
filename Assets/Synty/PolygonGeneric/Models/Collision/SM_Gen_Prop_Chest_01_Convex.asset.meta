@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c362fd450dcb7f14f9eb2d318b236b4b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 1046744310305300985
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonGeneric/Models/Collision/SM_Gen_Prop_Chest_01_Convex.asset
+  uploadId: 864500

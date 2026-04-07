@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 110ca441d17d91e4f98f9606d6073975
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43476900726049254
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Broccoli_01_Convex.asset
+  uploadId: 864500

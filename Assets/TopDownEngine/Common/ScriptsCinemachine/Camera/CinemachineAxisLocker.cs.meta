@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: f5c9f882c880a6d4eba541985f1e9416
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/ScriptsCinemachine/Camera/CinemachineAxisLocker.cs
+  uploadId: 846008

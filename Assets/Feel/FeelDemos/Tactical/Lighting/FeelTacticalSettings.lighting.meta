@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ab90c65be0414f24ca7a49a89f1218dc
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Tactical/Lighting/FeelTacticalSettings.lighting
+  uploadId: 830868

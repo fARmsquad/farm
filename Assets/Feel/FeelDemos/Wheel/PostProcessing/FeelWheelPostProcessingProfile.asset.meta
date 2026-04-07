@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 22840ef425398694b9aed07314045ecb
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Wheel/PostProcessing/FeelWheelPostProcessingProfile.asset
+  uploadId: 830868

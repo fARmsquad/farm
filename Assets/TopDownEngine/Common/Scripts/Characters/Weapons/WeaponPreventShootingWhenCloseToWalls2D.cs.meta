@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: b2a1ad332e670b84fb2ee52316f58ebd
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Characters/Weapons/WeaponPreventShootingWhenCloseToWalls2D.cs
+  uploadId: 846008

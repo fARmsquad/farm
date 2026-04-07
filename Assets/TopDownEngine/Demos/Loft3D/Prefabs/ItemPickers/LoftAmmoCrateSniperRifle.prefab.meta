@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: c091707c5b6618041a47969bffcf70b5
+timeCreated: 1523124644
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/ItemPickers/LoftAmmoCrateSniperRifle.prefab
+  uploadId: 846008

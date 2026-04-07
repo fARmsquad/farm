@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 8a258d69670d9a54d943dd0e57ffea8a
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/InventoryEngine/Scripts/MoreMountains.InventoryEngine.asmdef
+  uploadId: 846008

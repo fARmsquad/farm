@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 441fd09bf5072fb4eacedbc606c5ad46
+timeCreated: 1520820302
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Materials/LoftGateMaterial.mat
+  uploadId: 846008

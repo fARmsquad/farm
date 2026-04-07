@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 7d9788e82d6befd44bbf3adef8ced523
+timeCreated: 1521987984
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/Weapons/Weapons/LoftAIAssaultRifle.prefab
+  uploadId: 846008

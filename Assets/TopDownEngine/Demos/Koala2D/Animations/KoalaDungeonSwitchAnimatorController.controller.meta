@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5fa32075a8331c749ad2fd1f25839989
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Animations/KoalaDungeonSwitchAnimatorController.controller
+  uploadId: 846008

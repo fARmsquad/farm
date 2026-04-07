@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9514733bdb8907147af1bfa8c4117eff
+timeCreated: 1528260251
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 15600000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Scenes/Terrains/Terrain_Classic_Tree.asset
+  uploadId: 731838

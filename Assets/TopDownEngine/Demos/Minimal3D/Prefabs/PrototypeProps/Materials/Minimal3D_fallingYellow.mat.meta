@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d42efd1925b4b3c41b2e46b46116d174
+timeCreated: 1450115737
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Materials/Minimal3D_fallingYellow.mat
+  uploadId: 846008

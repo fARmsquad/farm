@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 5a6041929e276584f9432070954cb361
+timeCreated: 1521990160
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Materials/KoalaCollectionExplosionYellowMaterial.mat
+  uploadId: 846008

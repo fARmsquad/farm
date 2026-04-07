@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9e76fb3c6fd6ef04e839ca5428dbad55
+timeCreated: 1557105676
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_SeedPacket_01.prefab
+  uploadId: 864500

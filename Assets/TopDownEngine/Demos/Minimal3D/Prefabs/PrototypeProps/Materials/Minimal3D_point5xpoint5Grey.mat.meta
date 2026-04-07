@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 45290f1ea6039db448715d5fa29f2101
+timeCreated: 1450055214
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Materials/Minimal3D_point5xpoint5Grey.mat
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1f14183af2fd24c40a56d1e6b204fb52
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Materials/LoftWallBottomMaterial.mat
+  uploadId: 846008

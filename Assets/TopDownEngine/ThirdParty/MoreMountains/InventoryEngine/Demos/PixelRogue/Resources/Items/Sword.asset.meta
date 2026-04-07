@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2c6c3c9fc82f7484ab8b3ee19e0a0cad
+timeCreated: 1463396279
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Resources/Items/Sword.asset
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3c8b79b397b12ff4a8790a8c0d6ad519
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/Props/LoftFurniture/LoftSpeaker.prefab
+  uploadId: 846008

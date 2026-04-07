@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: e8d68c29de007884da5b2c51c59ec344
+timeCreated: 1521302678
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Materials/LoftCoinMaterial.mat
+  uploadId: 846008

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e42b6cd1778402b428d9a7b37ecdf5b3
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Models/Characters/Suspenders/Materials/No
+    Name.mat
+  uploadId: 846008

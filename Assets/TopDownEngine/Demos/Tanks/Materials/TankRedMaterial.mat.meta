@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4c93cd5ecbb14fa4190b064708ac5044
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Tanks/Materials/TankRedMaterial.mat
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f38558a6843f2244e93e0b36180f1582
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Animations/KoalaDungeonChestClosed.anim
+  uploadId: 846008

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 092b85f5f05bc0f4bb97bab8327f367e
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/CardsUI/Prefabs/FeelCardsUI_Card_Fireproof.prefab
+  uploadId: 830868

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 1e11e97960a80e247b1dba8f46494d4c
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Barbarians/Prefabs/FeelBarbarianFloatingText.prefab
+  uploadId: 830868

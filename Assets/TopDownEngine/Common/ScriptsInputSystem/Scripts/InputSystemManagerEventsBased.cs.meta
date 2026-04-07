@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: ce788749c8497bc438c5d3bf65be8a6f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/ScriptsInputSystem/Scripts/InputSystemManagerEventsBased.cs
+  uploadId: 846008

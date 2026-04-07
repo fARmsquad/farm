@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c1f12f253f392b7498bd30cd479a90ca
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Weapons/Projectiles/KoalaCannonBallPoison.prefab
+  uploadId: 846008

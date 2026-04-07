@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d941856a323f83442965104dcfeb9ba2
+timeCreated: 1461577793
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Animations/AdventurerGreenIdle.anim
+  uploadId: 846008

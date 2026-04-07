@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 167a383168152ae4e96fa26fcaf1ac09
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Explodudes/Scripts/ExplodudesMultiplayerLevelManager.cs
+  uploadId: 846008

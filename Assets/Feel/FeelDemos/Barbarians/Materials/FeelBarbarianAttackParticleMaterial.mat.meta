@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a26feb16bb9f2df41badeddb95abe94e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Barbarians/Materials/FeelBarbarianAttackParticleMaterial.mat
+  uploadId: 830868

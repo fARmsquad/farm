@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 314ddf6bcc482c543a20c8d39f9ff6ec
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal2D/Prefabs/PlayableCharacters/MinimalCharacter2DPlayer1.prefab
+  uploadId: 846008

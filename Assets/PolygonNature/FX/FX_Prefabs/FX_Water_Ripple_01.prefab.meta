@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5d5da19b06b71d74baef1d8c22f634e1
+timeCreated: 1527656670
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/FX/FX_Prefabs/FX_Water_Ripple_01.prefab
+  uploadId: 731838

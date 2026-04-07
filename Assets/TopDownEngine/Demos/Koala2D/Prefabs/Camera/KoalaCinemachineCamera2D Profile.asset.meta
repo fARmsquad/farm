@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: dfebdf44cbf06d44e8df595154b720ea
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Camera/KoalaCinemachineCamera2D
+    Profile.asset
+  uploadId: 846008

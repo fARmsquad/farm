@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 75a992fcf5463da409d5af25b9f20e6f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/SquashAndStretch/Materials/FeelSquashAndStretchCarHeadlights.mat
+  uploadId: 830868

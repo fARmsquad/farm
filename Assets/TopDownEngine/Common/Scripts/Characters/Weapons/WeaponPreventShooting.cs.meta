@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 79b614973e8eded46a5efb82c1f2f083
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Characters/Weapons/WeaponPreventShooting.cs
+  uploadId: 846008

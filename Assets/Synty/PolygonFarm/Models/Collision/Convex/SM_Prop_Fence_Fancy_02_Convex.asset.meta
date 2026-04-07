@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6b0fded281018724083979ab6fc9355d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43979533095369404
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Fence_Fancy_02_Convex.asset
+  uploadId: 864500

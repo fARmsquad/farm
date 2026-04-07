@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1bd9c42314e7df44c8ab8e581f7f5310
+timeCreated: 1527737122
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Materials/Misc/PolygonNature_Vines.mat
+  uploadId: 731838

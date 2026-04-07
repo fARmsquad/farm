@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f4c63e0b2020d984fa67cd6e83e18965
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Prefabs/UI/DeadlineLevelSelectionButton.prefab
+  uploadId: 846008

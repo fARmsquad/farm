@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 36d6b76091faf274898e65d9aad0c344
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Animations/HornsBlue/GrasslandsHornsBlueIdleEast.anim
+  uploadId: 846008

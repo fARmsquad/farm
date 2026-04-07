@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 084109252c3a2104aa80f806510ce431
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Animations/KoalaIntroAnimation.anim
+  uploadId: 846008

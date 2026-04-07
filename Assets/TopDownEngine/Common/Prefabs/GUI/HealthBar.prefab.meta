@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7310a43ad3f1c9d4185b5c98d30baa54
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Prefabs/GUI/HealthBar.prefab
+  uploadId: 846008

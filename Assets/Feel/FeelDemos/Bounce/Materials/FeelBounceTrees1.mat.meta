@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 98d3d989fc57f3e4f861c5c5c5a60917
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Bounce/Materials/FeelBounceTrees1.mat
+  uploadId: 830868

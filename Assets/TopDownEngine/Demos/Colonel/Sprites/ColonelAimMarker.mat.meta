@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 72d0560434b25bc48bbeaea5ce8cf568
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Colonel/Sprites/ColonelAimMarker.mat
+  uploadId: 846008

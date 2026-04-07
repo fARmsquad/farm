@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 13fe6c1816791534785bf178c80fca76
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Springs/Prefabs/FeelSpringsSlider.prefab
+  uploadId: 830868

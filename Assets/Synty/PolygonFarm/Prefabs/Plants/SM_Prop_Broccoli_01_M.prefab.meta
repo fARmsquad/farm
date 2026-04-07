@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 007624b1cde2b434a8166ff9d5e8adcf
+timeCreated: 1555552537
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Broccoli_01_M.prefab
+  uploadId: 864500

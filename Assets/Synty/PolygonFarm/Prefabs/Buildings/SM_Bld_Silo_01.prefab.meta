@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ca2a787328680534488b66d6a68eae8d
+timeCreated: 1555552558
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Buildings/SM_Bld_Silo_01.prefab
+  uploadId: 864500

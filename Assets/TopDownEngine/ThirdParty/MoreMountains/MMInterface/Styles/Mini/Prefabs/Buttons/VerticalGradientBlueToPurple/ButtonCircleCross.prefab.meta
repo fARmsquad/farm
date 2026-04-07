@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: f92520bd73812ea449b263bd0140505c
+timeCreated: 1512703523
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/VerticalGradientBlueToPurple/ButtonCircleCross.prefab
+  uploadId: 846008

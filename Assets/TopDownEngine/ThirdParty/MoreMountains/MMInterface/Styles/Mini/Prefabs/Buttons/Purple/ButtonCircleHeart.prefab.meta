@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: d6effae938bfc2d4e84fbbb8fc8dbcaa
+timeCreated: 1512704363
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Purple/ButtonCircleHeart.prefab
+  uploadId: 846008

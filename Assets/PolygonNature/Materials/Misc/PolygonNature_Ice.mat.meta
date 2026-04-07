@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 07eab001c591e8d4d8b63d6d019040fb
+timeCreated: 1528253652
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Materials/Misc/PolygonNature_Ice.mat
+  uploadId: 731838

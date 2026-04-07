@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c58f83dbd7ec992468a567ad0968326e
+timeCreated: 1463387618
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Resources/Items/ArmorBlue.asset
+  uploadId: 846008

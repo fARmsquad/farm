@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 668fdf9dc2b8ad847aefffe5fb275613
+timeCreated: 1450055326
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Prefabs/PlatformsYellow/Minimal3D_point5xpoint5
+    Yellow.prefab
+  uploadId: 846008

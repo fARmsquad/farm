@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e8911131ac75e6849ad05cbb903fd539
+timeCreated: 1450024213
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Colonel/Materials/ColonelCubeMaterial.mat
+  uploadId: 846008

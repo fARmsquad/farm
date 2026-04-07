@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 7bc475f4467f1334aa85bc87ed2a4b0f
+timeCreated: 1512703520
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/VerticalGradientBlueToPurple/ButtonSquareSoundOff.prefab
+  uploadId: 846008

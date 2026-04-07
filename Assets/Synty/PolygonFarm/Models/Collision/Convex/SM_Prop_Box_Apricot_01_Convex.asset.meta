@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7c8997f2028343b4da4c7d9cef55d4bb
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43200242428276540
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Box_Apricot_01_Convex.asset
+  uploadId: 864500

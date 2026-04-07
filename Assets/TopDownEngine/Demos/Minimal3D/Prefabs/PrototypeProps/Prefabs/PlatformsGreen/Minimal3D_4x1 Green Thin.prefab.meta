@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b556256c07eeb1f428be552269fa0025
+timeCreated: 1450116613
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Prefabs/PlatformsGreen/Minimal3D_4x1
+    Green Thin.prefab
+  uploadId: 846008

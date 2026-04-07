@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: f31b518c2b50cc2479370c46d4485485
+timeCreated: 1522535341
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Weapons/Reticles/KoalaUIReticle.prefab
+  uploadId: 846008

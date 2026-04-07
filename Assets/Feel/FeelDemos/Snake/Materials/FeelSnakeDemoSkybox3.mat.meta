@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2551f16b11627614f854189f0bd1f45b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Snake/Materials/FeelSnakeDemoSkybox3.mat
+  uploadId: 830868

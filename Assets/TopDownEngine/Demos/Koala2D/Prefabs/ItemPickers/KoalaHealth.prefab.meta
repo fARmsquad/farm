@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b61a677da86766b489b3aff3c1c6ccb4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/ItemPickers/KoalaHealth.prefab
+  uploadId: 846008

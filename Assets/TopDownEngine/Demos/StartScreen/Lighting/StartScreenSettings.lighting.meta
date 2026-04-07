@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 563deb7d8ff49104f932c7a9905a4bcf
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/StartScreen/Lighting/StartScreenSettings.lighting
+  uploadId: 846008

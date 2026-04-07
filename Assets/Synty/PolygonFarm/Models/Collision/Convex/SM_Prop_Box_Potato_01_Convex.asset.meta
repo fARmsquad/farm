@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f35e5d1bae6e52745935d09c00a889e2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43198950664695228
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Box_Potato_01_Convex.asset
+  uploadId: 864500

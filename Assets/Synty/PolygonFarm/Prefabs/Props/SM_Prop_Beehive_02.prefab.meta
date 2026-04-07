@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d59dd811931a2d149a437bbac7f0d4a2
+timeCreated: 1555552541
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Beehive_02.prefab
+  uploadId: 864500

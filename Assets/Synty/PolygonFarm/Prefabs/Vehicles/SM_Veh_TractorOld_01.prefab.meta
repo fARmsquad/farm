@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c458e890f1755a341893df58d24ed4da
+timeCreated: 1556838251
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Vehicles/SM_Veh_TractorOld_01.prefab
+  uploadId: 864500

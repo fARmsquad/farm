@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 517d2c8e789e5b64a8e2740ecd4aab42
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Colonel/Materials/ColonelMineLightMaterial.mat
+  uploadId: 846008

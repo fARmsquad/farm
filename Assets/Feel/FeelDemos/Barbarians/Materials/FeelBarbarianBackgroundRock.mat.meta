@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e36ec190f12fb2f48a83333af62f5de5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Barbarians/Materials/FeelBarbarianBackgroundRock.mat
+  uploadId: 830868

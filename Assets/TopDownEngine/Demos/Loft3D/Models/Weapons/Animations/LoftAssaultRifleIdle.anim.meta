@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: b472f56caf14d6143b19e63065b8e0c0
+timeCreated: 1522028671
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Models/Weapons/Animations/LoftAssaultRifleIdle.anim
+  uploadId: 846008

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 8f6e2b2ebaac9af4e9f5acb11d8e5d88
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PlayableCharacters/MinimalSpaceship3D.prefab
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c109e1b1cadedb64686484f1dcb6de6a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/CardsUI/Lighting/FeelCardsUISettings.lighting
+  uploadId: 830868

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: cabf8ba3256165e4387291afadf7dc31
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Tactical/Materials/FeelTacticalBulletImpactParticle.mat
+  uploadId: 830868

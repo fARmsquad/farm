@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 37f0b3ae284243a4aa416a4a27b9794c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Tanks/Lighting/TanksSettings.lighting
+  uploadId: 846008

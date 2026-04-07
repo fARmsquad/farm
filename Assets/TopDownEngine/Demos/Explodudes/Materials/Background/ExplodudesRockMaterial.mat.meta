@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 03ad0a5629f70a44195562cb788579b3
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Explodudes/Materials/Background/ExplodudesRockMaterial.mat
+  uploadId: 846008

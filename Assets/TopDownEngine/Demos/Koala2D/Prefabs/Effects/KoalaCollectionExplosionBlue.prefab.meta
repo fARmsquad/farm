@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 925923046384f284f9fa9a692d832d2c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Effects/KoalaCollectionExplosionBlue.prefab
+  uploadId: 846008

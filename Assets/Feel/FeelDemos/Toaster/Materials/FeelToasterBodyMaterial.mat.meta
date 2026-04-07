@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4390a50a4288c4340846c0d6e9f0db54
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Toaster/Materials/FeelToasterBodyMaterial.mat
+  uploadId: 830868

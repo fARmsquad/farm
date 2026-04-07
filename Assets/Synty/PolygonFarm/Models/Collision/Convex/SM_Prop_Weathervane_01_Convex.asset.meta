@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7f38b7519eb79ef45ab0f453d4be8833
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43667443561848184
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Weathervane_01_Convex.asset
+  uploadId: 864500

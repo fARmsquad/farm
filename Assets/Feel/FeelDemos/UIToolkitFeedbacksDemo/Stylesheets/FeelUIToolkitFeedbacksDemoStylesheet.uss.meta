@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 4b112bc2d5df4c247864fd3499a53d9e
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 12385, guid: 0000000000000000e000000000000000, type: 0}
+  disableValidation: 0
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/UIToolkitFeedbacksDemo/Stylesheets/FeelUIToolkitFeedbacksDemoStylesheet.uss
+  uploadId: 830868

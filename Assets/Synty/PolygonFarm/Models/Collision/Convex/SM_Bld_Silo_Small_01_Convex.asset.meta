@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 21eb614f05980e14fa880c72d3e2188d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43775130760922884
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Bld_Silo_Small_01_Convex.asset
+  uploadId: 864500

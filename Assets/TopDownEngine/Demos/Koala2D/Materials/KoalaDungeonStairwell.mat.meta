@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 67aef8ca28375e640ae86539c4d4b4eb
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Materials/KoalaDungeonStairwell.mat
+  uploadId: 846008

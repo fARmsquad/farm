@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e4699a778a7c43a4d9d7adea59d40434
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Gates/KoalaDungeonGateTop.prefab
+  uploadId: 846008

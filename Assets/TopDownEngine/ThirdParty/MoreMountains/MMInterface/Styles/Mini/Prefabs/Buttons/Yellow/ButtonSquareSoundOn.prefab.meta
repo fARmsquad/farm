@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: a63a6b3e4d789d146b2b8446152ed7bf
+timeCreated: 1512704520
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Yellow/ButtonSquareSoundOn.prefab
+  uploadId: 846008

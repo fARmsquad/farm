@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8ca48541c69e382498ea7ef79914a850
+timeCreated: 1528776585
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Materials/LODS/Alternates/PolygonNature_Leaves_Willow_LOD_01_Yellow.mat
+  uploadId: 731838

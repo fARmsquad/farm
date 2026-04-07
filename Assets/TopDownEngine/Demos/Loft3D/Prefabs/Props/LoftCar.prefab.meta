@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 39b6cad506946a347b96cbbdc28d5869
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/Props/LoftCar.prefab
+  uploadId: 846008

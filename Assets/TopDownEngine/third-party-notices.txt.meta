@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7b1da9924dc8d364b9c38ef9ebc7b7af
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/third-party-notices.txt
+  uploadId: 846008

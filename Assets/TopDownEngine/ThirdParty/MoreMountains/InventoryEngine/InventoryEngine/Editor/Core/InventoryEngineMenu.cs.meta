@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: b64f7689229c891428754541043cbe30
+timeCreated: 1499848796
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/InventoryEngine/Editor/Core/InventoryEngineMenu.cs
+  uploadId: 846008

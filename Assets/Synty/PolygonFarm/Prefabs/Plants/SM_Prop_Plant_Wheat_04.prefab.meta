@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8416f5f211e80a548ac67b94026c2b14
+timeCreated: 1555552544
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Plant_Wheat_04.prefab
+  uploadId: 864500

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 32bf0c94d8b03fa489ac4ae693bb7fdd
+timeCreated: 1522028681
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Models/Weapons/Animations/LoftAssaultRifleShoot.anim
+  uploadId: 846008

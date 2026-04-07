@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b53f17e6d0fd1c04ea120f7e069d7fd3
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Tiles/KoalaDungeonGroundBeigeTiles.asset
+  uploadId: 846008

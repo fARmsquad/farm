@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 56975ca9fb26b94469f48f0108f835bc
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Springs/Materials/FeelSpringsBarbariansGround.mat
+  uploadId: 830868

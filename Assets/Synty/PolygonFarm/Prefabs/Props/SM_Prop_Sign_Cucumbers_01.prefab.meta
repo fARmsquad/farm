@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3a280b28245122641a2437313d08e1c3
+timeCreated: 1556746670
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Sign_Cucumbers_01.prefab
+  uploadId: 864500

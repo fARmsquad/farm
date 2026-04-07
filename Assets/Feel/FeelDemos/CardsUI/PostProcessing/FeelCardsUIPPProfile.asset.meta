@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ca84483515897314ab34ade6c928d2ca
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/CardsUI/PostProcessing/FeelCardsUIPPProfile.asset
+  uploadId: 830868

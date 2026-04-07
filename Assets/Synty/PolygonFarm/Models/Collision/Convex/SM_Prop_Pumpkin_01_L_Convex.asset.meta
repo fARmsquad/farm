@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ebc782e213b92674a951f521e3b4b25f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43445316107042000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Pumpkin_01_L_Convex.asset
+  uploadId: 864500

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 33ed303d4bdb45946bb0a32639cb568f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/AI/LoftSuitRagdollAI.prefab
+  uploadId: 846008

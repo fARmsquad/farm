@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 56df083b5990d81489586685fdcea2c3
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43076534581983360
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_LetterBox_Generic_01_Convex.asset
+  uploadId: 864500

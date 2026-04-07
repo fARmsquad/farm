@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e7ee567f9f5e94a42907e518f09df216
+AssemblyDefinitionReferenceImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/ScriptsCinemachine/Editor/MoreMountains.TopDownEngine.Cinemachine.Editor.asmref
+  uploadId: 846008

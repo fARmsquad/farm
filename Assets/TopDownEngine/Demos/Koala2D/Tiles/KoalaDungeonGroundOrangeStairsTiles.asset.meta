@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f1d1ab01283c8c64bbde37e0038c9f82
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Tiles/KoalaDungeonGroundOrangeStairsTiles.asset
+  uploadId: 846008

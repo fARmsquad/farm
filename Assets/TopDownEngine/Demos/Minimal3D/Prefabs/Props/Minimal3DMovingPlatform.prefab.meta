@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 061753285da60dd429bf5ec4c783039a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/Props/Minimal3DMovingPlatform.prefab
+  uploadId: 846008

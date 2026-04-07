@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: c54b7b53e26347643a7d54dd14a14b62
+timeCreated: 1473671694
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Characters/CharacterAbilities/CharacterHandleSecondaryWeapon.cs
+  uploadId: 846008

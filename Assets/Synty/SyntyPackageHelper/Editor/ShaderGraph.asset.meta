@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ae2230046d413234aa8c985cb51fb2a9
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/SyntyPackageHelper/Editor/ShaderGraph.asset
+  uploadId: 864500

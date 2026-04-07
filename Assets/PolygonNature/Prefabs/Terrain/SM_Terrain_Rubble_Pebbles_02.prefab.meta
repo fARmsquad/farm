@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 7aec7d7b6b4e5f24f832c33028ee90d9
+timeCreated: 1528163995
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_Rubble_Pebbles_02.prefab
+  uploadId: 731838

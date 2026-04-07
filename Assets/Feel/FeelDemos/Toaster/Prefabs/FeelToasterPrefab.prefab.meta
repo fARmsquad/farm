@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0caa033144b76ea459799fff82b26335
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Toaster/Prefabs/FeelToasterPrefab.prefab
+  uploadId: 830868

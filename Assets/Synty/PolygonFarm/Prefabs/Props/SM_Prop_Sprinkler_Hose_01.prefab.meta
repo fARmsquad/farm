@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d27dcac185b4fcb48b212da5c3a71683
+timeCreated: 1556673128
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Sprinkler_Hose_01.prefab
+  uploadId: 864500

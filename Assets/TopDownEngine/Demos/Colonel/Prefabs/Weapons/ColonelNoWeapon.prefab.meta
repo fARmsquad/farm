@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 638ee4870ec128e4292c4d3604af5ab3
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Colonel/Prefabs/Weapons/ColonelNoWeapon.prefab
+  uploadId: 846008

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 6a61d9fb13c0ffb45a9006c118bbba7a
+timeCreated: 1512704401
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Pink/ButtonSquareSoundOff.prefab
+  uploadId: 846008

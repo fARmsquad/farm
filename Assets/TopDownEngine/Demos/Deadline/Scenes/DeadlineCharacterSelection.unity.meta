@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 1b24ed7992274a849aa535d18b4cb18a
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Scenes/DeadlineCharacterSelection.unity
+  uploadId: 846008

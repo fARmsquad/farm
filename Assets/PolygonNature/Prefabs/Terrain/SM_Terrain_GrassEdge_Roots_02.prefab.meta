@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a77b4654fc33b0e4f9e776abad04b55d
+timeCreated: 1527820964
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_GrassEdge_Roots_02.prefab
+  uploadId: 731838

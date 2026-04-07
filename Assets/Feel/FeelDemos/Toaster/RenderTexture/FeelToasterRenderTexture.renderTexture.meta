@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5a5d9e44215a2914cbdef5e01b27561c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Toaster/RenderTexture/FeelToasterRenderTexture.renderTexture
+  uploadId: 830868

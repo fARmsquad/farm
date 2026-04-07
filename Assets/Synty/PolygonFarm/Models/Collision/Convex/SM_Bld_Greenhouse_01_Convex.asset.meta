@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2d0f35965b8108d4f9b29744196ab3c1
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43920970645582216
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Bld_Greenhouse_01_Convex.asset
+  uploadId: 864500

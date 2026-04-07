@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4ad0e4327df863f4dab0a0c17a730914
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43469850825109308
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Dirt_Rows_End_Top_01_Convex.asset
+  uploadId: 864500

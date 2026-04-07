@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e546a9dc214b69f47921125eab9fa3b1
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Colonel/Materials/ColonelMineLineMaterial.mat
+  uploadId: 846008

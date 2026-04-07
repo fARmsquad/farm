@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 279961af7ee37d74a94b0daafd5d3a57
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Characters/CharacterAbilities/CharacterShipMovement.cs
+  uploadId: 846008

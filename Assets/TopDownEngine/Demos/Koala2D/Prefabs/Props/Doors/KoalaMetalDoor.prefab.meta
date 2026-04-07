@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 36c8e693544cd8d46a48e1421122f15c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Props/Doors/KoalaMetalDoor.prefab
+  uploadId: 846008

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ad68b8ec130099e41b6198b5c5627261
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Tactical/Prefabs/FeelTacticalTMPFloatingText.prefab
+  uploadId: 830868

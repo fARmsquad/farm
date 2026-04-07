@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 78ad7d7970322ed4e9437e93962b7cc8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Animations/KoalaCoin.anim
+  uploadId: 846008

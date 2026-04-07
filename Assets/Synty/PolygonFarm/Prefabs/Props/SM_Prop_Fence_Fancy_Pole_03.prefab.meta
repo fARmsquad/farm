@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4ea86a9f7b3a4a8458586449e0e5a67c
+timeCreated: 1555551046
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Fence_Fancy_Pole_03.prefab
+  uploadId: 864500

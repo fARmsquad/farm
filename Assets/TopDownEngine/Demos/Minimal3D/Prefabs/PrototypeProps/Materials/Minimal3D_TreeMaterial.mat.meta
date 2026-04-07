@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e8b4af8e94090de4dbc42953eac7f999
+timeCreated: 1450467517
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Materials/Minimal3D_TreeMaterial.mat
+  uploadId: 846008

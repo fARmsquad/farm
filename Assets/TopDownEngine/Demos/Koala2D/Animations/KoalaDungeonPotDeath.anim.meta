@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b57c19405f2982d4c99a1930ec27b672
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Animations/KoalaDungeonPotDeath.anim
+  uploadId: 846008

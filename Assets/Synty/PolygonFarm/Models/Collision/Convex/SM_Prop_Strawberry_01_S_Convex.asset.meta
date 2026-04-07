@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d2ce1d0114ae1e644807d4a6443b670f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43028983914070454
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Strawberry_01_S_Convex.asset
+  uploadId: 864500

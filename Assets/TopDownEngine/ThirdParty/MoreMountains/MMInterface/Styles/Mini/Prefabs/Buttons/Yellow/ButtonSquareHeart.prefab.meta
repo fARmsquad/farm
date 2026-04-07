@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: be941c7bddf066248944c8608d2f8362
+timeCreated: 1512704522
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Yellow/ButtonSquareHeart.prefab
+  uploadId: 846008

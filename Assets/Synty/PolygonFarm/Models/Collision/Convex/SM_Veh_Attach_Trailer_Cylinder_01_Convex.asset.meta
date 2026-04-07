@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 288c12f1889890e409b871cb55057028
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43896455615887836
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Veh_Attach_Trailer_Cylinder_01_Convex.asset
+  uploadId: 864500

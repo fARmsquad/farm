@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e377b882a13405d4b9d5c3e8e747595e
+timeCreated: 1528164005
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Trees/SM_Tree_Generic_01.prefab
+  uploadId: 731838

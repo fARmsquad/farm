@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f576d08579105bd449cdbb07bed4898e
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Prefabs/Items/StarPicker.prefab
+  uploadId: 846008

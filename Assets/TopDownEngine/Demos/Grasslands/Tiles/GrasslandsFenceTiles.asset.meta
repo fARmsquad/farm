@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 48073b582651ee543a065bbed99d6d4b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Tiles/GrasslandsFenceTiles.asset
+  uploadId: 846008

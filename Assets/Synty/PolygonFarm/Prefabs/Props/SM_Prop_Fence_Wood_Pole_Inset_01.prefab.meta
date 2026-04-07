@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: f752b63c74344c24a81e6ec30719e6b6
+timeCreated: 1555551048
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Fence_Wood_Pole_Inset_01.prefab
+  uploadId: 864500

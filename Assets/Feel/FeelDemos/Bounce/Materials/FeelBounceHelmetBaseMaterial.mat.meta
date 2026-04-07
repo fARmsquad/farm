@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 92cd93025c60fa042b27412d834aacf6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Bounce/Materials/FeelBounceHelmetBaseMaterial.mat
+  uploadId: 830868

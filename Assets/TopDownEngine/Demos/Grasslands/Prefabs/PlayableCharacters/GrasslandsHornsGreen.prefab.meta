@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: dd1b3167e454d4a48969c796f75de23d
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Prefabs/PlayableCharacters/GrasslandsHornsGreen.prefab
+  uploadId: 846008

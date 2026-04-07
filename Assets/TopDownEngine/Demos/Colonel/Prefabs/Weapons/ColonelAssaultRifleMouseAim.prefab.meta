@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 18824766ff0319b48958d98303ea5903
+timeCreated: 1521987984
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Colonel/Prefabs/Weapons/ColonelAssaultRifleMouseAim.prefab
+  uploadId: 846008

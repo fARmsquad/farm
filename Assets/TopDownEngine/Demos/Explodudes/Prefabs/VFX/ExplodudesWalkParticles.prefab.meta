@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 55579b31fdb05fe48863e50132ac51a4
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Explodudes/Prefabs/VFX/ExplodudesWalkParticles.prefab
+  uploadId: 846008

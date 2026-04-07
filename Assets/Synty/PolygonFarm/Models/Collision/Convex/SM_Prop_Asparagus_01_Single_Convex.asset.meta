@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: af86cbf3b5942954182029d834363efa
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43624822443427354
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Asparagus_01_Single_Convex.asset
+  uploadId: 864500

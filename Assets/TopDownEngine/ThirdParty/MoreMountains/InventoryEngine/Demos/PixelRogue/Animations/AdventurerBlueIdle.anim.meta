@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: dca25db8624618441a268cec668ed60b
+timeCreated: 1463302215
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Animations/AdventurerBlueIdle.anim
+  uploadId: 846008

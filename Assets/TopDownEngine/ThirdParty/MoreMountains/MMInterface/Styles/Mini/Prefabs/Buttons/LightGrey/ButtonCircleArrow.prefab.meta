@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: a2d9a940a5bac71449cc68fedf5de07c
+timeCreated: 1512703879
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/LightGrey/ButtonCircleArrow.prefab
+  uploadId: 846008

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0adba868bfc74684e99c2f41a5f10ff6
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/ItemPickers/KoalaStimpack.prefab
+  uploadId: 846008

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 2d56dce9cca474241a0abb7b367f9a7d
+timeCreated: 1512704405
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Pink/ButtonCircleGear.prefab
+  uploadId: 846008

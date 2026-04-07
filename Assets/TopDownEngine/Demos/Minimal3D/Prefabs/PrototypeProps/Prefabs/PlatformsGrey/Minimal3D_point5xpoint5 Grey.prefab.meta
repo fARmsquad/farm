@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d604dc285b1840e4b84b2ccae893c3e4
+timeCreated: 1450055299
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Prefabs/PlatformsGrey/Minimal3D_point5xpoint5
+    Grey.prefab
+  uploadId: 846008

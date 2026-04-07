@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5e44cc6f29306d8498f7df5c4fd00a81
+timeCreated: 1555552538
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Pumpkin_Italian_01_S.prefab
+  uploadId: 864500

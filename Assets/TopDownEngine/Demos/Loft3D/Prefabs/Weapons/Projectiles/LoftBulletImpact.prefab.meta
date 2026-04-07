@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 8c6c4b46f25c8674c836660af8f3582d
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/Weapons/Projectiles/LoftBulletImpact.prefab
+  uploadId: 846008

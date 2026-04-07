@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 483eda75ad0c8174eaed39f0e1fc876f
+timeCreated: 1512704322
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/LightGreen/ButtonSquareCheck.prefab
+  uploadId: 846008

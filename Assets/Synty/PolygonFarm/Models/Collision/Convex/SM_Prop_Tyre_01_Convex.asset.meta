@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e1653dae101cc8841b01e744e8e264da
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43823368492147878
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Tyre_01_Convex.asset
+  uploadId: 864500

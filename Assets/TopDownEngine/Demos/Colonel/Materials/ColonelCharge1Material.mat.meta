@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c7b8470ddd1e2b44e83236d7b17b1785
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Colonel/Materials/ColonelCharge1Material.mat
+  uploadId: 846008

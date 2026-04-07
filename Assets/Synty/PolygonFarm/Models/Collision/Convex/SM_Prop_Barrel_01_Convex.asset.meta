@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 8d298974da8f23a438cdcdcf3afe3390
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43562500845180756
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Barrel_01_Convex.asset
+  uploadId: 864500

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: cf30da65deefe8c48944f48d564d031a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Prefabs/SlotIcon.prefab
+  uploadId: 846008

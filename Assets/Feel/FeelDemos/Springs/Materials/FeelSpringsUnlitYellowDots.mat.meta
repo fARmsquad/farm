@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f5bf8e6ef9d17d74babbfaba2e66a877
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Springs/Materials/FeelSpringsUnlitYellowDots.mat
+  uploadId: 830868

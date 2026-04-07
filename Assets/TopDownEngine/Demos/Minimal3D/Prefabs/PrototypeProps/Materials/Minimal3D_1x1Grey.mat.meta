@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3358a36a5e4c16849b2ffe25969b7a63
+timeCreated: 1450047837
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Materials/Minimal3D_1x1Grey.mat
+  uploadId: 846008

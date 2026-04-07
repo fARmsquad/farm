@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a3d0db67fe8ee844fac0ef616e6364fd
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43228288089567862
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Cucumber_01_Group_Convex.asset
+  uploadId: 864500

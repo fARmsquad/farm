@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 627660b0ee15020409ca9ec8aadc015d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/Props/LoftFurniture/LoftTV.prefab
+  uploadId: 846008

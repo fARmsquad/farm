@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1befe9784b8b90b4ab24989daef77854
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal2D/Prefabs/Props/Minimal2DDestructibleBlock.prefab
+  uploadId: 846008

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e31f163695c152544942f429e624a8ca
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/GettingStartedTutorial/PostProcessing/FeelGettingStartedTutorial
+    PostProcessingProfile.asset
+  uploadId: 830868

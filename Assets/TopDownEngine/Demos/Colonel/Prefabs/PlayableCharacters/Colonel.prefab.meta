@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 240b92699d6dbf044a8c838eebbc30af
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Colonel/Prefabs/PlayableCharacters/Colonel.prefab
+  uploadId: 846008

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 934cc00f7026a084c85d92a2c7d1bc62
+timeCreated: 1506282167
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Common/Animations/Buttons/Animations/MMI_ButtonDarken.anim
+  uploadId: 846008

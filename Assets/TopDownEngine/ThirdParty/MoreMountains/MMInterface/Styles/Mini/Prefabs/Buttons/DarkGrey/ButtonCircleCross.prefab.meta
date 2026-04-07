@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: b3082c35ee43fee418736a3ee74977bb
+timeCreated: 1512704084
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/DarkGrey/ButtonCircleCross.prefab
+  uploadId: 846008

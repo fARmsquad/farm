@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: aceb9b44874201243a9e1607d29fc175
+timeCreated: 1450118849
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Prefabs/Props/Minimal3D_PushablePlatform.prefab
+  uploadId: 846008

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: bb9a521337c27c145a99d34c750ad74b
+timeCreated: 1491026195
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Shaders/VS_indirect.cginc
+  uploadId: 731838

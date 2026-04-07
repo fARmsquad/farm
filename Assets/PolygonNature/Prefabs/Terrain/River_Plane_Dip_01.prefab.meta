@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 25046730a753c1f439d6cdbf46269f47
+timeCreated: 1528155081
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Terrain/River_Plane_Dip_01.prefab
+  uploadId: 731838

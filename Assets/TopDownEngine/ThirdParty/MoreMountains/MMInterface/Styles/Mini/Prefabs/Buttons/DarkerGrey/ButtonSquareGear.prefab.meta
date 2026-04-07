@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 270900a79d361824e81f0d34747b54d1
+timeCreated: 1512704127
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/DarkerGrey/ButtonSquareGear.prefab
+  uploadId: 846008

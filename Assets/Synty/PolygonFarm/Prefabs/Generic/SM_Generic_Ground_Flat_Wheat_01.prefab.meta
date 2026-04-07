@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 15003ceaeeee90f4ebbc62a616483b13
+timeCreated: 1556493901
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Ground_Flat_Wheat_01.prefab
+  uploadId: 864500

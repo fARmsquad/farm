@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 7619ff023e2be7e4799ec12d04f21369
+timeCreated: 1522896165
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Resources/Items/LoftSword.asset
+  uploadId: 846008

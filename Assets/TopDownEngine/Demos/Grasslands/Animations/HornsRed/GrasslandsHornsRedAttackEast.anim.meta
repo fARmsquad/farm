@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7d227d422d8e3f040a75883ade2f1fbd
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Animations/HornsRed/GrasslandsHornsRedAttackEast.anim
+  uploadId: 846008

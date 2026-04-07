@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 88c91835e83b581418b36db7a8165f11
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43804957128769436
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Pebbles_03_Convex.asset
+  uploadId: 864500

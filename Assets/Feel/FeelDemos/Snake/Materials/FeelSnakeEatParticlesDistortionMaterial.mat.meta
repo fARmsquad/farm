@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 470e816063a4bad419938b2992efcb02
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Snake/Materials/FeelSnakeEatParticlesDistortionMaterial.mat
+  uploadId: 830868

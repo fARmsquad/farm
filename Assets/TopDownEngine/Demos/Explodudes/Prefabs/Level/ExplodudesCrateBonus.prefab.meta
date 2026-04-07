@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 07279ddcb8ca7d349a36a38122bae33a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Explodudes/Prefabs/Level/ExplodudesCrateBonus.prefab
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1815c65852fa2fe468997b942f0321d8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Brass/Materials/FeelBrassClothes.mat
+  uploadId: 830868

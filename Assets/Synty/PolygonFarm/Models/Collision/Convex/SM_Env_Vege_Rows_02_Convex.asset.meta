@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fc23e06e1d294694ba211bcec5494e5f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43617409280939480
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Vege_Rows_02_Convex.asset
+  uploadId: 864500

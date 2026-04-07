@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 17e06417e9433554ab294b8813d63c50
+AssemblyDefinitionReferenceImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Scripts/MoreMountains.InventoryEngine.Demos.asmref
+  uploadId: 846008

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: df5283419c7b93c489f747ae9b7cfad3
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Toaster/FeelToaster.unity
+  uploadId: 830868

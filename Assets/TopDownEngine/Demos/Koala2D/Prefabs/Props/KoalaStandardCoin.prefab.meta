@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 606928d803e90db448b7dad51e4085d3
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Props/KoalaStandardCoin.prefab
+  uploadId: 846008

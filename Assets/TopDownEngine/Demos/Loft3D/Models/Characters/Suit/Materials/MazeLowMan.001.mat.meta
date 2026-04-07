@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e86d4b154491ec647a44671ed02fb5fe
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Models/Characters/Suit/Materials/MazeLowMan.001.mat
+  uploadId: 846008

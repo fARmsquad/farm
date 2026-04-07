@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0f6882b0de0be6743861da4384873383
+timeCreated: 1463000572
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Prefabs/ItemsPickers/ArmorBlue.prefab
+  uploadId: 846008

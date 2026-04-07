@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: eb5ea2d0a1532444cb3ba081197f648d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43667209442409642
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Lillypads_01_Convex.asset
+  uploadId: 864500

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 5202bb69e6dc1a44cacdac58197df245
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/Feel/MMTools/Core/MMReorderableList/reorderable-list-licence.txt
+  uploadId: 846008

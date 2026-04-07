@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1ab581f9e0198304996581171522f458
+timeCreated: 1548814082
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Shaders/SyntyStudios_Water.shader
+  uploadId: 731838

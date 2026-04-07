@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ec77d0131d8ffb84d8339c0ba4e056c0
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43629132100945448
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Chr_Attach_Glasses_01_Convex.asset
+  uploadId: 864500

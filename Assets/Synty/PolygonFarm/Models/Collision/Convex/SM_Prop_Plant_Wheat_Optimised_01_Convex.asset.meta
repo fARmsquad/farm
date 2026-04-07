@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3f02133e3f583954db5d42f5aea9cda3
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43956067420078458
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Plant_Wheat_Optimised_01_Convex.asset
+  uploadId: 864500

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: af2c14f3bde655947aca0d6a7b8dbeb8
+timeCreated: 1463396724
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Resources/Items/Axe.asset
+  uploadId: 846008

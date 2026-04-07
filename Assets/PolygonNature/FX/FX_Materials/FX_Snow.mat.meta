@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8e7cca841ca60da4cb7eace3fa73bfe8
+timeCreated: 1528775337
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/FX/FX_Materials/FX_Snow.mat
+  uploadId: 731838

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 85100f2846b96ab4db6a40b985d86c31
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Barbarians/Materials/FeelBarbarianBackgroundGrass.mat
+  uploadId: 830868

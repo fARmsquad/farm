@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 07e5069cdf9ee934f8d7b768c461452c
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/Feel/MMTools/Accessories/MMVision/MMConeOfLight.shader
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 38f5693b1687aa2458a05a72aaf11a4a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Barbarians/Materials/FeelBarbarianTopDownLeaves.mat
+  uploadId: 830868

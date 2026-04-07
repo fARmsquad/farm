@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f991cbe75cb701b43baec351a60a630a
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/LevelSelection/LevelSelection.unity
+  uploadId: 846008

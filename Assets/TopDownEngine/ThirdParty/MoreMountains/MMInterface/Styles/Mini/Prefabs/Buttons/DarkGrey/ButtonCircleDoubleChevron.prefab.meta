@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: ddf945d622a71dc42a8df6d47f26b679
+timeCreated: 1512704084
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/DarkGrey/ButtonCircleDoubleChevron.prefab
+  uploadId: 846008

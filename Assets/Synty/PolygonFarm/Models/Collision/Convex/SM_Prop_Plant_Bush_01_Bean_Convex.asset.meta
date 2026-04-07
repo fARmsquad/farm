@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: be8a68b1633ffcc45a335a7e3d571eb6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43999213574340834
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Plant_Bush_01_Bean_Convex.asset
+  uploadId: 864500

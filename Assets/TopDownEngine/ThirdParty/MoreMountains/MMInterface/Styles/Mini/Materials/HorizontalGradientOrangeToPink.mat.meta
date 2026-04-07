@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 421e1209b37540c43a6562e6bc083172
+timeCreated: 1511748309
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Materials/HorizontalGradientOrangeToPink.mat
+  uploadId: 846008

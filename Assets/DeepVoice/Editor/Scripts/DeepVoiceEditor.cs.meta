@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 91624e9ea3e5d9a4dac5e37495ea569a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 251738
+  packageName: DeepVoice AI - Text To Voice
+  packageVersion: 2.1.5
+  assetPath: Assets/DeepVoice/Editor/Scripts/DeepVoiceEditor.cs
+  uploadId: 883842

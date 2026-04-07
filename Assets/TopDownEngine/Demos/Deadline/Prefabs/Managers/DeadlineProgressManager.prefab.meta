@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 5bd79e981594fc44e87dbc1919821638
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Prefabs/Managers/DeadlineProgressManager.prefab
+  uploadId: 846008

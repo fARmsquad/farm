@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: fa06c5a900b4a784f9e7e46fc9e63b0f
+timeCreated: 1512704404
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Pink/ButtonCircleDoubleChevron.prefab
+  uploadId: 846008

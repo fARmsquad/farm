@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d6a9cc8f03380b2498b5e6d4500e0af6
+timeCreated: 1527127559
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/FX/FX_Prefabs/Butterlies_Particle_01_Blue.prefab
+  uploadId: 731838

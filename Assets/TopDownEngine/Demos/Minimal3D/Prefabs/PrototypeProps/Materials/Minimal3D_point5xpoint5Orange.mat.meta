@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: dd4e14dc99bb4e84db1d5989d1f6e037
+timeCreated: 1450055221
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Materials/Minimal3D_point5xpoint5Orange.mat
+  uploadId: 846008

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: b3454222fe10f7544a648c5f199541ad
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/ScriptsCinemachine/Camera/MultiplayerSplitCameraRig.cs
+  uploadId: 846008

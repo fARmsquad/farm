@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: de84711dfbb30fa499dff2fe1d6d86d4
+timeCreated: 1527820961
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Rocks/SM_Rock_CaveInterior_02.prefab
+  uploadId: 731838

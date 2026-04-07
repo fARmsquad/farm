@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bc4cb0255ff6f334f8a34243ab3e633b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43013254057161674
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Beehive_02_Convex.asset
+  uploadId: 864500

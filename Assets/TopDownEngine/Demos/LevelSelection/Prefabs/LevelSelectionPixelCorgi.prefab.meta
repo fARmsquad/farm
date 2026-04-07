@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: cfbe0dff5538c1a488c3dff198a48069
+timeCreated: 1452707277
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/LevelSelection/Prefabs/LevelSelectionPixelCorgi.prefab
+  uploadId: 846008

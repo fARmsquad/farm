@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7dd4341e6eb3f384daaf23d76ce07ee2
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/MinimalScene3D.unity
+  uploadId: 846008

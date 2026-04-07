@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: be085640f3d368f4287741edddb4299d
+timeCreated: 1450116612
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Prefabs/PlatformsBlue/Minimal3D_4x1
+    Blue Thin.prefab
+  uploadId: 846008

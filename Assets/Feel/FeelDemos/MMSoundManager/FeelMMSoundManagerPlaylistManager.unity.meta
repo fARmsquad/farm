@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d12ef16f94b788e4ab90aa9534e64dcb
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/MMSoundManager/FeelMMSoundManagerPlaylistManager.unity
+  uploadId: 830868

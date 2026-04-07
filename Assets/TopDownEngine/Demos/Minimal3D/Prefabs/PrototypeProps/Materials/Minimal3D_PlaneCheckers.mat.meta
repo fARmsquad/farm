@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: e6893dcb405a8aa4fbdf1a28fac5de33
+timeCreated: 1518984889
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Materials/Minimal3D_PlaneCheckers.mat
+  uploadId: 846008

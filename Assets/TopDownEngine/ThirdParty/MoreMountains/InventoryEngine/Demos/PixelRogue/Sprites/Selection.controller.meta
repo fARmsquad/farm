@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: cf18d60d976b68e4394e0c6ab76499a6
+timeCreated: 1463215409
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Sprites/Selection.controller
+  uploadId: 846008

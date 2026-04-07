@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 79351a369d26e8c46b89fe7f5c6d5994
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Prefabs/Props/GrasslandsTree1.prefab
+  uploadId: 846008

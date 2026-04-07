@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 98d38f217afa68844b6a4c2d3b257750
+timeCreated: 1511398484
+licenseType: Store
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/readme.txt
+  uploadId: 846008

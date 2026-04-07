@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 223caa20eb485ef4896af8f3db4be864
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/AI/KoalaNinjaRifleman.prefab
+  uploadId: 846008

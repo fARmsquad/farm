@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 79e89ee92d24194448a54290e1551bca
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/AI/Loft3DBlueCube.prefab
+  uploadId: 846008

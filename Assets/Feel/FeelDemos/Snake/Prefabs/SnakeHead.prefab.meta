@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c3c2b9ab2730a774c9a598108b43813a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Snake/Prefabs/SnakeHead.prefab
+  uploadId: 830868

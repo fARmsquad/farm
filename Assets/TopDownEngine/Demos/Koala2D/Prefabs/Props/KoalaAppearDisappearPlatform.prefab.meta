@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 22a75694e0d678e4a999a3bc84d39e64
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Props/KoalaAppearDisappearPlatform.prefab
+  uploadId: 846008

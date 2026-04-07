@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 1f5ce5c518529a846866ae435e06893c
+timeCreated: 1512704279
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Green/ButtonCircleGear.prefab
+  uploadId: 846008

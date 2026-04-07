@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 94afb37e4b3a5a4429d9647f076309fc
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Brass/Animations/FeelBrassTacticalAnimator.controller
+  uploadId: 830868

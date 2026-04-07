@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: debdf82fe82d70d44baa77a3a3a710fe
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Animations/KoalaDungeonSwitchOn.anim
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 73d7843da02c41646b5d0e016d55d908
+timeCreated: 1463414826
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Resources/Items/Bomb.asset
+  uploadId: 846008

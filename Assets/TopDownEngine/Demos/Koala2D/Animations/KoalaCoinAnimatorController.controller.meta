@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 180561207ebf5244d9e3a0272498d23f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Animations/KoalaCoinAnimatorController.controller
+  uploadId: 846008

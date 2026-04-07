@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d235d887305d7944b9dd215173dc4f12
+timeCreated: 1450466807
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Prefabs/Props/Minimal3D_1WayPlatform3D.prefab
+  uploadId: 846008

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: f95dde2d76a8ad544b00eb0c7373364b
+timeCreated: 1512704229
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Cyan/ButtonCircleHome.prefab
+  uploadId: 846008

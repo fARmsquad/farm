@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ee7d437a5c4ef8d4c85b7037e5172e9f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43308063673644842
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Sprinkler_01_Convex.asset
+  uploadId: 864500

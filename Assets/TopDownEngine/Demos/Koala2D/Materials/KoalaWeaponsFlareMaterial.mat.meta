@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2b93188a6f7a3824ebbe3e81e9795f24
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Materials/KoalaWeaponsFlareMaterial.mat
+  uploadId: 846008

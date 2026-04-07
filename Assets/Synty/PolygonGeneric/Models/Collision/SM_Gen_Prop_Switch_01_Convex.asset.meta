@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 12f0b633bfad7ca418f420f09b5d4172
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: -2564044381440133068
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonGeneric/Models/Collision/SM_Gen_Prop_Switch_01_Convex.asset
+  uploadId: 864500

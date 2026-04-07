@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0ff1b85377cf60f4c9ce005548911454
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43056106216704128
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Fence_Wood_Pole_01_Convex.asset
+  uploadId: 864500

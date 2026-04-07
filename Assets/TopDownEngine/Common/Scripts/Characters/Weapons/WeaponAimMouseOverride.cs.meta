@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: e471cd75c6d63b444a011599dabb4f75
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Characters/Weapons/WeaponAimMouseOverride.cs
+  uploadId: 846008

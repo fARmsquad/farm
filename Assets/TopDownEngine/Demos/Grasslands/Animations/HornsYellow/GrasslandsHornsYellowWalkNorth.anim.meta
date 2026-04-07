@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 721287960a38a8143b33b5215baa2dbd
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Animations/HornsYellow/GrasslandsHornsYellowWalkNorth.anim
+  uploadId: 846008

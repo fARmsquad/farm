@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 015a8907d2c097c45b05485ecb8d615d
+timeCreated: 1505825388
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 22100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Common/Animations/Buttons/Animators/ButtonAnimatorOneTimePushDown.overrideController
+  uploadId: 846008

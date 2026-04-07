@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: dd1c3959cc08125438b89eecfa2c2a8f
+timeCreated: 1530226884
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Models/Materials/Leave.mat
+  uploadId: 731838

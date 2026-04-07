@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 8fc92e6af69ecf045a5b247b342b06ae
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal2D/Prefabs/Walls/MinimalWall2D21.prefab
+  uploadId: 846008

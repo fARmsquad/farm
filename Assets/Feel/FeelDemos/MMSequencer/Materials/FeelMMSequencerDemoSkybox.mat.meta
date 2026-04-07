@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 442f0bf836b266f499004e2f72719dc7
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/MMSequencer/Materials/FeelMMSequencerDemoSkybox.mat
+  uploadId: 830868

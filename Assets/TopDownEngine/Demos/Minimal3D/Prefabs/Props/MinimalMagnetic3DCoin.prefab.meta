@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2839df927b4d78a47aacaff394f1dbb1
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/Props/MinimalMagnetic3DCoin.prefab
+  uploadId: 846008

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 727378de08137ae478b02772f9ef3013
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Colonel/Prefabs/Weapons/ColonelDashPicker.prefab
+  uploadId: 846008

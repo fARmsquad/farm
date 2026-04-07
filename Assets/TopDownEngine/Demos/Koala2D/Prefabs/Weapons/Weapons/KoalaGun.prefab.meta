@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 63309671082ff30409623a954c22e8f5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Koala2D/Prefabs/Weapons/Weapons/KoalaGun.prefab
+  uploadId: 846008

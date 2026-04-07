@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: c704680c90181c648a0b5cb809aa40ae
+timeCreated: 1521302601
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Scripts/Items/Coin.cs
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2cc2e8fb769fc3247b8c090644a37043
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Lighting/GrasslandsSettings.lighting
+  uploadId: 846008

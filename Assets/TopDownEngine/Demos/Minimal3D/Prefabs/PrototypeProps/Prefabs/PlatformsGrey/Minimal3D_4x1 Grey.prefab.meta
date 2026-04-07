@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: dfb1eb8f942a02e49b6862754aa8a994
+timeCreated: 1450116251
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Prefabs/PlatformsGrey/Minimal3D_4x1
+    Grey.prefab
+  uploadId: 846008

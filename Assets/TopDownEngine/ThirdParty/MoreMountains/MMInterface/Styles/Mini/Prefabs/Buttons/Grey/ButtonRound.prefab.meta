@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 13b6cad3de0b44140b5595d8f0912b0c
+timeCreated: 1512703938
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Grey/ButtonRound.prefab
+  uploadId: 846008

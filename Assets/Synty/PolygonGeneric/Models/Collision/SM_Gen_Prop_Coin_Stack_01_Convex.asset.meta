@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6c1f076da7923b3409cba656bb6bd9dd
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8815785910808686826
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonGeneric/Models/Collision/SM_Gen_Prop_Coin_Stack_01_Convex.asset
+  uploadId: 864500

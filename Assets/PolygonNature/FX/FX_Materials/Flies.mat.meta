@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2ebe5f4397ab6f540a440c1b54e797bf
+timeCreated: 1527658087
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/FX/FX_Materials/Flies.mat
+  uploadId: 731838

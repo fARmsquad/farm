@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e54783b7b53ce814f93c254c5b99c383
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal2D/Lighting/MinimalSandbox2DSettings.lighting
+  uploadId: 846008

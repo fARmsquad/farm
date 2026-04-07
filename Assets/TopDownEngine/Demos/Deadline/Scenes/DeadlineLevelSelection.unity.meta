@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: cae2011858b82124dbd1687045344914
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Scenes/DeadlineLevelSelection.unity
+  uploadId: 846008

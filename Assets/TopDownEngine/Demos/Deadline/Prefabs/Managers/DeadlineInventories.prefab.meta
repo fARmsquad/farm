@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d48ab87c75a858c498d15d6fbd6f6f4a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Prefabs/Managers/DeadlineInventories.prefab
+  uploadId: 846008

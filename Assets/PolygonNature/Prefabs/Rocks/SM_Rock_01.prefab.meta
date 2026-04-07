@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 51917b8e41ef6a1469249c9dfee70390
+timeCreated: 1528252062
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Rocks/SM_Rock_01.prefab
+  uploadId: 731838

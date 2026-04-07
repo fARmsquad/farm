@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 8d12323d5180fda46bb465e4a27b680c
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Colonel/Prefabs/Weapons/ColonelCharge1Bullet.prefab
+  uploadId: 846008

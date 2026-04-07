@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2b5d97a26d960434aacea05428dec3ef
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Grasslands/Prefabs/Props/GrasslandsBush.prefab
+  uploadId: 846008

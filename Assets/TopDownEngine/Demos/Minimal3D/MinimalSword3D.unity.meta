@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: a8bba52c06984564fbf26a7cfc873e39
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/MinimalSword3D.unity
+  uploadId: 846008

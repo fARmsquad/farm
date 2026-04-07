@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 8d8de1236bf773a44a834b0e2ea5ff14
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Materials/Loft/LoftReflectSurface.renderTexture
+  uploadId: 846008

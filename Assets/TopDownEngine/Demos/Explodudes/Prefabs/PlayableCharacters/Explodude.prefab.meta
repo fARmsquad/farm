@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: be4545189848dbb44996f7fc9b4d53cb
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Explodudes/Prefabs/PlayableCharacters/Explodude.prefab
+  uploadId: 846008

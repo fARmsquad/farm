@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: fb949f46dbfbeaa4f830147be82b43ba
+timeCreated: 1512704227
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/Cyan/ButtonSquareHome.prefab
+  uploadId: 846008

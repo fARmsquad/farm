@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 41d1fe7c66f343e4892663c32fc9567e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/ItemPickers/Loft3DLootTable.asset
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2c7a7d837aebba84b917c74f7a6d9113
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43022049566290048
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Reeds_02_Convex.asset
+  uploadId: 864500

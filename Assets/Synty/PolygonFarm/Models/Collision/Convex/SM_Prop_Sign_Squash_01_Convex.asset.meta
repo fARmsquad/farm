@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e35e1dc16f6b8234aba71df50067e249
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43421885331357740
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Sign_Squash_01_Convex.asset
+  uploadId: 864500

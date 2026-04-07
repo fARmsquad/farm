@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 821887bf86595b74b843a8d7be9dcfd3
+timeCreated: 1506542172
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Common/Animations/Popup/PopupClosed.anim
+  uploadId: 846008

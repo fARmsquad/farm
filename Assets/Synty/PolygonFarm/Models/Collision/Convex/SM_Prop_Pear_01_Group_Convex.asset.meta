@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 64cd448004ec00f48ba4a360216899ad
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43244239112022772
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Pear_01_Group_Convex.asset
+  uploadId: 864500

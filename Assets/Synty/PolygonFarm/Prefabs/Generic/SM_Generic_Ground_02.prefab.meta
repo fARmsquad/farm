@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: f6d5cab8b70f0af4d8609bea8143e6f2
+timeCreated: 1555552235
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Ground_02.prefab
+  uploadId: 864500

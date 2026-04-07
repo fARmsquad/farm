@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 566814b1eb74baa449f9fef747a83fd1
+timeCreated: 1528164002
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Trees/SM_Tree_Pine_Large_02.prefab
+  uploadId: 731838

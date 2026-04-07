@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 38f64b70ffbfa6148b5d43350e478e2f
+timeCreated: 1450033128
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/Prefabs/PrototypeProps/Materials/Minimal3D_palette.mat
+  uploadId: 846008

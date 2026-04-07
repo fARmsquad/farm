@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: da87a3f13fd0da146a280000ce5ec55c
+timeCreated: 1461577793
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Animations/Adventurer_0.controller
+  uploadId: 846008

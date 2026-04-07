@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 640da401760d12e4b96e738799e16180
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Explodudes/Materials/Picker/PickerMaterial.mat
+  uploadId: 846008

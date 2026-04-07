@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 86ecf396d4e5910469b09c9cc730940d
+timeCreated: 1555552567
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Cherry_01.prefab
+  uploadId: 864500

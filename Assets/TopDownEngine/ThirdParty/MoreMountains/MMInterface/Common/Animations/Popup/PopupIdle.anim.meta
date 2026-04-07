@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c10229dda7348e140a7c4d9a4ef06dd6
+timeCreated: 1506541071
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Common/Animations/Popup/PopupIdle.anim
+  uploadId: 846008

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 22d5a5310a35d4740a09bd7162d15606
+timeCreated: 1512703044
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Styles/Mini/Prefabs/Buttons/HorizontalGradientGreenToBlue/ButtonSquareSoundOn.prefab
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fc310f0002b9b714884ea8fb1517d73b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/SquashAndStretch/PostProcessingProfile/FeelSquashAndStretchSkyboxPostProcessingProfile.asset
+  uploadId: 830868

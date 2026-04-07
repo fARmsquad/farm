@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 77c11560aca2ca24595389a0ea78a11a
+timeCreated: 1461938806
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/InventoryEngine/Demos/PixelRogue/Minimal2.unity
+  uploadId: 846008

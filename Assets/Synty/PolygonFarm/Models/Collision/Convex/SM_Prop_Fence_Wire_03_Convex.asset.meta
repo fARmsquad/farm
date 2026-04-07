@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b73ebd7febb1ca5489ea072e05d39d81
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 43690347136254570
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 146192
+  packageName: POLYGON - Farm Pack - Art by Synty
+  packageVersion: 1.7.0
+  assetPath: Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Fence_Wire_03_Convex.asset
+  uploadId: 864500

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 913aed532e7e36e45be44dd53fcf660e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 13400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/Bounce/Physics/FeelBounceBouncyMaterial.physicMaterial
+  uploadId: 830868

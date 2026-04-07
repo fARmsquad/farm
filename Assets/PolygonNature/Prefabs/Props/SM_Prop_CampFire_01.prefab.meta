@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1fbdd99ef1d1e2b4dac24a8d8ef04741
+timeCreated: 1528164002
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Prefabs/Props/SM_Prop_CampFire_01.prefab
+  uploadId: 731838

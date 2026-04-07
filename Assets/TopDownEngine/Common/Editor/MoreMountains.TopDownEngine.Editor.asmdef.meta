@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ca9287c46804c9442be534d9689f5904
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Common/Editor/MoreMountains.TopDownEngine.Editor.asmdef
+  uploadId: 846008

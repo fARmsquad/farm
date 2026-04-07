@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e3b976857bb605a47a19901e2d90666b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Loft3D/Prefabs/Props/LoftFurniture/LoftKitchenStove.prefab
+  uploadId: 846008

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 8866da7caad60954a93a5a2f437a384b
+timeCreated: 1528347716
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/Scenes/DemoScene_Classic_Trees.unity
+  uploadId: 731838

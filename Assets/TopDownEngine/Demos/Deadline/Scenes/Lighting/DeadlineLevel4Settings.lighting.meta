@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1dd62e23c1a88b44fa12e1c9752f3708
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Deadline/Scenes/Lighting/DeadlineLevel4Settings.lighting
+  uploadId: 846008

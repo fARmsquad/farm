@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 38886cc6cada7204c86478a588105630
+timeCreated: 1527653823
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 120152
+  packageName: POLYGON Nature - Low Poly 3D Art by Synty
+  packageVersion: 1.1.7
+  assetPath: Assets/PolygonNature/FX/FX_Materials/WaterParticle.mat
+  uploadId: 731838

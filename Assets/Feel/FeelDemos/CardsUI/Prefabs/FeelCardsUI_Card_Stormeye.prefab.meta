@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7fc69917d0d06bc45b69968dd837d42b
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183370
+  packageName: Feel
+  packageVersion: 5.9.1
+  assetPath: Assets/Feel/FeelDemos/CardsUI/Prefabs/FeelCardsUI_Card_Stormeye.prefab
+  uploadId: 830868

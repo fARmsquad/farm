@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: efe4bae84ceb393499054d08f386ac96
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/Demos/Minimal3D/MinimalGrid3D/LightingData.asset
+  uploadId: 846008

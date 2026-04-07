@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ad315fa173c699e43ad323bee918f2b1
+timeCreated: 1505825403
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89636
+  packageName: TopDown Engine
+  packageVersion: 4.5
+  assetPath: Assets/TopDownEngine/ThirdParty/MoreMountains/MMInterface/Common/Animations/Buttons/Animations/DefaultPlaceholders/MMI_ButtonIdle.anim
+  uploadId: 846008
