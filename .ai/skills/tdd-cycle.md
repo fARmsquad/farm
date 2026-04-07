@@ -8,6 +8,15 @@ Full TDD orchestration: RED → GREEN → VERIFY → REFACTOR → ASSEMBLE → X
 - Target system/class to implement
 - Acceptance criteria from spec
 
+## Pre-Step: Memory Load
+**Before starting any TDD cycle:**
+1. **READ .ai/memory/project-memory.md** — scan for:
+   - Patterns relevant to the system being built
+   - Antipatterns to avoid (especially asset paths, MCP workflow, Input System)
+   - Lessons learned from similar past work
+   - Tech debt that might affect this task
+2. **READ .ai/memory/research-notes.md** — check for prior research on this feature
+
 ## Step Sequence
 
 ### For Core/ tasks (pure logic — no MCP needed):
@@ -64,6 +73,14 @@ Full TDD orchestration: RED → GREEN → VERIFY → REFACTOR → ASSEMBLE → X
 - After every 3rd task: `.ai/scripts/git_sync.sh sync` (rebase onto origin/main)
 - `git push` after each completed task to keep remote branch current
 
+## Post-Step: Memory Write
+**After completing a full TDD cycle (RED→GREEN→VERIFY→REFACTOR):**
+If anything non-obvious was learned during implementation:
+- New pattern → WRITE to project-memory.md "Established Patterns"
+- Gotcha or trap → WRITE to project-memory.md "Antipatterns" or "Lessons Learned"
+- Performance discovery → WRITE to project-memory.md "Performance Budgets"
+Skip if the cycle was routine with no new insights.
+
 ## Exit Criteria
 - All tests pass (including new boundary tests)
 - Code meets Quality Contract
@@ -73,3 +90,4 @@ Full TDD orchestration: RED → GREEN → VERIFY → REFACTOR → ASSEMBLE → X
 - If XR: interaction components wired, physics layers configured
 - All commits follow `[tag] message` format
 - Branch pushed to origin and synced with main
+- project-memory.md updated if new lessons learned

@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace FarmSimVR.MonoBehaviours
 {
     /// <summary>
     /// Simple first-person controller for world exploration.
     /// WASD to move, mouse to look. No jumping.
+    /// Uses the new Input System package.
     /// </summary>
     public class FirstPersonExplorer : MonoBehaviour
     {
@@ -33,8 +35,12 @@ namespace FarmSimVR.MonoBehaviours
 
         private void HandleLook()
         {
-            float mouseX = Input.GetAxis("Mouse X") * lookSpeed;
-            float mouseY = Input.GetAxis("Mouse Y") * lookSpeed;
+            var mouse = Mouse.current;
+            if (mouse == null) return;
+
+            Vector2 delta = mouse.delta.ReadValue();
+            float mouseX = delta.x * lookSpeed * 0.1f;
+            float mouseY = delta.y * lookSpeed * 0.1f;
 
             _pitch -= mouseY;
             _pitch = Mathf.Clamp(_pitch, -80f, 80f);
@@ -45,8 +51,16 @@ namespace FarmSimVR.MonoBehaviours
 
         private void HandleMove()
         {
-            float h = Input.GetAxis("Horizontal");
-            float v = Input.GetAxis("Vertical");
+            var keyboard = Keyboard.current;
+            if (keyboard == null) return;
+
+            float h = 0f;
+            float v = 0f;
+
+            if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) h += 1f;
+            if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) h -= 1f;
+            if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) v += 1f;
+            if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) v -= 1f;
 
             Vector3 move = transform.right * h + transform.forward * v;
             move *= moveSpeed;

@@ -13,7 +13,7 @@ namespace FarmSimVR.Editor
     public static partial class WorldSceneBuilder
     {
         // ── World Constants ───────────────────────────────────────
-        public const float TerrainSize = 400f;
+        public const float TerrainSize = 250f;
         public const float TerrainHeight = 20f;
         public const int HeightmapRes = 513;
         public const int AlphamapRes = 1024;
@@ -37,15 +37,15 @@ namespace FarmSimVR.Editor
         /// </summary>
         public static readonly Vector4[] ZoneBounds =
         {
-            new(120, 40, 160, 120),        // Farm
-            new(-120, 10, 160, 180),       // Town
-            new(-120, 150, 160, 100),      // NorthField
-            new(120, 160, 160, 80),        // SandyShores
-            new(-130, -120, 140, 80),      // Meadow
-            new(30, -120, 180, 80),        // River
-            new(160, -120, 80, 80),        // CountyFair
-            new(0, -180, 400, 40),         // WildflowerHills
-            new(0, 50, 80, 100)            // Trail
+            new(72, 24, 96, 72),          // Farm
+            new(-72, 6, 96, 108),         // Town
+            new(-72, 90, 96, 60),         // NorthField
+            new(72, 96, 96, 48),          // SandyShores
+            new(-78, -72, 84, 48),        // Meadow
+            new(18, -72, 108, 48),        // River
+            new(96, -72, 48, 48),         // CountyFair
+            new(0, -108, 250, 24),        // WildflowerHills
+            new(0, 30, 48, 60)            // Trail
         };
 
         // ── Scene Config Colors ──────────────────────────────────
@@ -150,8 +150,8 @@ namespace FarmSimVR.Editor
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
             RenderSettings.fogColor = FogColor;
-            RenderSettings.fogStartDistance = 80f;
-            RenderSettings.fogEndDistance = 350f;
+            RenderSettings.fogStartDistance = 50f;
+            RenderSettings.fogEndDistance = 220f;
 
             // ── RenderSettings: Ambient ──
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
@@ -170,7 +170,7 @@ namespace FarmSimVR.Editor
             var probeGo = new GameObject("ReflectionProbe");
             probeGo.transform.position = new Vector3(0f, 5f, 0f);
             var probe = probeGo.AddComponent<ReflectionProbe>();
-            probe.size = new Vector3(400f, 20f, 400f);
+            probe.size = new Vector3(250f, 20f, 250f);
             probe.resolution = 256;
             probe.mode = UnityEngine.Rendering.ReflectionProbeMode.Baked;
             probeGo.transform.SetParent(configRoot.transform);
@@ -187,7 +187,11 @@ namespace FarmSimVR.Editor
             terrainData.alphamapResolution = AlphamapRes;
             terrainData.size = new Vector3(TerrainSize, TerrainHeight, TerrainSize);
 
-            // ── Terrain Layers ──
+            // ── Terrain Layers (saved as assets so textures persist) ──
+            const string layerDir = "Assets/_Project/TerrainLayers";
+            if (!AssetDatabase.IsValidFolder(layerDir))
+                AssetDatabase.CreateFolder("Assets/_Project", "TerrainLayers");
+
             var layers = new TerrainLayer[TerrainTexturePaths.Length];
             for (int i = 0; i < TerrainTexturePaths.Length; i++)
             {
@@ -202,7 +206,11 @@ namespace FarmSimVR.Editor
                     var nrm = AssetDatabase.LoadAssetAtPath<Texture2D>(TerrainNormalPaths[i]);
                     if (nrm != null) layers[i].normalMapTexture = nrm;
                 }
+
+                string layerPath = $"{layerDir}/Layer_{i}_{System.IO.Path.GetFileNameWithoutExtension(TerrainTexturePaths[i])}.terrainlayer";
+                AssetDatabase.CreateAsset(layers[i], layerPath);
             }
+            AssetDatabase.SaveAssets();
             terrainData.terrainLayers = layers;
 
             // ── Paint Textures & Heights ──
@@ -217,7 +225,7 @@ namespace FarmSimVR.Editor
             var terrain = terrainGo.GetComponent<Terrain>();
             terrain.drawInstanced = true;
             terrain.heightmapPixelError = 8;
-            terrain.basemapDistance = 150f;
+            terrain.basemapDistance = 100f;
 
             terrainGo.transform.SetParent(terrainRoot.transform);
 
@@ -239,31 +247,31 @@ namespace FarmSimVR.Editor
                 for (int x = 0; x < res; x++)
                     alphas[y, x, LAYER_GRASS] = 1f;
 
-            // Sandy Shores: (40,120) -> (200,200)
-            PaintZoneTexture(alphas, res, 40f, 120f, 200f, 200f, LAYER_SAND, LAYER_GRASS);
+            // Sandy Shores
+            PaintZoneTexture(alphas, res, 24f, 72f, 120f, 120f, LAYER_SAND, LAYER_GRASS);
 
-            // Farm plots: (60,25) -> (110,65)
-            PaintZoneTexture(alphas, res, 60f, 25f, 110f, 65f, LAYER_MUD, LAYER_GRASS);
+            // Farm plots
+            PaintZoneTexture(alphas, res, 36f, 15f, 66f, 39f, LAYER_MUD, LAYER_GRASS);
 
-            // River channel: (-60,-160) -> (120,-80)
-            PaintZoneTexture(alphas, res, -60f, -160f, 120f, -80f, LAYER_MUD, LAYER_GRASS);
+            // River channel
+            PaintZoneTexture(alphas, res, -36f, -96f, 72f, -48f, LAYER_MUD, LAYER_GRASS);
 
-            // Meadow: (-200,-160) -> (-60,-80) as GRASS2
-            PaintZoneTexture(alphas, res, -200f, -160f, -60f, -80f, LAYER_GRASS2, LAYER_GRASS);
-            // Inner meadow flowers: (-180,-150) -> (-80,-90)
-            PaintZoneTexture(alphas, res, -180f, -150f, -80f, -90f, LAYER_FLOWERS, LAYER_GRASS2);
+            // Meadow
+            PaintZoneTexture(alphas, res, -120f, -96f, -36f, -48f, LAYER_GRASS2, LAYER_GRASS);
+            // Inner meadow flowers
+            PaintZoneTexture(alphas, res, -108f, -90f, -48f, -54f, LAYER_FLOWERS, LAYER_GRASS2);
 
-            // North Field: (-180,110) -> (-60,190)
-            PaintZoneTexture(alphas, res, -180f, 110f, -60f, 190f, LAYER_FLOWERS, LAYER_GRASS);
+            // North Field
+            PaintZoneTexture(alphas, res, -108f, 66f, -36f, 114f, LAYER_FLOWERS, LAYER_GRASS);
 
-            // Town Main St: (-190,25) -> (-50,35)
-            PaintZoneTexture(alphas, res, -190f, 25f, -50f, 35f, LAYER_PEBBLES, LAYER_GRASS);
+            // Town Main St
+            PaintZoneTexture(alphas, res, -114f, 15f, -30f, 21f, LAYER_PEBBLES, LAYER_GRASS);
 
-            // Trail: (-15,0) -> (15,95)
-            PaintZoneTexture(alphas, res, -15f, 0f, 15f, 95f, LAYER_PEBBLES, LAYER_GRASS);
+            // Trail
+            PaintZoneTexture(alphas, res, -9f, 0f, 9f, 57f, LAYER_PEBBLES, LAYER_GRASS);
 
-            // Wildflower Hills: (-200,-200) -> (200,-160)
-            PaintZoneTexture(alphas, res, -200f, -200f, 200f, -160f, LAYER_GRASS2, LAYER_GRASS);
+            // Wildflower Hills
+            PaintZoneTexture(alphas, res, -120f, -120f, 120f, -96f, LAYER_GRASS2, LAYER_GRASS);
 
             terrainData.SetAlphamaps(0, 0, alphas);
         }
@@ -272,8 +280,6 @@ namespace FarmSimVR.Editor
             float worldMinX, float worldMinZ, float worldMaxX, float worldMaxZ,
             int newLayer, int replaceLayer)
         {
-            // Convert world coords to alphamap coords
-            // Terrain origin is at (-TerrainSize/2, -TerrainSize/2)
             float halfSize = TerrainSize / 2f;
             int xMin = Mathf.Clamp(Mathf.FloorToInt((worldMinX + halfSize) / TerrainSize * res), 0, res - 1);
             int xMax = Mathf.Clamp(Mathf.CeilToInt((worldMaxX + halfSize) / TerrainSize * res), 0, res - 1);
@@ -284,7 +290,6 @@ namespace FarmSimVR.Editor
             {
                 for (int x = xMin; x <= xMax; x++)
                 {
-                    // Feather edges over 5 pixels
                     int feather = 5;
                     float dx = Mathf.Min(x - xMin, xMax - x, feather) / (float)feather;
                     float dz = Mathf.Min(z - zMin, zMax - z, feather) / (float)feather;
@@ -305,34 +310,33 @@ namespace FarmSimVR.Editor
             {
                 for (int x = 0; x < res; x++)
                 {
-                    // Convert heightmap coords to world coords
                     float worldX = ((float)x / (res - 1)) * TerrainSize - TerrainSize / 2f;
                     float worldZ = ((float)z / (res - 1)) * TerrainSize - TerrainSize / 2f;
 
                     float h = 0f;
 
                     // Farm: flat elevated area
-                    if (worldX > 40f && worldX < 200f && worldZ > -20f && worldZ < 100f)
+                    if (worldX > 24f && worldX < 120f && worldZ > -12f && worldZ < 60f)
                     {
                         h = 0.5f;
                     }
                     // Trail: lerp from west to east
-                    else if (worldX > -40f && worldX < 40f && worldZ > 0f && worldZ < 100f)
+                    else if (worldX > -24f && worldX < 24f && worldZ > 0f && worldZ < 60f)
                     {
-                        h = Mathf.Lerp(0f, 0.5f, (worldX + 40f) / 80f);
+                        h = Mathf.Lerp(0f, 0.5f, (worldX + 24f) / 48f);
                     }
                     // Meadow: gentle rolling
-                    else if (worldX < -60f && worldZ > -160f && worldZ < -80f)
+                    else if (worldX < -36f && worldZ > -96f && worldZ < -48f)
                     {
-                        h = Mathf.Sin(worldX * 0.05f) * Mathf.Sin(worldZ * 0.07f) * 2f;
+                        h = Mathf.Sin(worldX * 0.08f) * Mathf.Sin(worldZ * 0.12f) * 2f;
                     }
                     // River: carved channel
-                    else if (worldX > -60f && worldX < 120f && worldZ > -155f && worldZ < -85f)
+                    else if (worldX > -36f && worldX < 72f && worldZ > -93f && worldZ < -51f)
                     {
-                        float riverCenter = -120f;
+                        float riverCenter = -72f;
                         float distFromCenter = Mathf.Abs(worldZ - riverCenter);
-                        float blendDist = 15f;
-                        float halfWidth = 35f;
+                        float blendDist = 9f;
+                        float halfWidth = 21f;
 
                         if (distFromCenter < halfWidth - blendDist)
                         {
@@ -345,10 +349,10 @@ namespace FarmSimVR.Editor
                         }
                     }
                     // Hills: southern hills
-                    else if (worldZ < -160f)
+                    else if (worldZ < -96f)
                     {
-                        h = (Mathf.Sin(worldX * 0.03f + 1.5f) + 1f) * 2f
-                            * (Mathf.Cos(worldZ * 0.05f) * 0.5f + 0.5f);
+                        h = (Mathf.Sin(worldX * 0.05f + 1.5f) + 1f) * 2f
+                            * (Mathf.Cos(worldZ * 0.08f) * 0.5f + 0.5f);
                     }
 
                     heights[z, x] = h / TerrainHeight;
@@ -393,9 +397,6 @@ namespace FarmSimVR.Editor
         }
         // ── Helpers ───────────────────────────────────────────────
 
-        /// <summary>
-        /// Creates a new empty GameObject, sets its position, and optionally parents it.
-        /// </summary>
         public static GameObject CreateEmpty(string name, Vector3 pos, Transform parent = null)
         {
             var go = new GameObject(name);
@@ -405,10 +406,6 @@ namespace FarmSimVR.Editor
             return go;
         }
 
-        /// <summary>
-        /// Loads a prefab from AssetDatabase and instantiates it via PrefabUtility.
-        /// Falls back to a magenta placeholder cube if the prefab is not found.
-        /// </summary>
         public static GameObject InstantiatePrefab(string path, Vector3 pos, Quaternion rot, Transform parent)
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
@@ -422,7 +419,6 @@ namespace FarmSimVR.Editor
                 return instance;
             }
 
-            // Fallback: magenta placeholder cube
             Debug.LogWarning($"[WorldSceneBuilder] Prefab not found at '{path}', using placeholder.");
             var placeholder = GameObject.CreatePrimitive(PrimitiveType.Cube);
             placeholder.name = $"MISSING_{System.IO.Path.GetFileNameWithoutExtension(path)}";

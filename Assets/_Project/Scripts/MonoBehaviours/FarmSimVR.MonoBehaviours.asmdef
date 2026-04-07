@@ -3,7 +3,8 @@
     "rootNamespace": "FarmSimVR.MonoBehaviours",
     "references": [
         "FarmSimVR.Core",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
