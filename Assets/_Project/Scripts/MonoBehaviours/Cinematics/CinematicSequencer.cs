@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -186,7 +187,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                         break;
 
                     case CinematicStepType.CameraMove:
-                        if (!_cameraPathLookup.ContainsKey(key ?? ""))
+                        if (!string.IsNullOrEmpty(key) && !_cameraPathLookup.ContainsKey(key))
                         {
                             Debug.LogWarning($"[CinematicSequencer] Step {i}: CameraPath key '{key}' not found in registry.");
                             valid = false;
@@ -209,6 +210,245 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             }
 
             return valid;
+        }
+
+        #endregion
+
+        #region Playback State
+
+        private int _startIndex;
+        private Coroutine _runCoroutine;
+
+        #endregion
+
+        #region CompletionFlag
+
+        private class CompletionFlag
+        {
+            public bool Done;
+        }
+
+        #endregion
+
+        #region ExecuteStep
+
+        /// <summary>
+        /// Dispatches a single step to the appropriate subsystem.
+        /// For callback-based steps, wires the completion callback to set flag.Done.
+        /// </summary>
+        private void ExecuteStep(CinematicStep step, CompletionFlag flag)
+        {
+            switch (step.type)
+            {
+                case CinematicStepType.Fade:
+                    if (_screenEffects == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] ScreenEffects is null — skipping Fade step.");
+                        flag.Done = true;
+                        break;
+                    }
+                    if (step.floatParam > 0)
+                        _screenEffects.FadeToBlack(step.duration, () => flag.Done = true);
+                    else
+                        _screenEffects.FadeFromBlack(step.duration, () => flag.Done = true);
+                    break;
+
+                case CinematicStepType.Shake:
+                    if (_screenEffects == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] ScreenEffects is null — skipping Shake step.");
+                        flag.Done = true;
+                        break;
+                    }
+                    _screenEffects.ScreenShake(step.floatParam, step.duration, () => flag.Done = true);
+                    break;
+
+                case CinematicStepType.Letterbox:
+                    if (_screenEffects == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] ScreenEffects is null — skipping Letterbox step.");
+                        flag.Done = true;
+                        break;
+                    }
+                    if (step.floatParam > 0)
+                        _screenEffects.ShowLetterbox(step.floatParam, step.duration, () => flag.Done = true);
+                    else
+                        _screenEffects.HideLetterbox(step.duration, () => flag.Done = true);
+                    break;
+
+                case CinematicStepType.ObjectivePopup:
+                    if (_screenEffects == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] ScreenEffects is null — skipping ObjectivePopup step.");
+                        break;
+                    }
+                    _screenEffects.ShowObjective(step.stringParam);
+                    break;
+
+                case CinematicStepType.Dialogue:
+                    if (_dialogueManager == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] DialogueManager is null — skipping Dialogue step.");
+                        flag.Done = true;
+                        break;
+                    }
+                    if (_dialogueLookup != null && _dialogueLookup.TryGetValue(step.stringParam ?? "", out DialogueData dialogueData))
+                    {
+                        _dialogueManager.OnDialogueComplete.AddListener(OnDialogueCompletedForFlag);
+                        _dialogueManager.StartDialogue(dialogueData);
+
+                        void OnDialogueCompletedForFlag()
+                        {
+                            flag.Done = true;
+                            _dialogueManager.OnDialogueComplete.RemoveListener(OnDialogueCompletedForFlag);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[CinematicSequencer] Dialogue key '{step.stringParam}' not found — skipping.");
+                        flag.Done = true;
+                    }
+                    break;
+
+                case CinematicStepType.CameraMove:
+                    if (_cinematicCamera == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] CinematicCamera is null — skipping CameraMove step.");
+                        flag.Done = true;
+                        break;
+                    }
+                    if (!string.IsNullOrEmpty(step.stringParam))
+                    {
+                        if (_cameraPathLookup != null && _cameraPathLookup.TryGetValue(step.stringParam, out CameraPath path))
+                        {
+                            _cinematicCamera.OnWaypointReached.AddListener(OnWaypointForFlag);
+                            _cinematicCamera.PlayPath(path);
+
+                            void OnWaypointForFlag()
+                            {
+                                flag.Done = true;
+                                _cinematicCamera.OnWaypointReached.RemoveListener(OnWaypointForFlag);
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[CinematicSequencer] CameraPath key '{step.stringParam}' not found — skipping.");
+                            flag.Done = true;
+                        }
+                    }
+                    else
+                    {
+                        _cinematicCamera.OnWaypointReached.AddListener(OnWaypointIndexForFlag);
+                        _cinematicCamera.MoveToWaypoint(step.intParam);
+
+                        void OnWaypointIndexForFlag()
+                        {
+                            flag.Done = true;
+                            _cinematicCamera.OnWaypointReached.RemoveListener(OnWaypointIndexForFlag);
+                        }
+                    }
+                    break;
+
+                case CinematicStepType.Wait:
+                    // Wait is handled by RunSequence via WaitForSecondsRealtime
+                    break;
+
+                case CinematicStepType.PlaySFX:
+                    if (_audioManager == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] AudioManager is null — skipping PlaySFX step.");
+                        break;
+                    }
+                    _audioManager.PlaySFXByKey(step.stringParam ?? "", step.floatParam > 0 ? step.floatParam : 1f);
+                    break;
+
+                case CinematicStepType.PlayMusic:
+                    if (_audioManager == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] AudioManager is null — skipping PlayMusic step.");
+                        break;
+                    }
+                    _audioManager.PlayMusicByKey(step.stringParam ?? "", step.duration);
+                    break;
+
+                case CinematicStepType.StopMusic:
+                    if (_audioManager == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] AudioManager is null — skipping StopMusic step.");
+                        break;
+                    }
+                    _audioManager.StopMusic(step.duration);
+                    break;
+
+                case CinematicStepType.EnablePlayerControl:
+                    if (_playerMovement == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] PlayerMovement is null — skipping EnablePlayerControl step.");
+                        break;
+                    }
+                    _playerMovement.enabled = true;
+                    break;
+
+                case CinematicStepType.DisablePlayerControl:
+                    if (_playerMovement == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] PlayerMovement is null — skipping DisablePlayerControl step.");
+                        break;
+                    }
+                    _playerMovement.enabled = false;
+                    break;
+
+                case CinematicStepType.ActivateNPC:
+                    if (_npcLookup != null && _npcLookup.TryGetValue(step.stringParam ?? "", out NPCController npcToActivate))
+                    {
+                        npcToActivate.Activate();
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[CinematicSequencer] NPC key '{step.stringParam}' not found — skipping ActivateNPC.");
+                    }
+                    break;
+
+                case CinematicStepType.DeactivateNPC:
+                    if (_npcLookup != null && _npcLookup.TryGetValue(step.stringParam ?? "", out NPCController npcToDeactivate))
+                    {
+                        npcToDeactivate.Deactivate();
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[CinematicSequencer] NPC key '{step.stringParam}' not found — skipping DeactivateNPC.");
+                    }
+                    break;
+
+                case CinematicStepType.MissionStart:
+                    if (_missionManager == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] MissionManager is null — skipping MissionStart step.");
+                        break;
+                    }
+                    string[] missionParts = (step.stringParam ?? "").Split('|');
+                    string missionName = missionParts.Length > 0 ? missionParts[0] : "";
+                    string objectiveText = missionParts.Length > 1 ? missionParts[1] : "";
+                    _missionManager.StartMission(missionName, objectiveText);
+                    break;
+
+                case CinematicStepType.MissionComplete:
+                    if (_missionManager == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] MissionManager is null — skipping MissionComplete step.");
+                        break;
+                    }
+                    _missionManager.CompleteMission();
+                    break;
+
+                case CinematicStepType.SetLighting:
+                    Debug.Log($"[CinematicSequencer] SetLighting step (future INT-009 integration): stringParam='{step.stringParam}', floatParam={step.floatParam}");
+                    break;
+
+                default:
+                    Debug.LogWarning($"[CinematicSequencer] Unknown step type: {step.type}");
+                    break;
+            }
         }
 
         #endregion
