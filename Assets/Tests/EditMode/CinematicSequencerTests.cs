@@ -37,4 +37,36 @@ namespace FarmSimVR.Tests.EditMode
             Assert.IsTrue(Enum.IsDefined(typeof(CinematicStepType), type));
         }
     }
+
+    [TestFixture]
+    public class CinematicStepTests
+    {
+        [Test]
+        public void Step_DefaultValues_AreZeroAndFalse()
+        {
+            var step = new CinematicStep();
+
+            Assert.AreEqual(CinematicStepType.CameraMove, step.type);
+            Assert.IsNull(step.stringParam);
+            Assert.AreEqual(0f, step.floatParam);
+            Assert.AreEqual(0, step.intParam);
+            Assert.AreEqual(0f, step.duration);
+            Assert.IsFalse(step.waitForCompletion);
+        }
+
+        [Test]
+        public void MissionStart_ParsesPipeDelimiter()
+        {
+            var step = new CinematicStep
+            {
+                type = CinematicStepType.MissionStart,
+                stringParam = "POLLO LOCO|Capture El Pollo Loco"
+            };
+
+            string[] parts = step.stringParam.Split('|');
+            Assert.AreEqual(2, parts.Length);
+            Assert.AreEqual("POLLO LOCO", parts[0]);
+            Assert.AreEqual("Capture El Pollo Loco", parts[1]);
+        }
+    }
 }
