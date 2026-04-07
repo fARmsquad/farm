@@ -18,7 +18,7 @@ namespace FarmSimVR.Editor
     public static class FeatureShowcaseBuilder
     {
         [MenuItem("FarmSim/Build Feature Showcase")]
-        public static void CreateShowcaseScene()
+        public static void CreateShowcaseSceneMenu()
         {
             if (!EditorUtility.DisplayDialog(
                 "Build Feature Showcase",
@@ -26,6 +26,15 @@ namespace FarmSimVR.Editor
                 "Build", "Cancel"))
                 return;
 
+            CreateShowcaseScene();
+        }
+
+        /// <summary>
+        /// Builds the scene without a confirmation dialog.
+        /// Called directly by WorldSceneBuilder so the showcase is always generated.
+        /// </summary>
+        public static void CreateShowcaseScene()
+        {
             var scene = EditorSceneManager.NewScene(
                 NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
 
