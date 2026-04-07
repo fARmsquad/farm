@@ -19,7 +19,8 @@ This is the central tracker for all feature specs. Before building anything, fin
 | INT-004 | [Cinematic Camera](Assets/Specs/Features/INT-004-cinematic-camera.md) | INT | Open | -- | -- |
 | INT-005 | [Cinematic Sequencer](Assets/Specs/Features/INT-005-cinematic-sequencer.md) | INT | Open | -- | INT-001, INT-002, INT-003, INT-004 |
 | INT-006 | [NPC Controller](Assets/Specs/Features/INT-006-npc-controller.md) | INT | Open | -- | INT-003 |
-| INT-007 | [Mission Manager](Assets/Specs/Features/INT-007-mission-manager.md) | INT | Open | -- | INT-001 |
+| INT-007 | [Mission Manager](Assets/Specs/Features/INT-007-mission-manager.md) | INT | Open | -- | INT-001, INT-002 |
+| INT-008 | [Intro Scene Assembly](Assets/Specs/Features/INT-008-intro-scene-assembly.md) | INT | Open | -- | INT-001 thru INT-007 |
 
 **Status values:** `Open` | `Claimed` | `In Progress` | `In Review` | `Done`
 
@@ -42,13 +43,22 @@ Specs are organized in layers. Lower layers are built first.
 
 ```
 INT Layer Build Order (Intro Cinematic):
-  INT-001 Screen Effects ─────┐
-  INT-002 Audio Manager ──────┼──→ INT-005 Cinematic Sequencer
-  INT-003 Dialogue System ────┤         │
-  INT-004 Cinematic Camera ───┘         ↓
-                                   (Full Intro)
-  INT-003 Dialogue System ──→ INT-006 NPC Controller
-  INT-001 Screen Effects ───→ INT-007 Mission Manager
+
+  Phase 1 — No dependencies, build in parallel:
+    INT-001 Screen Effects
+    INT-002 Audio Manager
+    INT-003 Dialogue System
+    INT-004 Cinematic Camera
+
+  Phase 2 — Needs Phase 1:
+    INT-006 NPC Controller        (needs INT-003)
+    INT-007 Mission Manager       (needs INT-001, INT-002)
+
+  Phase 3 — Needs Phase 1 + 2:
+    INT-005 Cinematic Sequencer   (needs INT-001 thru INT-004, INT-006, INT-007)
+
+  Phase 4 — Needs everything:
+    INT-008 Intro Scene Assembly  (needs INT-001 thru INT-007)
 
 L2-007 Hunting Chore (needs Farm Layout)
 ```
