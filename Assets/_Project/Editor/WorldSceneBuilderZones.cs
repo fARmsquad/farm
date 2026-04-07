@@ -483,7 +483,7 @@ namespace FarmSimVR.Editor
         private static void BuildMarkers()
         {
             var markersRoot = CreateEmpty("Markers", Vector3.zero);
-            var spawn = CreateEmpty("SpawnPoint", GroundPos(30f, 27f, 0.5f), markersRoot.transform);
+            var spawn = CreateEmpty("SpawnPoint", GroundPos(57f, 33f, 0.5f), markersRoot.transform);
             // Register the tag if it doesn't exist
             var tagManager = new SerializedObject(AssetDatabase.LoadMainAssetAtPath("ProjectSettings/TagManager.asset"));
             var tagsProp = tagManager.FindProperty("tags");

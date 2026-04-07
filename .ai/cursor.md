@@ -11,7 +11,7 @@ Cursor and Windsurf agents should:
 
 ## Limitations
 - No CLI test execution — rely on editor test runner
-- No git finalization — use manual PR workflow
+
 - No parallel flight coordination — single-agent mode only
 
 ## Best Uses

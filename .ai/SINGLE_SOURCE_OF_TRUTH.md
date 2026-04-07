@@ -3,12 +3,12 @@
 Last updated: 2026-04-06
 
 ## Current State
-- **Active branch**: main
+
 - **Current story**: none
 - **Story phase**: idle
 - **Tests**: 0 EditMode passing, 0 PlayMode passing
 - **Main status**: green
-- **Last merge**: none yet
+- **Last push**: none yet
 - **Tech debt items**: 0 (see project-memory.md)
 
 ## Architecture Snapshot

@@ -13,6 +13,7 @@ namespace FarmSimVR.MonoBehaviours
         [SerializeField] private float moveSpeed = 8f;
         [SerializeField] private float lookSpeed = 2f;
         [SerializeField] private float gravity = -15f;
+        [SerializeField] private float jumpForce = 7f;
 
         private CharacterController _controller;
         private Transform _cameraTransform;
@@ -66,9 +67,15 @@ namespace FarmSimVR.MonoBehaviours
             move *= moveSpeed;
 
             if (_controller.isGrounded)
+            {
                 _yVelocity = -2f;
+                if (keyboard.spaceKey.wasPressedThisFrame)
+                    _yVelocity = jumpForce;
+            }
             else
+            {
                 _yVelocity += gravity * Time.deltaTime;
+            }
 
             move.y = _yVelocity;
             _controller.Move(move * Time.deltaTime);

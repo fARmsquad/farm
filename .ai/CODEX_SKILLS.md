@@ -5,14 +5,14 @@ These map to .ai/skills/ files that Codex can invoke:
 
 | Skill | File | Use When |
 |-------|------|----------|
-| Git Discipline | git-discipline.md | **MANDATORY** at every phase boundary — pull, branch, commit, merge |
+| Git Discipline | git-discipline.md | **MANDATORY** at every phase boundary — pull, commit, push to main |
 | Unity Research | unity-research.md | **MANDATORY** before every spec & implementation — web search for patterns |
 | TDD Cycle | tdd-cycle.md | Writing tests and implementation |
 | Story Lookup | story-lookup.md | Finding story context |
 | Spec Delivery | spec-driven-delivery.md | Generating spec packages |
 | Test Runner | unity-test-runner.md | Running/parsing test results |
-| Preflight | preflight.md | Pre-merge validation |
-| Git Finalize | git-finalization.md | PR + merge pipeline |
+| Preflight | preflight.md | Pre-push validation |
+| Git Finalize | git-finalization.md | Pre-push validation + push to main |
 | Parallel Flight | parallel-flight.md | Multi-agent coordination |
 | Asset Pipeline | asset-pipeline.md | 3D asset import validation |
 
