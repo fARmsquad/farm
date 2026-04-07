@@ -8,6 +8,7 @@ namespace FarmSimVR.MonoBehaviours.Hunting
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private float rotationSpeed = 12f;
         [SerializeField] private float gravity = -20f;
+        [SerializeField] private float jumpForce = 7f;
 
         private CharacterController _controller;
         private float _verticalVelocity;
@@ -31,11 +32,17 @@ namespace FarmSimVR.MonoBehaviours.Hunting
 
             Vector3 move = new Vector3(h, 0, v).normalized;
 
-            // Gravity
+            // Gravity & jump
             if (_controller != null && _controller.isGrounded)
+            {
                 _verticalVelocity = -2f;
+                if (kb.spaceKey.wasPressedThisFrame)
+                    _verticalVelocity = jumpForce;
+            }
             else
+            {
                 _verticalVelocity += gravity * Time.deltaTime;
+            }
 
             // Rotate toward movement direction
             if (move.sqrMagnitude > 0.01f)
