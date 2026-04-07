@@ -23,5 +23,24 @@ namespace FarmSimVR.Tests.EditMode
         {
             Assert.AreEqual(9, WorldSceneBuilder.ZoneNames.Length);
         }
+
+        [Test]
+        public void FogColor_IsWarmGolden()
+        {
+            var fog = WorldSceneBuilder.FogColor;
+            Assert.That(fog.r, Is.GreaterThan(0.9f));
+            Assert.That(fog.g, Is.InRange(0.75f, 0.9f));
+            Assert.That(fog.b, Is.InRange(0.55f, 0.7f));
+        }
+
+        [Test]
+        public void TerrainLayerPaths_AllExist()
+        {
+            foreach (var path in WorldSceneBuilder.TerrainTexturePaths)
+            {
+                var tex = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Texture2D>(path);
+                Assert.IsNotNull(tex, $"Missing terrain texture: {path}");
+            }
+        }
     }
 }
