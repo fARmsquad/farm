@@ -2,7 +2,8 @@
     "name": "FarmSimVR.MonoBehaviours",
     "rootNamespace": "FarmSimVR.MonoBehaviours",
     "references": [
-        "FarmSimVR.Core"
+        "FarmSimVR.Core",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
