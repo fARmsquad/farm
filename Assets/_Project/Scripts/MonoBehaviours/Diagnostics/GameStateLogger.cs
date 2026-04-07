@@ -141,15 +141,16 @@ namespace FarmSimVR.MonoBehaviours.Diagnostics
             var mgr = FindAnyObjectByType<HuntingManager>();
             if (mgr == null) { sb.AppendLine("  (HuntingManager not found)"); return; }
 
+            var tracker = mgr.Tracker;
+            if (tracker != null)
+            {
+                sb.AppendLine($"  Carrying: {tracker.CarriedCount}");
+                sb.AppendLine($"  Deposited: {tracker.DepositedCount}");
+            }
+
             var spawner = FindAnyObjectByType<WildAnimalSpawner>();
             if (spawner != null)
                 sb.AppendLine($"  Wild Animals Active: {spawner.ActiveCount}");
-
-            // Read tracker state via HUD (it has the references)
-            var hud = FindAnyObjectByType<HuntingHUD>();
-            // We can't directly access the tracker, but the HUD displays the counts
-            // So let's find BarnDropOff and check if we can read
-            sb.AppendLine($"  (Carrying/Barn counts visible in HUD overlay)");
         }
 
         private void WritePenState(StringBuilder sb)
