@@ -84,6 +84,17 @@ namespace FarmSimVR.Editor
         public const int LAYER_FLOWERS = 5;
         public const int LAYER_SAND_DARK = 6;
 
+        // ── Water Prefab Paths ───────────────────────────────────
+        public static readonly string[] WaterPrefabPaths = {
+            "Assets/PolygonNature/Prefabs/Terrain/River_Plane_01.prefab",
+            "Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_RiverSide_01.prefab",
+            "Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_RiverSide_Corner_01.prefab",
+            "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Pond_01.prefab",
+            "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Reeds_01.prefab",
+            "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Reeds_02.prefab",
+            "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Lillypads_01.prefab",
+        };
+
         // ── Menu Entry ────────────────────────────────────────────
 
         [MenuItem("FarmSim/Build World Scene (New)")]
@@ -385,8 +396,182 @@ namespace FarmSimVR.Editor
             }
             Debug.Log("[WorldSceneBuilder] Zone hierarchy created for 9 zones.");
         }
-        private static void BuildWater() { }
-        private static void BuildPaths() { }
+        private static void BuildWater()
+        {
+            var waterRoot = CreateEmpty("Water", Vector3.zero);
+
+            // ── River ──
+            var riverParent = CreateEmpty("River", Vector3.zero, waterRoot.transform);
+            Vector3[] riverPoints = {
+                new(-40f, -0.8f, -120f),
+                new(-10f, -0.8f, -115f),
+                new(20f, -0.8f, -125f),
+                new(50f, -0.8f, -118f),
+                new(80f, -0.8f, -122f),
+                new(110f, -0.8f, -115f),
+            };
+            for (int i = 0; i < riverPoints.Length; i++)
+            {
+                float yRot = (i % 2 == 0) ? 0f : 15f;
+                var seg = InstantiatePrefab(
+                    "Assets/PolygonNature/Prefabs/Terrain/River_Plane_01.prefab",
+                    riverPoints[i], Quaternion.Euler(0f, yRot, 0f), riverParent.transform);
+                seg.name = $"RiverSegment_{i}";
+            }
+
+            // ── River Banks ──
+            for (int i = 0; i < riverPoints.Length; i++)
+            {
+                // North bank (+12 z)
+                var northPos = riverPoints[i] + new Vector3(0f, 0f, 12f);
+                var northBank = InstantiatePrefab(
+                    "Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_RiverSide_01.prefab",
+                    northPos, Quaternion.identity, riverParent.transform);
+                northBank.name = $"RiverBank_North_{i}";
+
+                // South bank (-12 z), rotated 180
+                var southPos = riverPoints[i] + new Vector3(0f, 0f, -12f);
+                var southBank = InstantiatePrefab(
+                    "Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_RiverSide_01.prefab",
+                    southPos, Quaternion.Euler(0f, 180f, 0f), riverParent.transform);
+                southBank.name = $"RiverBank_South_{i}";
+            }
+
+            // ── Reeds along river banks ──
+            for (int i = 0; i < 10; i++)
+            {
+                int ptIdx = i % riverPoints.Length;
+                float zOffset = (i % 2 == 0) ? 14f : -14f;
+                var reedPos = riverPoints[ptIdx] + new Vector3(i * 3f - 15f, 0.2f, zOffset);
+                var reed = InstantiatePrefab(
+                    "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Reeds_01.prefab",
+                    reedPos, Quaternion.identity, riverParent.transform);
+                reed.name = $"Reed_{i}";
+            }
+
+            // ── Creek ──
+            var creekParent = CreateEmpty("Creek", Vector3.zero, waterRoot.transform);
+            var creek0 = InstantiatePrefab(
+                "Assets/PolygonNature/Prefabs/Terrain/River_Plane_01.prefab",
+                new Vector3(-10f, -0.3f, 55f), Quaternion.Euler(0f, 30f, 0f), creekParent.transform);
+            creek0.transform.localScale = Vector3.one * 0.4f;
+            creek0.name = "CreekSegment_0";
+
+            var creek1 = InstantiatePrefab(
+                "Assets/PolygonNature/Prefabs/Terrain/River_Plane_01.prefab",
+                new Vector3(10f, -0.3f, 50f), Quaternion.Euler(0f, 30f, 0f), creekParent.transform);
+            creek1.transform.localScale = Vector3.one * 0.4f;
+            creek1.name = "CreekSegment_1";
+
+            // ── Bridge over creek ──
+            var bridge = InstantiatePrefab(
+                "Assets/PolygonNature/Prefabs/Props/SM_Prop_Bridge_Curved_01.prefab",
+                new Vector3(0f, 0f, 52f), Quaternion.Euler(0f, 90f, 0f), creekParent.transform);
+            bridge.name = "CreekBridge";
+
+            // ── Farm Pond ──
+            var pond = InstantiatePrefab(
+                "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Pond_01.prefab",
+                new Vector3(165f, 0f, 20f), Quaternion.identity, waterRoot.transform);
+            pond.name = "FarmPond";
+
+            // ── Lily pads ──
+            var lilypads = InstantiatePrefab(
+                "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Lillypads_01.prefab",
+                new Vector3(165f, 0.05f, 20f), Quaternion.identity, waterRoot.transform);
+            lilypads.name = "FarmPondLilypads";
+
+            Debug.Log("[WorldSceneBuilder] Water system built (river, creek, bridge, pond).");
+        }
+
+        private static void BuildPaths()
+        {
+            var pathsRoot = CreateEmpty("Paths", Vector3.zero);
+
+            // ── MainStreet ──
+            var mainStreet = CreateEmpty("MainStreet", Vector3.zero, pathsRoot.transform);
+            const string gravelStraight = "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_Gravel_Straight_01.prefab";
+            const string gravelEnd = "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_Gravel_End_01.prefab";
+
+            // Straight segments along z=30 from x=-185 to x=-55, step 10
+            for (float x = -185f; x <= -55f; x += 10f)
+            {
+                var seg = InstantiatePrefab(gravelStraight,
+                    new Vector3(x, 0.02f, 30f), Quaternion.Euler(0f, 90f, 0f), mainStreet.transform);
+                seg.name = $"MainStreet_Straight_{(int)x}";
+            }
+
+            // End caps
+            var endCapW = InstantiatePrefab(gravelEnd,
+                new Vector3(-190f, 0.02f, 30f), Quaternion.Euler(0f, -90f, 0f), mainStreet.transform);
+            endCapW.name = "MainStreet_EndCap_West";
+
+            var endCapE = InstantiatePrefab(gravelEnd,
+                new Vector3(-50f, 0.02f, 30f), Quaternion.Euler(0f, 90f, 0f), mainStreet.transform);
+            endCapE.name = "MainStreet_EndCap_East";
+
+            // ── TrailToFarm ──
+            var trailToFarm = CreateEmpty("TrailToFarm", Vector3.zero, pathsRoot.transform);
+            const string dirtStraight = "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_Dirt_Straight_01.prefab";
+            const string dirtSwerve = "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_Dirt_Swerve_01.prefab";
+
+            Vector3[] trailPoints = {
+                new(-35f, 0.02f, 30f),
+                new(-25f, 0.02f, 35f),
+                new(-15f, 0.02f, 42f),
+                new(-5f, 0.02f, 48f),
+                new(5f, 0.02f, 50f),
+                new(15f, 0.02f, 50f),
+                new(25f, 0.02f, 48f),
+                new(35f, 0.02f, 45f),
+            };
+            int[] swerveIndices = { 2, 5 };
+
+            for (int i = 0; i < trailPoints.Length; i++)
+            {
+                bool isSwerve = System.Array.IndexOf(swerveIndices, i) >= 0;
+                string prefab = isSwerve ? dirtSwerve : dirtStraight;
+
+                // Calculate y-rotation from direction to next point
+                float yRot = 0f;
+                if (i < trailPoints.Length - 1)
+                {
+                    Vector3 dir = trailPoints[i + 1] - trailPoints[i];
+                    yRot = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+                }
+                else
+                {
+                    // Last point: use same rotation as previous segment
+                    Vector3 dir = trailPoints[i] - trailPoints[i - 1];
+                    yRot = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+                }
+
+                var seg = InstantiatePrefab(prefab,
+                    trailPoints[i], Quaternion.Euler(0f, yRot, 0f), trailToFarm.transform);
+                seg.name = $"Trail_{(isSwerve ? "Swerve" : "Straight")}_{i}";
+            }
+
+            // ── FarmPaths ──
+            var farmPaths = CreateEmpty("FarmPaths", Vector3.zero, pathsRoot.transform);
+
+            // N-S: x=100, z from 45 to 75 step 10, y=0.52
+            for (float z = 45f; z <= 75f; z += 10f)
+            {
+                var seg = InstantiatePrefab(dirtStraight,
+                    new Vector3(100f, 0.52f, z), Quaternion.identity, farmPaths.transform);
+                seg.name = $"FarmPath_NS_{(int)z}";
+            }
+
+            // E-W: z=55, x from 70 to 100 step 10, y=0.52, rotated 90 y
+            for (float x = 70f; x <= 100f; x += 10f)
+            {
+                var seg = InstantiatePrefab(dirtStraight,
+                    new Vector3(x, 0.52f, 55f), Quaternion.Euler(0f, 90f, 0f), farmPaths.transform);
+                seg.name = $"FarmPath_EW_{(int)x}";
+            }
+
+            Debug.Log("[WorldSceneBuilder] Path network built (MainStreet, TrailToFarm, FarmPaths).");
+        }
         private static void BuildFarmZone() { }
         private static void BuildTownZone() { }
         private static void BuildUnpopulatedZones() { }

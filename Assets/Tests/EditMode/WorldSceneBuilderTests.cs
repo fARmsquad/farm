@@ -42,5 +42,15 @@ namespace FarmSimVR.Tests.EditMode
                 Assert.IsNotNull(tex, $"Missing terrain texture: {path}");
             }
         }
+
+        [Test]
+        public void WaterPrefabPaths_AllExist()
+        {
+            foreach (var path in WorldSceneBuilder.WaterPrefabPaths)
+            {
+                var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(path);
+                Assert.IsNotNull(prefab, $"Missing water prefab: {path}");
+            }
+        }
     }
 }
