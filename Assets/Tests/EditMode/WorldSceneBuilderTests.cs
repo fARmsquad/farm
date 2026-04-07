@@ -52,5 +52,22 @@ namespace FarmSimVR.Tests.EditMode
                 Assert.IsNotNull(prefab, $"Missing water prefab: {path}");
             }
         }
+
+        [Test]
+        public void FarmBuildingPrefabPaths_AllExist()
+        {
+            string[] paths = {
+                "Assets/Synty/PolygonFarm/Prefabs/Buildings/SM_Bld_Farmhouse_01.prefab",
+                "Assets/Synty/PolygonFarm/Prefabs/Buildings/SM_Bld_Barn_01.prefab",
+                "Assets/Synty/PolygonFarm/Prefabs/Buildings/SM_Bld_Silo_01.prefab",
+                "Assets/Synty/PolygonFarm/Prefabs/Buildings/SM_Bld_Silo_Small_01.prefab",
+                "Assets/Synty/PolygonFarm/Prefabs/Buildings/SM_Bld_Greenhouse_01.prefab",
+            };
+            foreach (var p in paths)
+            {
+                var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(p);
+                Assert.IsNotNull(prefab, $"Missing farm building: {p}");
+            }
+        }
     }
 }
