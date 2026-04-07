@@ -3,6 +3,10 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
+using FarmSimVR.MonoBehaviours;
+using FarmSimVR.MonoBehaviours.Cinematics;
 
 namespace FarmSimVR.Editor
 {
@@ -123,6 +127,8 @@ namespace FarmSimVR.Editor
             BuildMarkers();
             BuildZoneSigns();
             BuildExplorationPlayer();
+            BuildScreenEffectsUI();
+            RegisterScenesInBuildSettings();
 
             EditorSceneManager.SaveScene(scene,
                 "Assets/_Project/Scenes/WorldMain.unity");
@@ -396,6 +402,150 @@ namespace FarmSimVR.Editor
             }
             Debug.Log("[WorldSceneBuilder] Zone hierarchy created for 9 zones.");
         }
+        // ── Screen Effects UI + Bootstrap ────────────────────────
+
+        private static void BuildScreenEffectsUI()
+        {
+            var root = new GameObject("ScreenEffectsCanvas");
+
+            // Canvas
+            var canvas = root.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 100;
+            var scaler = root.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.matchWidthOrHeight = 0.5f;
+            root.AddComponent<GraphicRaycaster>();
+
+            // Fade overlay (full-screen black image + CanvasGroup for alpha)
+            var fadeGo = new GameObject("FadeOverlay");
+            fadeGo.transform.SetParent(root.transform, false);
+            var fadeRect = fadeGo.AddComponent<RectTransform>();
+            StretchFull(fadeRect);
+            var fadeImage = fadeGo.AddComponent<Image>();
+            fadeImage.color = Color.black;
+            fadeImage.raycastTarget = false;
+            var fadeGroup = fadeGo.AddComponent<CanvasGroup>();
+            fadeGroup.alpha = 1;
+            fadeGroup.blocksRaycasts = false;
+
+            // Letterbox bars
+            var topBar = CreateLetterboxBar("TopBar", root.transform,
+                new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1));
+            var bottomBar = CreateLetterboxBar("BottomBar", root.transform,
+                new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0));
+
+            // Objective popup container
+            var objContainer = new GameObject("ObjectiveContainer");
+            objContainer.transform.SetParent(root.transform, false);
+            var objRect = objContainer.AddComponent<RectTransform>();
+            objRect.anchorMin = new Vector2(0, 0.5f);
+            objRect.anchorMax = new Vector2(1, 0.5f);
+            objRect.sizeDelta = new Vector2(0, 80);
+            var objBg = objContainer.AddComponent<Image>();
+            objBg.color = new Color(0, 0, 0, 0.6f);
+            objContainer.SetActive(false);
+
+            var objTextGo = new GameObject("ObjectiveText");
+            objTextGo.transform.SetParent(objContainer.transform, false);
+            StretchFull(objTextGo.AddComponent<RectTransform>());
+            var objTmp = objTextGo.AddComponent<TextMeshProUGUI>();
+            objTmp.fontSize = 32;
+            objTmp.color = Color.white;
+            objTmp.alignment = TextAlignmentOptions.Center;
+
+            // Mission passed banner
+            var missionGo = new GameObject("MissionPassed");
+            missionGo.transform.SetParent(root.transform, false);
+            var missionRect = missionGo.AddComponent<RectTransform>();
+            missionRect.anchorMin = new Vector2(0, 0.4f);
+            missionRect.anchorMax = new Vector2(1, 0.6f);
+            missionRect.sizeDelta = Vector2.zero;
+            var missionBg = missionGo.AddComponent<Image>();
+            missionBg.color = new Color(0, 0, 0, 0.7f);
+            var missionGroup = missionGo.AddComponent<CanvasGroup>();
+            missionGroup.alpha = 0;
+            missionGo.SetActive(false);
+
+            var missionTextGo = new GameObject("MissionText");
+            missionTextGo.transform.SetParent(missionGo.transform, false);
+            StretchFull(missionTextGo.AddComponent<RectTransform>());
+            var missionTmp = missionTextGo.AddComponent<TextMeshProUGUI>();
+            missionTmp.fontSize = 48;
+            missionTmp.color = Color.white;
+            missionTmp.alignment = TextAlignmentOptions.Center;
+
+            // Attach ScreenEffects and wire serialized fields
+            var fx = root.AddComponent<ScreenEffects>();
+            var so = new SerializedObject(fx);
+            so.FindProperty("fadeOverlay").objectReferenceValue = fadeImage;
+            so.FindProperty("fadeCanvasGroup").objectReferenceValue = fadeGroup;
+            so.FindProperty("topBar").objectReferenceValue = topBar;
+            so.FindProperty("bottomBar").objectReferenceValue = bottomBar;
+            so.FindProperty("objectiveContainer").objectReferenceValue = objRect;
+            so.FindProperty("objectiveText").objectReferenceValue = objTmp;
+            so.FindProperty("missionPassedGroup").objectReferenceValue = missionGroup;
+            so.FindProperty("missionPassedText").objectReferenceValue = missionTmp;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            // Attach bootstrap
+            var bootstrapGo = new GameObject("WorldSceneBootstrap");
+            bootstrapGo.AddComponent<WorldSceneBootstrap>();
+
+            Debug.Log("[WorldSceneBuilder] ScreenEffects UI canvas and bootstrap added.");
+        }
+
+        private static RectTransform CreateLetterboxBar(string name, Transform parent,
+            Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            var rect = go.AddComponent<RectTransform>();
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.pivot = pivot;
+            rect.sizeDelta = new Vector2(0, 0);
+            var img = go.AddComponent<Image>();
+            img.color = Color.black;
+            img.raycastTarget = false;
+            return rect;
+        }
+
+        private static void StretchFull(RectTransform rect)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.sizeDelta = Vector2.zero;
+            rect.anchoredPosition = Vector2.zero;
+        }
+
+        private static void RegisterScenesInBuildSettings()
+        {
+            string[] requiredScenes = {
+                "Assets/_Project/Scenes/TitleScreen.unity",
+                "Assets/_Project/Scenes/WorldMain.unity",
+                "Assets/_Project/Scenes/FarmMain.unity",
+            };
+
+            var existing = new System.Collections.Generic.List<EditorBuildSettingsScene>(
+                EditorBuildSettings.scenes);
+
+            foreach (string path in requiredScenes)
+            {
+                bool found = false;
+                foreach (var s in existing)
+                {
+                    if (s.path == path) { found = true; break; }
+                }
+                if (!found)
+                    existing.Add(new EditorBuildSettingsScene(path, true));
+            }
+
+            EditorBuildSettings.scenes = existing.ToArray();
+            Debug.Log("[WorldSceneBuilder] Build Settings updated with TitleScreen, WorldMain, FarmMain.");
+        }
+
         // ── Material Upgrade ──────────────────────────────────────
         /// <summary>
         /// Upgrades PolygonNature materials from built-in/custom shaders to URP Lit.
@@ -481,6 +631,24 @@ namespace FarmSimVR.Editor
 
         // ── Helpers ───────────────────────────────────────────────
 
+        /// <summary>
+        /// Returns the terrain surface height at the given world XZ position.
+        /// </summary>
+        public static float SampleTerrainHeight(float worldX, float worldZ)
+        {
+            var terrain = Terrain.activeTerrain;
+            if (terrain == null) return 0f;
+            return terrain.SampleHeight(new Vector3(worldX, 0f, worldZ));
+        }
+
+        /// <summary>
+        /// Returns a world position snapped to terrain surface with an optional Y offset.
+        /// </summary>
+        public static Vector3 GroundPos(float x, float z, float yOffset = 0f)
+        {
+            return new Vector3(x, SampleTerrainHeight(x, z) + yOffset, z);
+        }
+
         public static GameObject CreateEmpty(string name, Vector3 pos, Transform parent = null)
         {
             var go = new GameObject(name);
@@ -490,13 +658,23 @@ namespace FarmSimVR.Editor
             return go;
         }
 
-        public static GameObject InstantiatePrefab(string path, Vector3 pos, Quaternion rot, Transform parent)
+        /// <summary>
+        /// Instantiates a prefab. When snapToTerrain is true (default), pos.y is ignored
+        /// and the object is placed on the terrain surface. Pass snapToTerrain=false for
+        /// water or objects that need an explicit Y position.
+        /// </summary>
+        public static GameObject InstantiatePrefab(string path, Vector3 pos, Quaternion rot,
+            Transform parent, bool snapToTerrain = true)
         {
+            Vector3 finalPos = snapToTerrain
+                ? new Vector3(pos.x, SampleTerrainHeight(pos.x, pos.z), pos.z)
+                : pos;
+
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             if (prefab != null)
             {
                 var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-                instance.transform.position = pos;
+                instance.transform.position = finalPos;
                 instance.transform.rotation = rot;
                 if (parent != null)
                     instance.transform.SetParent(parent);
@@ -506,7 +684,7 @@ namespace FarmSimVR.Editor
             Debug.LogWarning($"[WorldSceneBuilder] Prefab not found at '{path}', using placeholder.");
             var placeholder = GameObject.CreatePrimitive(PrimitiveType.Cube);
             placeholder.name = $"MISSING_{System.IO.Path.GetFileNameWithoutExtension(path)}";
-            placeholder.transform.position = pos;
+            placeholder.transform.position = finalPos;
             placeholder.transform.rotation = rot;
             if (parent != null)
                 placeholder.transform.SetParent(parent);

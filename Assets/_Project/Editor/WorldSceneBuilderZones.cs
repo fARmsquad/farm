@@ -29,7 +29,7 @@ namespace FarmSimVR.Editor
                 float yRot = (i % 2 == 0) ? 0f : 15f;
                 var seg = InstantiatePrefab(
                     "Assets/PolygonNature/Prefabs/Terrain/River_Plane_01.prefab",
-                    riverPoints[i], Quaternion.Euler(0f, yRot, 0f), riverParent.transform);
+                    riverPoints[i], Quaternion.Euler(0f, yRot, 0f), riverParent.transform, false);
                 seg.name = $"RiverSegment_{i}";
             }
 
@@ -39,13 +39,13 @@ namespace FarmSimVR.Editor
                 var northPos = riverPoints[i] + new Vector3(0f, 0f, 10f);
                 var northBank = InstantiatePrefab(
                     "Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_RiverSide_01.prefab",
-                    northPos, Quaternion.identity, riverParent.transform);
+                    northPos, Quaternion.identity, riverParent.transform, false);
                 northBank.name = $"RiverBank_North_{i}";
 
                 var southPos = riverPoints[i] + new Vector3(0f, 0f, -10f);
                 var southBank = InstantiatePrefab(
                     "Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_RiverSide_01.prefab",
-                    southPos, Quaternion.Euler(0f, 180f, 0f), riverParent.transform);
+                    southPos, Quaternion.Euler(0f, 180f, 0f), riverParent.transform, false);
                 southBank.name = $"RiverBank_South_{i}";
             }
 
@@ -65,13 +65,13 @@ namespace FarmSimVR.Editor
             var creekParent = CreateEmpty("Creek", Vector3.zero, waterRoot.transform);
             var creek0 = InstantiatePrefab(
                 "Assets/PolygonNature/Prefabs/Terrain/River_Plane_01.prefab",
-                new Vector3(-6f, -0.3f, 33f), Quaternion.Euler(0f, 30f, 0f), creekParent.transform);
+                new Vector3(-6f, -0.3f, 33f), Quaternion.Euler(0f, 30f, 0f), creekParent.transform, false);
             creek0.transform.localScale = Vector3.one * 0.4f;
             creek0.name = "CreekSegment_0";
 
             var creek1 = InstantiatePrefab(
                 "Assets/PolygonNature/Prefabs/Terrain/River_Plane_01.prefab",
-                new Vector3(6f, -0.3f, 30f), Quaternion.Euler(0f, 30f, 0f), creekParent.transform);
+                new Vector3(6f, -0.3f, 30f), Quaternion.Euler(0f, 30f, 0f), creekParent.transform, false);
             creek1.transform.localScale = Vector3.one * 0.4f;
             creek1.name = "CreekSegment_1";
 
@@ -81,16 +81,17 @@ namespace FarmSimVR.Editor
                 new Vector3(0f, 0f, 31f), Quaternion.Euler(0f, 90f, 0f), creekParent.transform);
             bridge.name = "CreekBridge";
 
-            // ── Farm Pond ──
+            // ── Farm Pond (snaps to terrain) ──
             var pond = InstantiatePrefab(
                 "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Pond_01.prefab",
                 new Vector3(99f, 0f, 12f), Quaternion.identity, waterRoot.transform);
             pond.name = "FarmPond";
 
             // ── Lily pads ──
+            var lilyY = SampleTerrainHeight(99f, 12f) + 0.05f;
             var lilypads = InstantiatePrefab(
                 "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Lillypads_01.prefab",
-                new Vector3(99f, 0.05f, 12f), Quaternion.identity, waterRoot.transform);
+                new Vector3(99f, lilyY, 12f), Quaternion.identity, waterRoot.transform, false);
             lilypads.name = "FarmPondLilypads";
 
             Debug.Log("[WorldSceneBuilder] Water system built (river, creek, bridge, pond).");
@@ -482,7 +483,7 @@ namespace FarmSimVR.Editor
         private static void BuildMarkers()
         {
             var markersRoot = CreateEmpty("Markers", Vector3.zero);
-            var spawn = CreateEmpty("SpawnPoint", new Vector3(30f, 0.5f, 27f), markersRoot.transform);
+            var spawn = CreateEmpty("SpawnPoint", GroundPos(30f, 27f, 0.5f), markersRoot.transform);
             // Register the tag if it doesn't exist
             var tagManager = new SerializedObject(AssetDatabase.LoadMainAssetAtPath("ProjectSettings/TagManager.asset"));
             var tagsProp = tagManager.FindProperty("tags");

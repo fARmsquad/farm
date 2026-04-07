@@ -9,7 +9,8 @@ namespace FarmSimVR.Editor
         {
             // Player root
             var player = new GameObject("ExplorationPlayer");
-            player.transform.position = new Vector3(30f, 1.5f, 27f); // spawn at farm entrance
+            float spawnY = SampleTerrainHeight(30f, 27f) + 1.5f;
+            player.transform.position = new Vector3(30f, spawnY, 27f); // spawn at farm entrance
             player.tag = "Player";
 
             // Character Controller for collision
