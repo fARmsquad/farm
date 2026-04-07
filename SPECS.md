@@ -12,7 +12,14 @@ This is the central tracker for all feature specs. Before building anything, fin
 | L1-002 | [Sky & Lighting](Assets/Specs/Features/L1-002-sky-and-lighting.md) | L1 | Done | Youssef | L1-001 |
 | -- | [Crop Growth Calculator](Assets/Specs/Features/crop-growth-calculator.md) | Core | Done | Youssef | -- |
 | -- | [Farm Scene Demo](Assets/Specs/Features/farm-scene-demo.md) | Demo | Done | Youssef | Crop Growth Calc |
-| L2-007 | [Hunting Chore (Catch Animals)](Assets/Specs/Features/L2-007-hunting-chore.md) | L2 | Open | -- | L1-001 |
+| L2-007 | [Hunting Chore (Catch Animals)](Assets/Specs/Features/L2-007-hunting-chore.md) | L2 | Done | AI | L1-001 |
+| INT-001 | [Screen Effects](Assets/Specs/Features/INT-001-screen-effects.md) | INT | Open | -- | -- |
+| INT-002 | [Simple Audio Manager](Assets/Specs/Features/INT-002-simple-audio-manager.md) | INT | Open | -- | -- |
+| INT-003 | [Dialogue System](Assets/Specs/Features/INT-003-dialogue-system.md) | INT | Open | -- | -- |
+| INT-004 | [Cinematic Camera](Assets/Specs/Features/INT-004-cinematic-camera.md) | INT | Open | -- | -- |
+| INT-005 | [Cinematic Sequencer](Assets/Specs/Features/INT-005-cinematic-sequencer.md) | INT | Open | -- | INT-001, INT-002, INT-003, INT-004 |
+| INT-006 | [NPC Controller](Assets/Specs/Features/INT-006-npc-controller.md) | INT | Open | -- | INT-003 |
+| INT-007 | [Mission Manager](Assets/Specs/Features/INT-007-mission-manager.md) | INT | Open | -- | INT-001 |
 
 **Status values:** `Open` | `Claimed` | `In Progress` | `In Review` | `Done`
 
@@ -27,12 +34,22 @@ Specs are organized in layers. Lower layers are built first.
 | **L1** | Environment & scene setup | Ground plane, skybox, lighting |
 | **L2** | Gameplay systems (Core/ C#) | Soil, crops, planting, watering, harvest, inventory |
 | **L3** | Polish & effects | Day/night cycle, weather, VFX, audio (not yet specced) |
+| **INT** | Intro/Cinematic systems | Screen effects, dialogue, cutscene camera, sequencer |
 | **Core** | Foundation logic | Calculators, data types, utilities |
 | **Demo** | Playable demos | Quick proof-of-concept scenes |
 
-**Build order:** Core and L1 have no dependencies. L2 specs may depend on each other — check the "Depends On" column.
+**Build order:** Core and L1 have no dependencies. L2 specs may depend on each other — check the "Depends On" column. INT (intro) specs have their own dependency tree.
 
 ```
+INT Layer Build Order (Intro Cinematic):
+  INT-001 Screen Effects ─────┐
+  INT-002 Audio Manager ──────┼──→ INT-005 Cinematic Sequencer
+  INT-003 Dialogue System ────┤         │
+  INT-004 Cinematic Camera ───┘         ↓
+                                   (Full Intro)
+  INT-003 Dialogue System ──→ INT-006 NPC Controller
+  INT-001 Screen Effects ───→ INT-007 Mission Manager
+
 L2-007 Hunting Chore (needs Farm Layout)
 ```
 
