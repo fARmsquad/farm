@@ -141,9 +141,6 @@ namespace FarmSimVR.Editor
             EditorSceneManager.SaveScene(scene,
                 "Assets/_Project/Scenes/WorldMain.unity");
             Debug.Log("[WorldSceneBuilder] WorldMain.unity created and saved.");
-
-            // Also build the Feature Showcase scene so it's always available
-            FeatureShowcaseBuilder.CreateShowcaseScene();
         }
 
         // ── Core Build Methods ────────────────────────────────────
