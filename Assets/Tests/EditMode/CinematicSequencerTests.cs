@@ -103,4 +103,65 @@ namespace FarmSimVR.Tests.EditMode
             Object.DestroyImmediate(sequence);
         }
     }
+
+    [TestFixture]
+    public class CinematicSequencerValidationTests
+    {
+        private CinematicSequencer CreateSequencer()
+        {
+            var go = new GameObject("Sequencer");
+            return go.AddComponent<CinematicSequencer>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            foreach (var go in Object.FindObjectsByType<CinematicSequencer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                Object.DestroyImmediate(go.gameObject);
+        }
+
+        [Test]
+        public void Validate_EmptySequence_ReturnsTrue()
+        {
+            var sequencer = CreateSequencer();
+            var sequence = ScriptableObject.CreateInstance<CinematicSequence>();
+
+            bool result = sequencer.Validate(sequence);
+
+            Assert.IsTrue(result);
+            Object.DestroyImmediate(sequence);
+        }
+
+        [Test]
+        public void Validate_WaitStep_NoKeyNeeded_ReturnsTrue()
+        {
+            var sequencer = CreateSequencer();
+            var sequence = ScriptableObject.CreateInstance<CinematicSequence>();
+            sequence.steps = new[]
+            {
+                new CinematicStep { type = CinematicStepType.Wait, duration = 1f }
+            };
+
+            bool result = sequencer.Validate(sequence);
+
+            Assert.IsTrue(result);
+            Object.DestroyImmediate(sequence);
+        }
+
+        [Test]
+        public void Validate_DialogueStep_WithBadKey_ReturnsFalse()
+        {
+            var sequencer = CreateSequencer();
+            var sequence = ScriptableObject.CreateInstance<CinematicSequence>();
+            sequence.steps = new[]
+            {
+                new CinematicStep { type = CinematicStepType.Dialogue, stringParam = "NonExistent" }
+            };
+
+            bool result = sequencer.Validate(sequence);
+
+            Assert.IsFalse(result);
+            Object.DestroyImmediate(sequence);
+        }
+    }
 }
