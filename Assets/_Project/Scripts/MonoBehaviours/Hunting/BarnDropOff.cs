@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using FarmSimVR.Core.Hunting;
 
 namespace FarmSimVR.MonoBehaviours.Hunting
@@ -9,6 +10,7 @@ namespace FarmSimVR.MonoBehaviours.Hunting
         private CaughtAnimalTracker _tracker;
 
         public event System.Action<int> OnDeposit;
+        public event System.Action<IReadOnlyList<CaughtAnimalRecord>> OnAnimalsDeposited;
 
         public void Initialize(CaughtAnimalTracker tracker)
         {
@@ -19,13 +21,13 @@ namespace FarmSimVR.MonoBehaviours.Hunting
         {
             if (_tracker == null || _tracker.CarriedCount == 0) return;
 
-            // Check if it's the player
             if (other.GetComponent<IPlayerInput>() == null &&
                 other.GetComponentInParent<IPlayerInput>() == null) return;
 
-            int deposited = _tracker.DepositAll();
-            Debug.Log($"[Hunting] Deposited {deposited} animals at barn! Total in barn: {_tracker.DepositedCount}");
-            OnDeposit?.Invoke(deposited);
+            var deposited = _tracker.DepositAll();
+            Debug.Log($"[BarnDropOff] Deposited {deposited.Count} animals. OnAnimalsDeposited subscribers: {OnAnimalsDeposited?.GetInvocationList().Length ?? 0}");
+            OnDeposit?.Invoke(deposited.Count);
+            OnAnimalsDeposited?.Invoke(deposited);
         }
     }
 }

@@ -18,12 +18,12 @@ namespace FarmSimVR.Core.Hunting
         public IReadOnlyList<CaughtAnimalRecord> GetCarried() => _carried;
         public IReadOnlyList<CaughtAnimalRecord> GetDeposited() => _deposited;
 
-        public int DepositAll()
+        public IReadOnlyList<CaughtAnimalRecord> DepositAll()
         {
-            int count = _carried.Count;
+            var depositing = new List<CaughtAnimalRecord>(_carried);
             _deposited.AddRange(_carried);
             _carried.Clear();
-            return count;
+            return depositing;
         }
     }
 }

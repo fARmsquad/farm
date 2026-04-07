@@ -19,6 +19,11 @@ namespace FarmSimVR.MonoBehaviours
         [SerializeField] private Vector3 boundsCenter = Vector3.zero;
         [SerializeField] private float boundsRadius = 8f;
 
+        [Header("Exclusion Zone (optional)")]
+        [SerializeField] private Vector3 exclusionCenter;
+        [SerializeField] private float exclusionRadius;
+        [SerializeField] private bool hasExclusion;
+
         private Vector3 _targetPoint;
         private float _stateTimer;
         private bool _isWalking;
@@ -76,19 +81,58 @@ namespace FarmSimVR.MonoBehaviours
                     transform.position = boundsCenter + offset.normalized * boundsRadius;
                     PickNewTarget(); // bounce back
                 }
+
+                // Bounce away from exclusion zone
+                if (hasExclusion)
+                {
+                    Vector3 toExclusion = transform.position - exclusionCenter;
+                    toExclusion.y = 0;
+                    if (toExclusion.magnitude < exclusionRadius)
+                    {
+                        transform.position = exclusionCenter + toExclusion.normalized * exclusionRadius;
+                        PickNewTarget();
+                    }
+                }
             }
+        }
+
+        public void SetBounds(Vector3 center, float radius)
+        {
+            boundsCenter = center;
+            boundsRadius = radius;
+            wanderRadius = Mathf.Min(wanderRadius, radius * 0.5f);
+        }
+
+        public void SetExclusionZone(Vector3 center, float radius)
+        {
+            exclusionCenter = center;
+            exclusionRadius = radius;
+            hasExclusion = true;
         }
 
         private void PickNewTarget()
         {
-            Vector2 randomCircle = Random.insideUnitCircle * wanderRadius;
-            _targetPoint = transform.position + new Vector3(randomCircle.x, 0, randomCircle.y);
+            for (int i = 0; i < 5; i++) // retry if target lands in exclusion zone
+            {
+                Vector2 randomCircle = Random.insideUnitCircle * wanderRadius;
+                _targetPoint = transform.position + new Vector3(randomCircle.x, 0, randomCircle.y);
 
-            // Keep target within bounds
-            Vector3 offset = _targetPoint - boundsCenter;
-            offset.y = 0;
-            if (offset.magnitude > boundsRadius)
-                _targetPoint = boundsCenter + offset.normalized * boundsRadius * 0.8f;
+                // Keep target within bounds
+                Vector3 offset = _targetPoint - boundsCenter;
+                offset.y = 0;
+                if (offset.magnitude > boundsRadius)
+                    _targetPoint = boundsCenter + offset.normalized * boundsRadius * 0.8f;
+
+                // Avoid exclusion zone
+                if (hasExclusion)
+                {
+                    Vector3 toExcl = _targetPoint - exclusionCenter;
+                    toExcl.y = 0;
+                    if (toExcl.magnitude < exclusionRadius)
+                        continue; // try again
+                }
+                break;
+            }
         }
     }
 }

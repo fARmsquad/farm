@@ -42,13 +42,19 @@ namespace FarmSimVR.MonoBehaviours.Hunting
         {
             if (animalPrefabs == null || animalPrefabs.Length == 0) return;
 
-            // Pick random point on perimeter
-            float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
-            Vector3 spawnPos = new Vector3(
-                Mathf.Cos(angle) * config.spawnRadius,
-                0f,
-                Mathf.Sin(angle) * config.spawnRadius
-            );
+            // Pick random point on perimeter, avoiding the pen area
+            Vector3 spawnPos;
+            int attempts = 0;
+            do
+            {
+                float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+                spawnPos = new Vector3(
+                    Mathf.Cos(angle) * config.spawnRadius,
+                    0f,
+                    Mathf.Sin(angle) * config.spawnRadius
+                );
+                attempts++;
+            } while (IsInsidePen(spawnPos) && attempts < 10);
 
             int prefabIndex = Random.Range(0, animalPrefabs.Length);
             GameObject animal = Instantiate(animalPrefabs[prefabIndex], spawnPos, Quaternion.identity, transform);
@@ -56,10 +62,13 @@ namespace FarmSimVR.MonoBehaviours.Hunting
             // Determine animal type from prefab name
             AnimalType type = GuessAnimalType(animalPrefabs[prefabIndex].name);
 
-            // Ensure AnimalWander
+            // Ensure AnimalWander — keep wild animals out of the pen
             var wander = animal.GetComponent<AnimalWander>();
             if (wander == null)
                 wander = animal.AddComponent<AnimalWander>();
+            var pen = FindAnyObjectByType<AnimalPen>();
+            if (pen != null)
+                wander.SetExclusionZone(pen.PenCenter, pen.PenRadius + 1f);
 
             // Add flee behavior
             var flee = animal.GetComponent<AnimalFleeBehavior>();
@@ -85,6 +94,16 @@ namespace FarmSimVR.MonoBehaviours.Hunting
             _activeAnimals.Remove(zone.gameObject);
             Destroy(zone.gameObject);
             Debug.Log($"[Hunting] Caught a {zone.AnimalType}! Carrying: {_tracker.CarriedCount}");
+        }
+
+        private bool IsInsidePen(Vector3 pos)
+        {
+            var pen = FindAnyObjectByType<AnimalPen>();
+            if (pen == null) return false;
+            float dist = Vector3.Distance(
+                new Vector3(pos.x, 0, pos.z),
+                new Vector3(pen.PenCenter.x, 0, pen.PenCenter.z));
+            return dist < pen.PenRadius + 1f; // 1m buffer
         }
 
         private AnimalType GuessAnimalType(string prefabName)
