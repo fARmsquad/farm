@@ -17,7 +17,7 @@ This is the central tracker for all feature specs. Before building anything, fin
 | INT-002 | [Simple Audio Manager](Assets/Specs/Features/INT-002-simple-audio-manager.md) | INT | Done | Youssef | -- |
 | INT-003 | [Dialogue System](Assets/Specs/Features/INT-003-dialogue-system.md) | INT | Done | Youssef | -- |
 | INT-004 | [Cinematic Camera](Assets/Specs/Features/INT-004-cinematic-camera.md) | INT | Done | Youssef | -- |
-| INT-005 | [Cinematic Sequencer](Assets/Specs/Features/INT-005-cinematic-sequencer.md) | INT | Open | -- | INT-001, INT-002, INT-003, INT-004 |
+| INT-005 | [Cinematic Sequencer](Assets/Specs/Features/INT-005-cinematic-sequencer.md) | INT | Done | AI | INT-001, INT-002, INT-003, INT-004 |
 | INT-006 | [NPC Controller](Assets/Specs/Features/INT-006-npc-controller.md) | INT | Done | Youssef | INT-003 |
 | INT-007 | [Mission Manager](Assets/Specs/Features/INT-007-mission-manager.md) | INT | Done | Youssef | INT-001, INT-002 |
 | INT-009 | [Lighting Presets & Transitions](Assets/Specs/Features/INT-009-lighting-presets.md) | INT | Open | -- | INT-005 |
