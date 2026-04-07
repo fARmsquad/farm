@@ -353,7 +353,7 @@ namespace FarmSimVR.Editor
             InstantiatePrefab(P("Props/SM_Prop_Barrel_01.prefab"), new Vector3(-71f, 0f, 22f), Quaternion.identity, props);
             InstantiatePrefab(P("Props/SM_Prop_Barrel_02.prefab"), new Vector3(-70f, 0f, 22f), Quaternion.identity, props);
             InstantiatePrefab(P("Props/SM_Prop_Crate_01.prefab"), new Vector3(-73f, 0f, 22f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Crate_02.prefab"), new Vector3(-74f, 0f, 22f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Crate_01.prefab"), new Vector3(-74f, 0f, 22f), Quaternion.identity, props);
             InstantiatePrefab(P("Props/SM_Prop_Bench_01.prefab"),
                 new Vector3(-44f, 0f, 17f), Quaternion.Euler(0f, 90f, 0f), props);
             InstantiatePrefab(P("Props/SM_Prop_Bench_01.prefab"),
@@ -483,6 +483,21 @@ namespace FarmSimVR.Editor
         {
             var markersRoot = CreateEmpty("Markers", Vector3.zero);
             var spawn = CreateEmpty("SpawnPoint", new Vector3(30f, 0.5f, 27f), markersRoot.transform);
+            // Register the tag if it doesn't exist
+            var tagManager = new SerializedObject(AssetDatabase.LoadMainAssetAtPath("ProjectSettings/TagManager.asset"));
+            var tagsProp = tagManager.FindProperty("tags");
+            bool tagExists = false;
+            for (int i = 0; i < tagsProp.arraySize; i++)
+            {
+                if (tagsProp.GetArrayElementAtIndex(i).stringValue == "SpawnPoint")
+                { tagExists = true; break; }
+            }
+            if (!tagExists)
+            {
+                tagsProp.InsertArrayElementAtIndex(tagsProp.arraySize);
+                tagsProp.GetArrayElementAtIndex(tagsProp.arraySize - 1).stringValue = "SpawnPoint";
+                tagManager.ApplyModifiedProperties();
+            }
             spawn.tag = "SpawnPoint";
             Debug.Log("[WorldSceneBuilder] Global markers placed (SpawnPoint).");
         }

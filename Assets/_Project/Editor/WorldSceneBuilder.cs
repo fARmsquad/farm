@@ -109,6 +109,7 @@ namespace FarmSimVR.Editor
             var scene = EditorSceneManager.NewScene(
                 NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
 
+            UpgradePolygonNatureMaterials();
             BuildSceneConfig();
             BuildTerrain();
             BuildZoneHierarchy();
@@ -395,6 +396,89 @@ namespace FarmSimVR.Editor
             }
             Debug.Log("[WorldSceneBuilder] Zone hierarchy created for 9 zones.");
         }
+        // ── Material Upgrade ──────────────────────────────────────
+        /// <summary>
+        /// Upgrades PolygonNature materials from built-in/custom shaders to URP Lit.
+        /// Without this, trees, bushes, rocks, ferns etc. render invisible in URP.
+        /// </summary>
+        private static void UpgradePolygonNatureMaterials()
+        {
+            var urpLit = Shader.Find("Universal Render Pipeline/Lit");
+            if (urpLit == null)
+            {
+                Debug.LogWarning("[WorldSceneBuilder] URP Lit shader not found, skipping material upgrade.");
+                return;
+            }
+
+            // Shaders that need upgrading (built-in Standard + all custom Amplify shaders)
+            string[] incompatibleShaderNames = {
+                "Standard",
+                "SyntyStudios/Trees",
+                "SyntyStudios/Moss",
+                "SyntyStudios/Water",
+                "SyntyStudios/LOD",
+                "SyntyStudios/Vines",
+                "SyntyStudios/SkyGradient",
+            };
+
+            string[] matGuids = AssetDatabase.FindAssets("t:Material", new[] { "Assets/PolygonNature/Materials" });
+            int upgraded = 0;
+
+            foreach (string guid in matGuids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (mat == null || mat.shader == null) continue;
+
+                bool needsUpgrade = false;
+                foreach (string shaderName in incompatibleShaderNames)
+                {
+                    if (mat.shader.name == shaderName)
+                    { needsUpgrade = true; break; }
+                }
+                if (!needsUpgrade) continue;
+
+                // Preserve texture and color before switching shader
+                Texture mainTex = mat.HasProperty("_MainTex") ? mat.GetTexture("_MainTex") : null;
+                if (mainTex == null && mat.HasProperty("_MainTexture"))
+                    mainTex = mat.GetTexture("_MainTexture");
+                Color color = mat.HasProperty("_Color") ? mat.GetColor("_Color") : Color.white;
+                if (mat.HasProperty("_ColorTint"))
+                {
+                    var tint = mat.GetColor("_ColorTint");
+                    if (tint != Color.black) color = tint;
+                }
+
+                bool wasTransparent = mat.renderQueue > 2500;
+
+                mat.shader = urpLit;
+
+                if (mainTex != null)
+                    mat.SetTexture("_BaseMap", mainTex);
+                if (color != Color.black)
+                    mat.SetColor("_BaseColor", color);
+
+                // Handle transparency for leaves/foliage
+                if (wasTransparent || (mainTex != null && mainTex.name.ToLower().Contains("leaf")))
+                {
+                    mat.SetFloat("_Surface", 0); // Opaque with alpha clip
+                    mat.SetFloat("_AlphaClip", 1);
+                    mat.SetFloat("_Cutoff", 0.5f);
+                    mat.EnableKeyword("_ALPHATEST_ON");
+                    mat.renderQueue = 2450;
+                }
+
+                EditorUtility.SetDirty(mat);
+                upgraded++;
+            }
+
+            if (upgraded > 0)
+            {
+                AssetDatabase.SaveAssets();
+                Debug.Log($"[WorldSceneBuilder] Upgraded {upgraded} PolygonNature materials to URP Lit.");
+            }
+        }
+
         // ── Helpers ───────────────────────────────────────────────
 
         public static GameObject CreateEmpty(string name, Vector3 pos, Transform parent = null)

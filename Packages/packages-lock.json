@@ -1,12 +1,13 @@
 {
   "dependencies": {
-    "com.bezi.sidekick": {
-      "version": "file:com.bezi.sidekick",
+    "com.unity.2d.pixel-perfect": {
+      "version": "5.1.1",
       "depth": 0,
-      "source": "embedded",
+      "source": "registry",
       "dependencies": {
-        "com.unity.nuget.newtonsoft-json": "3.2.1"
-      }
+        "com.unity.modules.imgui": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
     },
     "com.unity.2d.pixel-perfect": {
       "version": "5.1.1",
