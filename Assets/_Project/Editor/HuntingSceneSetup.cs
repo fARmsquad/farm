@@ -55,7 +55,7 @@ namespace FarmSimVR.Editor
                     $"Assets/_Project/Prefabs/Animals/{names[i]}.prefab");
                 element.FindPropertyRelative("prefab").objectReferenceValue = prefab;
             }
-            penSO.ApplyModifiedPropertiesWithoutUndo();
+            penSO.ApplyModifiedProperties();
             Debug.Log("[Setup] Configured AnimalPen with prefab mappings");
 
             // Wire into HuntingManager
@@ -68,7 +68,7 @@ namespace FarmSimVR.Editor
                     {
                         var mgrSO = new SerializedObject(c);
                         mgrSO.FindProperty("animalPen").objectReferenceValue = penComp;
-                        mgrSO.ApplyModifiedPropertiesWithoutUndo();
+                        mgrSO.ApplyModifiedProperties();
                         Debug.Log("[Setup] Wired AnimalPen into HuntingManager");
                         break;
                     }
@@ -84,10 +84,9 @@ namespace FarmSimVR.Editor
                     if (c.GetType().Name == "ThirdPersonCamera")
                     {
                         var camSO = new SerializedObject(c);
-                        camSO.FindProperty("offset").vector3Value = new Vector3(0, 5, -7);
-                        camSO.FindProperty("positionSmoothTime").floatValue = 0.15f;
-                        camSO.FindProperty("rotationSmoothSpeed").floatValue = 10f;
-                        camSO.ApplyModifiedPropertiesWithoutUndo();
+                        camSO.FindProperty("offset").vector3Value = new Vector3(0, 10, -7);
+                        camSO.FindProperty("smoothTime").floatValue = 0.2f;
+                        camSO.ApplyModifiedProperties();
                         Debug.Log("[Setup] Updated ThirdPersonCamera settings");
                         break;
                     }
