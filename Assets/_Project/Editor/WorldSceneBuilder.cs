@@ -6,7 +6,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using FarmSimVR.MonoBehaviours;
+using FarmSimVR.MonoBehaviours.Audio;
 using FarmSimVR.MonoBehaviours.Cinematics;
+using FarmSimVR.MonoBehaviours.Debugging;
 
 namespace FarmSimVR.Editor
 {
@@ -127,7 +129,13 @@ namespace FarmSimVR.Editor
             BuildMarkers();
             BuildZoneSigns();
             BuildExplorationPlayer();
+            BuildDebugPanelHost();
             BuildScreenEffectsUI();
+            BuildSimpleAudioManager();
+            BuildDialogueUI();
+            BuildCinematicCamera();
+            BuildMissionManager();
+            BuildNPCDemos();
             RegisterScenesInBuildSettings();
 
             EditorSceneManager.SaveScene(scene,
@@ -411,7 +419,7 @@ namespace FarmSimVR.Editor
             // Canvas
             var canvas = root.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 100;
+            canvas.sortingOrder = 999;
             var scaler = root.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920, 1080);
@@ -489,11 +497,162 @@ namespace FarmSimVR.Editor
             so.FindProperty("missionPassedText").objectReferenceValue = missionTmp;
             so.ApplyModifiedPropertiesWithoutUndo();
 
+            // Demo overlay
+            var demoGo = new GameObject("ScreenEffectsDemo");
+            var demo = demoGo.AddComponent<ScreenEffectsDemo>();
+            var demoSo = new SerializedObject(demo);
+            demoSo.FindProperty("screenEffects").objectReferenceValue = fx;
+            demoSo.ApplyModifiedPropertiesWithoutUndo();
+
             // Attach bootstrap
             var bootstrapGo = new GameObject("WorldSceneBootstrap");
             bootstrapGo.AddComponent<WorldSceneBootstrap>();
 
-            Debug.Log("[WorldSceneBuilder] ScreenEffects UI canvas and bootstrap added.");
+            Debug.Log("[WorldSceneBuilder] ScreenEffects UI canvas, demo, and bootstrap added.");
+        }
+
+        // ── Debug Panel Host ─────────────────────────────────────
+
+        private static void BuildDebugPanelHost()
+        {
+            var go = new GameObject("DebugPanelHost");
+            go.AddComponent<DebugPanelHost>();
+            Debug.Log("[WorldSceneBuilder] DebugPanelHost added (press Tab to open master menu).");
+        }
+
+        // ── INT-002: Simple Audio Manager ──────────────────────
+
+        private static void BuildSimpleAudioManager()
+        {
+            var go = new GameObject("SimpleAudioManager");
+            go.AddComponent<SimpleAudioManager>();
+            var demoGo = new GameObject("SimpleAudioManagerDemo");
+            demoGo.AddComponent<SimpleAudioManagerDemo>();
+            Debug.Log("[WorldSceneBuilder] SimpleAudioManager and demo added.");
+        }
+
+        // ── INT-003: Dialogue System ─────────────────────────────
+
+        private static void BuildDialogueUI()
+        {
+            var root = new GameObject("DialogueCanvas");
+            var canvas = root.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 998;
+            var scaler = root.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.matchWidthOrHeight = 0.5f;
+            root.AddComponent<GraphicRaycaster>();
+
+            // Panel — bottom-center, 80% width, 180px tall
+            var panelGo = new GameObject("DialoguePanel");
+            panelGo.transform.SetParent(root.transform, false);
+            var panelRect = panelGo.AddComponent<RectTransform>();
+            panelRect.anchorMin = new Vector2(0.1f, 0f);
+            panelRect.anchorMax = new Vector2(0.9f, 0f);
+            panelRect.pivot = new Vector2(0.5f, 0f);
+            panelRect.sizeDelta = new Vector2(0, 180);
+            panelRect.anchoredPosition = new Vector2(0, 30);
+            var panelBg = panelGo.AddComponent<Image>();
+            panelBg.color = new Color(0.05f, 0.05f, 0.1f, 0.85f);
+
+            // Speaker name
+            var speakerGo = new GameObject("SpeakerName");
+            speakerGo.transform.SetParent(panelGo.transform, false);
+            var speakerRect = speakerGo.AddComponent<RectTransform>();
+            speakerRect.anchorMin = new Vector2(0, 0.78f);
+            speakerRect.anchorMax = new Vector2(1, 1);
+            speakerRect.sizeDelta = Vector2.zero;
+            speakerRect.offsetMin = new Vector2(24, 0);
+            speakerRect.offsetMax = new Vector2(-24, -8);
+            var speakerTmp = speakerGo.AddComponent<TextMeshProUGUI>();
+            speakerTmp.fontSize = 26;
+            speakerTmp.fontStyle = FontStyles.Bold;
+            speakerTmp.color = Color.yellow;
+            speakerTmp.alignment = TextAlignmentOptions.BottomLeft;
+
+            // Dialogue text
+            var dialogueGo = new GameObject("DialogueText");
+            dialogueGo.transform.SetParent(panelGo.transform, false);
+            var dialogueRect = dialogueGo.AddComponent<RectTransform>();
+            dialogueRect.anchorMin = Vector2.zero;
+            dialogueRect.anchorMax = new Vector2(1, 0.78f);
+            dialogueRect.sizeDelta = Vector2.zero;
+            dialogueRect.offsetMin = new Vector2(24, 12);
+            dialogueRect.offsetMax = new Vector2(-24, -4);
+            var dialogueTmp = dialogueGo.AddComponent<TextMeshProUGUI>();
+            dialogueTmp.fontSize = 22;
+            dialogueTmp.color = Color.white;
+            dialogueTmp.alignment = TextAlignmentOptions.TopLeft;
+            dialogueTmp.enableWordWrapping = true;
+
+            var mgr = root.AddComponent<DialogueManager>();
+            var so = new SerializedObject(mgr);
+            so.FindProperty("dialogueCanvas").objectReferenceValue = canvas;
+            so.FindProperty("speakerNameText").objectReferenceValue = speakerTmp;
+            so.FindProperty("dialogueText").objectReferenceValue = dialogueTmp;
+            so.FindProperty("panelBackground").objectReferenceValue = panelBg;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            root.SetActive(false);
+
+            var demoGo = new GameObject("DialogueDemo");
+            demoGo.AddComponent<DialogueDemo>();
+            Debug.Log("[WorldSceneBuilder] DialogueManager canvas and demo added.");
+        }
+
+        // ── INT-004: Cinematic Camera ────────────────────────────
+
+        private static void BuildCinematicCamera()
+        {
+            var camGo = new GameObject("CinematicCamera");
+            camGo.transform.position = new Vector3(0f, 20f, 0f);
+            var cam = camGo.AddComponent<Camera>();
+            cam.fieldOfView = 60f;
+            cam.nearClipPlane = 0.1f;
+            cam.farClipPlane = 300f;
+            cam.clearFlags = CameraClearFlags.Skybox;
+            cam.enabled = false;
+            camGo.AddComponent<UniversalAdditionalCameraData>();
+
+            Camera gameplayCam = null;
+            foreach (var c in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
+            {
+                if (c.gameObject.CompareTag("MainCamera"))
+                { gameplayCam = c; break; }
+            }
+
+            var cineCam = camGo.AddComponent<CinematicCamera>();
+            var so = new SerializedObject(cineCam);
+            so.FindProperty("cinematicCam").objectReferenceValue = cam;
+            if (gameplayCam != null)
+                so.FindProperty("gameplayCam").objectReferenceValue = gameplayCam;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            var demoGo = new GameObject("CinematicCameraDemo");
+            demoGo.AddComponent<CinematicCameraDemo>();
+            Debug.Log("[WorldSceneBuilder] CinematicCamera and demo added.");
+        }
+
+        // ── INT-007: Mission Manager ─────────────────────────────
+
+        private static void BuildMissionManager()
+        {
+            var go = new GameObject("MissionManager");
+            go.AddComponent<MissionManager>();
+            var demoGo = new GameObject("MissionManagerDemo");
+            demoGo.AddComponent<MissionManagerDemo>();
+            Debug.Log("[WorldSceneBuilder] MissionManager and demo added.");
+        }
+
+        // ── INT-006: NPC Demo ────────────────────────────────────
+
+        private static void BuildNPCDemos()
+        {
+            var demoGo = new GameObject("NPCControllerDemo");
+            demoGo.AddComponent<NPCControllerDemo>();
+            Debug.Log("[WorldSceneBuilder] NPCController demo added.");
         }
 
         private static RectTransform CreateLetterboxBar(string name, Transform parent,
