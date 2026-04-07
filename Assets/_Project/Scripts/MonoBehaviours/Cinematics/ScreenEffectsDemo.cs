@@ -1,21 +1,76 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace FarmSimVR.MonoBehaviours.Cinematics
 {
     /// <summary>
-    /// Demo controller for testing INT-001 Screen Effects.
-    /// Each public method is wired to a UI button in the test scene.
+    /// Debug overlay for testing INT-001 Screen Effects in the World scene.
+    /// Press F1 to toggle the debug panel. Uses IMGUI so it's self-contained
+    /// with no Canvas setup required.
     /// </summary>
     public class ScreenEffectsDemo : MonoBehaviour
     {
         [SerializeField] public ScreenEffects screenEffects;
-
         private int objectiveCount = 1;
+        private bool showPanel;
 
         private void Start()
         {
             if (screenEffects == null)
                 screenEffects = FindAnyObjectByType<ScreenEffects>();
+        }
+
+        private void Update()
+        {
+            var kb = Keyboard.current;
+            if (kb != null && kb.leftAltKey.isPressed && kb.digit1Key.wasPressedThisFrame)
+                showPanel = !showPanel;
+        }
+
+        private void OnGUI()
+        {
+            if (!showPanel) return;
+
+            float w = 220f;
+            float h = 310f;
+            float x = 10f;
+            float y = 10f;
+            float btnH = 30f;
+            float pad = 5f;
+
+            GUI.Box(new Rect(x, y, w, h), "Screen Effects (Alt+1)");
+            float cy = y + 25f;
+
+            if (GUI.Button(new Rect(x + pad, cy, w - pad * 2, btnH), "Fade To Black"))
+                OnFadeToBlack();
+            cy += btnH + pad;
+
+            if (GUI.Button(new Rect(x + pad, cy, w - pad * 2, btnH), "Fade From Black"))
+                OnFadeFromBlack();
+            cy += btnH + pad;
+
+            if (GUI.Button(new Rect(x + pad, cy, w - pad * 2, btnH), "Screen Shake"))
+                OnScreenShake();
+            cy += btnH + pad;
+
+            if (GUI.Button(new Rect(x + pad, cy, w - pad * 2, btnH), "Show Letterbox"))
+                OnShowLetterbox();
+            cy += btnH + pad;
+
+            if (GUI.Button(new Rect(x + pad, cy, w - pad * 2, btnH), "Hide Letterbox"))
+                OnHideLetterbox();
+            cy += btnH + pad;
+
+            if (GUI.Button(new Rect(x + pad, cy, w - pad * 2, btnH), "Show Objective"))
+                OnShowObjective();
+            cy += btnH + pad;
+
+            if (GUI.Button(new Rect(x + pad, cy, w - pad * 2, btnH), "Mission Passed"))
+                OnMissionPassed();
+            cy += btnH + pad;
+
+            if (GUI.Button(new Rect(x + pad, cy, w - pad * 2, btnH), "Reset All"))
+                OnResetAll();
         }
 
         public void OnFadeToBlack()
