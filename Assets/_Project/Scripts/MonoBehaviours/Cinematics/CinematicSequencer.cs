@@ -230,6 +230,155 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
         #endregion
 
+        #region Public Playback API
+
+        /// <summary>
+        /// Starts playing a cinematic sequence from the beginning.
+        /// Stops any currently running sequence first.
+        /// </summary>
+        public void Play(CinematicSequence sequence)
+        {
+            if (_runCoroutine != null)
+            {
+                StopAllCoroutines();
+                _runCoroutine = null;
+            }
+
+            BuildLookups();
+            Validate(sequence);
+
+            IsPlaying = true;
+            IsPaused = false;
+            _startIndex = 0;
+
+            _runCoroutine = StartCoroutine(RunSequence(sequence));
+        }
+
+        /// <summary>
+        /// Pauses the currently playing sequence.
+        /// </summary>
+        public void Pause()
+        {
+            if (IsPlaying)
+                IsPaused = true;
+        }
+
+        /// <summary>
+        /// Resumes a paused sequence.
+        /// </summary>
+        public void Resume()
+        {
+            if (IsPaused)
+                IsPaused = false;
+        }
+
+        /// <summary>
+        /// Immediately stops the current sequence, applies terminal states, and fires OnSequenceComplete.
+        /// </summary>
+        public void Skip()
+        {
+            StopAllCoroutines();
+            _runCoroutine = null;
+
+            // Apply terminal states
+            if (_screenEffects != null)
+                _screenEffects.ResetAll();
+            if (_dialogueManager != null)
+                _dialogueManager.Hide();
+            if (_playerMovement != null)
+                _playerMovement.enabled = true;
+
+            IsPlaying = false;
+            IsPaused = false;
+
+            OnSequenceComplete?.Invoke();
+        }
+
+        /// <summary>
+        /// Stops the current sequence and restarts from the given step index.
+        /// </summary>
+        public void SkipToStep(CinematicSequence sequence, int stepIndex)
+        {
+            StopAllCoroutines();
+            _runCoroutine = null;
+
+            _startIndex = stepIndex;
+            _runCoroutine = StartCoroutine(RunSequence(sequence));
+        }
+
+        #endregion
+
+        #region RunSequence Coroutine
+
+        private IEnumerator RunSequence(CinematicSequence sequence)
+        {
+            if (sequence == null || sequence.steps == null || sequence.steps.Length == 0)
+            {
+                IsPlaying = false;
+                OnSequenceComplete?.Invoke();
+                yield break;
+            }
+
+            for (int i = _startIndex; i < sequence.steps.Length; i++)
+            {
+                // Wait while paused
+                while (IsPaused)
+                    yield return null;
+
+                CinematicStep step = sequence.steps[i];
+                CompletionFlag flag = new CompletionFlag();
+
+                ExecuteStep(step, flag);
+
+                if (step.waitForCompletion)
+                {
+                    switch (step.type)
+                    {
+                        // Wait type: use WaitForSecondsRealtime(duration)
+                        case CinematicStepType.Wait:
+                            yield return new WaitForSecondsRealtime(step.duration);
+                            break;
+
+                        // Callback-based types: wait for flag with timeout
+                        case CinematicStepType.Fade:
+                        case CinematicStepType.Shake:
+                        case CinematicStepType.Letterbox:
+                        case CinematicStepType.Dialogue:
+                        case CinematicStepType.CameraMove:
+                            float timeout = step.duration + 5f;
+                            float elapsed = 0f;
+                            while (!flag.Done && elapsed < timeout)
+                            {
+                                elapsed += Time.unscaledDeltaTime;
+                                yield return null;
+                            }
+                            if (!flag.Done)
+                            {
+                                Debug.LogWarning($"[CinematicSequencer] Step {i} ({step.type}) timed out after {timeout:F1}s — auto-advancing.");
+                            }
+                            break;
+
+                        // Duration-based types: use WaitForSecondsRealtime(duration)
+                        case CinematicStepType.PlaySFX:
+                        case CinematicStepType.PlayMusic:
+                        case CinematicStepType.StopMusic:
+                            yield return new WaitForSecondsRealtime(step.duration);
+                            break;
+
+                        // Instant types: no wait
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            IsPlaying = false;
+            _runCoroutine = null;
+            OnSequenceComplete?.Invoke();
+        }
+
+        #endregion
+
         #region ExecuteStep
 
         /// <summary>
