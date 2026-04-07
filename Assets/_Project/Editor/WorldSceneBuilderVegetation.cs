@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace FarmSimVR.Editor
@@ -24,7 +25,7 @@ namespace FarmSimVR.Editor
                 "Assets/PolygonNature/Prefabs/Trees/SM_Tree_Birch_03.prefab",
                 "Assets/PolygonNature/Prefabs/Trees/SM_Tree_Pine_01.prefab",
                 "Assets/PolygonNature/Prefabs/Trees/SM_Tree_Pine_02.prefab",
-                "Assets/PolygonNature/Prefabs/Trees/SM_Tree_Pine_03.prefab",
+                "Assets/PolygonNature/Prefabs/Trees/SM_Tree_Pine_Large_01.prefab",
                 "Assets/PolygonNature/Prefabs/Trees/SM_Tree_Willow_Medium_01.prefab",
                 "Assets/PolygonNature/Prefabs/Trees/SM_Tree_Willow_Large_01.prefab",
             };
@@ -127,9 +128,9 @@ namespace FarmSimVR.Editor
 
             // ── Bushes (~20) ────────────────────────────────────
             string[] bushPrefabs = {
-                "Assets/PolygonNature/Prefabs/Plants/SM_Bush_01.prefab",
-                "Assets/PolygonNature/Prefabs/Plants/SM_Bush_02.prefab",
-                "Assets/PolygonNature/Prefabs/Plants/SM_Bush_03.prefab",
+                "Assets/PolygonNature/Prefabs/Plants/SM_Plant_Bush_01.prefab",
+                "Assets/PolygonNature/Prefabs/Plants/SM_Plant_Bush_02.prefab",
+                "Assets/PolygonNature/Prefabs/Plants/SM_Plant_Bush_03.prefab",
             };
 
             var bushRng = new System.Random(42);
@@ -152,7 +153,7 @@ namespace FarmSimVR.Editor
             string[] rockPrefabs = {
                 "Assets/PolygonNature/Prefabs/Rocks/SM_Rock_Small_01.prefab",
                 "Assets/PolygonNature/Prefabs/Rocks/SM_Rock_Small_02.prefab",
-                "Assets/PolygonNature/Prefabs/Rocks/SM_Rock_Large_01.prefab",
+                "Assets/PolygonNature/Prefabs/Rocks/SM_Rock_Cluster_Large_01.prefab",
                 "Assets/PolygonNature/Prefabs/Rocks/SM_Rock_Boulder_01.prefab",
             };
 
@@ -178,9 +179,9 @@ namespace FarmSimVR.Editor
 
             // ── Ferns (~15) ─────────────────────────────────────
             string[] fernPrefabs = {
-                "Assets/PolygonNature/Prefabs/Plants/SM_Fern_01.prefab",
-                "Assets/PolygonNature/Prefabs/Plants/SM_Fern_02.prefab",
-                "Assets/PolygonNature/Prefabs/Plants/SM_Fern_03.prefab",
+                "Assets/PolygonNature/Prefabs/Plants/SM_Plant_Fern_01.prefab",
+                "Assets/PolygonNature/Prefabs/Plants/SM_Plant_Fern_02.prefab",
+                "Assets/PolygonNature/Prefabs/Plants/SM_Plant_Fern_03.prefab",
             };
 
             var fernRng = new System.Random(42);

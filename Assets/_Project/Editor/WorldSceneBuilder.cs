@@ -120,6 +120,8 @@ namespace FarmSimVR.Editor
             BuildVegetation();
             BuildFX();
             BuildMarkers();
+            BuildZoneSigns();
+            BuildExplorationPlayer();
 
             EditorSceneManager.SaveScene(scene,
                 "Assets/_Project/Scenes/WorldMain.unity");
@@ -131,16 +133,6 @@ namespace FarmSimVR.Editor
         private static void BuildSceneConfig()
         {
             var configRoot = CreateEmpty("_SceneConfig", Vector3.zero);
-
-            // ── Main Camera ──
-            var camGo = new GameObject("Main Camera");
-            camGo.tag = "MainCamera";
-            camGo.transform.position = new Vector3(0f, 50f, -100f);
-            camGo.transform.rotation = Quaternion.Euler(30f, 0f, 0f);
-            var cam = camGo.AddComponent<Camera>();
-            cam.fieldOfView = 60f;
-            cam.farClipPlane = 500f;
-            camGo.AddComponent<UniversalAdditionalCameraData>();
 
             // ── Directional Light ──
             var lightGo = new GameObject("Directional Light");
@@ -183,7 +175,7 @@ namespace FarmSimVR.Editor
             probe.mode = UnityEngine.Rendering.ReflectionProbeMode.Baked;
             probeGo.transform.SetParent(configRoot.transform);
 
-            Debug.Log("[WorldSceneBuilder] Scene config built (camera, light, fog, ambient, probe).");
+            Debug.Log("[WorldSceneBuilder] Scene config built (light, fog, ambient, probe).");
         }
         private static void BuildTerrain()
         {
@@ -203,7 +195,7 @@ namespace FarmSimVR.Editor
                 var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(TerrainTexturePaths[i]);
                 if (tex != null) layers[i].diffuseTexture = tex;
                 else Debug.LogWarning($"[WorldSceneBuilder] Missing terrain texture: {TerrainTexturePaths[i]}");
-                layers[i].tileSize = new Vector2(10f, 10f);
+                layers[i].tileSize = new Vector2(15f, 15f);
 
                 if (TerrainNormalPaths[i] != null)
                 {
@@ -292,11 +284,14 @@ namespace FarmSimVR.Editor
             {
                 for (int x = xMin; x <= xMax; x++)
                 {
-                    if (alphas[z, x, replaceLayer] > 0f)
-                    {
-                        alphas[z, x, replaceLayer] = 0f;
-                        alphas[z, x, newLayer] = 1f;
-                    }
+                    // Feather edges over 5 pixels
+                    int feather = 5;
+                    float dx = Mathf.Min(x - xMin, xMax - x, feather) / (float)feather;
+                    float dz = Mathf.Min(z - zMin, zMax - z, feather) / (float)feather;
+                    float blend = Mathf.Clamp01(Mathf.Min(dx, dz));
+
+                    alphas[z, x, replaceLayer] = 1f - blend;
+                    alphas[z, x, newLayer] = blend;
                 }
             }
         }
