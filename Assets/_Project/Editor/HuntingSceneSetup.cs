@@ -176,21 +176,9 @@ namespace FarmSimVR.Editor
                     Debug.LogError("[Setup] GameStateLogger type not found");
             }
 
-            // IngameDebugConsole
-            if (GameObject.Find("IngameDebugConsole") == null)
-            {
-                string[] guids = AssetDatabase.FindAssets("IngameDebugConsole t:Prefab");
-                if (guids.Length > 0)
-                {
-                    string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                    var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                    if (prefab != null)
-                    {
-                        PrefabUtility.InstantiatePrefab(prefab);
-                        Debug.Log("[Setup] Added IngameDebugConsole");
-                    }
-                }
-            }
+            // Note: yasirkula IngameDebugConsole removed from auto-setup.
+            // If needed, drag the prefab from Packages manually into the scene.
+            // It requires a Canvas + EventSystem to work properly.
         }
 
         static Component FindComponent(GameObject obj, string typeName)
