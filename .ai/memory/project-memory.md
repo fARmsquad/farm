@@ -35,6 +35,13 @@
 - For complex scene setup, prefer Editor menu item scripts over individual MCP calls
 - `Unity_RunCommand` can't reference project types — use reflection or SerializedObject
 
+### Asset Path Verification
+- Before referencing ANY third-party prefab/model/texture in code or scene assembly:
+  1. `FindProjectAssets(query: "descriptive name")` or glob `Assets/**/*keyword*`
+  2. Use the EXACT path returned — don't construct paths from naming conventions
+  3. If multiple matches, pick the best one and log the choice in the commit message
+- This applies to Synty packs, Unity starter assets, Asset Store downloads, etc.
+
 ### Testing
 - EditMode tests for Core/ pure C# logic
 - PlayMode tests for MonoBehaviour integration
@@ -56,6 +63,11 @@
 - DON'T use `Debug.Log` in committed code (use conditional compilation)
 - DON'T use legacy Input API (`Input.GetKey`, `Input.GetAxis`) — it's dead
 - DON'T leave `TODO`/`FIXME` in merge-ready code
+
+### Asset Paths
+- DON'T hardcode prefab/asset paths without verifying the actual filename first
+- DON'T assume asset pack naming conventions (Synty, etc.) — always glob or `FindProjectAssets`
+- DON'T trust spec/plan paths for third-party assets — verify at implementation time
 
 ### MCP
 - DON'T call MCP scene tools immediately after writing `.cs` files — domain reload will disconnect
@@ -83,7 +95,14 @@
 
 <!-- Append hard-won lessons from debugging sessions, failed approaches, etc. -->
 
-(will accumulate through development)
+### Asset Naming (2026-04-07)
+**Synty asset packs use inconsistent naming.** A plan assumed prefab names
+like `SM_Prop_HayBale_01` but the actual Synty file was
+`SM_Prop_Hay_Bale_Square_01` (extra underscores between words). Similarly
+`SM_Prop_LetterBox` vs `SM_Prop_Letterbox` (capitalization difference).
+**Rule: Always `FindProjectAssets` or glob for the actual filename before
+hardcoding any prefab/asset path in code, specs, or scene assembly.** Never
+assume naming conventions from asset packs — verify every path.
 
 ---
 

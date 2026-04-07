@@ -3,6 +3,8 @@
     "rootNamespace": "FarmSimVR.Tests.EditMode",
     "references": [
         "FarmSimVR.Core",
+        "FarmSimVR.Editor",
+        "FarmSimVR.MonoBehaviours",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

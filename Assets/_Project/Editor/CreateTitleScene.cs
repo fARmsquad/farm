@@ -122,7 +122,9 @@ namespace FarmSimVR.Editor
             EditorSceneManager.SaveScene(scene, scenePath);
             AssetDatabase.Refresh();
 
-            AddScenesToBuild(scenePath, "Assets/_Project/Scenes/FarmMain.unity");
+            AddScenesToBuild(scenePath,
+                "Assets/_Project/Scenes/WorldMain.unity",
+                "Assets/_Project/Scenes/FarmMain.unity");
             Debug.Log("[TitleScene] Done! TitleScreen.unity created.");
         }
 
@@ -139,22 +141,22 @@ namespace FarmSimVR.Editor
             return go;
         }
 
-        static void AddScenesToBuild(string titlePath, string farmMainPath)
+        static void AddScenesToBuild(params string[] scenePaths)
         {
             var existing = new System.Collections.Generic.List<EditorBuildSettingsScene>(
                 EditorBuildSettings.scenes);
 
-            bool hasTitle = false, hasFarmMain = false;
-            foreach (var s in existing)
+            for (int i = 0; i < scenePaths.Length; i++)
             {
-                if (s.path == titlePath) hasTitle = true;
-                if (s.path == farmMainPath) hasFarmMain = true;
+                string path = scenePaths[i];
+                bool found = false;
+                foreach (var s in existing)
+                {
+                    if (s.path == path) { found = true; break; }
+                }
+                if (!found)
+                    existing.Insert(i, new EditorBuildSettingsScene(path, true));
             }
-
-            if (!hasTitle)
-                existing.Insert(0, new EditorBuildSettingsScene(titlePath, true));
-            if (!hasFarmMain)
-                existing.Insert(1, new EditorBuildSettingsScene(farmMainPath, true));
 
             EditorBuildSettings.scenes = existing.ToArray();
             Debug.Log("[TitleScene] Build Settings updated.");

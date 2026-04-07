@@ -9,6 +9,8 @@ this model", "import this", or "here's a [object name]".
 ## Prerequisites
 - com.unity.cloud.gltfast package installed
 - Unity editor open with MCP running
+- **READ .ai/memory/project-memory.md** — check "Lessons Learned > Asset Naming"
+  and "Antipatterns > Asset Paths" before referencing any asset
 
 ## Phase 1: Detect & Classify
 
@@ -318,6 +320,13 @@ manage_scene → save
 ```
 
 Commit: `[asset] ingest [Category]_[Name].glb — prefab + materials + scene placement`
+
+## Phase 7b: Learn
+**WRITE to project-memory.md** if anything non-obvious happened:
+- Model required unexpected scale adjustment → "Lessons Learned"
+- glTFast shader had Quest issues → "Antipatterns"
+- New material workflow proved effective → "Established Patterns"
+- Model was over budget → "Tech Debt Log" (with LOD creation note)
 
 ## Phase 8: Report to Developer
 

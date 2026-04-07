@@ -9,7 +9,8 @@ namespace FarmSimVR.Editor
         {
             // Player root
             var player = new GameObject("ExplorationPlayer");
-            player.transform.position = new Vector3(50f, 1.5f, 45f); // spawn at farm entrance
+            float spawnY = SampleTerrainHeight(30f, 27f) + 1.5f;
+            player.transform.position = new Vector3(30f, spawnY, 27f); // spawn at farm entrance
             player.tag = "Player";
 
             // Character Controller for collision
@@ -27,9 +28,12 @@ namespace FarmSimVR.Editor
             var cam = camGO.AddComponent<Camera>();
             cam.fieldOfView = 70f;
             cam.nearClipPlane = 0.1f;
-            cam.farClipPlane = 500f;
+            cam.farClipPlane = 300f;
             cam.clearFlags = CameraClearFlags.Skybox;
             camGO.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+            // Remove any existing AudioListeners to avoid duplicates
+            foreach (var existing in Object.FindObjectsByType<AudioListener>(FindObjectsSortMode.None))
+                Object.DestroyImmediate(existing);
             camGO.AddComponent<AudioListener>();
 
             // Attach the FPS controller script
@@ -46,15 +50,15 @@ namespace FarmSimVR.Editor
             string signPrefab = "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_SignPost_01.prefab";
 
             (string name, Vector3 pos, float yRot)[] signs = {
-                ("McTavish Farm", new Vector3(50f, 0.5f, 48f), 180f),
-                ("Willowbrook", new Vector3(-45f, 0f, 30f), 90f),
-                ("North Field", new Vector3(-120f, 0f, 105f), 0f),
-                ("Sandy Shores", new Vector3(45f, 0f, 125f), -90f),
-                ("Meadow", new Vector3(-65f, 0f, -85f), 0f),
-                ("River", new Vector3(-55f, 0f, -100f), 45f),
-                ("County Fair", new Vector3(125f, 0f, -85f), -90f),
-                ("Wildflower Hills", new Vector3(0f, 0f, -162f), 0f),
-                ("Trail", new Vector3(-35f, 0f, 35f), 45f),
+                ("McTavish Farm", new Vector3(30f, 0.5f, 29f), 180f),
+                ("Willowbrook", new Vector3(-27f, 0f, 18f), 90f),
+                ("North Field", new Vector3(-72f, 0f, 63f), 0f),
+                ("Sandy Shores", new Vector3(27f, 0f, 75f), -90f),
+                ("Meadow", new Vector3(-39f, 0f, -51f), 0f),
+                ("River", new Vector3(-33f, 0f, -60f), 45f),
+                ("County Fair", new Vector3(75f, 0f, -51f), -90f),
+                ("Wildflower Hills", new Vector3(0f, 0f, -97f), 0f),
+                ("Trail", new Vector3(-21f, 0f, 21f), 45f),
             };
 
             foreach (var (name, pos, yRot) in signs)
@@ -67,6 +71,8 @@ namespace FarmSimVR.Editor
                 textGO.transform.localRotation = Quaternion.identity;
                 var tm = textGO.AddComponent<TextMesh>();
                 tm.text = name;
+                tm.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                tm.GetComponent<MeshRenderer>().material = tm.font.material;
                 tm.fontSize = 32;
                 tm.characterSize = 0.5f;
                 tm.anchor = TextAnchor.MiddleCenter;

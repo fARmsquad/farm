@@ -23,6 +23,7 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
 → GATE: `git_sync.sh verify` must pass before entering Phase 1
 
 ## Phase 1: Intake
+→ **READ .ai/memory/project-memory.md** — load patterns, antipatterns, lessons learned
 → Check .ai/inbox/ for any pending items related to this feature
 → Skill: .ai/skills/story-lookup.md
 → If existing story: load context, resume from last phase
@@ -39,8 +40,11 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
 
 → **Step 2b: Spec Generation**
 → Skill: .ai/skills/spec-driven-delivery.md
+→ **READ .ai/memory/project-memory.md** — check for relevant ADRs, patterns, and antipatterns
+→ Cross-reference: does the proposed approach conflict with any established pattern or ADR?
 → Generate: Feature Spec → Technical Plan (with Research Reference) → Task Breakdown
 → Technical Plan MUST reference research findings and adopted patterns
+→ Technical Plan MUST reference relevant entries from project-memory.md if they exist
 → Save to Assets/Specs/Features/[feature].md
 → Commit: `[spec] add specification for [feature]`
 → Push: `git push` (keep remote branch up to date)
@@ -60,6 +64,13 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
 ### 3a. RED → GREEN → VERIFY → REFACTOR (pure C# logic)
 
     ┌─────────────────────────────────────────────────┐
+    │  MEMORY CHECK (before each task)                │
+    │  → READ .ai/memory/project-memory.md            │
+    │    Check: patterns, antipatterns, lessons that   │
+    │    apply to THIS task (asset paths, naming,      │
+    │    API gotchas, performance traps)               │
+    │  ──────────────── then ────────────────────────│
+    │                                                 │
     │  RESEARCH CHECK (before each task)              │
     │  If task involves a Unity API, pattern, or      │
     │  system the agent hasn't used before:           │
@@ -75,7 +86,7 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
     │  ──────────────── hands off to ──────────────── │
     │                                                 │
     │  implementer (GREEN)                            │
-    │  reads research brief before writing code       │
+    │  reads research brief + project-memory.md       │
     │  writes minimal code, confirms tests pass       │
     │  commits: [feature] implement [task]            │
     │  ──────────────── hands off to ──────────────── │
@@ -89,6 +100,17 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
     │  refactorer (REFACTOR)                          │
     │  cleans up, runs tests after each change        │
     │  commits: [refactor] clean up [task]            │
+    │  ──────────────── LEARN ──────────────────────│
+    │                                                 │
+    │  MEMORY WRITE (after each task completes)       │
+    │  If anything non-obvious was learned:           │
+    │  → WRITE to .ai/memory/project-memory.md        │
+    │    - New pattern? → "Established Patterns"      │
+    │    - Gotcha hit? → "Antipatterns"               │
+    │    - Debugging insight? → "Lessons Learned"     │
+    │    - Asset path trap? → "Lessons Learned"       │
+    │    - Perf discovery? → "Performance Budgets"    │
+    │  Skip if task was routine with no new lessons.  │
     └─────────────────────────────────────────────────┘
 
     Tests run via MCP run_tests if editor open, CLI fallback if closed.
@@ -96,6 +118,7 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
 ### 3b. ASSEMBLE (MCP-powered, after REFACTOR)
 If this task produced a MonoBehaviour or anything that lives in the scene:
 → Skill: .ai/skills/scene-assembly.md
+→ **READ project-memory.md "Asset Paths" antipattern** — verify all prefab/asset paths before use
 
 1. **Check editor state** — read editor_state, verify not compiling/playing
 2. **refresh_unity** — ensure new scripts are compiled
@@ -149,6 +172,7 @@ If the feature requires new 3D models:
     → Repeat for next task in breakdown
     → Between tasks:
       → Check .ai/inbox/ for developer steering
+      → **WRITE to project-memory.md** if this task taught something new
       → `git push` (keep remote up to date after each task)
       → Every 3rd task: `.ai/scripts/git_sync.sh sync` (rebase onto origin/main)
       → If rebase conflicts: resolve, run tests, then continue
@@ -167,6 +191,7 @@ If the feature requires new 3D models:
 → Mark spec acceptance criteria as [x]
 → Run preflight (17 gates: 12 CLI + 5 MCP) — if fails, fix and retry (up to 3 attempts)
 → `.ai/scripts/git_sync.sh verify` must pass (included in preflight as gate 9)
+→ **WRITE to project-memory.md** — add any new patterns/antipatterns discovered during this feature
 
 **Step 4c: PR + Merge**
 → `git push` (final push of rebased branch)
@@ -208,6 +233,21 @@ If the feature requires new 3D models:
   - "What if we also..." → new feature suggestion
     → Create story card in .ai/inbox/ideas/
     → Acknowledge and continue with current story closure
+
+## Memory Touchpoints (Summary)
+Agents interact with `.ai/memory/project-memory.md` at these moments:
+
+| When | Action | What |
+|------|--------|------|
+| Phase 1 (Intake) | **READ** | Load all patterns, antipatterns, lessons before starting |
+| Phase 2 (Spec) | **READ** | Check ADRs and patterns that affect the design |
+| Phase 3 (each task start) | **READ** | Check relevant antipatterns before implementation |
+| Phase 3 (each task end) | **WRITE** | Record new pattern, gotcha, or lesson if any |
+| Phase 3b (Assembly) | **READ** | Verify asset paths, check MCP antipatterns |
+| Phase 4 (Finalization) | **WRITE** | Consolidate all lessons from this feature |
+| Phase 6 (Feedback) | **WRITE** | Record what the playtest revealed (feels wrong = lesson) |
+
+**Rule: if you learned something non-obvious, write it down. If it's routine, skip.**
 
 ## Inbox Check Points
 Agents check .ai/inbox/ at these moments:

@@ -17,35 +17,35 @@ namespace FarmSimVR.Editor
             // ── River ──
             var riverParent = CreateEmpty("River", Vector3.zero, waterRoot.transform);
             Vector3[] riverPoints = {
-                new(-40f, -0.8f, -120f),
-                new(-10f, -0.8f, -115f),
-                new(20f, -0.8f, -125f),
-                new(50f, -0.8f, -118f),
-                new(80f, -0.8f, -122f),
-                new(110f, -0.8f, -115f),
+                new(-24f, -0.8f, -72f),
+                new(-6f, -0.8f, -69f),
+                new(12f, -0.8f, -75f),
+                new(30f, -0.8f, -71f),
+                new(48f, -0.8f, -73f),
+                new(66f, -0.8f, -69f),
             };
             for (int i = 0; i < riverPoints.Length; i++)
             {
                 float yRot = (i % 2 == 0) ? 0f : 15f;
                 var seg = InstantiatePrefab(
                     "Assets/PolygonNature/Prefabs/Terrain/River_Plane_01.prefab",
-                    riverPoints[i], Quaternion.Euler(0f, yRot, 0f), riverParent.transform);
+                    riverPoints[i], Quaternion.Euler(0f, yRot, 0f), riverParent.transform, false);
                 seg.name = $"RiverSegment_{i}";
             }
 
             // ── River Banks ──
             for (int i = 0; i < riverPoints.Length; i++)
             {
-                var northPos = riverPoints[i] + new Vector3(0f, 0f, 12f);
+                var northPos = riverPoints[i] + new Vector3(0f, 0f, 10f);
                 var northBank = InstantiatePrefab(
                     "Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_RiverSide_01.prefab",
-                    northPos, Quaternion.identity, riverParent.transform);
+                    northPos, Quaternion.identity, riverParent.transform, false);
                 northBank.name = $"RiverBank_North_{i}";
 
-                var southPos = riverPoints[i] + new Vector3(0f, 0f, -12f);
+                var southPos = riverPoints[i] + new Vector3(0f, 0f, -10f);
                 var southBank = InstantiatePrefab(
                     "Assets/PolygonNature/Prefabs/Terrain/SM_Terrain_RiverSide_01.prefab",
-                    southPos, Quaternion.Euler(0f, 180f, 0f), riverParent.transform);
+                    southPos, Quaternion.Euler(0f, 180f, 0f), riverParent.transform, false);
                 southBank.name = $"RiverBank_South_{i}";
             }
 
@@ -53,8 +53,8 @@ namespace FarmSimVR.Editor
             for (int i = 0; i < 10; i++)
             {
                 int ptIdx = i % riverPoints.Length;
-                float zOffset = (i % 2 == 0) ? 14f : -14f;
-                var reedPos = riverPoints[ptIdx] + new Vector3(i * 3f - 15f, 0.2f, zOffset);
+                float zOffset = (i % 2 == 0) ? 12f : -12f;
+                var reedPos = riverPoints[ptIdx] + new Vector3(i * 2f - 9f, 0.2f, zOffset);
                 var reed = InstantiatePrefab(
                     "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Reeds_01.prefab",
                     reedPos, Quaternion.identity, riverParent.transform);
@@ -65,32 +65,33 @@ namespace FarmSimVR.Editor
             var creekParent = CreateEmpty("Creek", Vector3.zero, waterRoot.transform);
             var creek0 = InstantiatePrefab(
                 "Assets/PolygonNature/Prefabs/Terrain/River_Plane_01.prefab",
-                new Vector3(-10f, -0.3f, 55f), Quaternion.Euler(0f, 30f, 0f), creekParent.transform);
+                new Vector3(-6f, -0.3f, 33f), Quaternion.Euler(0f, 30f, 0f), creekParent.transform, false);
             creek0.transform.localScale = Vector3.one * 0.4f;
             creek0.name = "CreekSegment_0";
 
             var creek1 = InstantiatePrefab(
                 "Assets/PolygonNature/Prefabs/Terrain/River_Plane_01.prefab",
-                new Vector3(10f, -0.3f, 50f), Quaternion.Euler(0f, 30f, 0f), creekParent.transform);
+                new Vector3(6f, -0.3f, 30f), Quaternion.Euler(0f, 30f, 0f), creekParent.transform, false);
             creek1.transform.localScale = Vector3.one * 0.4f;
             creek1.name = "CreekSegment_1";
 
             // ── Bridge over creek ──
             var bridge = InstantiatePrefab(
                 "Assets/PolygonNature/Prefabs/Props/SM_Prop_Bridge_Curved_01.prefab",
-                new Vector3(0f, 0f, 52f), Quaternion.Euler(0f, 90f, 0f), creekParent.transform);
+                new Vector3(0f, 0f, 31f), Quaternion.Euler(0f, 90f, 0f), creekParent.transform);
             bridge.name = "CreekBridge";
 
-            // ── Farm Pond ──
+            // ── Farm Pond (snaps to terrain) ──
             var pond = InstantiatePrefab(
                 "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Pond_01.prefab",
-                new Vector3(165f, 0f, 20f), Quaternion.identity, waterRoot.transform);
+                new Vector3(99f, 0f, 12f), Quaternion.identity, waterRoot.transform);
             pond.name = "FarmPond";
 
             // ── Lily pads ──
+            var lilyY = SampleTerrainHeight(99f, 12f) + 0.05f;
             var lilypads = InstantiatePrefab(
                 "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Lillypads_01.prefab",
-                new Vector3(165f, 0.05f, 20f), Quaternion.identity, waterRoot.transform);
+                new Vector3(99f, lilyY, 12f), Quaternion.identity, waterRoot.transform, false);
             lilypads.name = "FarmPondLilypads";
 
             Debug.Log("[WorldSceneBuilder] Water system built (river, creek, bridge, pond).");
@@ -106,18 +107,18 @@ namespace FarmSimVR.Editor
             const string gravelStraight = "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_Gravel_Straight_01.prefab";
             const string gravelEnd = "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_Gravel_End_01.prefab";
 
-            for (float x = -185f; x <= -55f; x += 10f)
+            for (float x = -111f; x <= -33f; x += 10f)
             {
                 var seg = InstantiatePrefab(gravelStraight,
-                    new Vector3(x, 0.02f, 30f), Quaternion.Euler(0f, 90f, 0f), mainStreet.transform);
+                    new Vector3(x, 0.02f, 18f), Quaternion.Euler(0f, 90f, 0f), mainStreet.transform);
                 seg.name = $"MainStreet_Straight_{(int)x}";
             }
 
             var endCapW = InstantiatePrefab(gravelEnd,
-                new Vector3(-190f, 0.02f, 30f), Quaternion.Euler(0f, -90f, 0f), mainStreet.transform);
+                new Vector3(-114f, 0.02f, 18f), Quaternion.Euler(0f, -90f, 0f), mainStreet.transform);
             endCapW.name = "MainStreet_EndCap_West";
             var endCapE = InstantiatePrefab(gravelEnd,
-                new Vector3(-50f, 0.02f, 30f), Quaternion.Euler(0f, 90f, 0f), mainStreet.transform);
+                new Vector3(-30f, 0.02f, 18f), Quaternion.Euler(0f, 90f, 0f), mainStreet.transform);
             endCapE.name = "MainStreet_EndCap_East";
 
             // ── TrailToFarm ──
@@ -126,10 +127,10 @@ namespace FarmSimVR.Editor
             const string dirtSwerve = "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_Dirt_Swerve_01.prefab";
 
             Vector3[] trailPoints = {
-                new(-35f, 0.02f, 30f), new(-25f, 0.02f, 35f),
-                new(-15f, 0.02f, 42f), new(-5f, 0.02f, 48f),
-                new(5f, 0.02f, 50f),   new(15f, 0.02f, 50f),
-                new(25f, 0.02f, 48f),  new(35f, 0.02f, 45f),
+                new(-21f, 0.02f, 18f), new(-15f, 0.02f, 21f),
+                new(-9f, 0.02f, 25f),  new(-3f, 0.02f, 29f),
+                new(3f, 0.02f, 30f),   new(9f, 0.02f, 30f),
+                new(15f, 0.02f, 29f),  new(21f, 0.02f, 27f),
             };
             int[] swerveIndices = { 2, 5 };
 
@@ -155,16 +156,16 @@ namespace FarmSimVR.Editor
 
             // ── FarmPaths ──
             var farmPaths = CreateEmpty("FarmPaths", Vector3.zero, pathsRoot.transform);
-            for (float z = 45f; z <= 75f; z += 10f)
+            for (float z = 27f; z <= 45f; z += 10f)
             {
                 var seg = InstantiatePrefab(dirtStraight,
-                    new Vector3(100f, 0.52f, z), Quaternion.identity, farmPaths.transform);
+                    new Vector3(60f, 0.52f, z), Quaternion.identity, farmPaths.transform);
                 seg.name = $"FarmPath_NS_{(int)z}";
             }
-            for (float x = 70f; x <= 100f; x += 10f)
+            for (float x = 42f; x <= 60f; x += 10f)
             {
                 var seg = InstantiatePrefab(dirtStraight,
-                    new Vector3(x, 0.52f, 55f), Quaternion.Euler(0f, 90f, 0f), farmPaths.transform);
+                    new Vector3(x, 0.52f, 33f), Quaternion.Euler(0f, 90f, 0f), farmPaths.transform);
                 seg.name = $"FarmPath_EW_{(int)x}";
             }
 
@@ -175,7 +176,7 @@ namespace FarmSimVR.Editor
         private static void BuildFarmZone()
         {
             var farm = GameObject.Find("Farm");
-            if (farm == null) farm = CreateEmpty("Farm", new Vector3(120f, 0f, 40f));
+            if (farm == null) farm = CreateEmpty("Farm", new Vector3(72f, 0f, 24f));
 
             var buildings = farm.transform.Find("Buildings") ?? CreateEmpty("Buildings", Vector3.zero, farm.transform).transform;
             var props = farm.transform.Find("Props") ?? CreateEmpty("Props", Vector3.zero, farm.transform).transform;
@@ -189,18 +190,18 @@ namespace FarmSimVR.Editor
 
             // ── Buildings ──
             InstantiatePrefab(P("Buildings/SM_Bld_Farmhouse_01.prefab"),
-                new Vector3(100f, 0.5f, 60f), Quaternion.Euler(0f, 180f, 0f), buildings);
+                new Vector3(60f, 0.5f, 36f), Quaternion.Euler(0f, 180f, 0f), buildings);
             InstantiatePrefab(P("Buildings/SM_Bld_Barn_01.prefab"),
-                new Vector3(140f, 0.5f, 70f), Quaternion.Euler(0f, 90f, 0f), buildings);
+                new Vector3(84f, 0.5f, 42f), Quaternion.Euler(0f, 90f, 0f), buildings);
             InstantiatePrefab(P("Buildings/SM_Bld_Silo_01.prefab"),
-                new Vector3(155f, 0.5f, 75f), Quaternion.identity, buildings);
+                new Vector3(93f, 0.5f, 45f), Quaternion.identity, buildings);
             InstantiatePrefab(P("Buildings/SM_Bld_Silo_Small_01.prefab"),
-                new Vector3(150f, 0.5f, 65f), Quaternion.identity, buildings);
+                new Vector3(90f, 0.5f, 39f), Quaternion.identity, buildings);
             InstantiatePrefab(P("Buildings/SM_Bld_Greenhouse_01.prefab"),
-                new Vector3(60f, 0.5f, 30f), Quaternion.identity, buildings);
+                new Vector3(36f, 0.5f, 18f), Quaternion.identity, buildings);
 
             // ── Circular Pen (El Pollo Loco) ──
-            Vector3 penCenter = new(120f, 0.5f, 40f);
+            Vector3 penCenter = new(72f, 0.5f, 24f);
             const float penRadius = 8f;
             for (int i = 0; i < 12; i++)
             {
@@ -215,8 +216,8 @@ namespace FarmSimVR.Editor
 
             // ── Crop Plots ──
             Vector3[] plotCenters = {
-                new(70f, 0.5f, 50f), new(85f, 0.5f, 50f),
-                new(70f, 0.5f, 35f), new(85f, 0.5f, 35f),
+                new(42f, 0.5f, 30f), new(51f, 0.5f, 30f),
+                new(42f, 0.5f, 21f), new(51f, 0.5f, 21f),
             };
             for (int c = 0; c < plotCenters.Length; c++)
             {
@@ -238,10 +239,9 @@ namespace FarmSimVR.Editor
             }
 
             // ── Pasture (wire fence enclosure) ──
-            Vector3 pastureMin = new(155f, 0.5f, 15f);
-            Vector3 pastureMax = new(185f, 0.5f, 45f);
+            Vector3 pastureMin = new(93f, 0.5f, 9f);
+            Vector3 pastureMax = new(111f, 0.5f, 27f);
 
-            // E-W runs (north & south sides)
             for (float x = pastureMin.x; x <= pastureMax.x; x += 5f)
             {
                 InstantiatePrefab(P("Props/SM_Prop_Fence_Wire_01.prefab"),
@@ -249,7 +249,6 @@ namespace FarmSimVR.Editor
                 InstantiatePrefab(P("Props/SM_Prop_Fence_Wire_01.prefab"),
                     new Vector3(x, 0.5f, pastureMin.z), Quaternion.identity, pasture);
             }
-            // N-S runs (east & west sides)
             for (float z = pastureMin.z; z <= pastureMax.z; z += 5f)
             {
                 InstantiatePrefab(P("Props/SM_Prop_Fence_Wire_01.prefab"),
@@ -257,45 +256,43 @@ namespace FarmSimVR.Editor
                 InstantiatePrefab(P("Props/SM_Prop_Fence_Wire_01.prefab"),
                     new Vector3(pastureMax.x, 0.5f, z), Quaternion.Euler(0f, 90f, 0f), pasture);
             }
-            // Corner poles
             Vector3[] corners = {
                 new(pastureMin.x, 0.5f, pastureMin.z), new(pastureMax.x, 0.5f, pastureMin.z),
                 new(pastureMin.x, 0.5f, pastureMax.z), new(pastureMax.x, 0.5f, pastureMax.z),
             };
             foreach (var corner in corners)
                 InstantiatePrefab(P("Props/SM_Prop_Fence_Wire_Pole_01.prefab"), corner, Quaternion.identity, pasture);
-            // Gate on south side
             InstantiatePrefab(P("Props/SM_Prop_Fence_Wire_Gate_01.prefab"),
-                new Vector3(170f, 0.5f, pastureMin.z), Quaternion.identity, pasture);
+                new Vector3(102f, 0.5f, pastureMin.z), Quaternion.identity, pasture);
 
             // ── Props ──
-            InstantiatePrefab(P("Props/SM_Prop_Well_01.prefab"), new Vector3(95f, 0.5f, 55f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Scarecrow_01.prefab"), new Vector3(78f, 0.5f, 45f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Hay_Bale_Square_01.prefab"), new Vector3(145f, 0.5f, 62f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Hay_Bale_Square_01.prefab"), new Vector3(148f, 0.5f, 60f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Hay_Bale_Round_01.prefab"), new Vector3(143f, 0.5f, 65f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Crate_01.prefab"), new Vector3(137f, 0.5f, 68f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_PalletCrate_01.prefab"), new Vector3(139f, 0.5f, 68f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Wheelbarrow_01.prefab"), new Vector3(75f, 0.5f, 40f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Watering_Can_01.prefab"), new Vector3(93f, 0.5f, 56f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Barrel_01.prefab"), new Vector3(105f, 0.5f, 58f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Barrel_02.prefab"), new Vector3(107f, 0.5f, 59f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Trough_01.prefab"), new Vector3(170f, 0.5f, 30f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_LetterBox_01.prefab"), new Vector3(50f, 0.5f, 45f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Well_01.prefab"), new Vector3(57f, 0.5f, 33f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Scarecrow_01.prefab"), new Vector3(47f, 0.5f, 27f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Hay_Bale_Square_01.prefab"), new Vector3(87f, 0.5f, 37f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Hay_Bale_Square_01.prefab"), new Vector3(89f, 0.5f, 36f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Hay_Bale_Round_01.prefab"), new Vector3(86f, 0.5f, 39f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Crate_01.prefab"), new Vector3(82f, 0.5f, 41f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_PalletCrate_01.prefab"), new Vector3(83f, 0.5f, 41f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Wheelbarrow_01.prefab"), new Vector3(45f, 0.5f, 24f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Watering_Can_01.prefab"), new Vector3(56f, 0.5f, 34f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Barrel_01.prefab"), new Vector3(63f, 0.5f, 35f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Barrel_02.prefab"), new Vector3(64f, 0.5f, 35f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Trough_01.prefab"), new Vector3(102f, 0.5f, 18f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_LetterBox_01.prefab"), new Vector3(30f, 0.5f, 27f), Quaternion.identity, props);
 
             // ── Trees ──
-            InstantiatePrefab(P("Environments/SM_Env_Tree_Apple_Grown_01.prefab"), new Vector3(90f, 0.5f, 70f), Quaternion.identity, trees);
-            InstantiatePrefab(P("Environments/SM_Env_Tree_Apple_Grown_01.prefab"), new Vector3(85f, 0.5f, 75f), Quaternion.identity, trees);
-            InstantiatePrefab(P("Environments/SM_Env_Tree_Apple_Grown_01.prefab"), new Vector3(95f, 0.5f, 76f), Quaternion.identity, trees);
-            InstantiatePrefab(P("Environments/SM_Env_Tree_Cherry_Grown_01.prefab"), new Vector3(55f, 0.5f, 48f), Quaternion.identity, trees);
-            InstantiatePrefab(P("Environments/SM_Env_Tree_Cherry_Grown_01.prefab"), new Vector3(50f, 0.5f, 52f), Quaternion.identity, trees);
-            InstantiatePrefab(P("Environments/SM_Env_Tree_Large_01.prefab"), new Vector3(110f, 0.5f, 80f), Quaternion.identity, trees);
-            InstantiatePrefab(P("Environments/SM_Env_Tree_Large_01.prefab"), new Vector3(160f, 0.5f, 85f), Quaternion.identity, trees);
+            InstantiatePrefab(P("Environments/SM_Env_Tree_Apple_Grown_01.prefab"), new Vector3(54f, 0.5f, 42f), Quaternion.identity, trees);
+            InstantiatePrefab(P("Environments/SM_Env_Tree_Apple_Grown_01.prefab"), new Vector3(51f, 0.5f, 45f), Quaternion.identity, trees);
+            InstantiatePrefab(P("Environments/SM_Env_Tree_Apple_Grown_01.prefab"), new Vector3(57f, 0.5f, 46f), Quaternion.identity, trees);
+            InstantiatePrefab(P("Environments/SM_Env_Tree_Cherry_Grown_01.prefab"), new Vector3(33f, 0.5f, 29f), Quaternion.identity, trees);
+            InstantiatePrefab(P("Environments/SM_Env_Tree_Cherry_Grown_01.prefab"), new Vector3(30f, 0.5f, 31f), Quaternion.identity, trees);
+            InstantiatePrefab(P("Environments/SM_Env_Tree_Large_01.prefab"), new Vector3(66f, 0.5f, 48f), Quaternion.identity, trees);
+            InstantiatePrefab(P("Environments/SM_Env_Tree_Large_01.prefab"), new Vector3(96f, 0.5f, 51f), Quaternion.identity, trees);
 
             // ── FX ──
-            InstantiatePrefab(P("FX/FX_Pollen_Wind_01.prefab"), new Vector3(80f, 2f, 45f), Quaternion.identity, fx);
-            InstantiatePrefab(P("FX/FX_Sprinkler_01.prefab"), new Vector3(75f, 0.5f, 50f), Quaternion.identity, fx);
-            InstantiatePrefab(P("FX/FX_Sprinkler_01.prefab"), new Vector3(85f, 0.5f, 35f), Quaternion.identity, fx);
+            InstantiatePrefab(P("FX/FX_Pollen_Wind_01.prefab"), new Vector3(48f, 2f, 27f), Quaternion.identity, fx);
+            InstantiatePrefab(P("FX/FX_Sprinkler_01.prefab"), new Vector3(45f, 0.5f, 30f), Quaternion.identity, fx);
+            InstantiatePrefab(P("FX/FX_Sprinkler_01.prefab"), new Vector3(51f, 0.5f, 21f), Quaternion.identity, fx);
 
             Debug.Log("[WorldSceneBuilder] Farm zone populated (buildings, pen, plots, pasture, props, trees, fx).");
         }
@@ -304,7 +301,7 @@ namespace FarmSimVR.Editor
         private static void BuildTownZone()
         {
             var town = GameObject.Find("Town");
-            if (town == null) town = CreateEmpty("Town", new Vector3(-120f, 0f, 10f));
+            if (town == null) town = CreateEmpty("Town", new Vector3(-72f, 0f, 6f));
 
             var buildings = town.transform.Find("Buildings") ?? CreateEmpty("Buildings", Vector3.zero, town.transform).transform;
             var mainSt = town.transform.Find("MainStreet") ?? CreateEmpty("MainStreet", Vector3.zero, town.transform).transform;
@@ -315,86 +312,80 @@ namespace FarmSimVR.Editor
 
             // ── Buildings ──
             InstantiatePrefab(P("Buildings/SM_Bld_Farmhouse_02.prefab"),
-                new Vector3(-160f, 0f, 20f), Quaternion.Euler(0f, 90f, 0f), buildings);
+                new Vector3(-96f, 0f, 12f), Quaternion.Euler(0f, 90f, 0f), buildings);
             InstantiatePrefab(P("Buildings/SM_Bld_ProduceStand_01.prefab"),
-                new Vector3(-120f, 0f, 38f), Quaternion.Euler(0f, 180f, 0f), buildings);
+                new Vector3(-72f, 0f, 23f), Quaternion.Euler(0f, 180f, 0f), buildings);
             InstantiatePrefab(P("Buildings/SM_Bld_Garage_01.prefab"),
-                new Vector3(-75f, 0f, 38f), Quaternion.Euler(0f, 180f, 0f), buildings);
+                new Vector3(-45f, 0f, 23f), Quaternion.Euler(0f, 180f, 0f), buildings);
             InstantiatePrefab(P("Buildings/SM_Bld_Shelter_01.prefab"),
-                new Vector3(-160f, 0f, -10f), Quaternion.identity, buildings);
+                new Vector3(-96f, 0f, -6f), Quaternion.identity, buildings);
             InstantiatePrefab(P("Buildings/SM_Bld_Greenhouse_Large_01.prefab"),
-                new Vector3(-120f, 0f, -10f), Quaternion.identity, buildings);
+                new Vector3(-72f, 0f, -6f), Quaternion.identity, buildings);
             InstantiatePrefab(P("Buildings/SM_Bld_Farmhouse_01.prefab"),
-                new Vector3(-80f, 0f, -20f), Quaternion.Euler(0f, 45f, 0f), buildings);
+                new Vector3(-48f, 0f, -12f), Quaternion.Euler(0f, 45f, 0f), buildings);
             InstantiatePrefab(P("Buildings/SM_Bld_Farmhouse_01.prefab"),
-                new Vector3(-100f, 0f, -40f), Quaternion.Euler(0f, -30f, 0f), buildings);
+                new Vector3(-60f, 0f, -24f), Quaternion.Euler(0f, -30f, 0f), buildings);
 
             // ── Main Street Furniture ──
-            // Fences along z=25 and z=35
-            for (float x = -185f; x <= -55f; x += 8f)
+            for (float x = -111f; x <= -33f; x += 8f)
             {
                 InstantiatePrefab(P("Props/SM_Prop_Fence_Painted_01.prefab"),
-                    new Vector3(x, 0f, 25f), Quaternion.Euler(0f, 90f, 0f), mainSt);
+                    new Vector3(x, 0f, 15f), Quaternion.Euler(0f, 90f, 0f), mainSt);
                 InstantiatePrefab(P("Props/SM_Prop_Fence_Painted_01.prefab"),
-                    new Vector3(x, 0f, 35f), Quaternion.Euler(0f, 90f, 0f), mainSt);
+                    new Vector3(x, 0f, 21f), Quaternion.Euler(0f, 90f, 0f), mainSt);
             }
-            // Lamps
-            for (float x = -180f; x <= -60f; x += 25f)
+            for (float x = -108f; x <= -36f; x += 25f)
             {
                 InstantiatePrefab("Assets/Synty/PolygonGeneric/Prefabs/Props/SM_Gen_Prop_Light_Roof_01.prefab",
-                    new Vector3(x, 0f, 24f), Quaternion.identity, mainSt);
+                    new Vector3(x, 0f, 14f), Quaternion.identity, mainSt);
             }
-            // Signs
             InstantiatePrefab(P("Props/SM_Prop_SignPost_01.prefab"),
-                new Vector3(-145f, 0f, 36f), Quaternion.Euler(0f, 180f, 0f), mainSt);
+                new Vector3(-87f, 0f, 22f), Quaternion.Euler(0f, 180f, 0f), mainSt);
             InstantiatePrefab(P("Props/SM_Prop_SignPost_02.prefab"),
-                new Vector3(-95f, 0f, 36f), Quaternion.Euler(0f, 180f, 0f), mainSt);
-            // Letterboxes
+                new Vector3(-57f, 0f, 22f), Quaternion.Euler(0f, 180f, 0f), mainSt);
             InstantiatePrefab(P("Props/SM_Prop_LetterBox_01.prefab"),
-                new Vector3(-155f, 0f, 18f), Quaternion.identity, mainSt);
+                new Vector3(-93f, 0f, 11f), Quaternion.identity, mainSt);
             InstantiatePrefab(P("Props/SM_Prop_LetterBox_01.prefab"),
-                new Vector3(-75f, 0f, -18f), Quaternion.identity, mainSt);
+                new Vector3(-45f, 0f, -11f), Quaternion.identity, mainSt);
             InstantiatePrefab(P("Props/SM_Prop_LetterBox_01.prefab"),
-                new Vector3(-95f, 0f, -38f), Quaternion.identity, mainSt);
+                new Vector3(-57f, 0f, -23f), Quaternion.identity, mainSt);
 
             // ── Props ──
-            InstantiatePrefab(P("Props/SM_Prop_Barrel_01.prefab"), new Vector3(-118f, 0f, 36f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Barrel_02.prefab"), new Vector3(-116f, 0f, 37f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Crate_01.prefab"), new Vector3(-122f, 0f, 36f), Quaternion.identity, props);
-            InstantiatePrefab(P("Props/SM_Prop_Crate_02.prefab"), new Vector3(-124f, 0f, 37f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Barrel_01.prefab"), new Vector3(-71f, 0f, 22f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Barrel_02.prefab"), new Vector3(-70f, 0f, 22f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Crate_01.prefab"), new Vector3(-73f, 0f, 22f), Quaternion.identity, props);
+            InstantiatePrefab(P("Props/SM_Prop_Crate_01.prefab"), new Vector3(-74f, 0f, 22f), Quaternion.identity, props);
             InstantiatePrefab(P("Props/SM_Prop_Bench_01.prefab"),
-                new Vector3(-73f, 0f, 28f), Quaternion.Euler(0f, 90f, 0f), props);
+                new Vector3(-44f, 0f, 17f), Quaternion.Euler(0f, 90f, 0f), props);
             InstantiatePrefab(P("Props/SM_Prop_Bench_01.prefab"),
-                new Vector3(-73f, 0f, 22f), Quaternion.Euler(0f, 90f, 0f), props);
+                new Vector3(-44f, 0f, 13f), Quaternion.Euler(0f, 90f, 0f), props);
             InstantiatePrefab(P("Props/SM_Prop_Beehive_01.prefab"),
-                new Vector3(-85f, 0f, -25f), Quaternion.identity, props);
-            // Bushes
-            float[] bushXPositions = { -165f, -155f, -125f, -115f, -80f, -70f, -105f, -95f };
+                new Vector3(-51f, 0f, -15f), Quaternion.identity, props);
+            float[] bushXPositions = { -99f, -93f, -75f, -69f, -48f, -42f, -63f, -57f };
             for (int i = 0; i < bushXPositions.Length; i++)
             {
                 string bush = (i % 2 == 0)
                     ? "Assets/PolygonNature/Prefabs/Plants/SM_Plant_Bush_01.prefab"
                     : "Assets/PolygonNature/Prefabs/Plants/SM_Plant_Bush_02.prefab";
-                float bz = 18f + (i % 3) * 2f;
+                float bz = 11f + (i % 3) * 2f;
                 InstantiatePrefab(bush, new Vector3(bushXPositions[i], 0f, bz), Quaternion.identity, props);
             }
 
             // ── Trees ──
-            float[] treeLargeX = { -170f, -140f, -100f, -60f };
+            float[] treeLargeX = { -102f, -84f, -60f, -36f };
             foreach (float tx in treeLargeX)
                 InstantiatePrefab(P("Environments/SM_Env_Tree_Large_01.prefab"),
-                    new Vector3(tx, 0f, 30f), Quaternion.identity, trees);
+                    new Vector3(tx, 0f, 18f), Quaternion.identity, trees);
             InstantiatePrefab("Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Tree_Patch_01.prefab",
-                new Vector3(-190f, 0f, -50f), Quaternion.identity, trees);
+                new Vector3(-114f, 0f, -30f), Quaternion.identity, trees);
             InstantiatePrefab("Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Tree_Patch_01.prefab",
-                new Vector3(-50f, 0f, -60f), Quaternion.Euler(0f, 45f, 0f), trees);
+                new Vector3(-30f, 0f, -36f), Quaternion.Euler(0f, 45f, 0f), trees);
 
             Debug.Log("[WorldSceneBuilder] Town zone populated (buildings, main street, props, trees).");
         }
 
         // ── Unpopulated Zones ────────────────────────────────────
 
-        /// <summary>Finds a zone's Markers child. Returns null if zone or child missing.</summary>
         private static Transform FindZoneMarkers(string zoneName)
         {
             var zone = GameObject.Find(zoneName);
@@ -407,7 +398,7 @@ namespace FarmSimVR.Editor
             var m = FindZoneMarkers("NorthField");
             if (m != null)
             {
-                var festival = CreateEmpty("FestivalCenter", new Vector3(-120f, 0f, 150f), m);
+                var festival = CreateEmpty("FestivalCenter", new Vector3(-72f, 0f, 90f), m);
                 festival.AddComponent<BoxCollider>().isTrigger = true;
             }
 
@@ -415,23 +406,23 @@ namespace FarmSimVR.Editor
             m = FindZoneMarkers("SandyShores");
             if (m != null)
             {
-                CreateEmpty("TrevorTrailerPosition", new Vector3(120f, 0f, 160f), m);
+                CreateEmpty("TrevorTrailerPosition", new Vector3(72f, 0f, 96f), m);
                 for (int i = 0; i < 5; i++)
                     InstantiatePrefab("Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Pebbles_01.prefab",
-                        new Vector3(50f + i * 30f, 0f, 118f), Quaternion.identity, m);
+                        new Vector3(30f + i * 18f, 0f, 71f), Quaternion.identity, m);
             }
 
             // ── Meadow ──
             m = FindZoneMarkers("Meadow");
             if (m != null)
             {
-                Vector3[] truffleSpots = { new(-150f,0f,-110f), new(-100f,0f,-130f), new(-170f,0f,-140f) };
+                Vector3[] truffleSpots = { new(-90f,0f,-66f), new(-60f,0f,-78f), new(-102f,0f,-84f) };
                 for (int i = 0; i < truffleSpots.Length; i++)
                     CreateEmpty($"TruffleSpot_{i}", truffleSpots[i], m);
                 for (int i = 0; i < 5; i++)
                 {
                     var flower = CreateEmpty($"WildflowerSpecies_{i}",
-                        new Vector3(-180f + i * 25f, 0f, -100f - i * 10f), m);
+                        new Vector3(-108f + i * 15f, 0f, -60f - i * 6f), m);
                     flower.AddComponent<BoxCollider>().isTrigger = true;
                 }
             }
@@ -440,14 +431,14 @@ namespace FarmSimVR.Editor
             m = FindZoneMarkers("CountyFair");
             if (m != null)
             {
-                CreateEmpty("TrainLoopCenter", new Vector3(160f, 0f, -120f), m);
-                CreateEmpty("PettingZooArea", new Vector3(150f, 0f, -100f), m);
-                Vector3 fc = new(160f, 0f, -120f);
+                CreateEmpty("TrainLoopCenter", new Vector3(96f, 0f, -72f), m);
+                CreateEmpty("PettingZooArea", new Vector3(90f, 0f, -60f), m);
+                Vector3 fc = new(96f, 0f, -72f);
                 for (int i = 0; i < 8; i++)
                 {
                     float angle = i * 45f;
                     float rad = angle * Mathf.Deg2Rad;
-                    var pos = fc + new Vector3(Mathf.Sin(rad) * 35f, 0f, Mathf.Cos(rad) * 35f);
+                    var pos = fc + new Vector3(Mathf.Sin(rad) * 21f, 0f, Mathf.Cos(rad) * 21f);
                     InstantiatePrefab("Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Fence_Fancy_01.prefab",
                         pos, Quaternion.Euler(0f, angle, 0f), m);
                 }
@@ -456,21 +447,21 @@ namespace FarmSimVR.Editor
             // ── River ──
             m = FindZoneMarkers("River");
             if (m != null)
-                CreateEmpty("TheTruthVanPosition", new Vector3(10f, 0f, -140f), m);
+                CreateEmpty("TheTruthVanPosition", new Vector3(6f, 0f, -84f), m);
 
             // ── Wildflower Hills ──
             m = FindZoneMarkers("WildflowerHills");
             if (m != null)
             {
-                CreateEmpty("MichaelEaselPosition", new Vector3(0f, 2f, -175f), m);
+                CreateEmpty("MichaelEaselPosition", new Vector3(0f, 2f, -105f), m);
                 for (int i = 0; i < 5; i++)
-                    CreateEmpty($"FlowerSpawnPoint_{i}", new Vector3(-150f + i * 75f, 0f, -180f), m);
+                    CreateEmpty($"FlowerSpawnPoint_{i}", new Vector3(-90f + i * 45f, 0f, -108f), m);
             }
 
             // ── Trail ──
             m = FindZoneMarkers("Trail");
             if (m != null)
-                CreateEmpty("TenpennyLampPost", new Vector3(0f, 0f, 60f), m);
+                CreateEmpty("TenpennyLampPost", new Vector3(0f, 0f, 36f), m);
 
             Debug.Log("[WorldSceneBuilder] Unpopulated zone markers placed.");
         }
@@ -481,9 +472,9 @@ namespace FarmSimVR.Editor
         {
             var fxRoot = CreateEmpty("FX", Vector3.zero);
             InstantiatePrefab("Assets/Synty/PolygonFarm/Prefabs/FX/FX_Pollen_Wind_01.prefab",
-                new Vector3(-130f, 2f, -120f), Quaternion.identity, fxRoot.transform);
+                new Vector3(-78f, 2f, -72f), Quaternion.identity, fxRoot.transform);
             InstantiatePrefab("Assets/Synty/PolygonFarm/Prefabs/FX/FX_Dust_Wind_01.prefab",
-                new Vector3(120f, 1f, 160f), Quaternion.identity, fxRoot.transform);
+                new Vector3(72f, 1f, 96f), Quaternion.identity, fxRoot.transform);
             Debug.Log("[WorldSceneBuilder] World FX placed (pollen, dust).");
         }
 
@@ -492,7 +483,22 @@ namespace FarmSimVR.Editor
         private static void BuildMarkers()
         {
             var markersRoot = CreateEmpty("Markers", Vector3.zero);
-            var spawn = CreateEmpty("SpawnPoint", new Vector3(50f, 0.5f, 45f), markersRoot.transform);
+            var spawn = CreateEmpty("SpawnPoint", GroundPos(30f, 27f, 0.5f), markersRoot.transform);
+            // Register the tag if it doesn't exist
+            var tagManager = new SerializedObject(AssetDatabase.LoadMainAssetAtPath("ProjectSettings/TagManager.asset"));
+            var tagsProp = tagManager.FindProperty("tags");
+            bool tagExists = false;
+            for (int i = 0; i < tagsProp.arraySize; i++)
+            {
+                if (tagsProp.GetArrayElementAtIndex(i).stringValue == "SpawnPoint")
+                { tagExists = true; break; }
+            }
+            if (!tagExists)
+            {
+                tagsProp.InsertArrayElementAtIndex(tagsProp.arraySize);
+                tagsProp.GetArrayElementAtIndex(tagsProp.arraySize - 1).stringValue = "SpawnPoint";
+                tagManager.ApplyModifiedProperties();
+            }
             spawn.tag = "SpawnPoint";
             Debug.Log("[WorldSceneBuilder] Global markers placed (SpawnPoint).");
         }

@@ -13,6 +13,21 @@ presence in the game.
 
 ## Assembly Sequence
 
+### 0. Memory Check (BEFORE touching the scene)
+```
+READ .ai/memory/project-memory.md
+  → Check "Antipatterns > Asset Paths" — never hardcode paths
+  → Check "Antipatterns > MCP" — domain reload rules
+  → Check "Established Patterns > MCP Workflow"
+  → Check "Lessons Learned" for any scene assembly gotchas
+```
+**Critical rule**: Before referencing ANY prefab, model, or asset in assembly:
+```
+FindProjectAssets(query: "descriptive name")  // or glob
+→ Use the EXACT path returned
+→ DO NOT construct paths from assumed naming conventions
+```
+
 ### 1. Pre-check
 ```
 editor_state → verify editor ready
@@ -71,3 +86,9 @@ batch_execute([
 ### 8. Save Scene
 - manage_scene → save current scene
 - Commit: `[scene] assemble [feature] objects and prefabs`
+
+### 9. Learn
+If anything unexpected happened during assembly:
+- Asset path didn't match expected name → WRITE to project-memory.md "Lessons Learned"
+- New MCP pattern discovered → WRITE to project-memory.md "Established Patterns"
+- MCP gotcha hit (disconnect, timeout, etc.) → WRITE to project-memory.md "Antipatterns"

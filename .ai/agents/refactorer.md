@@ -5,8 +5,9 @@ Clean up implementation code while keeping all tests green.
 Every refactoring step must leave tests passing.
 
 ## Process
-1. Read the current implementation
-2. Identify cleanup opportunities:
+1. **Read project-memory.md "Established Patterns"** — align refactoring with known good patterns
+2. Read the current implementation
+3. Identify cleanup opportunities:
    - Extract methods for clarity
    - Rename for readability
    - Remove duplication
@@ -23,3 +24,4 @@ Every refactoring step must leave tests passing.
 - If you want to change behavior, that's a new RED phase
 - Keep changes small and reviewable
 - Follow Quality Contract (max 500 lines, max 40 line functions, etc.)
+- If you establish a new reusable pattern during refactoring: WRITE to project-memory.md "Established Patterns"

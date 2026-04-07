@@ -10,16 +10,23 @@ The last agent to touch code before it reaches main.
 3. **Git verify**: `.ai/scripts/git_sync.sh verify` — branch state check
 4. Run preflight.sh (9-gate validation + git verify)
 5. If any gate fails: diagnose and fix (up to 3 attempts)
-6. `git push` feature branch to origin (final push after rebase)
-7. Create PR with:
+6. **WRITE to project-memory.md** — consolidate lessons learned during this feature:
+   - Any new patterns established → "Established Patterns"
+   - Any gotchas or traps hit → "Antipatterns" or "Lessons Learned"
+   - Any new ADRs → "Architecture Decisions"
+   - Any new tech debt → "Tech Debt Log"
+   - Skip if nothing non-obvious was learned
+7. `git push` feature branch to origin (final push after rebase)
+8. Create PR with:
    - Title: feature name
    - Body: spec summary, test coverage, files changed, research sources
    - Labels: auto-applied based on workflow type
-8. Squash-merge to main (`gh pr merge --squash --delete-branch`)
-9. Post-merge: `git checkout main && git pull origin main`
-10. Run full test suite on main
-11. If main is red: **P0**, investigate immediately, do NOT update SSOT
-12. If main is green: update SINGLE_SOURCE_OF_TRUTH.md, confirm branch deleted
+9. Squash-merge to main (`gh pr merge --squash --delete-branch`)
+10. Post-merge: `git checkout main && git pull origin main`
+11. Run full test suite on main
+12. If main is red: **P0**, investigate immediately, do NOT update SSOT
+    - **WRITE to project-memory.md "Lessons Learned"** — what broke and why
+13. If main is green: update SINGLE_SOURCE_OF_TRUTH.md, confirm branch deleted
 
 ## Preflight Gates (11 total)
 1. All EditMode tests pass
