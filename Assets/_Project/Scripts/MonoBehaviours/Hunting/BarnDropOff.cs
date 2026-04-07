@@ -25,7 +25,8 @@ namespace FarmSimVR.MonoBehaviours.Hunting
                 other.GetComponentInParent<IPlayerInput>() == null) return;
 
             var deposited = _tracker.DepositAll();
-            Debug.Log($"[BarnDropOff] Deposited {deposited.Count} animals. OnAnimalsDeposited subscribers: {OnAnimalsDeposited?.GetInvocationList().Length ?? 0}");
+            Debug.Log($"[BarnDropOff] Deposited {deposited.Count} animals.");
+            FarmSimVR.MonoBehaviours.Diagnostics.GameStateLogger.Instance?.LogEvent($"Deposited {deposited.Count} animals at barn");
             OnDeposit?.Invoke(deposited.Count);
             OnAnimalsDeposited?.Invoke(deposited);
         }

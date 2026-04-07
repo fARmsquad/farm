@@ -84,6 +84,7 @@ namespace FarmSimVR.MonoBehaviours.Hunting
             catchZone.OnCaught += HandleAnimalCaught;
 
             _activeAnimals.Add(animal);
+            FarmSimVR.MonoBehaviours.Diagnostics.GameStateLogger.Instance?.LogEvent($"Spawned wild {type} at ({spawnPos.x:F1}, {spawnPos.z:F1})");
         }
 
         private void HandleAnimalCaught(CatchZone zone)
@@ -94,6 +95,7 @@ namespace FarmSimVR.MonoBehaviours.Hunting
             _activeAnimals.Remove(zone.gameObject);
             Destroy(zone.gameObject);
             Debug.Log($"[Hunting] Caught a {zone.AnimalType}! Carrying: {_tracker.CarriedCount}");
+            FarmSimVR.MonoBehaviours.Diagnostics.GameStateLogger.Instance?.LogEvent($"Caught {zone.AnimalType}! Now carrying: {_tracker.CarriedCount}");
         }
 
         private bool IsInsidePen(Vector3 pos)

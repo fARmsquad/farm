@@ -100,5 +100,42 @@ namespace FarmSimVR.Editor
             EditorSceneManager.SaveOpenScenes();
             Debug.Log("[Setup] Scene saved! Press Play to test.");
         }
+
+        [MenuItem("FarmSimVR/Add Debug Tools to Scene")]
+        public static void AddDebugTools()
+        {
+            // GameStateLogger
+            if (GameObject.Find("GameStateLogger") == null)
+            {
+                var loggerObj = new GameObject("GameStateLogger");
+                var type = System.Type.GetType("FarmSimVR.MonoBehaviours.Diagnostics.GameStateLogger, FarmSimVR.MonoBehaviours");
+                if (type != null)
+                {
+                    loggerObj.AddComponent(type);
+                    Debug.Log("[Setup] Added GameStateLogger");
+                }
+                else
+                    Debug.LogError("[Setup] GameStateLogger type not found — compilation error?");
+            }
+
+            // IngameDebugConsole
+            if (GameObject.Find("IngameDebugConsole") == null)
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                    "Packages/com.yasirkula.ingamedebugconsole/Plugins/IngameDebugConsole/IngameDebugConsole.prefab");
+                if (prefab != null)
+                {
+                    var console = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+                    Debug.Log("[Setup] Added IngameDebugConsole");
+                }
+                else
+                    Debug.LogWarning("[Setup] IngameDebugConsole prefab not found — is the package installed?");
+            }
+
+            EditorSceneManager.MarkSceneDirty(
+                UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+            EditorSceneManager.SaveOpenScenes();
+            Debug.Log("[Setup] Debug tools added and scene saved.");
+        }
     }
 }

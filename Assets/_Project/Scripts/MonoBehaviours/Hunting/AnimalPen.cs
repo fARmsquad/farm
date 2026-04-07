@@ -104,6 +104,7 @@ namespace FarmSimVR.MonoBehaviours.Hunting
             _penAnimals.Add(penAnimal);
 
             Debug.Log($"[AnimalPen] {record.Type} is now vibing in the pen! ({_penAnimals.Count} total)");
+            FarmSimVR.MonoBehaviours.Diagnostics.GameStateLogger.Instance?.LogEvent($"{record.Type} added to pen ({_penAnimals.Count} total)");
         }
 
         private GameObject FindPrefab(AnimalType type)
