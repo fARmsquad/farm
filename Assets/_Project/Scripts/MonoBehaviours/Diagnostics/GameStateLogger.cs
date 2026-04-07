@@ -8,12 +8,13 @@ using FarmSimVR.MonoBehaviours.Hunting;
 namespace FarmSimVR.MonoBehaviours.Diagnostics
 {
     /// <summary>
-    /// Logs a structured text snapshot of the entire game state to a file
-    /// that can be read by Claude via MCP. Also shows an on-screen overlay.
+    /// [DEV ONLY] Logs a structured text snapshot of the entire game state
+    /// to a file that can be read by Claude via MCP.
     ///
-    /// Press F1 to toggle the on-screen overlay.
-    /// Press F2 to force-write a snapshot immediately.
+    /// Press Shift+5 to toggle the on-screen overlay.
+    /// Press Shift+6 to force-write a snapshot immediately.
     /// Snapshots auto-write every snapshotInterval seconds.
+    /// Overlay is hidden by default — dev feature only.
     ///
     /// Output file: Assets/_Project/Logs/gamestate.log
     /// </summary>
@@ -25,7 +26,7 @@ namespace FarmSimVR.MonoBehaviours.Diagnostics
         [SerializeField] private int maxEventHistory = 50;
 
         [Header("Overlay")]
-        [SerializeField] private bool showOverlay = true;
+        [SerializeField] private bool showOverlay = false;
         [SerializeField] private int overlayFontSize = 14;
 
         private float _snapshotTimer;
@@ -51,10 +52,10 @@ namespace FarmSimVR.MonoBehaviours.Diagnostics
         private void Update()
         {
             var kb = Keyboard.current;
-            if (kb != null)
+            if (kb != null && kb.leftShiftKey.isPressed)
             {
-                if (kb.f1Key.wasPressedThisFrame) showOverlay = !showOverlay;
-                if (kb.f2Key.wasPressedThisFrame) WriteSnapshot();
+                if (kb.digit5Key.wasPressedThisFrame) showOverlay = !showOverlay;
+                if (kb.digit6Key.wasPressedThisFrame) WriteSnapshot();
             }
 
             _snapshotTimer -= Time.deltaTime;
@@ -214,8 +215,8 @@ namespace FarmSimVR.MonoBehaviours.Diagnostics
             GUILayout.EndArea();
 
             // Toggle hint
-            GUI.Label(new Rect(Screen.width - 200, Screen.height - 25, 200, 20),
-                "F1=Toggle | F2=Snapshot", new GUIStyle(GUI.skin.label) { fontSize = 11, alignment = TextAnchor.LowerRight });
+            GUI.Label(new Rect(Screen.width - 250, Screen.height - 25, 250, 20),
+                "[DEV] Shift+5=Toggle | Shift+6=Snapshot", new GUIStyle(GUI.skin.label) { fontSize = 11, alignment = TextAnchor.LowerRight });
         }
     }
 }

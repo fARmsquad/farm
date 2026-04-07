@@ -13,14 +13,21 @@ This is the central tracker for all feature specs. Before building anything, fin
 | -- | [Crop Growth Calculator](Assets/Specs/Features/crop-growth-calculator.md) | Core | Done | Youssef | -- |
 | -- | [Farm Scene Demo](Assets/Specs/Features/farm-scene-demo.md) | Demo | Done | Youssef | Crop Growth Calc |
 | L2-007 | [Hunting Chore (Catch Animals)](Assets/Specs/Features/L2-007-hunting-chore.md) | L2 | Done | AI | L1-001 |
-| INT-001 | [Screen Effects](Assets/Specs/Features/INT-001-screen-effects.md) | INT | Open | -- | -- |
-| INT-002 | [Simple Audio Manager](Assets/Specs/Features/INT-002-simple-audio-manager.md) | INT | Open | -- | -- |
-| INT-003 | [Dialogue System](Assets/Specs/Features/INT-003-dialogue-system.md) | INT | Open | -- | -- |
-| INT-004 | [Cinematic Camera](Assets/Specs/Features/INT-004-cinematic-camera.md) | INT | Open | -- | -- |
+| INT-001 | [Screen Effects](Assets/Specs/Features/INT-001-screen-effects.md) | INT | Done | Youssef | -- |
+| INT-002 | [Simple Audio Manager](Assets/Specs/Features/INT-002-simple-audio-manager.md) | INT | Done | Youssef | -- |
+| INT-003 | [Dialogue System](Assets/Specs/Features/INT-003-dialogue-system.md) | INT | Done | Youssef | -- |
+| INT-004 | [Cinematic Camera](Assets/Specs/Features/INT-004-cinematic-camera.md) | INT | Done | Youssef | -- |
 | INT-005 | [Cinematic Sequencer](Assets/Specs/Features/INT-005-cinematic-sequencer.md) | INT | Open | -- | INT-001, INT-002, INT-003, INT-004 |
-| INT-006 | [NPC Controller](Assets/Specs/Features/INT-006-npc-controller.md) | INT | Open | -- | INT-003 |
-| INT-007 | [Mission Manager](Assets/Specs/Features/INT-007-mission-manager.md) | INT | Open | -- | INT-001, INT-002 |
-| INT-008 | [Intro Scene Assembly](Assets/Specs/Features/INT-008-intro-scene-assembly.md) | INT | Open | -- | INT-001 thru INT-007 |
+| INT-006 | [NPC Controller](Assets/Specs/Features/INT-006-npc-controller.md) | INT | Done | Youssef | INT-003 |
+| INT-007 | [Mission Manager](Assets/Specs/Features/INT-007-mission-manager.md) | INT | Done | Youssef | INT-001, INT-002 |
+| INT-009 | [Lighting Presets & Transitions](Assets/Specs/Features/INT-009-lighting-presets.md) | INT | Open | -- | INT-005 |
+| INT-010 | [Environment Particle Systems](Assets/Specs/Features/INT-010-particle-effects.md) | INT | Open | -- | -- |
+| INT-011 | [Comic Text & Speech Bubbles](Assets/Specs/Features/INT-011-comic-text-overlays.md) | INT | Open | -- | INT-003 |
+| INT-012 | [Cutscene Skip & Auto-Save](Assets/Specs/Features/INT-012-skip-and-autosave.md) | INT | Open | -- | INT-005, INT-001 |
+| INT-013 | [Intro Props & Ambient NPCs](Assets/Specs/Features/INT-013-intro-props.md) | INT | Open | -- | INT-005 |
+| INT-008 | [Intro Scene Assembly](Assets/Specs/Features/INT-008-intro-scene-assembly.md) | INT | Open | -- | INT-005 thru INT-013 |
+| INT-014 | [Intro Art & Audio Polish](Assets/Specs/Features/INT-014-intro-art-audio.md) | POL | Open | -- | INT-008 |
+| POL-001 | [Polish Backlog](Assets/Specs/Features/POL-001-polish-backlog.md) | POL | Open | -- | All gameplay + intro Done |
 
 **Status values:** `Open` | `Claimed` | `In Progress` | `In Review` | `Done`
 
@@ -38,29 +45,40 @@ Specs are organized in layers. Lower layers are built first.
 | **INT** | Intro/Cinematic systems | Screen effects, dialogue, cutscene camera, sequencer |
 | **Core** | Foundation logic | Calculators, data types, utilities |
 | **Demo** | Playable demos | Quick proof-of-concept scenes |
+| **POL** | Polish pass | Replace placeholders, add real assets, tune timing/audio |
 
 **Build order:** Core and L1 have no dependencies. L2 specs may depend on each other — check the "Depends On" column. INT (intro) specs have their own dependency tree.
 
 ```
 INT Layer Build Order (Intro Cinematic):
 
-  Phase 1 — No dependencies, build in parallel:
+  Phase 1 — No dependencies, build in parallel:  ✅ ALL DONE
     INT-001 Screen Effects
     INT-002 Audio Manager
     INT-003 Dialogue System
     INT-004 Cinematic Camera
 
-  Phase 2 — Needs Phase 1:
+  Phase 2 — Needs Phase 1:  ✅ ALL DONE
     INT-006 NPC Controller        (needs INT-003)
     INT-007 Mission Manager       (needs INT-001, INT-002)
 
-  Phase 3 — Needs Phase 1 + 2:
+  Phase 3 — Needs Phase 1 + 2, build in parallel:
     INT-005 Cinematic Sequencer   (needs INT-001 thru INT-004, INT-006, INT-007)
+    INT-010 Particle Effects      (no code deps)
 
-  Phase 4 — Needs everything:
-    INT-008 Intro Scene Assembly  (needs INT-001 thru INT-007)
+  Phase 4 — Needs Phase 3, build in parallel:
+    INT-009 Lighting Presets      (needs INT-005 for sequencer integration)
+    INT-011 Comic Text Overlays   (needs INT-003)
+    INT-012 Skip & Auto-Save      (needs INT-005, INT-001)
+    INT-013 Intro Props           (needs INT-005)
 
-L2-007 Hunting Chore (needs Farm Layout)
+  Phase 5 — Assembly (placeholders + existing Synty assets):
+    INT-008 Intro Scene Assembly  (needs INT-005 thru INT-013, uses placeholders)
+
+  Phase 6 — Polish (swap placeholders for real assets):
+    INT-014 Intro Art & Audio Polish  (needs INT-008 Done first)
+
+L2-007 Hunting Chore (needs Farm Layout) ✅ DONE
 ```
 
 ---
