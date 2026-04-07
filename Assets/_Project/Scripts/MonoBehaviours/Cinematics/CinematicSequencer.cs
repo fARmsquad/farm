@@ -240,7 +240,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         {
             if (_runCoroutine != null)
             {
-                StopAllCoroutines();
+                StopCoroutine(_runCoroutine);
                 _runCoroutine = null;
             }
 
@@ -277,8 +277,12 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         /// </summary>
         public void Skip()
         {
-            StopAllCoroutines();
+            if (_runCoroutine != null) StopCoroutine(_runCoroutine);
             _runCoroutine = null;
+
+            // Clean up listeners that ExecuteStep may have added
+            if (_dialogueManager != null) _dialogueManager.OnDialogueComplete.RemoveAllListeners();
+            if (_cinematicCamera != null) _cinematicCamera.OnWaypointReached.RemoveAllListeners();
 
             // Apply terminal states
             if (_screenEffects != null)
@@ -299,7 +303,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         /// </summary>
         public void SkipToStep(CinematicSequence sequence, int stepIndex)
         {
-            StopAllCoroutines();
+            if (_runCoroutine != null) StopCoroutine(_runCoroutine);
             _runCoroutine = null;
 
             _startIndex = stepIndex;
@@ -334,9 +338,15 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                 {
                     switch (step.type)
                     {
-                        // Wait type: use WaitForSecondsRealtime(duration)
+                        // Wait type: manual elapsed loop so Pause can interrupt
                         case CinematicStepType.Wait:
-                            yield return new WaitForSecondsRealtime(step.duration);
+                            float waitElapsed = 0f;
+                            while (waitElapsed < step.duration)
+                            {
+                                while (IsPaused) yield return null;
+                                waitElapsed += Time.unscaledDeltaTime;
+                                yield return null;
+                            }
                             break;
 
                         // Callback-based types: wait for flag with timeout
@@ -349,6 +359,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                             float elapsed = 0f;
                             while (!flag.Done && elapsed < timeout)
                             {
+                                while (IsPaused) yield return null;
                                 elapsed += Time.unscaledDeltaTime;
                                 yield return null;
                             }

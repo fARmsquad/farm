@@ -141,5 +141,35 @@ namespace FarmSimVR.Tests.PlayMode
 
             Object.Destroy(sequence);
         }
+
+        [UnityTest]
+        public IEnumerator Play_WithoutWaitForCompletion_ProceedsImmediately()
+        {
+            var playerGo = new GameObject("Player");
+            var pm = playerGo.AddComponent<PlayerMovement>();
+            playerGo.AddComponent<CharacterController>();
+            pm.enabled = true;
+
+            var field = typeof(CinematicSequencer).GetField("_playerMovement",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            field.SetValue(_sequencer, pm);
+
+            var sequence = ScriptableObject.CreateInstance<CinematicSequence>();
+            sequence.steps = new[]
+            {
+                // Wait with waitForCompletion=false should NOT block the next step
+                new CinematicStep { type = CinematicStepType.Wait, duration = 5f, waitForCompletion = false },
+                new CinematicStep { type = CinematicStepType.DisablePlayerControl }
+            };
+
+            _sequencer.Play(sequence);
+            yield return null; // one frame
+
+            // DisablePlayerControl should have run immediately (not waiting 5s)
+            Assert.IsFalse(pm.enabled, "DisablePlayerControl should run immediately when previous step has waitForCompletion=false");
+
+            Object.Destroy(sequence);
+            Object.Destroy(playerGo);
+        }
     }
 }
