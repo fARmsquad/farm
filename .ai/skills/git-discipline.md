@@ -1,16 +1,15 @@
-# Skill: Git Discipline (Mandatory Git Operations)
+# Skill: Git Discipline (Trunk-Based Development)
 
 ## Purpose
-Enforce consistent git hygiene at every phase boundary: pull before work,
-branch per feature, commit per phase, rebase before merge. No code lands
-on main without passing through this discipline.
+Enforce consistent git hygiene. All work happens on main. Commit early,
+commit often, push frequently. No branches, no PRs, no rebasing.
 
 ## Principles
-1. **Never work on stale code** — always pull/sync before starting
-2. **Never work on main** — always on a feature branch
+1. **Never work on stale code** — always `git pull origin main` before starting
+2. **Everything on main** — no feature branches
 3. **Commit early, commit often** — one commit per logical unit of work
-4. **Rebase before merge** — keep history clean, catch conflicts early
-5. **Squash-merge to main** — one clean commit per feature on main
+4. **Push after every completed task** — keep remote up to date
+5. **Main is always green** — run tests before pushing
 
 ---
 
@@ -18,42 +17,14 @@ on main without passing through this discipline.
 
 ### On Session Start (MANDATORY, before any work)
 ```
-git fetch origin main
+git pull origin main
 git status
 ```
-- If on `main`: create feature branch (see Branch Creation below)
-- If on feature branch: sync with origin/main (see Sync below)
-- If uncommitted changes exist: stash or commit before proceeding
-
-### Branch Creation (Phase 1: Intake)
-When starting a new feature:
-```
-git checkout main
-git pull origin main
-git checkout -b feature/[story-id]-[short-name]
-```
-
-**Branch naming convention:**
-- Features: `feature/L[level]-[id]-[short-name]` (e.g., `feature/L2-007-hunting-chore`)
-- Bugfixes: `fix/[id]-[short-name]` (e.g., `fix/B-012-crop-rotation-crash`)
-- Refactors: `refactor/[short-name]` (e.g., `refactor/extract-inventory-core`)
-
-The branch MUST be created and pushed before Phase 2 begins:
-```
-git push -u origin feature/[branch-name]
-```
-
-### Sync Before Spec (Phase 2: before research + spec)
-```
-git fetch origin main
-git rebase origin/main
-```
-- If rebase conflicts: resolve, then continue
-- If conflicts are architectural: flag in `.ai/inbox/needs-eyes/`
+- If uncommitted changes exist: commit or stash before proceeding
+- If pull fails (diverged): pull with rebase (`git pull --rebase origin main`)
 
 ### Commits During TDD Cycle (Phase 3)
-Each agent commits after its step. This is already in the workflow but
-the commit message format is now ENFORCED:
+Each agent commits after its step with enforced format:
 
 | Agent | Commit Format | Example |
 |-------|--------------|---------|
@@ -73,74 +44,36 @@ the commit message format is now ENFORCED:
 - Every commit message starts with a `[tag]` prefix
 - Commit body (optional) can reference the spec or research
 
-### Mid-Feature Sync (between Phase 3 tasks)
-After every 3rd task in the breakdown OR every 2 hours (whichever comes first):
-```
-git fetch origin main
-git rebase origin/main
-```
-- Catches drift early instead of a painful mega-rebase at the end
-- If rebase fails: fix conflicts, run tests, commit resolution
+### Push Cadence
+- `git push origin main` after every completed task
+- If push is rejected (someone else pushed): `git pull --rebase origin main`, re-run tests, push again
+- Never force push
 
-### Pre-Finalization Sync (Phase 4: before preflight)
+### Pre-Push Check
+Before every push:
 ```
-git fetch origin main
-git rebase origin/main
-# Run full test suite after rebase
-.ai/scripts/run-tests.sh all
+./run-tests.sh all    # tests must pass
+git push origin main
 ```
-- Tests MUST pass after rebase — if they don't, the rebase introduced a conflict
-- Only proceed to preflight after post-rebase tests are green
-
-### Merge to Main (Phase 4: finalization)
-```
-# Via finalize.sh --merge (uses gh CLI)
-gh pr merge --squash --delete-branch
-git checkout main
-git pull origin main
-.ai/scripts/run-tests.sh all
-```
-
-### Post-Merge Verification
-```
-git checkout main
-git pull origin main
-.ai/scripts/run-tests.sh all
-```
-- If tests fail on main: **P0 — fix immediately**
-- Update `.ai/SINGLE_SOURCE_OF_TRUTH.md` only after green main
 
 ---
 
-## Git Sync Script
-Use `.ai/scripts/git_sync.sh` for automated sync operations.
-It handles fetch, rebase, conflict detection, and test verification.
-
 ## Error Recovery
 
-### Rebase Conflict
-1. `git status` — identify conflicting files
-2. Resolve conflicts (prefer incoming for non-project files, ours for Core/)
-3. `git add <resolved-files>`
-4. `git rebase --continue`
-5. Run tests to verify resolution
-6. If still broken: `git rebase --abort` and flag for developer
+### Push Rejected (Remote Has New Commits)
+1. `git pull --rebase origin main`
+2. If conflict: resolve, `git add`, `git rebase --continue`
+3. Run tests to verify
+4. `git push origin main`
 
-### Accidentally on Main
-1. `git stash` (if uncommitted changes)
-2. `git checkout -b feature/[name]`
-3. `git stash pop` (if stashed)
-4. Continue on feature branch
-
-### Diverged Branch
-1. `git fetch origin main`
-2. `git rebase origin/main`
-3. If too many conflicts (>5 files): consider fresh branch + cherry-pick
+### Accidentally Committed Broken Code
+1. Fix the issue immediately
+2. Commit the fix: `[fix] fix [what broke]`
+3. Push both commits
 
 ## Quality Gates
-- [ ] On a feature branch (not main/master)
-- [ ] Branch pushed to origin with `-u`
-- [ ] Branch not behind origin/main (synced)
+- [ ] On main branch
+- [ ] Working tree clean (or changes are staged/committed)
 - [ ] All commits follow the `[tag] message` format
 - [ ] No `git add .` or `git add -A` in commit history
-- [ ] Tests pass after most recent rebase
+- [ ] Tests pass before push

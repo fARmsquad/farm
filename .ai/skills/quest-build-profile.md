@@ -35,7 +35,7 @@ For fast performance assessment without building:
 ## Performance Regression Check
 Before merging a perf-sensitive feature:
 1. Profile on main branch → save baseline
-2. Profile on feature branch → save comparison
+2. Profile after changes → save comparison
 3. manage_profiler → compare snapshots
 4. FAIL if frame time regressed >2ms
 5. WARN if memory increased >10MB

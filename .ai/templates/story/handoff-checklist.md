@@ -3,7 +3,7 @@
 ## Code Complete
 - [ ] All tests passing (EditMode + PlayMode)
 - [ ] Preflight passed
-- [ ] PR merged to main
+- [ ] Pushed to main
 - [ ] Main branch is green
 
 ## Documentation

@@ -6,21 +6,15 @@ at playtest checkpoint only. The developer CAN intervene at any point via
 the inbox or direct interrupt, but the pipeline does not WAIT for them.
 
 ## Prerequisites (auto-checked, not human-verified)
-- [ ] Git sync performed (`.ai/scripts/git_sync.sh verify`)
-- [ ] On a feature branch (not main) — create if needed
-- [ ] Branch pushed to origin with tracking (`-u`)
+- [ ] On main branch
+- [ ] `git pull origin main` performed (up to date)
+- [ ] Working tree clean
 - [ ] No conflicting flights on flight-board.json
 
-## Phase 0: Git Setup (MANDATORY, before anything else)
-→ Skill: .ai/skills/git-discipline.md
-→ Run `.ai/scripts/git_sync.sh verify` to check current state
-→ If on main:
-  → `git pull origin main`
-  → `.ai/scripts/git_sync.sh create feature/[story-id]-[short-name]`
-→ If on feature branch:
-  → `.ai/scripts/git_sync.sh sync` (fetch + rebase onto origin/main)
-→ If uncommitted changes: stash or commit before proceeding
-→ GATE: `git_sync.sh verify` must pass before entering Phase 1
+## Phase 0: Git Sync (MANDATORY, before anything else)
+→ `git pull origin main` — always start from latest
+→ If uncommitted changes: commit or stash before proceeding
+→ GATE: working tree clean and up to date before entering Phase 1
 
 ## Phase 1: Intake
 → **READ .ai/memory/project-memory.md** — load patterns, antipatterns, lessons learned
@@ -47,15 +41,11 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
 → Technical Plan MUST reference relevant entries from project-memory.md if they exist
 → Save to Assets/Specs/Features/[feature].md
 → Commit: `[spec] add specification for [feature]`
-→ Push: `git push` (keep remote branch up to date)
+→ `git push origin main`
 → Auto-proceed to Phase 3
 → NOTE: if the spec involves a NEW system boundary, architectural uncertainty,
   or a decision that's hard to reverse, DROP a note in .ai/inbox/needs-eyes/
   and continue. The developer can review async and steer later.
-
-**Git checkpoint between Phase 2 → 3:**
-→ `.ai/scripts/git_sync.sh sync` (rebase onto latest origin/main)
-→ If rebase conflicts: resolve, run tests, then proceed
 
 ## Phase 3: TDD Cycle (AUTONOMOUS, agent-to-agent handoff)
 → Skill: .ai/skills/tdd-cycle.md
@@ -174,36 +164,26 @@ If the feature requires new 3D models:
       → Check .ai/inbox/ for developer steering
       → **WRITE to project-memory.md** if this task taught something new
       → `git push` (keep remote up to date after each task)
-      → Every 3rd task: `.ai/scripts/git_sync.sh sync` (rebase onto origin/main)
-      → If rebase conflicts: resolve, run tests, then continue
+
 
 ## Phase 4: Finalization (AUTONOMOUS)
 → Auto-triggered after last task completes. No "ship it" prompt needed.
 → Delegate to .ai/agents/finalizer.md
 
-**Step 4a: Pre-Finalization Git Sync**
-→ `.ai/scripts/git_sync.sh sync` (final rebase onto origin/main)
-→ Run full test suite after rebase: `.ai/scripts/run-tests.sh all`
-→ If tests fail after rebase: fix conflicts, re-run tests
-→ GATE: tests must be green post-rebase before proceeding
-
-**Step 4b: Preflight**
+**Step 4a: Preflight**
 → Mark spec acceptance criteria as [x]
-→ Run preflight (17 gates: 12 CLI + 5 MCP) — if fails, fix and retry (up to 3 attempts)
-→ `.ai/scripts/git_sync.sh verify` must pass (included in preflight as gate 9)
+→ Run full test suite: `.ai/scripts/run-tests.sh all`
+→ Run preflight — if fails, fix and retry (up to 3 attempts)
 → **WRITE to project-memory.md** — add any new patterns/antipatterns discovered during this feature
 
-**Step 4c: PR + Merge**
-→ `git push` (final push of rebased branch)
-→ Create PR with full report (via `finalize.sh`)
-→ Squash-merge to main (via `finalize.sh --merge`)
+**Step 4b: Push**
+→ `git push origin main`
+→ GATE: push must succeed. If rejected (someone else pushed), pull and re-run tests.
 
-**Step 4d: Post-Merge Verification**
-→ `git checkout main && git pull origin main`
-→ `.ai/scripts/run-tests.sh all`
+**Step 4c: Post-Push Verification**
+→ `.ai/scripts/run-tests.sh all` (verify main is still green after push)
 → If red on main: **P0** — investigate immediately, do NOT proceed
 → If green: update SINGLE_SOURCE_OF_TRUTH.md
-→ Delete feature branch (handled by `--delete-branch` in squash-merge)
 → Auto-proceed to Phase 5
 
 ## Phase 5: Playtest Checkpoint (HUMAN GATE — the only one)

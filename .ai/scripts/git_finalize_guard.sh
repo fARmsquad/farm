@@ -1,5 +1,5 @@
 #!/bin/bash
-# Git Finalization Guard — validates hard gates before PR/merge
+# Git Finalization Guard — validates hard gates before push
 set -e
 
 PROJECT_PATH="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -11,22 +11,17 @@ ERRORS=0
 if [ -n "$(git status --porcelain)" ]; then
     echo "✗ Uncommitted changes"
     ERRORS=$((ERRORS+1))
+else
+    echo "✓ Working tree clean"
 fi
 
-# Feature branch
+# On main
 BRANCH=$(git branch --show-current)
-if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
-    echo "✗ On $BRANCH"
+if [[ "$BRANCH" != "main" ]]; then
+    echo "✗ Not on main (on $BRANCH)"
     ERRORS=$((ERRORS+1))
-fi
-
-# Upstream sync
-git fetch origin main --quiet 2>/dev/null || true
-LOCAL=$(git rev-parse origin/main 2>/dev/null || echo "x")
-BASE=$(git merge-base HEAD origin/main 2>/dev/null || echo "y")
-if [ "$LOCAL" != "$BASE" ]; then
-    echo "✗ Behind origin/main — rebase first"
-    ERRORS=$((ERRORS+1))
+else
+    echo "✓ On main"
 fi
 
 # No active flights
@@ -35,6 +30,8 @@ if [ -f ".ai/coordination/flight-board.json" ]; then
     if [ "$ACTIVE" != "0" ]; then
         echo "✗ $ACTIVE active flights — wait or resolve"
         ERRORS=$((ERRORS+1))
+    else
+        echo "✓ No active flights"
     fi
 fi
 

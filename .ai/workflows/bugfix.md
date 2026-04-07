@@ -9,7 +9,7 @@ Bug fixes follow a streamlined TDD cycle without spec generation.
 3. **Fix**: Minimal code change to make the test pass
 4. **Verify**: Run full test suite — no regressions
 5. **Commit**: `[fix] [description of what was broken]`
-6. **Finalize**: If on a feature branch, run preflight + merge
+6. **Push**: `git push origin main`
 
 ## Severity Routing
 - **P0** (main is red, crash): Fix immediately, skip inbox check

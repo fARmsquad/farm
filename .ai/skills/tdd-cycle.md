@@ -70,7 +70,6 @@ Full TDD orchestration: RED → GREEN → VERIFY → REFACTOR → ASSEMBLE → X
 ## Git Discipline (per-task)
 - Each agent commits with the correct `[tag]` prefix after its step
 - Stage only specific files (`git add <files>`), never `git add .`
-- After every 3rd task: `.ai/scripts/git_sync.sh sync` (rebase onto origin/main)
 - `git push` after each completed task to keep remote branch current
 
 ## Post-Step: Memory Write
