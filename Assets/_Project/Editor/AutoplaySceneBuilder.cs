@@ -361,7 +361,8 @@ namespace FarmSimVR.Editor
             so.FindProperty("dialogueText").objectReferenceValue = dlgTmp;
             so.FindProperty("panelBackground").objectReferenceValue = pBg;
             so.ApplyModifiedPropertiesWithoutUndo();
-            root.SetActive(false);
+            // Don't deactivate the root — DialogueManager.Awake() needs to run
+            // to set Instance. The Hide() call in Awake hides the panel visually.
         }
 
         // ── Cinematic Camera ─────────────────────────────────────
