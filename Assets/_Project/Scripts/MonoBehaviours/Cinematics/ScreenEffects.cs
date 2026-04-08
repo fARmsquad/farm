@@ -421,6 +421,59 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
         #endregion
 
+        #region Timeline Direct API
+
+        /// <summary>
+        /// Directly sets fade alpha — used by Timeline FadeTrack mixer.
+        /// </summary>
+        public void SetFadeAlphaDirect(float alpha) => SetFadeAlpha(alpha);
+
+        /// <summary>
+        /// Directly sets letterbox height (0–1 normalized) — used by Timeline LetterboxTrack mixer.
+        /// </summary>
+        public void SetLetterboxHeightDirect(float normalizedHeight)
+        {
+            SetLetterboxHeight(Mathf.Clamp01(normalizedHeight) * maxLetterboxHeight);
+        }
+
+        /// <summary>
+        /// Applies a per-frame camera shake offset — used by Timeline ScreenShakeTrack mixer.
+        /// Pass 0 to reset the camera position.
+        /// </summary>
+        public void SetTimelineShake(float intensity)
+        {
+            if (targetCamera == null) return;
+            if (intensity <= 0f)
+            {
+                targetCamera.transform.localPosition = originalCameraPosition;
+                return;
+            }
+            Vector2 offset = UnityEngine.Random.insideUnitCircle * intensity;
+            targetCamera.transform.localPosition = originalCameraPosition + new Vector3(offset.x, offset.y, 0);
+        }
+
+        /// <summary>
+        /// Directly shows subtitle text at center — used by Timeline SubtitleTrack mixer.
+        /// </summary>
+        public void ShowSubtitleText(string text)
+        {
+            if (objectiveText == null || objectiveContainer == null) return;
+            objectiveText.text = text;
+            objectiveContainer.gameObject.SetActive(true);
+            objectiveContainer.anchoredPosition = Vector2.zero;
+        }
+
+        /// <summary>
+        /// Directly hides subtitle text — used by Timeline SubtitleTrack mixer.
+        /// </summary>
+        public void HideSubtitleText()
+        {
+            if (objectiveContainer == null) return;
+            objectiveContainer.gameObject.SetActive(false);
+        }
+
+        #endregion
+
         #region Utility
 
         /// <summary>
