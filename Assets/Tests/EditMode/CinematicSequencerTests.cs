@@ -83,7 +83,7 @@ namespace FarmSimVR.Tests.EditMode
             Assert.IsNotNull(sequence.steps);
             Assert.AreEqual(0, sequence.steps.Length);
 
-            Object.DestroyImmediate(sequence);
+            UnityEngine.Object.DestroyImmediate(sequence);
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace FarmSimVR.Tests.EditMode
             Assert.AreEqual(CinematicStepType.Wait, sequence.steps[0].type);
             Assert.AreEqual(CinematicStepType.Fade, sequence.steps[1].type);
 
-            Object.DestroyImmediate(sequence);
+            UnityEngine.Object.DestroyImmediate(sequence);
         }
     }
 
@@ -116,8 +116,8 @@ namespace FarmSimVR.Tests.EditMode
         [TearDown]
         public void TearDown()
         {
-            foreach (var go in Object.FindObjectsByType<CinematicSequencer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-                Object.DestroyImmediate(go.gameObject);
+            foreach (var go in UnityEngine.Object.FindObjectsByType<CinematicSequencer>(FindObjectsInactive.Include))
+                UnityEngine.Object.DestroyImmediate(go.gameObject);
         }
 
         [Test]
@@ -129,7 +129,7 @@ namespace FarmSimVR.Tests.EditMode
             bool result = sequencer.Validate(sequence);
 
             Assert.IsTrue(result);
-            Object.DestroyImmediate(sequence);
+            UnityEngine.Object.DestroyImmediate(sequence);
         }
 
         [Test]
@@ -145,7 +145,7 @@ namespace FarmSimVR.Tests.EditMode
             bool result = sequencer.Validate(sequence);
 
             Assert.IsTrue(result);
-            Object.DestroyImmediate(sequence);
+            UnityEngine.Object.DestroyImmediate(sequence);
         }
 
         [Test]
@@ -161,7 +161,7 @@ namespace FarmSimVR.Tests.EditMode
             bool result = sequencer.Validate(sequence);
 
             Assert.IsFalse(result);
-            Object.DestroyImmediate(sequence);
+            UnityEngine.Object.DestroyImmediate(sequence);
         }
     }
 }

@@ -13,8 +13,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
         private void Update()
         {
-            DebugPanelShortcuts.UpdateInput();
-            if (!DebugPanelShortcuts.IsPanelActive(Panel)) return;
+            if (!DebugPanelShortcuts.UpdateToggle(Panel)) return;
 
             if (DebugPanelShortcuts.WasActionPressed(Panel, Key.Digit1)) OnSpawnMayor();
             if (DebugPanelShortcuts.WasActionPressed(Panel, Key.Digit2)) OnSpawnFarmer();
@@ -24,7 +23,6 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
         private void OnGUI()
         {
-            DebugPanelShortcuts.DrawMasterMenu();
             if (!DebugPanelShortcuts.IsPanelActive(Panel)) return;
 
             float w = 280f; float h = 200f;

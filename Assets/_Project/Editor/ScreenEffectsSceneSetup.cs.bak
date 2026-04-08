@@ -1,0 +1,336 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using TMPro;
+
+namespace FarmSimVR.Editor
+{
+    /// <summary>
+    /// Editor utility to create the INT-001 Screen Effects test scene.
+    /// </summary>
+    public static class ScreenEffectsSceneSetup
+    {
+        [MenuItem("FarmSimVR/INT-001/Create Screen Effects Test Scene")]
+        public static void CreateTestScene()
+        {
+            // Create new scene
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+
+            // Create ground plane
+            var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            ground.name = "Ground";
+            ground.transform.position = Vector3.zero;
+            ground.transform.localScale = new Vector3(5, 1, 5);
+            var groundMat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            groundMat.color = new Color(0.3f, 0.5f, 0.3f);
+            ground.GetComponent<MeshRenderer>().sharedMaterial = groundMat;
+
+            // Position the main camera
+            var mainCam = Camera.main;
+            if (mainCam != null)
+            {
+                mainCam.transform.position = new Vector3(0, 5, -10);
+                mainCam.transform.LookAt(Vector3.zero);
+            }
+
+            // Create ScreenEffects Canvas
+            var screenEffectsCanvas = CreateScreenEffectsCanvas();
+
+            // Create Demo UI Canvas (separate, lower sort order)
+            CreateDemoUI(screenEffectsCanvas.GetComponent<FarmSimVR.MonoBehaviours.Cinematics.ScreenEffects>());
+
+            // Save scene
+            string scenePath = "Assets/_Project/Scenes/INT001_ScreenEffectsTest.unity";
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Application.dataPath + "/../" + scenePath));
+            EditorSceneManager.SaveScene(scene, scenePath);
+            AssetDatabase.Refresh();
+
+            Debug.Log($"[INT-001] Created Screen Effects test scene at {scenePath}");
+        }
+
+        [MenuItem("FarmSimVR/INT-001/Add Screen Effects Canvas to Scene")]
+        public static void AddCanvasToScene()
+        {
+            var existing = Object.FindAnyObjectByType<FarmSimVR.MonoBehaviours.Cinematics.ScreenEffects>();
+            if (existing != null)
+            {
+                Debug.LogWarning("[INT-001] ScreenEffects already exists in scene");
+                Selection.activeGameObject = existing.gameObject;
+                return;
+            }
+
+            var canvas = CreateScreenEffectsCanvas();
+            Selection.activeGameObject = canvas;
+            Debug.Log("[INT-001] Added ScreenEffects Canvas to scene");
+        }
+
+        private static GameObject CreateScreenEffectsCanvas()
+        {
+            // Root Canvas
+            var canvasGO = new GameObject("ScreenEffectsCanvas");
+            var canvas = canvasGO.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 999;
+
+            var scaler = canvasGO.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+
+            canvasGO.AddComponent<GraphicRaycaster>();
+
+            // Fade Overlay (full screen black image with CanvasGroup)
+            var fadeGO = new GameObject("FadeOverlay");
+            fadeGO.transform.SetParent(canvasGO.transform, false);
+            var fadeRT = fadeGO.AddComponent<RectTransform>();
+            fadeRT.anchorMin = Vector2.zero;
+            fadeRT.anchorMax = Vector2.one;
+            fadeRT.sizeDelta = Vector2.zero;
+
+            var fadeImage = fadeGO.AddComponent<Image>();
+            fadeImage.color = new Color(0, 0, 0, 0);
+            fadeImage.raycastTarget = false;
+
+            var fadeCanvasGroup = fadeGO.AddComponent<CanvasGroup>();
+            fadeCanvasGroup.alpha = 0;
+            fadeCanvasGroup.blocksRaycasts = false;
+            fadeCanvasGroup.interactable = false;
+
+            // Letterbox Top Bar
+            var topBarGO = new GameObject("LetterboxTop");
+            topBarGO.transform.SetParent(canvasGO.transform, false);
+            var topBarRT = topBarGO.AddComponent<RectTransform>();
+            topBarRT.anchorMin = new Vector2(0, 1);
+            topBarRT.anchorMax = new Vector2(1, 1);
+            topBarRT.pivot = new Vector2(0.5f, 1);
+            topBarRT.sizeDelta = new Vector2(0, 0);
+            topBarRT.anchoredPosition = Vector2.zero;
+
+            var topBarImage = topBarGO.AddComponent<Image>();
+            topBarImage.color = Color.black;
+            topBarImage.raycastTarget = false;
+
+            // Letterbox Bottom Bar
+            var bottomBarGO = new GameObject("LetterboxBottom");
+            bottomBarGO.transform.SetParent(canvasGO.transform, false);
+            var bottomBarRT = bottomBarGO.AddComponent<RectTransform>();
+            bottomBarRT.anchorMin = new Vector2(0, 0);
+            bottomBarRT.anchorMax = new Vector2(1, 0);
+            bottomBarRT.pivot = new Vector2(0.5f, 0);
+            bottomBarRT.sizeDelta = new Vector2(0, 0);
+            bottomBarRT.anchoredPosition = Vector2.zero;
+
+            var bottomBarImage = bottomBarGO.AddComponent<Image>();
+            bottomBarImage.color = Color.black;
+            bottomBarImage.raycastTarget = false;
+
+            // Objective Container (anchored left-center)
+            var objectiveContainerGO = new GameObject("ObjectiveContainer");
+            objectiveContainerGO.transform.SetParent(canvasGO.transform, false);
+            var objectiveContainerRT = objectiveContainerGO.AddComponent<RectTransform>();
+            objectiveContainerRT.anchorMin = new Vector2(0.5f, 0.5f);
+            objectiveContainerRT.anchorMax = new Vector2(0.5f, 0.5f);
+            objectiveContainerRT.pivot = new Vector2(0.5f, 0.5f);
+            objectiveContainerRT.sizeDelta = new Vector2(500, 60);
+            objectiveContainerRT.anchoredPosition = Vector2.zero;
+
+            // Objective Background
+            var objectiveBgGO = new GameObject("Background");
+            objectiveBgGO.transform.SetParent(objectiveContainerGO.transform, false);
+            var objectiveBgRT = objectiveBgGO.AddComponent<RectTransform>();
+            objectiveBgRT.anchorMin = Vector2.zero;
+            objectiveBgRT.anchorMax = Vector2.one;
+            objectiveBgRT.sizeDelta = Vector2.zero;
+
+            var objectiveBgImage = objectiveBgGO.AddComponent<Image>();
+            objectiveBgImage.color = new Color(0, 0, 0, 0.7f);
+            objectiveBgImage.raycastTarget = false;
+
+            // Objective Text
+            var objectiveTextGO = new GameObject("ObjectiveText");
+            objectiveTextGO.transform.SetParent(objectiveContainerGO.transform, false);
+            var objectiveTextRT = objectiveTextGO.AddComponent<RectTransform>();
+            objectiveTextRT.anchorMin = Vector2.zero;
+            objectiveTextRT.anchorMax = Vector2.one;
+            objectiveTextRT.sizeDelta = new Vector2(-20, -10);
+
+            var objectiveText = objectiveTextGO.AddComponent<TextMeshProUGUI>();
+            objectiveText.text = "OBJECTIVE";
+            objectiveText.fontSize = 28;
+            objectiveText.alignment = TextAlignmentOptions.Center;
+            objectiveText.color = Color.white;
+            objectiveText.raycastTarget = false;
+
+            objectiveContainerGO.SetActive(false);
+
+            // Mission Passed Container (centered)
+            var missionPassedGO = new GameObject("MissionPassedContainer");
+            missionPassedGO.transform.SetParent(canvasGO.transform, false);
+            var missionPassedRT = missionPassedGO.AddComponent<RectTransform>();
+            missionPassedRT.anchorMin = new Vector2(0.5f, 0.5f);
+            missionPassedRT.anchorMax = new Vector2(0.5f, 0.5f);
+            missionPassedRT.pivot = new Vector2(0.5f, 0.5f);
+            missionPassedRT.sizeDelta = new Vector2(600, 100);
+            missionPassedRT.anchoredPosition = Vector2.zero;
+
+            var missionPassedGroup = missionPassedGO.AddComponent<CanvasGroup>();
+            missionPassedGroup.alpha = 0;
+
+            // Mission Passed Background
+            var missionBgGO = new GameObject("Background");
+            missionBgGO.transform.SetParent(missionPassedGO.transform, false);
+            var missionBgRT = missionBgGO.AddComponent<RectTransform>();
+            missionBgRT.anchorMin = Vector2.zero;
+            missionBgRT.anchorMax = Vector2.one;
+            missionBgRT.sizeDelta = Vector2.zero;
+
+            var missionBgImage = missionBgGO.AddComponent<Image>();
+            missionBgImage.color = new Color(0.1f, 0.1f, 0.1f, 0.9f);
+            missionBgImage.raycastTarget = false;
+
+            // Mission Passed Text
+            var missionTextGO = new GameObject("MissionPassedText");
+            missionTextGO.transform.SetParent(missionPassedGO.transform, false);
+            var missionTextRT = missionTextGO.AddComponent<RectTransform>();
+            missionTextRT.anchorMin = Vector2.zero;
+            missionTextRT.anchorMax = Vector2.one;
+            missionTextRT.sizeDelta = Vector2.zero;
+
+            var missionText = missionTextGO.AddComponent<TextMeshProUGUI>();
+            missionText.text = "MISSION PASSED";
+            missionText.fontSize = 48;
+            missionText.alignment = TextAlignmentOptions.Center;
+            missionText.color = new Color(1f, 0.84f, 0f); // Gold color
+            missionText.fontStyle = FontStyles.Bold;
+            missionText.raycastTarget = false;
+
+            missionPassedGO.SetActive(false);
+
+            // Add ScreenEffects component and wire references
+            var screenEffects = canvasGO.AddComponent<FarmSimVR.MonoBehaviours.Cinematics.ScreenEffects>();
+
+            var so = new SerializedObject(screenEffects);
+            so.FindProperty("fadeOverlay").objectReferenceValue = fadeImage;
+            so.FindProperty("fadeCanvasGroup").objectReferenceValue = fadeCanvasGroup;
+            so.FindProperty("topBar").objectReferenceValue = topBarRT;
+            so.FindProperty("bottomBar").objectReferenceValue = bottomBarRT;
+            so.FindProperty("objectiveContainer").objectReferenceValue = objectiveContainerRT;
+            so.FindProperty("objectiveText").objectReferenceValue = objectiveText;
+            so.FindProperty("missionPassedGroup").objectReferenceValue = missionPassedGroup;
+            so.FindProperty("missionPassedText").objectReferenceValue = missionText;
+            so.FindProperty("targetCamera").objectReferenceValue = Camera.main;
+            so.ApplyModifiedProperties();
+
+            Undo.RegisterCreatedObjectUndo(canvasGO, "Create ScreenEffects Canvas");
+            EditorUtility.SetDirty(canvasGO);
+
+            return canvasGO;
+        }
+
+        private static void CreateDemoUI(FarmSimVR.MonoBehaviours.Cinematics.ScreenEffects screenEffects)
+        {
+            // Demo UI Canvas (lower sort order so buttons are clickable)
+            var demoCanvasGO = new GameObject("DemoUICanvas");
+            var demoCanvas = demoCanvasGO.AddComponent<Canvas>();
+            demoCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            demoCanvas.sortingOrder = 100;
+
+            var demoScaler = demoCanvasGO.AddComponent<CanvasScaler>();
+            demoScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            demoScaler.referenceResolution = new Vector2(1920, 1080);
+
+            demoCanvasGO.AddComponent<GraphicRaycaster>();
+
+            // Demo Controller
+            var demoController = demoCanvasGO.AddComponent<ScreenEffectsDemo>();
+            var demoSO = new SerializedObject(demoController);
+            demoSO.FindProperty("screenEffects").objectReferenceValue = screenEffects;
+            demoSO.ApplyModifiedProperties();
+
+            // Button Panel (left side)
+            var panelGO = new GameObject("ButtonPanel");
+            panelGO.transform.SetParent(demoCanvasGO.transform, false);
+            var panelRT = panelGO.AddComponent<RectTransform>();
+            panelRT.anchorMin = new Vector2(0, 0.5f);
+            panelRT.anchorMax = new Vector2(0, 0.5f);
+            panelRT.pivot = new Vector2(0, 0.5f);
+            panelRT.sizeDelta = new Vector2(250, 400);
+            panelRT.anchoredPosition = new Vector2(20, 0);
+
+            var panelImage = panelGO.AddComponent<Image>();
+            panelImage.color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
+
+            var layoutGroup = panelGO.AddComponent<VerticalLayoutGroup>();
+            layoutGroup.padding = new RectOffset(10, 10, 10, 10);
+            layoutGroup.spacing = 10;
+            layoutGroup.childAlignment = TextAnchor.UpperCenter;
+            layoutGroup.childControlWidth = true;
+            layoutGroup.childControlHeight = false;
+            layoutGroup.childForceExpandWidth = true;
+            layoutGroup.childForceExpandHeight = false;
+
+            // Title
+            var titleGO = new GameObject("Title");
+            titleGO.transform.SetParent(panelGO.transform, false);
+            var titleRT = titleGO.AddComponent<RectTransform>();
+            titleRT.sizeDelta = new Vector2(0, 40);
+
+            var titleText = titleGO.AddComponent<TextMeshProUGUI>();
+            titleText.text = "INT-001 Screen Effects";
+            titleText.fontSize = 20;
+            titleText.alignment = TextAlignmentOptions.Center;
+            titleText.color = Color.white;
+            titleText.fontStyle = FontStyles.Bold;
+
+            // Create buttons
+            string[] buttonNames = { "Fade To Black", "Fade From Black", "Screen Shake", "Show Letterbox", "Hide Letterbox", "Show Objective", "Mission Passed", "Reset All" };
+            string[] methods = { "OnFadeToBlack", "OnFadeFromBlack", "OnScreenShake", "OnShowLetterbox", "OnHideLetterbox", "OnShowObjective", "OnMissionPassed", "OnResetAll" };
+
+            for (int i = 0; i < buttonNames.Length; i++)
+            {
+                CreateButton(panelGO.transform, buttonNames[i], demoController, methods[i]);
+            }
+
+            EditorUtility.SetDirty(demoCanvasGO);
+        }
+
+        private static void CreateButton(Transform parent, string label, ScreenEffectsDemo controller, string methodName)
+        {
+            var buttonGO = new GameObject(label.Replace(" ", "") + "Button");
+            buttonGO.transform.SetParent(parent, false);
+            var buttonRT = buttonGO.AddComponent<RectTransform>();
+            buttonRT.sizeDelta = new Vector2(0, 35);
+
+            var buttonImage = buttonGO.AddComponent<Image>();
+            buttonImage.color = new Color(0.3f, 0.3f, 0.3f, 1f);
+
+            var button = buttonGO.AddComponent<Button>();
+            button.targetGraphic = buttonImage;
+
+            // Wire up button click via UnityEvent
+            var onClick = button.onClick;
+            var targetInfo = UnityEngine.Events.UnityAction.CreateDelegate(
+                typeof(UnityEngine.Events.UnityAction),
+                controller,
+                methodName
+            ) as UnityEngine.Events.UnityAction;
+
+            if (targetInfo != null)
+                onClick.AddListener(targetInfo);
+
+            // Button text
+            var textGO = new GameObject("Text");
+            textGO.transform.SetParent(buttonGO.transform, false);
+            var textRT = textGO.AddComponent<RectTransform>();
+            textRT.anchorMin = Vector2.zero;
+            textRT.anchorMax = Vector2.one;
+            textRT.sizeDelta = Vector2.zero;
+
+            var buttonText = textGO.AddComponent<TextMeshProUGUI>();
+            buttonText.text = label;
+            buttonText.fontSize = 16;
+            buttonText.alignment = TextAlignmentOptions.Center;
+            buttonText.color = Color.white;
+        }
+    }
+}

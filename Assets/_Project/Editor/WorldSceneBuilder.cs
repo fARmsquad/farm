@@ -136,6 +136,7 @@ namespace FarmSimVR.Editor
             BuildCinematicCamera();
             BuildMissionManager();
             BuildNPCDemos();
+            BuildPhase4Demos();
             RegisterScenesInBuildSettings();
 
             EditorSceneManager.SaveScene(scene,
@@ -585,7 +586,7 @@ namespace FarmSimVR.Editor
             dialogueTmp.fontSize = 22;
             dialogueTmp.color = Color.white;
             dialogueTmp.alignment = TextAlignmentOptions.TopLeft;
-            dialogueTmp.enableWordWrapping = true;
+            dialogueTmp.textWrappingMode = TMPro.TextWrappingModes.Normal;
 
             var mgr = root.AddComponent<DialogueManager>();
             var so = new SerializedObject(mgr);
@@ -617,7 +618,7 @@ namespace FarmSimVR.Editor
             camGo.AddComponent<UniversalAdditionalCameraData>();
 
             Camera gameplayCam = null;
-            foreach (var c in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
+            foreach (var c in Object.FindObjectsByType<Camera>())
             {
                 if (c.gameObject.CompareTag("MainCamera"))
                 { gameplayCam = c; break; }
@@ -653,6 +654,34 @@ namespace FarmSimVR.Editor
             var demoGo = new GameObject("NPCControllerDemo");
             demoGo.AddComponent<NPCControllerDemo>();
             Debug.Log("[WorldSceneBuilder] NPCController demo added.");
+        }
+
+        // ── Phase 4: Lighting, Particles, Comic Text, Skip, Props ──
+
+        private static void BuildPhase4Demos()
+        {
+            // INT-009: Lighting Transition + Demo
+            var lightingGo = new GameObject("LightingTransition");
+            lightingGo.AddComponent<LightingTransition>();
+            var cascadeGo = new GameObject("WindowCascade");
+            cascadeGo.AddComponent<WindowCascade>();
+            new GameObject("LightingDemo").AddComponent<LightingDemo>();
+
+            // INT-010: Particle Effects Demo
+            new GameObject("ParticleEffectsDemo").AddComponent<ParticleEffectsDemo>();
+
+            // INT-011: Comic Text Manager + Demo
+            new GameObject("ComicTextManager").AddComponent<ComicTextManager>();
+            new GameObject("ComicTextDemo").AddComponent<ComicTextDemo>();
+
+            // INT-012: Skip Prompt + Demo
+            new GameObject("SkipPrompt").AddComponent<SkipPrompt>();
+            new GameObject("SkipAndSaveDemo").AddComponent<SkipAndSaveDemo>();
+
+            // INT-013: Intro Props Demo (props spawned at runtime)
+            new GameObject("IntroPropsDemo").AddComponent<IntroPropsDemo>();
+
+            Debug.Log("[WorldSceneBuilder] Phase 4 demos added (Lighting, Particles, ComicText, Skip, IntroProps).");
         }
 
         private static RectTransform CreateLetterboxBar(string name, Transform parent,

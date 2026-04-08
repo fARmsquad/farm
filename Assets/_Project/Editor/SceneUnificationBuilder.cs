@@ -56,7 +56,7 @@ namespace FarmSimVR.Editor
 
         private static void WireCropPlots()
         {
-            var plots = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None);
+            var plots = Object.FindObjectsByType<Transform>();
             foreach (var t in plots)
             {
                 if (!t.name.StartsWith("CropPlot_")) continue;

@@ -20,11 +20,11 @@ This is the central tracker for all feature specs. Before building anything, fin
 | INT-005 | [Cinematic Sequencer](Assets/Specs/Features/INT-005-cinematic-sequencer.md) | INT | Done | AI | INT-001, INT-002, INT-003, INT-004 |
 | INT-006 | [NPC Controller](Assets/Specs/Features/INT-006-npc-controller.md) | INT | Done | Youssef | INT-003 |
 | INT-007 | [Mission Manager](Assets/Specs/Features/INT-007-mission-manager.md) | INT | Done | Youssef | INT-001, INT-002 |
-| INT-009 | [Lighting Presets & Transitions](Assets/Specs/Features/INT-009-lighting-presets.md) | INT | Open | -- | INT-005 |
-| INT-010 | [Environment Particle Systems](Assets/Specs/Features/INT-010-particle-effects.md) | INT | Open | -- | -- |
-| INT-011 | [Comic Text & Speech Bubbles](Assets/Specs/Features/INT-011-comic-text-overlays.md) | INT | Open | -- | INT-003 |
-| INT-012 | [Cutscene Skip & Auto-Save](Assets/Specs/Features/INT-012-skip-and-autosave.md) | INT | Open | -- | INT-005, INT-001 |
-| INT-013 | [Intro Props & Ambient NPCs](Assets/Specs/Features/INT-013-intro-props.md) | INT | Open | -- | INT-005 |
+| INT-009 | [Lighting Presets & Transitions](Assets/Specs/Features/INT-009-lighting-presets.md) | INT | Done | Youssef | INT-005 |
+| INT-010 | [Environment Particle Systems](Assets/Specs/Features/INT-010-particle-effects.md) | INT | Done | Youssef | -- |
+| INT-011 | [Comic Text & Speech Bubbles](Assets/Specs/Features/INT-011-comic-text-overlays.md) | INT | Done | Youssef | INT-003 |
+| INT-012 | [Cutscene Skip & Auto-Save](Assets/Specs/Features/INT-012-skip-and-autosave.md) | INT | Done | Youssef | INT-005, INT-001 |
+| INT-013 | [Intro Props & Ambient NPCs](Assets/Specs/Features/INT-013-intro-props.md) | INT | Done | Youssef | INT-005 |
 | INT-008 | [Intro Scene Assembly](Assets/Specs/Features/INT-008-intro-scene-assembly.md) | INT | Open | -- | INT-005 thru INT-013 |
 | INT-014 | [Intro Art & Audio Polish](Assets/Specs/Features/INT-014-intro-art-audio.md) | POL | Open | -- | INT-008 |
 | POL-001 | [Polish Backlog](Assets/Specs/Features/POL-001-polish-backlog.md) | POL | Open | -- | All gameplay + intro Done |

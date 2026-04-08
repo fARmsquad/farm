@@ -15,6 +15,7 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
         protected int currentStep;
         protected int totalSteps = 1;
         protected bool finished;
+        public bool IsFinished => finished;
 
         protected abstract IEnumerator RunDemo();
 

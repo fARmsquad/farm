@@ -21,6 +21,29 @@ namespace FarmSimVR.Editor
     {
         private const string SceneDir = "Assets/_Project/Scenes/Autoplay";
 
+        [MenuItem("FarmSim/Build + Run All Autoplays")]
+        public static void BuildAndRunAll()
+        {
+            EnsureDirectory();
+            BuildScreenEffectsScene();
+            BuildAudioScene();
+            BuildDialogueScene();
+            BuildCinematicCameraScene();
+            BuildNPCScene();
+            BuildMissionScene();
+            BuildLightingScene();
+            BuildParticlesScene();
+            BuildComicTextScene();
+            BuildSkipSaveScene();
+            BuildIntroPropsScene();
+            BuildMasterChainScene();
+            Debug.Log("[AutoplaySceneBuilder] All 11 autoplay scenes + master chain built. Starting playback...");
+
+            // Open the master chain scene and press Play
+            EditorSceneManager.OpenScene($"{SceneDir}/Autoplay_MASTER_CHAIN.unity");
+            EditorApplication.isPlaying = true;
+        }
+
         [MenuItem("FarmSim/Autoplay/Build All Autoplay Scenes")]
         public static void BuildAll()
         {
@@ -31,7 +54,38 @@ namespace FarmSimVR.Editor
             BuildCinematicCameraScene();
             BuildNPCScene();
             BuildMissionScene();
-            Debug.Log("[AutoplaySceneBuilder] All 6 autoplay scenes built.");
+            BuildLightingScene();
+            BuildParticlesScene();
+            BuildComicTextScene();
+            BuildSkipSaveScene();
+            BuildIntroPropsScene();
+            BuildMasterChainScene();
+            Debug.Log("[AutoplaySceneBuilder] All 11 autoplay scenes + master chain built.");
+        }
+
+        [MenuItem("FarmSim/Autoplay/MASTER CHAIN (all demos)")]
+        public static void BuildMasterChainScene()
+        {
+            EnsureDirectory();
+            BeginScene();
+            BuildCommonSceneConfig();
+            BuildGround();
+
+            // Simple camera for the initial frame before first scene loads
+            // (BuildCommonSceneConfig removes default camera, so add one back)
+            var camGo = new GameObject("ChainCamera");
+            camGo.tag = "MainCamera";
+            var cam = camGo.AddComponent<Camera>();
+            cam.transform.position = new Vector3(0f, 3f, -8f);
+            cam.transform.LookAt(Vector3.zero);
+            cam.clearFlags = CameraClearFlags.Skybox;
+            cam.fieldOfView = 60f;
+            camGo.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+            camGo.AddComponent<AudioListener>();
+
+            new GameObject("AutoplayMasterChain").AddComponent<AutoplayMasterChain>();
+
+            SaveScene("Autoplay_MASTER_CHAIN");
         }
 
         [MenuItem("FarmSim/Autoplay/INT-001 Screen Effects")]
