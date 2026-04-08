@@ -136,6 +136,119 @@ namespace FarmSimVR.Editor
             SaveScene("Autoplay_INT007_Mission");
         }
 
+        // ── Phase 4 Autoplay Scenes ──────────────────────────────
+
+        [MenuItem("FarmSim/Autoplay/INT-009 Lighting Presets")]
+        public static void BuildLightingScene()
+        {
+            EnsureDirectory();
+            BeginScene();
+            BuildCommonSceneConfig();
+            BuildGround();
+            BuildPlayer();
+
+            // Lighting systems
+            new GameObject("LightingTransition").AddComponent<LightingTransition>();
+            var cascade = new GameObject("WindowCascade").AddComponent<WindowCascade>();
+
+            // Window lights for cascade demo
+            Light[] lights = new Light[6];
+            for (int i = 0; i < 6; i++)
+            {
+                var lg = new GameObject($"WindowLight_{i}");
+                lg.transform.position = new Vector3(-8f + i * 3f, 3f, 8f);
+                var l = lg.AddComponent<Light>();
+                l.type = LightType.Point;
+                l.color = new Color(1f, 0.85f, 0.5f);
+                l.range = 3f; l.intensity = 2f; l.enabled = false;
+                lights[i] = l;
+            }
+            var cso = new SerializedObject(cascade);
+            cso.FindProperty("windowLights").arraySize = lights.Length;
+            for (int i = 0; i < lights.Length; i++)
+                cso.FindProperty("windowLights").GetArrayElementAtIndex(i).objectReferenceValue = lights[i];
+            cso.ApplyModifiedPropertiesWithoutUndo();
+
+            // Some buildings for visual context
+            for (int i = 0; i < 4; i++)
+            {
+                var bldg = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                bldg.name = $"Building_{i}";
+                bldg.transform.position = new Vector3(-6f + i * 4f, 2.5f, 8f);
+                bldg.transform.localScale = new Vector3(3f, 5f, 3f);
+            }
+
+            new GameObject("Autoplay").AddComponent<AutoplayLighting>();
+            SaveScene("Autoplay_INT009_Lighting");
+        }
+
+        [MenuItem("FarmSim/Autoplay/INT-010 Particle Effects")]
+        public static void BuildParticlesScene()
+        {
+            EnsureDirectory();
+            BeginScene();
+            BuildCommonSceneConfig();
+            BuildGround();
+            BuildPlayer();
+
+            new GameObject("Autoplay").AddComponent<AutoplayParticles>();
+            SaveScene("Autoplay_INT010_Particles");
+        }
+
+        [MenuItem("FarmSim/Autoplay/INT-011 Comic Text")]
+        public static void BuildComicTextScene()
+        {
+            EnsureDirectory();
+            BeginScene();
+            BuildCommonSceneConfig();
+            BuildGround();
+            BuildPlayer();
+
+            new GameObject("ComicTextManager").AddComponent<ComicTextManager>();
+
+            // Target for speech bubbles
+            var target = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            target.name = "SpeechTarget";
+            target.transform.position = new Vector3(3f, 1f, 3f);
+
+            new GameObject("Autoplay").AddComponent<AutoplayComicText>();
+            SaveScene("Autoplay_INT011_ComicText");
+        }
+
+        [MenuItem("FarmSim/Autoplay/INT-012 Skip and AutoSave")]
+        public static void BuildSkipSaveScene()
+        {
+            EnsureDirectory();
+            BeginScene();
+            BuildCommonSceneConfig();
+            BuildGround();
+            BuildPlayer();
+
+            new GameObject("SkipPrompt").AddComponent<SkipPrompt>();
+
+            new GameObject("Autoplay").AddComponent<AutoplaySkipSave>();
+            SaveScene("Autoplay_INT012_SkipSave");
+        }
+
+        [MenuItem("FarmSim/Autoplay/INT-013 Intro Props")]
+        public static void BuildIntroPropsScene()
+        {
+            EnsureDirectory();
+            BeginScene();
+            BuildCommonSceneConfig();
+            BuildGround();
+            BuildPlayer();
+
+            // Rooftop for cat
+            var roof = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            roof.name = "Rooftop";
+            roof.transform.position = new Vector3(0f, 5f, 0f);
+            roof.transform.localScale = new Vector3(20f, 0.3f, 4f);
+
+            new GameObject("Autoplay").AddComponent<AutoplayIntroProps>();
+            SaveScene("Autoplay_INT013_IntroProps");
+        }
+
         // ══════════════════════════════════════════════════════════
         // Shared build helpers
         // ══════════════════════════════════════════════════════════
