@@ -3,6 +3,8 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using FarmSimVR.MonoBehaviours;
+using FarmSimVR.MonoBehaviours.Cinematics;
 
 namespace FarmSimVR.Editor
 {
@@ -95,19 +97,22 @@ namespace FarmSimVR.Editor
             esGO.AddComponent<EventSystem>();
             esGO.AddComponent<StandaloneInputModule>();
 
-            // --- IntroCutsceneManager ---
-            var mgrGO = new GameObject("IntroCutsceneManager");
-            var mgr = mgrGO.AddComponent<FarmSimVR.MonoBehaviours.IntroCutsceneManager>();
+            // --- CinematicCamera on Main Camera ---
+            camGO.AddComponent<CinematicCamera>();
 
-            var so = new SerializedObject(mgr);
-            so.FindProperty("mainCam").objectReferenceValue = cam;
-            so.FindProperty("fadeOverlay").objectReferenceValue = fadeGroup;
-            so.FindProperty("subtitleText").objectReferenceValue = txt;
-            so.FindProperty("shot1Rectangle").objectReferenceValue = rect1.transform;
-            so.FindProperty("shot2BigRectangle").objectReferenceValue = rect2.transform;
-            so.FindProperty("shot3Circle").objectReferenceValue = circ.transform;
-            so.FindProperty("nextScene").stringValue = "FarmMain";
-            so.ApplyModifiedPropertiesWithoutUndo();
+            // --- CinematicRoot ---
+            var mgrGO = new GameObject("CinematicRoot");
+
+            var screenEffects = mgrGO.AddComponent<ScreenEffects>();
+            var soEffects = new SerializedObject(screenEffects);
+            soEffects.FindProperty("fadeCanvasGroup").objectReferenceValue = fadeGroup;
+            soEffects.FindProperty("targetCamera").objectReferenceValue = cam;
+            soEffects.ApplyModifiedPropertiesWithoutUndo();
+
+            mgrGO.AddComponent<SkipPrompt>();
+            mgrGO.AddComponent<SceneLoader>();
+            mgrGO.AddComponent<CinematicSequencer>();
+            mgrGO.AddComponent<IntroCinematicAutoPlay>();
 
             // --- Save ---
             string scenePath = "Assets/_Project/Scenes/Intro.unity";

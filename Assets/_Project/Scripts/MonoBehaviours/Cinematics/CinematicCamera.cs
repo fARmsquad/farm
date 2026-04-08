@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -308,6 +309,71 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                 pathCoroutine = null;
             }
         }
+
+        #endregion
+
+        #region Orbit Move
+
+        /// <summary>
+        /// Orbits the camera around the given world-space center point using smoothstep easing.
+        /// Cancels any existing move before starting. Fires OnWaypointReached on completion.
+        /// </summary>
+        /// <param name="center">World-space orbit center.</param>
+        /// <param name="radius">Orbit radius in world units.</param>
+        /// <param name="height">Camera height above the center Y.</param>
+        /// <param name="startAngleDeg">Starting angle in degrees (0 = +Z axis).</param>
+        /// <param name="totalDegrees">Total arc to sweep, positive = clockwise when viewed from above.</param>
+        /// <param name="duration">Duration of the orbit in seconds (unscaled time).</param>
+        /// <param name="onComplete">Optional callback fired when the orbit finishes.</param>
+        public void OrbitAround(Vector3 center, float radius, float height,
+                                 float startAngleDeg, float totalDegrees,
+                                 float duration, Action onComplete = null)
+        {
+            CancelActiveMove();
+            moveCoroutine = StartCoroutine(OrbitAroundCoroutine(center, radius, height, startAngleDeg, totalDegrees, duration, onComplete));
+        }
+
+        private IEnumerator OrbitAroundCoroutine(Vector3 center, float radius, float height,
+                                                  float startAngleDeg, float totalDegrees,
+                                                  float duration, Action onComplete)
+        {
+            currentMode = CameraMode.Moving;
+
+            float elapsed = 0f;
+            float safeDuration = Mathf.Max(duration, 0.001f);
+
+            while (elapsed < safeDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = OrbitSmoothstep(Mathf.Clamp01(elapsed / safeDuration));
+                float angleDeg = startAngleDeg + totalDegrees * t;
+                float angleRad = angleDeg * Mathf.Deg2Rad;
+
+                Vector3 orbitPos = center + new Vector3(
+                    Mathf.Sin(angleRad) * radius,
+                    height,
+                    Mathf.Cos(angleRad) * radius);
+
+                transform.position = orbitPos;
+                transform.LookAt(center + Vector3.up);
+                yield return null;
+            }
+
+            // Snap to final position
+            float finalRad = (startAngleDeg + totalDegrees) * Mathf.Deg2Rad;
+            transform.position = center + new Vector3(
+                Mathf.Sin(finalRad) * radius,
+                height,
+                Mathf.Cos(finalRad) * radius);
+            transform.LookAt(center + Vector3.up);
+
+            moveCoroutine = null;
+            currentMode = CameraMode.Idle;
+            onComplete?.Invoke();
+            OnWaypointReached?.Invoke();
+        }
+
+        private static float OrbitSmoothstep(float t) => t * t * (3f - 2f * t);
 
         #endregion
     }

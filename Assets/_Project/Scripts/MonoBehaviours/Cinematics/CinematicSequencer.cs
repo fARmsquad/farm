@@ -355,6 +355,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                         case CinematicStepType.Letterbox:
                         case CinematicStepType.Dialogue:
                         case CinematicStepType.CameraMove:
+                        case CinematicStepType.OrbitMove:
                             float timeout = step.duration + 5f;
                             float elapsed = 0f;
                             while (!flag.Done && elapsed < timeout)
@@ -505,6 +506,38 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                         {
                             flag.Done = true;
                             _cinematicCamera.OnWaypointReached.RemoveListener(OnWaypointIndexForFlag);
+                        }
+                    }
+                    break;
+
+                case CinematicStepType.OrbitMove:
+                    if (_cinematicCamera == null)
+                    {
+                        Debug.LogWarning("[CinematicSequencer] CinematicCamera is null — skipping OrbitMove step.");
+                        flag.Done = true;
+                        break;
+                    }
+                    {
+                        // stringParam encodes orbit center and height as "centerX,centerY,centerZ,height,startAngleDeg"
+                        // floatParam = radius, intParam = totalDegrees, duration = total seconds
+                        var parts = (step.stringParam ?? "0,0,0,0,0").Split(',');
+                        float cx = parts.Length > 0 ? float.Parse(parts[0], System.Globalization.CultureInfo.InvariantCulture) : 0f;
+                        float cy = parts.Length > 1 ? float.Parse(parts[1], System.Globalization.CultureInfo.InvariantCulture) : 0f;
+                        float cz = parts.Length > 2 ? float.Parse(parts[2], System.Globalization.CultureInfo.InvariantCulture) : 0f;
+                        float orbitHeight    = parts.Length > 3 ? float.Parse(parts[3], System.Globalization.CultureInfo.InvariantCulture) : 0f;
+                        float startAngleDeg  = parts.Length > 4 ? float.Parse(parts[4], System.Globalization.CultureInfo.InvariantCulture) : 0f;
+
+                        Vector3 orbitCenter = new Vector3(cx, cy, cz);
+                        float orbitRadius   = step.floatParam;
+                        int totalDegrees    = step.intParam;
+
+                        _cinematicCamera.OnWaypointReached.AddListener(OnOrbitCompleteForFlag);
+                        _cinematicCamera.OrbitAround(orbitCenter, orbitRadius, orbitHeight, startAngleDeg, totalDegrees, step.duration);
+
+                        void OnOrbitCompleteForFlag()
+                        {
+                            flag.Done = true;
+                            _cinematicCamera.OnWaypointReached.RemoveListener(OnOrbitCompleteForFlag);
                         }
                     }
                     break;

@@ -1,0 +1,23 @@
+{
+    "name": "FarmSimVR.Editor.Cinematics",
+    "rootNamespace": "FarmSimVR.Editor.Cinematics",
+    "references": [
+        "FarmSimVR.Core",
+        "FarmSimVR.MonoBehaviours",
+        "Unity.Cinemachine",
+        "Unity.Cinemachine.Editor",
+        "Unity.Timeline",
+        "Unity.Timeline.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
