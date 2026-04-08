@@ -12,6 +12,22 @@
 
 Unity 6 LTS (6000.4.1f1) · URP · Meta Quest 2+3 · Solo dev (Youssef) + AI agents · Spec-driven TDD
 
+## Scene Map
+
+All project scenes live in `Assets/_Project/Scenes/` (not `Assets/Scenes/`).
+
+| Scene | Purpose |
+|---|---|
+| `FarmMain.unity` | Main farm gameplay |
+| `WorldMain.unity` | Overworld/world map |
+| `TitleScreen.unity` | Title/main menu |
+| `Intro.unity` | Intro cutscene (Synty farm prefabs, IntroCutsceneManager) |
+| `HuntingTest.unity` | Hunting mechanic test |
+| `AssetShowcase.unity` | Asset preview |
+| `INT001_ScreenEffectsTest.unity` | Screen effects integration test |
+
+> Ignore `Assets/Scenes/SampleScene.unity` — Unity default, unused.
+
 ## Testing — NON-NEGOTIABLE
 
 **Iron Law #1: NEVER write implementation without a failing test first.**
