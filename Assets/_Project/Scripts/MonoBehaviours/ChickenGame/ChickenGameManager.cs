@@ -21,6 +21,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         private Vector3 _playerStartPos;
         private Quaternion _playerStartRot;
         private Vector3 _chickenStartPos;
+        private int _lastDisplayedSecs = -1;
 
         private void Start()
         {
@@ -71,6 +72,8 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         {
             if (timerText == null) return;
             int secs = Mathf.CeilToInt(Mathf.Max(0f, _timeRemaining));
+            if (secs == _lastDisplayedSecs) return;
+            _lastDisplayedSecs = secs;
             timerText.text = $"Time: {secs}s";
             timerText.color = _timeRemaining <= 10f ? Color.red : Color.white;
         }
@@ -105,6 +108,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         {
             _gameOver = false;
             _timeRemaining = timeLimit;
+            _lastDisplayedSecs = -1;
             if (timerText != null) timerText.gameObject.SetActive(true);
 
             if (player != null)
