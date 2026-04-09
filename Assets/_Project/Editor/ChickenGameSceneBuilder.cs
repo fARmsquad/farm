@@ -1,9 +1,7 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Rendering;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using TMPro;
 using FarmSimVR.MonoBehaviours.ChickenGame;
 
 namespace FarmSimVR.Editor
@@ -12,9 +10,9 @@ namespace FarmSimVR.Editor
     {
         // ── Arena ─────────────────────────────────────────────────────────────
         // Square pen: wall centres sit at ±PenHalf on X and Z
-        private const float PenHalf          = 5.5f;
+        private const float PenHalf          = 10f;
         // Circular arena for AI (must stay inside the square walls)
-        private const float ArenaRadius      = 5f;
+        private const float ArenaRadius      = 9.5f;
 
         // ── Lighting (matches WorldMain exactly) ──────────────────────────────
         private static readonly Color SunColor      = new(1f,    0.96f, 0.88f);
@@ -55,11 +53,7 @@ namespace FarmSimVR.Editor
             CreateEnvironment();
             var player  = CreatePlayer();
             var chicken = CreateChicken();
-            CreateUI(
-                out TextMeshProUGUI timerTMP,
-                out TextMeshProUGUI resultTMP,
-                out TextMeshProUGUI instructionTMP);
-            CreateGameManager(chicken, player.transform, timerTMP, resultTMP, instructionTMP);
+            CreateGameManager(chicken, player.transform);
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -307,6 +301,7 @@ namespace FarmSimVR.Editor
                 new( PenHalf + 3f, 0f, -PenHalf - 2f),
                 new( PenHalf + 3f, 0f,  PenHalf + 2f),
                 new(-PenHalf - 3f, 0f,  PenHalf + 2f),
+                // Note: tree positions derive from PenHalf, so they always sit outside the fence
             };
             for (int i = 0; i < treePositions.Length; i++)
             {
@@ -373,74 +368,15 @@ namespace FarmSimVR.Editor
             return go;
         }
 
-        // ── UI ───────────────────────────────────────────────────────────────
-
-        static void CreateUI(
-            out TextMeshProUGUI timerTMP,
-            out TextMeshProUGUI resultTMP,
-            out TextMeshProUGUI instructionTMP)
-        {
-            var canvasGO = new GameObject("UI");
-            var canvas   = canvasGO.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-
-            var scaler = canvasGO.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode         = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920f, 1080f);
-            scaler.matchWidthOrHeight  = 0.5f;
-            canvasGO.AddComponent<GraphicRaycaster>();
-
-            timerTMP = MakeTMP(canvasGO.transform, "TimerText",
-                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
-                new Vector2(0f, -20f), new Vector2(400f, 80f), "Time: 45s", 52f);
-
-            resultTMP = MakeTMP(canvasGO.transform, "ResultText",
-                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                Vector2.zero, new Vector2(700f, 220f), "", 72f);
-            resultTMP.alignment = TextAlignmentOptions.Center;
-
-            instructionTMP = MakeTMP(canvasGO.transform, "InstructionText",
-                new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
-                new Vector2(0f, 25f), new Vector2(900f, 60f),
-                "WASD to move  ·  Mouse to aim  ·  Get close to catch!", 34f);
-        }
-
-        static TextMeshProUGUI MakeTMP(Transform parent, string name,
-            Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot,
-            Vector2 anchoredPos, Vector2 size, string text, float fontSize)
-        {
-            var go  = new GameObject(name);
-            go.transform.SetParent(parent, false);
-
-            var tmp       = go.AddComponent<TextMeshProUGUI>();
-            tmp.text      = text;
-            tmp.fontSize  = fontSize;
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.color     = Color.white;
-
-            var rt              = go.GetComponent<RectTransform>();
-            rt.anchorMin        = anchorMin;
-            rt.anchorMax        = anchorMax;
-            rt.pivot            = pivot;
-            rt.anchoredPosition = anchoredPos;
-            rt.sizeDelta        = size;
-            return tmp;
-        }
-
         // ── Game Manager ─────────────────────────────────────────────────────
 
-        static void CreateGameManager(
-            GameObject chickenGO, Transform player,
-            TextMeshProUGUI timerTMP, TextMeshProUGUI resultTMP, TextMeshProUGUI instructionTMP)
+        static void CreateGameManager(GameObject chickenGO, Transform player)
         {
             var go  = new GameObject("ChickenGameManager");
             var mgr = go.AddComponent<ChickenGameManager>();
-            mgr.chicken         = chickenGO.GetComponent<ChickenAI>();
-            mgr.player          = player;
-            mgr.timerText       = timerTMP;
-            mgr.resultText      = resultTMP;
-            mgr.instructionText = instructionTMP;
-            mgr.timeLimit       = 45f;
+            mgr.chicken   = chickenGO.GetComponent<ChickenAI>();
+            mgr.player    = player;
+            mgr.timeLimit = 45f;
         }
 
         // ── Helpers ──────────────────────────────────────────────────────────
