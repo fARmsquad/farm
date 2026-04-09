@@ -1,115 +1,199 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using TMPro;
 
 namespace FarmSimVR.MonoBehaviours.ChickenGame
 {
+    /// <summary>
+    /// Core game loop for the chicken-catching minigame.
+    /// Phase 1 — Chase: press E when in range to catch the chicken.
+    /// Phase 2 — Hold:  left-click continuously to maintain grip; walk to the coop to win.
+    ///                  Stop clicking and the chicken escapes back to Phase 1.
+    /// </summary>
     public class ChickenGameManager : MonoBehaviour
     {
         [Header("References")]
         [SerializeField] public ChickenAI chicken;
         [SerializeField] public Transform player;
-        [SerializeField] public TextMeshProUGUI timerText;
-        [SerializeField] public TextMeshProUGUI resultText;
-        [SerializeField] public TextMeshProUGUI instructionText;
+        [SerializeField] private Transform _coopTransform;
 
-        [Header("Settings")]
+        [Header("Timer")]
         [SerializeField] public float timeLimit = 45f;
 
+        [Header("Grip")]
+        [SerializeField] private float gripDrainRate   = 0.08f;  // Grip lost per second — empties in ~12s without clicking
+        [SerializeField] private float gripClickRefill = 0.30f;  // Grip gained per click — ~4 clicks to refill from empty
+
+        [Header("Coop")]
+        [SerializeField] private float coopDropRadius = 1.5f;
+
+        private ChickenPlayerController _playerController;
         private float _timeRemaining;
-        private bool _gameOver;
-        private Vector3 _playerStartPos;
+        private bool  _gameOver;
+        private bool  _isHoldingChicken;
+        private float _gripMeter;
+        private Vector3    _playerStartPos;
         private Quaternion _playerStartRot;
-        private Vector3 _chickenStartPos;
-        private int _lastDisplayedSecs = -1;
+        private Vector3    _chickenStartPos;
+        private Keyboard _keyboard;
+        private Mouse    _mouse;
 
         private void Start()
         {
-            _timeRemaining = timeLimit;
+            _keyboard = Keyboard.current;
+            _mouse    = Mouse.current;
 
             if (player != null)
             {
-                _playerStartPos = player.position;
-                _playerStartRot = player.rotation;
+                _playerController = player.GetComponent<ChickenPlayerController>();
+                _playerStartPos   = player.position;
+                _playerStartRot   = player.rotation;
             }
+
             if (chicken != null)
                 _chickenStartPos = chicken.transform.position;
 
-            if (resultText != null) resultText.gameObject.SetActive(false);
-            RefreshInstruction();
+            _timeRemaining = timeLimit;
         }
 
         private void Update()
         {
             if (_gameOver)
             {
-                var kb = Keyboard.current;
-                if (kb != null && kb.spaceKey.wasPressedThisFrame)
+                if (_keyboard != null && _keyboard.spaceKey.wasPressedThisFrame)
                     RestartGame();
                 return;
             }
 
             _timeRemaining -= Time.deltaTime;
-            UpdateTimerText();
 
-            if (chicken != null && player != null)
+            if (_isHoldingChicken)
             {
-                float dx = player.position.x - chicken.transform.position.x;
-                float dz = player.position.z - chicken.transform.position.z;
-                float sqDist = dx * dx + dz * dz;
-                if (sqDist <= chicken.catchRadius * chicken.catchRadius)
-                {
-                    EndGame(won: true);
-                    return;
-                }
+                HandleGripMechanic();
+                CheckCoopDrop();
+            }
+            else
+            {
+                HandleCatchInteraction();
             }
 
             if (_timeRemaining <= 0f)
                 EndGame(won: false);
         }
 
-        private void UpdateTimerText()
+        // ── Public state for UI ──────────────────────────────────────────────
+
+        /// <summary>Seconds remaining on the clock, clamped to zero.</summary>
+        public float TimeRemaining => Mathf.Max(0f, _timeRemaining);
+
+        /// <summary>True once the game has ended (win or lose).</summary>
+        public bool IsGameOver => _gameOver;
+
+        /// <summary>True if the last game ended with the chicken dropped in the coop.</summary>
+        public bool IsWon { get; private set; }
+
+        /// <summary>True while the player is holding the chicken.</summary>
+        public bool IsHoldingChicken => _isHoldingChicken;
+
+        /// <summary>Current grip level, 0–1. Drains without clicking, refills on click.</summary>
+        public float GripFraction => _gripMeter;
+
+        /// <summary>True when the chicken is currently stunned.</summary>
+        public bool IsChickenStunned => chicken != null && chicken.IsStunned;
+
+        /// <summary>True if the player is currently within catch range of the chicken.</summary>
+        public bool IsInCatchRange()
         {
-            if (timerText == null) return;
-            int secs = Mathf.CeilToInt(Mathf.Max(0f, _timeRemaining));
-            if (secs == _lastDisplayedSecs) return;
-            _lastDisplayedSecs = secs;
-            timerText.text = $"Time: {secs}s";
-            timerText.color = _timeRemaining <= 10f ? Color.red : Color.white;
+            if (chicken == null || player == null) return false;
+            float dx = player.position.x - chicken.transform.position.x;
+            float dz = player.position.z - chicken.transform.position.z;
+            return (dx * dx + dz * dz) <= chicken.catchRadius * chicken.catchRadius;
+        }
+
+        /// <summary>True when the player is holding the chicken and is close enough to the coop to drop it.</summary>
+        public bool IsNearCoop()
+        {
+            if (!_isHoldingChicken || _coopTransform == null || player == null) return false;
+            Vector3 delta = player.position - _coopTransform.position;
+            delta.y = 0f;
+            return delta.sqrMagnitude <= coopDropRadius * coopDropRadius;
+        }
+
+        // ── Private game logic ───────────────────────────────────────────────
+
+        private void HandleCatchInteraction()
+        {
+            if (chicken == null || player == null || _keyboard == null) return;
+
+            if (_keyboard.eKey.wasPressedThisFrame)
+            {
+                if (IsInCatchRange())
+                    CatchChicken();
+                else if (_playerController != null)
+                    _playerController.TriggerLungeMiss();
+            }
+        }
+
+        private void HandleGripMechanic()
+        {
+            _gripMeter -= gripDrainRate * Time.deltaTime;
+
+            if (_mouse != null && _mouse.leftButton.wasPressedThisFrame)
+                _gripMeter = Mathf.Min(1f, _gripMeter + gripClickRefill);
+
+            if (_gripMeter <= 0f)
+                ReleaseChicken();
+        }
+
+        private void CheckCoopDrop()
+        {
+            if (IsNearCoop())
+                EndGame(won: true);
+        }
+
+        private void CatchChicken()
+        {
+            _isHoldingChicken = true;
+            _gripMeter        = 1f;
+            chicken.Catch(player);
+        }
+
+        private void ReleaseChicken()
+        {
+            _isHoldingChicken = false;
+            _gripMeter        = 0f;
+            chicken.Escape();
         }
 
         private void EndGame(bool won)
         {
-            _gameOver = true;
-            if (chicken != null) chicken.enabled = false;
-            if (timerText != null) timerText.gameObject.SetActive(false);
-
-            if (resultText != null)
+            if (_isHoldingChicken)
             {
-                resultText.gameObject.SetActive(true);
-                if (won)
-                {
-                    int elapsed = Mathf.CeilToInt(timeLimit - _timeRemaining);
-                    resultText.text = $"CAUGHT!\nGot it in {elapsed}s!";
-                    resultText.color = new Color(0.2f, 0.9f, 0.2f);
-                }
-                else
-                {
-                    resultText.text = "TIME'S UP!\nThe chicken escaped!";
-                    resultText.color = Color.red;
-                }
+                _isHoldingChicken = false;
+                _gripMeter        = 0f;
+                chicken.Drop();
             }
 
-            if (instructionText != null)
-                instructionText.text = "Press SPACE to try again";
+            _gameOver = true;
+            IsWon     = won;
+
+            if (chicken != null)
+            {
+                chicken.enabled = false;
+                if (won) chicken.gameObject.SetActive(false);
+            }
+
+            Debug.Log(won
+                ? $"[ChickenGame] Dropped in coop after {Mathf.CeilToInt(timeLimit - _timeRemaining)}s!"
+                : "[ChickenGame] Time's up!");
         }
 
         private void RestartGame()
         {
-            _gameOver = false;
-            _timeRemaining = timeLimit;
-            _lastDisplayedSecs = -1;
-            if (timerText != null) timerText.gameObject.SetActive(true);
+            _gameOver         = false;
+            IsWon             = false;
+            _isHoldingChicken = false;
+            _gripMeter        = 0f;
+            _timeRemaining    = timeLimit;
 
             if (player != null)
             {
@@ -119,18 +203,14 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
 
             if (chicken != null)
             {
+                chicken.gameObject.SetActive(true);
                 chicken.transform.position = _chickenStartPos;
-                chicken.enabled = true;
+                chicken.enabled            = true;
+                chicken.ResetState();
             }
 
-            if (resultText != null) resultText.gameObject.SetActive(false);
-            RefreshInstruction();
-        }
-
-        private void RefreshInstruction()
-        {
-            if (instructionText != null)
-                instructionText.text = "WASD to move  ·  Mouse to aim  ·  Get close to catch!";
+            if (_playerController != null)
+                _playerController.ResetState();
         }
     }
 }
