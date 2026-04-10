@@ -17,8 +17,12 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         [SerializeField] private GameObject      _timerContainer;
         [SerializeField] private TextMeshProUGUI _timerText;
 
-        [Header("HUD — Prompt")]
+        [Header("HUD — Catch Prompt")]
         [SerializeField] private TextMeshProUGUI _catchPromptText;
+
+        [Header("HUD — Hint Bar")]
+        [SerializeField] private GameObject      _hintBar;
+        [SerializeField] private TextMeshProUGUI _hintText;
 
         [Header("HUD — Grip Meter")]
         [SerializeField] private GameObject _gripMeterContainer;
@@ -34,6 +38,10 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         private static readonly Color ColorUrgent  = new(1f, 0.25f, 0.25f);
         private static readonly Color ColorWin     = new(0.2f, 0.9f, 0.2f);
         private static readonly Color ColorWarning = new(1f, 0.75f, 0.1f);
+        private static readonly Color ColorMuted   = new(0.75f, 0.75f, 0.75f, 1f);
+
+        private const string HintChase   = "<color=#FFFFFF>WASD</color>  Move     <color=#FFFFFF>Shift</color>  Sprint     <color=#FFFFFF>E</color>  Catch  <color=#888888>(get close)</color>";
+        private const string HintHolding = "<color=#FFFFFF>Left Click</color>  Maintain grip     <color=#FFFFFF>WASD</color>  Walk to the coop";
 
         private bool _wasGameOver;
 
@@ -43,6 +51,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
 
             UpdateTimer();
             UpdateCatchPrompt();
+            UpdateHintBar();
             UpdateGripMeter();
             UpdateResultPanel();
         }
@@ -51,6 +60,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         public void ResetUI()
         {
             if (_timerContainer     != null) _timerContainer.SetActive(true);
+            if (_hintBar            != null) _hintBar.SetActive(true);
             if (_gripMeterContainer != null) _gripMeterContainer.SetActive(false);
             if (_dimOverlay         != null) _dimOverlay.SetActive(false);
             if (_resultPanel        != null) _resultPanel.SetActive(false);
@@ -76,16 +86,13 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
 
             if (_manager.IsHoldingChicken)
             {
-                _catchPromptText.gameObject.SetActive(true);
-                if (_manager.IsNearCoop())
+                // Only show the prominent prompt when near the coop — the hint bar handles the rest
+                bool nearCoop = _manager.IsNearCoop();
+                _catchPromptText.gameObject.SetActive(nearCoop);
+                if (nearCoop)
                 {
                     _catchPromptText.text  = "Drop in the coop!";
                     _catchPromptText.color = ColorWin;
-                }
-                else
-                {
-                    _catchPromptText.text  = "Keep clicking!  Walk to the coop";
-                    _catchPromptText.color = ColorWarning;
                 }
                 return;
             }
@@ -98,6 +105,16 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             _catchPromptText.color = ColorWarning;
         }
 
+        private void UpdateHintBar()
+        {
+            if (_hintBar == null || _hintText == null) return;
+            bool show = !_manager.IsGameOver;
+            _hintBar.SetActive(show);
+            if (!show) return;
+
+            _hintText.text = _manager.IsHoldingChicken ? HintHolding : HintChase;
+        }
+
         private void UpdateGripMeter()
         {
             if (_gripMeterContainer == null) return;
@@ -105,11 +122,16 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             _gripMeterContainer.SetActive(holding);
             if (!holding || _gripMeterFill == null) return;
 
-            float grip                = _manager.GripFraction;
-            _gripMeterFill.fillAmount = grip;
-            _gripMeterFill.color      = grip > 0.5f  ? ColorWin
-                                      : grip > 0.25f ? ColorWarning
-                                      : ColorUrgent;
+            float grip = _manager.GripFraction;
+
+            // Drive width via anchorMax so the rect physically shrinks left-to-right in real time.
+            // This works regardless of Image type or sprite assignment.
+            RectTransform fillRect = _gripMeterFill.rectTransform;
+            fillRect.anchorMax = new Vector2(grip, fillRect.anchorMax.y);
+
+            _gripMeterFill.color = grip > 0.5f  ? ColorWin
+                                 : grip > 0.25f ? ColorWarning
+                                 : ColorUrgent;
         }
 
         private void UpdateResultPanel()
