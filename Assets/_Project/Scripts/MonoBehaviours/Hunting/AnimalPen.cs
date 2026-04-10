@@ -26,9 +26,22 @@ namespace FarmSimVR.MonoBehaviours.Hunting
         public Vector3 PenCenter => penCenter;
         public float PenRadius => penRadius;
 
+        public void ConfigureRuntime(PenAnimalEntry[] entries, Vector3 center, float radius, bool buildFence)
+        {
+            penAnimalPrefabs = entries;
+            penCenter = center;
+            penRadius = radius;
+            buildFenceOnStart = buildFence;
+        }
+
         public void Initialize(BarnDropOff barnDropOff)
         {
-            if (_barnDropOff != null) return; // already initialized
+            if (_barnDropOff == barnDropOff && _barnDropOff != null)
+                return;
+
+            if (_barnDropOff != null)
+                _barnDropOff.OnAnimalsDeposited -= HandleAnimalsDeposited;
+
             _barnDropOff = barnDropOff;
             _barnDropOff.OnAnimalsDeposited += HandleAnimalsDeposited;
             Debug.Log($"[AnimalPen] Initialized via explicit call. Prefabs: {penAnimalPrefabs?.Length ?? 0}");
@@ -118,6 +131,9 @@ namespace FarmSimVR.MonoBehaviours.Hunting
 
         private void BuildFence()
         {
+            if (transform.Find("Fence") != null)
+                return;
+
             var fenceParent = new GameObject("Fence");
             fenceParent.transform.SetParent(transform);
             fenceParent.transform.position = penCenter;

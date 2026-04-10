@@ -22,20 +22,22 @@ namespace FarmSimVR.MonoBehaviours
 
         private void Awake()
         {
-            _controller = GetComponent<CharacterController>();
-            _cameraTransform = GetComponentInChildren<Camera>().transform;
+            TryResolveReferences();
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
 
         private void Update()
         {
+            TryResolveReferences();
             HandleLook();
             HandleMove();
         }
 
         private void HandleLook()
         {
+            if (_cameraTransform == null) return;
+
             var mouse = Mouse.current;
             if (mouse == null) return;
 
@@ -52,6 +54,8 @@ namespace FarmSimVR.MonoBehaviours
 
         private void HandleMove()
         {
+            if (_controller == null) return;
+
             var keyboard = Keyboard.current;
             if (keyboard == null) return;
 
@@ -85,6 +89,19 @@ namespace FarmSimVR.MonoBehaviours
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+        }
+
+        private void TryResolveReferences()
+        {
+            if (_controller == null)
+                _controller = GetComponent<CharacterController>();
+
+            if (_cameraTransform == null)
+            {
+                var cameraComponent = GetComponentInChildren<Camera>();
+                if (cameraComponent != null)
+                    _cameraTransform = cameraComponent.transform;
+            }
         }
     }
 }

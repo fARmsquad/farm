@@ -12,5 +12,10 @@ namespace FarmSimVR.MonoBehaviours
         [SerializeField] private string zoneName;
 
         public string ZoneName => zoneName;
+
+        public void SetZoneName(string value)
+        {
+            zoneName = value ?? string.Empty;
+        }
     }
 }

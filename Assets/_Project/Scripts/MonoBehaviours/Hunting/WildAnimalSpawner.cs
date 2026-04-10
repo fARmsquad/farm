@@ -9,11 +9,14 @@ namespace FarmSimVR.MonoBehaviours.Hunting
         [SerializeField] private HuntingConfig config;
         [SerializeField] private GameObject[] animalPrefabs;
         [SerializeField] private Transform playerTransform;
+        [SerializeField] private Transform spawnCenter;
 
         private readonly List<GameObject> _activeAnimals = new();
         private IPlayerInput _playerInput;
         private CaughtAnimalTracker _tracker;
         private float _spawnTimer;
+        private float _catchRadiusMultiplier = 1f;
+        private float _fleeSpeedScale = 1f;
 
         public int ActiveCount => _activeAnimals.Count;
 
@@ -21,6 +24,45 @@ namespace FarmSimVR.MonoBehaviours.Hunting
         {
             _playerInput = playerInput;
             _tracker = tracker;
+            _spawnTimer = 0f;
+        }
+
+        public void Configure(
+            HuntingConfig huntingConfig,
+            GameObject[] prefabs,
+            Transform player,
+            Transform center,
+            float catchRadiusMultiplier = 1f,
+            float fleeSpeedScale = 1f)
+        {
+            config = huntingConfig;
+            animalPrefabs = prefabs;
+            playerTransform = player;
+            spawnCenter = center;
+            _catchRadiusMultiplier = catchRadiusMultiplier <= 0f ? 1f : catchRadiusMultiplier;
+            _fleeSpeedScale = fleeSpeedScale <= 0f ? 1f : fleeSpeedScale;
+        }
+
+        public GameObject TrySpawnNow()
+        {
+            if (config == null || animalPrefabs == null || animalPrefabs.Length == 0)
+                return null;
+
+            if (_activeAnimals.Count >= config.maxWildAnimals)
+                return null;
+
+            return SpawnAnimal();
+        }
+
+        public void ClearActiveAnimals()
+        {
+            for (var i = 0; i < _activeAnimals.Count; i++)
+            {
+                if (_activeAnimals[i] != null)
+                    DestroyAnimal(_activeAnimals[i]);
+            }
+
+            _activeAnimals.Clear();
         }
 
         private void Update()
@@ -28,27 +70,29 @@ namespace FarmSimVR.MonoBehaviours.Hunting
             // Clean up destroyed references
             _activeAnimals.RemoveAll(a => a == null);
 
+            if (config == null || animalPrefabs == null || animalPrefabs.Length == 0)
+                return;
+
             if (_activeAnimals.Count >= config.maxWildAnimals) return;
 
             _spawnTimer -= Time.deltaTime;
             if (_spawnTimer <= 0f)
             {
-                SpawnAnimal();
+                TrySpawnNow();
                 _spawnTimer = config.spawnInterval;
             }
         }
 
-        private void SpawnAnimal()
+        private GameObject SpawnAnimal()
         {
-            if (animalPrefabs == null || animalPrefabs.Length == 0) return;
-
             // Pick random point on perimeter, avoiding the pen area
             Vector3 spawnPos;
             int attempts = 0;
+            var origin = ResolveSpawnOrigin();
             do
             {
                 float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
-                spawnPos = new Vector3(
+                spawnPos = origin + new Vector3(
                     Mathf.Cos(angle) * config.spawnRadius,
                     0f,
                     Mathf.Sin(angle) * config.spawnRadius
@@ -58,6 +102,7 @@ namespace FarmSimVR.MonoBehaviours.Hunting
 
             int prefabIndex = Random.Range(0, animalPrefabs.Length);
             GameObject animal = Instantiate(animalPrefabs[prefabIndex], spawnPos, Quaternion.identity, transform);
+            animal.SetActive(true);
 
             // Determine animal type from prefab name
             AnimalType type = GuessAnimalType(animalPrefabs[prefabIndex].name);
@@ -74,17 +119,18 @@ namespace FarmSimVR.MonoBehaviours.Hunting
             var flee = animal.GetComponent<AnimalFleeBehavior>();
             if (flee == null)
                 flee = animal.AddComponent<AnimalFleeBehavior>();
-            flee.Initialize(playerTransform, config.detectionRadius, config.fleeSpeedMultiplier, config.fleeCooldown);
+            flee.Initialize(playerTransform, config.detectionRadius, config.fleeSpeedMultiplier * _fleeSpeedScale, config.fleeCooldown);
 
             // Add catch zone
             var catchZone = animal.GetComponent<CatchZone>();
             if (catchZone == null)
                 catchZone = animal.AddComponent<CatchZone>();
-            catchZone.Initialize(_playerInput, config.catchRadius, type);
+            catchZone.Initialize(_playerInput, config.catchRadius * _catchRadiusMultiplier, type);
             catchZone.OnCaught += HandleAnimalCaught;
 
             _activeAnimals.Add(animal);
             FarmSimVR.MonoBehaviours.Diagnostics.GameStateLogger.Instance?.LogEvent($"Spawned wild {type} at ({spawnPos.x:F1}, {spawnPos.z:F1})");
+            return animal;
         }
 
         private void HandleAnimalCaught(CatchZone zone)
@@ -116,6 +162,22 @@ namespace FarmSimVR.MonoBehaviours.Hunting
             if (lower.Contains("horse")) return AnimalType.Horse;
             if (lower.Contains("pig")) return AnimalType.Pig;
             return AnimalType.Sheep;
+        }
+
+        private Vector3 ResolveSpawnOrigin()
+        {
+            return spawnCenter != null ? spawnCenter.position : transform.position;
+        }
+
+        private static void DestroyAnimal(GameObject animal)
+        {
+            if (Application.isPlaying)
+            {
+                Destroy(animal);
+                return;
+            }
+
+            DestroyImmediate(animal);
         }
     }
 }
