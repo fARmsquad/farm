@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
-using FarmSimVR.Core.Cinematics;
+using FarmSimVR.Core.GameState;
 using FarmSimVR.MonoBehaviours.Audio;
 
 namespace FarmSimVR.MonoBehaviours.Cinematics

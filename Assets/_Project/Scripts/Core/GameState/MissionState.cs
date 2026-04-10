@@ -1,4 +1,4 @@
-namespace FarmSimVR.Core.Cinematics
+namespace FarmSimVR.Core.GameState
 {
     public enum MissionState
     {
