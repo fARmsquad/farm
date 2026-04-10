@@ -7,8 +7,8 @@ using UnityEngine.UI;
 using TMPro;
 using FarmSimVR.MonoBehaviours;
 using FarmSimVR.MonoBehaviours.Audio;
+using FarmSimVR.MonoBehaviours.Autoplay;
 using FarmSimVR.MonoBehaviours.Cinematics;
-using FarmSimVR.MonoBehaviours.Debugging;
 
 namespace FarmSimVR.Editor
 {
@@ -129,7 +129,7 @@ namespace FarmSimVR.Editor
             BuildMarkers();
             BuildZoneSigns();
             BuildExplorationPlayer();
-            BuildDebugPanelHost();
+
             BuildScreenEffectsUI();
             BuildSimpleAudioManager();
             BuildDialogueUI();
@@ -137,6 +137,7 @@ namespace FarmSimVR.Editor
             BuildMissionManager();
             BuildNPCDemos();
             BuildPhase4Demos();
+            BuildIntroComponents();
             RegisterScenesInBuildSettings();
 
             EditorSceneManager.SaveScene(scene,
@@ -512,14 +513,6 @@ namespace FarmSimVR.Editor
             Debug.Log("[WorldSceneBuilder] ScreenEffects UI canvas, demo, and bootstrap added.");
         }
 
-        // ── Debug Panel Host ─────────────────────────────────────
-
-        private static void BuildDebugPanelHost()
-        {
-            var go = new GameObject("DebugPanelHost");
-            go.AddComponent<DebugPanelHost>();
-            Debug.Log("[WorldSceneBuilder] DebugPanelHost added (press Tab to open master menu).");
-        }
 
         // ── INT-002: Simple Audio Manager ──────────────────────
 
@@ -682,6 +675,42 @@ namespace FarmSimVR.Editor
             new GameObject("IntroPropsDemo").AddComponent<IntroPropsDemo>();
 
             Debug.Log("[WorldSceneBuilder] Phase 4 demos added (Lighting, Particles, ComicText, Skip, IntroProps).");
+        }
+
+        // ── INT-008: Intro Cinematic Components ──────────────────
+
+        private static void BuildIntroComponents()
+        {
+            var introGo = new GameObject("_IntroCinematic");
+
+            // CinematicSequencer — the central orchestrator
+            var seq = introGo.AddComponent<CinematicSequencer>();
+            var seqSo = new SerializedObject(seq);
+
+            // Wire subsystem references (find what was already built)
+            var screenFx = Object.FindAnyObjectByType<ScreenEffects>();
+            var audioMgr = Object.FindAnyObjectByType<SimpleAudioManager>();
+            var cineCam = Object.FindAnyObjectByType<CinematicCamera>();
+            var missionMgr = Object.FindAnyObjectByType<MissionManager>();
+
+            // DialogueManager starts inactive, need to search inactive objects
+            DialogueManager dialogueMgr = null;
+            var found = Object.FindObjectsByType<DialogueManager>(FindObjectsInactive.Include);
+            if (found.Length > 0) dialogueMgr = found[0];
+
+            if (screenFx != null) seqSo.FindProperty("_screenEffects").objectReferenceValue = screenFx;
+            if (audioMgr != null) seqSo.FindProperty("_audioManager").objectReferenceValue = audioMgr;
+            if (dialogueMgr != null) seqSo.FindProperty("_dialogueManager").objectReferenceValue = dialogueMgr;
+            if (cineCam != null) seqSo.FindProperty("_cinematicCamera").objectReferenceValue = cineCam;
+            if (missionMgr != null) seqSo.FindProperty("_missionManager").objectReferenceValue = missionMgr;
+            // Note: _playerMovement expects PlayerMovement (Hunting), not FirstPersonExplorer.
+            // AutoplayIntroScene handles player enable/disable directly.
+            seqSo.ApplyModifiedPropertiesWithoutUndo();
+
+            // AutoplayIntroScene drives the full intro flow
+            introGo.AddComponent<AutoplayIntroScene>();
+
+            Debug.Log("[WorldSceneBuilder] Intro cinematic components added (Sequencer + AutoplayIntroScene).");
         }
 
         private static RectTransform CreateLetterboxBar(string name, Transform parent,

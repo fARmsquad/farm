@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using FarmSimVR.Core.GameState;
+
 using FarmSimVR.MonoBehaviours.Debugging;
 
 namespace FarmSimVR.MonoBehaviours.Cinematics
@@ -77,7 +77,6 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
             // ── Status ───────────────────────────────────────
             bool hasCompleted = AutoSave.HasCompletedIntro();
-            float holdProgress = 0f;
             bool isActive = false;
 
             if (skipPrompt != null)
