@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b5c827fa52e382c45a066c5ff085b512
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Example/Scripts/Runtime/Febucci.TextAnimator.Demo.Runtime.asmdef
+  uploadId: 821174

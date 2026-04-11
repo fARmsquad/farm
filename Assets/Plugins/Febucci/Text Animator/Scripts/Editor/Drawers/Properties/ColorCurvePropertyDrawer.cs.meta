@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 66208123db9e4e77b655117ebcc45e29
+timeCreated: 1680346774
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Scripts/Editor/Drawers/Properties/ColorCurvePropertyDrawer.cs
+  uploadId: 821174

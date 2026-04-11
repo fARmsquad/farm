@@ -4,7 +4,8 @@
     "references": [
         "FarmSimVR.Core",
         "Unity.InputSystem",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.Postprocessing.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

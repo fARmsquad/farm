@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 475624099e3c24c10a455adc583e9044
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Scripts/Editor/Drawers/Scriptables/Animations/AnimScriptableDrawer.cs
+  uploadId: 821174

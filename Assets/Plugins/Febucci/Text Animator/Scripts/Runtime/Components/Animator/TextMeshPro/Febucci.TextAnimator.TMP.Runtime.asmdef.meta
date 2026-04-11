@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e539678cf69674b418d82e89c16a9753
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Scripts/Runtime/Components/Animator/TextMeshPro/Febucci.TextAnimator.TMP.Runtime.asmdef
+  uploadId: 821174

@@ -4,56 +4,90 @@ using UnityEngine.Events;
 namespace FarmSimVR.MonoBehaviours.Cinematics
 {
     /// <summary>
-    /// Tracks the chaos fill value (0–1) during the El Pollo chase.
+    /// Tracks chaos fill (0–1) driven by player proximity to El Pollo Loco.
     /// Fires threshold events at 0.4 (Dodge) and 0.8 (Tired).
-    /// Auto-fills to the Tired threshold after a 60s timeout.
+    /// Auto-fills to 1.0 after a configurable timeout (default 60s).
     /// </summary>
     public class ChaosMeter : MonoBehaviour
     {
-        private const float DodgeThreshold = 0.4f;
-        private const float TiredThreshold = 0.8f;
-        private const float TimeoutSeconds = 60f;
+        [Header("Settings")]
+        [SerializeField] private float autoFillTimeout = 60f;
 
+        [Header("Events")]
+        public UnityEvent OnDodgeThreshold = new UnityEvent();
+        public UnityEvent OnTiredThreshold = new UnityEvent();
+        public UnityEvent OnFull = new UnityEvent();
+
+        // ── Public State ──
         public float CurrentFill { get; private set; }
 
-        public UnityEvent OnDodgeThresholdReached = new UnityEvent();
-        public UnityEvent OnTiredThresholdReached  = new UnityEvent();
+        // ── Internals ──
+        private float elapsedTime;
+        private bool dodgeFired;
+        private bool tiredFired;
+        private bool fullFired;
 
-        private bool dodgeEventFired;
-        private bool tiredEventFired;
-        private float elapsed;
+        private const float DodgeThreshold = 0.4f;
+        private const float TiredThreshold = 0.8f;
 
         private void Update()
         {
-            elapsed += Time.deltaTime;
+            if (CurrentFill >= 1f) return;
 
-            // Force Tired threshold after timeout
-            if (elapsed >= TimeoutSeconds && CurrentFill < TiredThreshold)
+            // Auto-fill over time so the gameplay can't stall forever
+            elapsedTime += Time.deltaTime;
+            if (elapsedTime >= autoFillTimeout && CurrentFill < TiredThreshold)
             {
-                CurrentFill = TiredThreshold;
-                FireThresholdEvents();
+                AddFill((TiredThreshold - CurrentFill) + 0.01f);
             }
+
+            CheckThresholds();
         }
 
-        /// <summary>Adds fill amount per frame (already multiplied by Time.deltaTime by caller).</summary>
+        /// <summary>
+        /// Adds to the fill meter. Clamped to [0, 1].
+        /// Called externally by AutoplayIntroScene based on player-rooster proximity.
+        /// </summary>
         public void AddFill(float amount)
         {
+            if (amount <= 0f) return;
             CurrentFill = Mathf.Clamp01(CurrentFill + amount);
-            FireThresholdEvents();
+            CheckThresholds();
         }
 
-        private void FireThresholdEvents()
+        /// <summary>
+        /// Resets the meter to zero.
+        /// </summary>
+        public void Reset()
         {
-            if (!dodgeEventFired && CurrentFill >= DodgeThreshold)
+            CurrentFill = 0f;
+            elapsedTime = 0f;
+            dodgeFired = false;
+            tiredFired = false;
+            fullFired = false;
+        }
+
+        private void CheckThresholds()
+        {
+            if (!dodgeFired && CurrentFill >= DodgeThreshold)
             {
-                dodgeEventFired = true;
-                OnDodgeThresholdReached.Invoke();
+                dodgeFired = true;
+                Debug.Log("[ChaosMeter] Dodge threshold reached (0.4).");
+                OnDodgeThreshold?.Invoke();
             }
 
-            if (!tiredEventFired && CurrentFill >= TiredThreshold)
+            if (!tiredFired && CurrentFill >= TiredThreshold)
             {
-                tiredEventFired = true;
-                OnTiredThresholdReached.Invoke();
+                tiredFired = true;
+                Debug.Log("[ChaosMeter] Tired threshold reached (0.8).");
+                OnTiredThreshold?.Invoke();
+            }
+
+            if (!fullFired && CurrentFill >= 1f)
+            {
+                fullFired = true;
+                Debug.Log("[ChaosMeter] Meter full.");
+                OnFull?.Invoke();
             }
         }
     }

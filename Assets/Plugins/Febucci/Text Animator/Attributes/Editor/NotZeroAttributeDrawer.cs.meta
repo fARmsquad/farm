@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 319c5abbdd9c94e479d7c58013da0a7a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Attributes/Editor/NotZeroAttributeDrawer.cs
+  uploadId: 821174

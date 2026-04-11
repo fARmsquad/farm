@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: f9574f1311c20a8418059bbedf619737
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Attributes/Editor/PositiveValueAttributeDrawer.cs
+  uploadId: 821174

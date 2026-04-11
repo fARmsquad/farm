@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 67c87275cac3743da833880fb7431757
+timeCreated: 1677691499
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Scripts/Editor/Drawers/Settings/TextAnimatorSettingsDrawer.cs
+  uploadId: 821174

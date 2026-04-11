@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 7317a03cd5fb4135ba38336b9ed9fd1c
+timeCreated: 1672437590
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Scripts/Runtime/Parsing/_Core/CharInfo.cs
+  uploadId: 821174

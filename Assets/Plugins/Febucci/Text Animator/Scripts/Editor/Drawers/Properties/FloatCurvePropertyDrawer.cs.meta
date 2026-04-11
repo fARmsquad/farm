@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 4894f9d8534334cd7a2f30c70b7bf59f
+timeCreated: 1680343908
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Scripts/Editor/Drawers/Properties/FloatCurvePropertyDrawer.cs
+  uploadId: 821174

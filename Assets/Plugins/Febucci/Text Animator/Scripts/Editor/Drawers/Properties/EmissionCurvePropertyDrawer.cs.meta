@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 4d090238fa054eed8276f4ad839ea8d0
+timeCreated: 1680343908
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Scripts/Editor/Drawers/Properties/EmissionCurvePropertyDrawer.cs
+  uploadId: 821174

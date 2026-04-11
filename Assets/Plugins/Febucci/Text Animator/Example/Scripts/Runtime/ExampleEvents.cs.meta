@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 90f9467af4b1d44aab0c2f932db2b5a7
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Example/Scripts/Runtime/ExampleEvents.cs
+  uploadId: 821174

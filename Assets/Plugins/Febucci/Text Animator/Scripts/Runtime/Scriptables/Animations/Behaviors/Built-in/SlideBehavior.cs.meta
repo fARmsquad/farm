@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: a740b03d4c3f2d84f9cfc7b3a6f8ea80
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Scripts/Runtime/Scriptables/Animations/Behaviors/Built-in/SlideBehavior.cs
+  uploadId: 821174

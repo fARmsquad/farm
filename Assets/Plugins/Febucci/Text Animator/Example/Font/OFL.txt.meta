@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 00c3ff69a8133b34c9df87ba6dd26bf2
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Example/Font/OFL.txt
+  uploadId: 821174

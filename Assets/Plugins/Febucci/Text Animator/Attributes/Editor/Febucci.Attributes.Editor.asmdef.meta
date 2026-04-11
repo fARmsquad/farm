@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: fbcceeb83a7197e40b5e481f8eeb8508
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254677
+  packageName: Text Animator for Unity (2.X)
+  packageVersion: 2.3.2
+  assetPath: Assets/Plugins/Febucci/Text Animator/Attributes/Editor/Febucci.Attributes.Editor.asmdef
+  uploadId: 821174
