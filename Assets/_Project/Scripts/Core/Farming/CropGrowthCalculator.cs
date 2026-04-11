@@ -19,7 +19,8 @@ namespace FarmSimVR.Core.Farming
             float rate = cropData.BaseGrowthRate
                 * GetWeatherMultiplier(conditions.Weather)
                 * GetTemperatureMultiplier(conditions.Temperature)
-                * GetSoilMultiplier(conditions.SoilQuality);
+                * GetSoilMultiplier(conditions.SoilQuality)
+                * conditions.SeasonMultiplier;
 
             float growth = rate * deltaTime;
 

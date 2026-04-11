@@ -78,6 +78,9 @@
 - DON'T modify files another agent has locked in `flight-board.json`
 - DON'T commit `.ai/memory/session-memory.md` (it's ephemeral)
 
+### Harness
+- DON'T let repo-wide legacy debt block every branch. Preflight checks should validate the branch delta, not fail forever because `main` already contains oversized scripts or unchecked planning specs.
+
 ---
 
 ## Tech Debt Log
@@ -88,6 +91,7 @@
 |------|------|----------|-------|
 | 2026-04-06 | git-lfs not installed locally | Low | LFS hooks error but non-blocking; remove pre-push hook to push |
 | 2026-04-06 | TagManager.asset recurring error | Ignore | Pre-existing, harmless — don't try to fix |
+| 2026-04-11 | `com.gamelovers.mcp-unity` is embedded under `Packages/` | Low | Embedded from `Library/PackageCache` without `Server~/node_modules` so the missing `Editor/Tests/GetGameObjectResourceTests.cs.meta` can be fixed in-repo and the package can be tracked in source control |
 
 ---
 
@@ -103,6 +107,20 @@ like `SM_Prop_HayBale_01` but the actual Synty file was
 **Rule: Always `FindProjectAssets` or glob for the actual filename before
 hardcoding any prefab/asset path in code, specs, or scene assembly.** Never
 assume naming conventions from asset packs — verify every path.
+
+### Preflight Scope (2026-04-10)
+The repo-root `run-tests.sh` and `preflight.sh` scripts should delegate to the
+real harness scripts under `.ai/scripts/`. Also, preflight quality/spec gates
+need to evaluate the branch delta instead of the whole repo because current
+`main` already contains legacy oversized scripts and planning specs with
+unchecked acceptance boxes.
+
+### UI Input Modules (2026-04-11)
+When `ProjectSettings.asset` has `activeInputHandler: 1`, any scene or editor
+builder that creates an `EventSystem` must use `InputSystemUIInputModule`, not
+`StandaloneInputModule`. The legacy module calls `UnityEngine.Input` and will
+throw `InvalidOperationException` every frame in play mode once the old input
+manager is disabled.
 
 ---
 

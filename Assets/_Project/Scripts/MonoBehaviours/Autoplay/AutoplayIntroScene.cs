@@ -46,6 +46,7 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
             var sequencer = FindAnyObjectByType<CinematicSequencer>();
             if (sequencer == null)
             {
+                Destroy(sequence);
                 Debug.LogError("[IntroScene] No CinematicSequencer found.");
                 yield break;
             }
@@ -57,7 +58,17 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
 
             // Activate skip prompt
             var skip = FindAnyObjectByType<SkipPrompt>();
-            skip?.Activate();
+            void HandleSkip()
+            {
+                if (sequencer.IsPlaying)
+                    sequencer.Skip();
+            }
+
+            if (skip != null)
+            {
+                skip.OnSkipRequested.AddListener(HandleSkip);
+                skip.Activate();
+            }
 
             // Play cinematic
             bool cinematicDone = false;
@@ -68,7 +79,12 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
                 yield return null;
 
             // ── Cinematic done — start gameplay ──
-            skip?.Deactivate();
+            if (skip != null)
+            {
+                skip.OnSkipRequested.RemoveListener(HandleSkip);
+                skip.Deactivate();
+            }
+            Destroy(sequence);
 
             // Switch back to gameplay camera
             if (cineCam != null)

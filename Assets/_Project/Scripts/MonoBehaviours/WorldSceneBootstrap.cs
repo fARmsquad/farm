@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using FarmSimVR.MonoBehaviours.Cinematics;
+using FarmSimVR.MonoBehaviours.Farming;
+using FarmSimVR.MonoBehaviours.Hunting;
 
 namespace FarmSimVR.MonoBehaviours
 {
@@ -11,7 +13,13 @@ namespace FarmSimVR.MonoBehaviours
     public class WorldSceneBootstrap : MonoBehaviour
     {
         [SerializeField] private float fadeInDuration = 1.5f;
-        [SerializeField] private string objectiveText = "Explore Willowbrook";
+        [SerializeField] private string objectiveText = "Tend the farm";
+
+        private void Awake()
+        {
+            WorldFarmBootstrap.EnsureInstalled(gameObject);
+            WorldPenBootstrap.EnsureInstalled(gameObject);
+        }
 
         private void Start()
         {

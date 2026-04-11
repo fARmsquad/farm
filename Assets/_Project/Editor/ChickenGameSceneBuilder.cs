@@ -383,6 +383,9 @@ namespace FarmSimVR.Editor
 
         static void EnsureTag(string tag)
         {
+            if (string.IsNullOrWhiteSpace(tag) || IsBuiltInTag(tag))
+                return;
+
             var tm   = new SerializedObject(
                 AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
             var tags = tm.FindProperty("tags");
@@ -391,6 +394,17 @@ namespace FarmSimVR.Editor
             tags.InsertArrayElementAtIndex(tags.arraySize);
             tags.GetArrayElementAtIndex(tags.arraySize - 1).stringValue = tag;
             tm.ApplyModifiedProperties();
+        }
+
+        static bool IsBuiltInTag(string tag)
+        {
+            return tag is "Untagged"
+                or "Respawn"
+                or "Finish"
+                or "EditorOnly"
+                or "MainCamera"
+                or "Player"
+                or "GameController";
         }
     }
 }

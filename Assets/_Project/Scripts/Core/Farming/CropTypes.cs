@@ -16,6 +16,14 @@ namespace FarmSimVR.Core.Farming
         Rich
     }
 
+    public enum FarmSeason
+    {
+        Spring,
+        Summer,
+        Autumn,
+        Winter,
+    }
+
     public readonly struct CropData
     {
         public float BaseGrowthRate { get; }
@@ -33,12 +41,15 @@ namespace FarmSimVR.Core.Farming
         public WeatherType Weather { get; }
         public float Temperature { get; }
         public SoilQuality SoilQuality { get; }
+        /// <summary>Season suitability multiplier. 1 = ideal, 0.5 = tolerated, 0 = not plantable.</summary>
+        public float SeasonMultiplier { get; }
 
-        public GrowthConditions(WeatherType weather, float temperature, SoilQuality soilQuality)
+        public GrowthConditions(WeatherType weather, float temperature, SoilQuality soilQuality, float seasonMultiplier = 1f)
         {
             Weather = weather;
             Temperature = temperature;
             SoilQuality = soilQuality;
+            SeasonMultiplier = seasonMultiplier;
         }
     }
 

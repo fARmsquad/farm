@@ -12,6 +12,7 @@ This is the central tracker for all feature specs. Before building anything, fin
 | L1-002 | [Sky & Lighting](Assets/Specs/Features/L1-002-sky-and-lighting.md) | L1 | Done | Youssef | L1-001 |
 | -- | [Crop Growth Calculator](Assets/Specs/Features/crop-growth-calculator.md) | Core | Done | Youssef | -- |
 | -- | [Farm Scene Demo](Assets/Specs/Features/farm-scene-demo.md) | Demo | Done | Youssef | Crop Growth Calc |
+| L2-008 | [Starter Tool Discovery & Ability Unlocks](Assets/Specs/Features/L2-008-starter-tool-discovery-and-ability-unlocks.md) | L2 | Open | -- | L2-001 thru L2-006 |
 | L2-007 | [Hunting Chore (Catch Animals)](Assets/Specs/Features/L2-007-hunting-chore.md) | L2 | Done | AI | L1-001 |
 | INT-001 | [Screen Effects](Assets/Specs/Features/INT-001-screen-effects.md) | INT | Done | Youssef | -- |
 | INT-002 | [Simple Audio Manager](Assets/Specs/Features/INT-002-simple-audio-manager.md) | INT | Done | Youssef | -- |

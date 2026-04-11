@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using FarmSimVR.MonoBehaviours.Farming;
 
 namespace FarmSimVR.Editor
 {
@@ -62,6 +63,8 @@ namespace FarmSimVR.Editor
 
         private static void BuildFarmLayoutCore()
         {
+            ClearExistingFarmRoot();
+
             // Root hierarchy containers
             var farm = CreateEmpty("Farm", Vector3.zero);
             var ground = CreateEmpty("Ground", Vector3.zero, farm);
@@ -98,6 +101,9 @@ namespace FarmSimVR.Editor
             BuildLighting(lighting);
 
             // Task 9: Hierarchy is already organized via parenting above.
+
+            // Always ensure the interactive driver is present at scene root.
+            EnsureFarmSimDriver();
 
             // Mark scene dirty so user can save
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
@@ -352,18 +358,7 @@ namespace FarmSimVR.Editor
             zone.transform.localScale = scale;
 
             var renderer = zone.GetComponent<Renderer>();
-            var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            mat.SetFloat("_Surface", 1f); // transparent
-            mat.SetFloat("_Blend", 0f);
-            mat.SetFloat("_AlphaClip", 0f);
-            mat.SetOverrideTag("RenderType", "Transparent");
-            mat.renderQueue = 3000;
-            mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            mat.SetInt("_ZWrite", 0);
-            mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-            mat.color = ExpansionFogColor;
-            renderer.material = mat;
+            renderer.sharedMaterial = CreateColorMaterial(ExpansionFogColor, transparent: true);
 
             // Boundary marker
             var marker = CreateEmpty($"{name}_Boundary", position, parent);
@@ -422,7 +417,16 @@ namespace FarmSimVR.Editor
 
         private static void BuildProceduralSkybox()
         {
-            var skyboxMat = new Material(Shader.Find("Skybox/Procedural"));
+            const string matPath = "Assets/_Project/Materials/SkyboxProcedural.mat";
+            EnsureDirectoryExists("Assets/_Project/Materials");
+
+            var skyboxMat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+            if (skyboxMat == null)
+            {
+                skyboxMat = new Material(Shader.Find("Skybox/Procedural"));
+                AssetDatabase.CreateAsset(skyboxMat, matPath);
+            }
+
             skyboxMat.SetFloat("_SunDisk", 2f); // High Quality sun disk
             skyboxMat.SetFloat("_SunSize", 0.04f);
             skyboxMat.SetFloat("_SunSizeConvergence", 5f);
@@ -431,10 +435,8 @@ namespace FarmSimVR.Editor
             skyboxMat.SetColor("_SkyTint", new Color(0.5f, 0.5f, 0.5f));
             skyboxMat.SetColor("_GroundColor", new Color(0.37f, 0.35f, 0.31f));
 
-            // Save as asset for persistence
-            const string matPath = "Assets/_Project/Materials/SkyboxProcedural.mat";
-            EnsureDirectoryExists("Assets/_Project/Materials");
-            AssetDatabase.CreateAsset(skyboxMat, matPath);
+            EditorUtility.SetDirty(skyboxMat);
+            AssetDatabase.SaveAssets();
 
             RenderSettings.skybox = skyboxMat;
             DynamicGI.UpdateEnvironment();
@@ -564,6 +566,13 @@ namespace FarmSimVR.Editor
             }
         }
 
+        private static void ClearExistingFarmRoot()
+        {
+            var existingFarm = GameObject.Find("Farm");
+            if (existingFarm != null)
+                Object.DestroyImmediate(existingFarm);
+        }
+
         // ── Helpers ───────────────────────────────────────────────
 
         private static Transform CreateEmpty(
@@ -581,10 +590,99 @@ namespace FarmSimVR.Editor
             var renderer = go.GetComponent<Renderer>();
             if (renderer == null) return;
 
-            var mat = new Material(
-                Shader.Find("Universal Render Pipeline/Lit"));
-            mat.color = color;
-            renderer.material = mat;
+            renderer.sharedMaterial = CreateColorMaterial(color, transparent: false);
+        }
+
+        private static Material CreateColorMaterial(Color color, bool transparent)
+        {
+            var shader = ResolveCompatibleShader(transparent);
+            var material = new Material(shader);
+
+            ApplyColor(material, color);
+
+            if (transparent)
+            {
+                if (IsUsingUrp() && material.HasProperty("_Surface"))
+                    ConfigureUrpTransparentMaterial(material);
+                else if (material.shader.name == "Standard")
+                    ConfigureBuiltInStandardTransparentMaterial(material);
+            }
+            else if (material.HasProperty("_Glossiness"))
+            {
+                material.SetFloat("_Glossiness", 0f);
+            }
+
+            return material;
+        }
+
+        private static Shader ResolveCompatibleShader(bool transparent)
+        {
+            if (IsUsingUrp())
+            {
+                var urpShader = Shader.Find("Universal Render Pipeline/Lit");
+                if (urpShader != null)
+                    return urpShader;
+            }
+
+            if (transparent)
+            {
+                var transparentShader = Shader.Find("Legacy Shaders/Transparent/Diffuse");
+                if (transparentShader != null)
+                    return transparentShader;
+            }
+
+            var standardShader = Shader.Find("Standard");
+            if (standardShader != null)
+                return standardShader;
+
+            var unlitShader = Shader.Find("Unlit/Color");
+            if (unlitShader != null)
+                return unlitShader;
+
+            throw new System.InvalidOperationException(
+                "FarmSceneBuilder could not find a compatible shader for generated materials.");
+        }
+
+        private static bool IsUsingUrp()
+        {
+            return GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset;
+        }
+
+        private static void ApplyColor(Material material, Color color)
+        {
+            material.color = color;
+
+            if (material.HasProperty("_BaseColor"))
+                material.SetColor("_BaseColor", color);
+
+            if (material.HasProperty("_Color"))
+                material.SetColor("_Color", color);
+        }
+
+        private static void ConfigureUrpTransparentMaterial(Material material)
+        {
+            material.SetFloat("_Surface", 1f);
+            material.SetFloat("_Blend", 0f);
+            material.SetFloat("_AlphaClip", 0f);
+            material.SetOverrideTag("RenderType", "Transparent");
+            material.renderQueue = 3000;
+            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+            material.SetInt("_ZWrite", 0);
+            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        }
+
+        private static void ConfigureBuiltInStandardTransparentMaterial(Material material)
+        {
+            material.SetFloat("_Mode", 3f);
+            material.SetOverrideTag("RenderType", "Transparent");
+            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+            material.SetInt("_ZWrite", 0);
+            material.DisableKeyword("_ALPHATEST_ON");
+            material.EnableKeyword("_ALPHABLEND_ON");
+            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            material.renderQueue = 3000;
         }
 
         private static Color HexColor(string hex)
@@ -648,6 +746,21 @@ namespace FarmSimVR.Editor
             tags.InsertArrayElementAtIndex(tags.arraySize);
             tags.GetArrayElementAtIndex(tags.arraySize - 1).stringValue = tag;
             so.ApplyModifiedProperties();
+        }
+
+        /// <summary>
+        /// Ensures a FarmSimDriver GameObject exists at scene root after every build.
+        /// Skips creation if one is already present so it survives rebuilds.
+        /// </summary>
+        private static void EnsureFarmSimDriver()
+        {
+            // Check if it already exists
+            var existing = GameObject.Find("FarmSimDriver");
+            if (existing != null) return;
+
+            var go = new GameObject("FarmSimDriver");
+            go.AddComponent<FarmSimVR.MonoBehaviours.Farming.FarmSimDriver>();
+            Debug.Log("[FarmSceneBuilder] FarmSimDriver added to scene root.");
         }
     }
 }
