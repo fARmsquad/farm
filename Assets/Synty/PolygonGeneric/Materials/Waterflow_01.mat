@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 7
+  version: 10
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -29,14 +29,16 @@ Material:
   - _BUILTIN_ALPHATEST_ON
   - _BUILTIN_AlphaClip
   - _OVERLAY_UV_CHANNEL_UV0
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - _EMISSION
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap:
     RenderType: TransparentCutout
-  disabledShaderPasses: []
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -128,6 +130,7 @@ Material:
     - _CastShadows: 1
     - _Cull: 2
     - _DstBlend: 0
+    - _DstBlendAlpha: 0
     - _Enable_Ambient_Occlusion: 0
     - _Enable_Base_Texture: 0
     - _Enable_Emission_Texture: 0
@@ -154,6 +157,7 @@ Material:
     - _Snow_Transition: 1
     - _Snow_Use_World_Up: 1
     - _SrcBlend: 1
+    - _SrcBlendAlpha: 1
     - _Surface: 0
     - _Top_Metallic: 0
     - _Top_Smoothness: 0
@@ -201,6 +205,7 @@ Material:
     - _Triplanar_Tiling_Top: {r: 1, g: 1, b: 0, a: 0}
     - _UVPan: {r: 0, g: 0.1, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &183661189101230896
 MonoBehaviour:
   m_ObjectHideFlags: 11

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1de385df2ff713a41adfcbbb63b8af91
+timeCreated: 1442747533
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 15126
+  packageName: Simple People - Cartoon Characters
+  packageVersion: 1.33
+  assetPath: Assets/SimplePeople/Models/Animations/SimpleCharacter_5.0.controller
+  uploadId: 614126
