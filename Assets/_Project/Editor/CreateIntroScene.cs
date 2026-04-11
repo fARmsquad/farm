@@ -3,8 +3,10 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using FarmSimVR.MonoBehaviours;
 using FarmSimVR.MonoBehaviours.Cinematics;
+using FarmSimVR.Core.Tutorial;
 
 namespace FarmSimVR.Editor
 {
@@ -95,7 +97,7 @@ namespace FarmSimVR.Editor
             // --- EventSystem ---
             var esGO = new GameObject("EventSystem");
             esGO.AddComponent<EventSystem>();
-            esGO.AddComponent<StandaloneInputModule>();
+            esGO.AddComponent<InputSystemUIInputModule>();
 
             // --- CinematicCamera on Main Camera ---
             camGO.AddComponent<CinematicCamera>();
@@ -112,7 +114,11 @@ namespace FarmSimVR.Editor
             mgrGO.AddComponent<SkipPrompt>();
             mgrGO.AddComponent<SceneLoader>();
             mgrGO.AddComponent<CinematicSequencer>();
-            mgrGO.AddComponent<IntroCinematicAutoPlay>();
+            var autoPlay = mgrGO.AddComponent<IntroCinematicAutoPlay>();
+            var autoPlaySo = new SerializedObject(autoPlay);
+            autoPlaySo.FindProperty("completionSceneName").stringValue = TutorialSceneCatalog.FarmTutorialSceneName;
+            autoPlaySo.FindProperty("playbackSpeed").floatValue = TutorialDevTuning.IntroCutscenePlaybackSpeed;
+            autoPlaySo.ApplyModifiedPropertiesWithoutUndo();
 
             // --- Save ---
             string scenePath = "Assets/_Project/Scenes/Intro.unity";

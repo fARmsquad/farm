@@ -4,6 +4,7 @@
     "references": [
         "FarmSimVR.Core",
         "FarmSimVR.MonoBehaviours",
+        "Unity.InputSystem",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.TextMeshPro"

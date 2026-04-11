@@ -3,6 +3,8 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
+using FarmSimVR.Core.Tutorial;
 
 namespace FarmSimVR.Editor
 {
@@ -104,6 +106,7 @@ namespace FarmSimVR.Editor
             audioSource.volume = 1f;
 
             var mgrSO = new SerializedObject(mgr);
+            mgrSO.FindProperty("targetSceneName").stringValue = TutorialSceneCatalog.IntroSceneName;
             mgrSO.FindProperty("musicSource").objectReferenceValue = audioSource;
             mgrSO.ApplyModifiedPropertiesWithoutUndo();
 
@@ -115,7 +118,7 @@ namespace FarmSimVR.Editor
             // EventSystem
             var esGO = new GameObject("EventSystem");
             esGO.AddComponent<EventSystem>();
-            esGO.AddComponent<StandaloneInputModule>();
+            esGO.AddComponent<InputSystemUIInputModule>();
 
             // Save
             string scenePath = "Assets/_Project/Scenes/TitleScreen.unity";

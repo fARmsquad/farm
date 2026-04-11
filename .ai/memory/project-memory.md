@@ -91,6 +91,7 @@
 |------|------|----------|-------|
 | 2026-04-06 | git-lfs not installed locally | Low | LFS hooks error but non-blocking; remove pre-push hook to push |
 | 2026-04-06 | TagManager.asset recurring error | Ignore | Pre-existing, harmless — don't try to fix |
+| 2026-04-11 | `com.gamelovers.mcp-unity` is embedded under `Packages/` | Low | Embedded from `Library/PackageCache` without `Server~/node_modules` so the missing `Editor/Tests/GetGameObjectResourceTests.cs.meta` can be fixed in-repo and the package can be tracked in source control |
 
 ---
 
@@ -113,6 +114,13 @@ real harness scripts under `.ai/scripts/`. Also, preflight quality/spec gates
 need to evaluate the branch delta instead of the whole repo because current
 `main` already contains legacy oversized scripts and planning specs with
 unchecked acceptance boxes.
+
+### UI Input Modules (2026-04-11)
+When `ProjectSettings.asset` has `activeInputHandler: 1`, any scene or editor
+builder that creates an `EventSystem` must use `InputSystemUIInputModule`, not
+`StandaloneInputModule`. The legacy module calls `UnityEngine.Input` and will
+throw `InvalidOperationException` every frame in play mode once the old input
+manager is disabled.
 
 ---
 

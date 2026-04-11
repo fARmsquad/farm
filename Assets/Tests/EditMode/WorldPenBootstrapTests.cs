@@ -100,6 +100,55 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(Vector3.Distance(spawned.transform.position, Vector3.zero), Is.GreaterThan(20f));
         }
 
+        [Test]
+        public void TrySpawnNow_WithOnlyMissingPrefabEntries_ReturnsNullWithoutThrowing()
+        {
+            var center = new GameObject("SpawnCenter").transform;
+            center.position = new Vector3(-72f, 0f, -24f);
+
+            var player = CreatePlayer().transform;
+            var input = player.gameObject.AddComponent<TestPlayerInput>();
+
+            var config = ScriptableObject.CreateInstance<HuntingConfig>();
+            config.spawnRadius = 6f;
+            config.maxWildAnimals = 1;
+
+            var spawnerGo = new GameObject("Spawner");
+            var spawner = spawnerGo.AddComponent<WildAnimalSpawner>();
+            spawner.Configure(config, new GameObject[] { null }, player, center);
+            spawner.Initialize(input, new CaughtAnimalTracker());
+
+            GameObject spawned = null;
+
+            Assert.That(() => spawned = spawner.TrySpawnNow(), Throws.Nothing);
+            Assert.That(spawned, Is.Null);
+            Assert.That(spawner.ActiveCount, Is.Zero);
+        }
+
+        [Test]
+        public void TrySpawnNow_WithWorldPenCatalogPrefabs_DoesNotThrow()
+        {
+            var catalog = Resources.Load<WorldPenGameCatalog>("WorldPenGameCatalog");
+            Assert.That(catalog, Is.Not.Null, "World pen catalog should be available from Resources.");
+            Assert.That(catalog.WildAnimalPrefabs, Is.Not.Null.And.Not.Empty);
+
+            var center = new GameObject("SpawnCenter").transform;
+            center.position = new Vector3(-72f, 0f, -24f);
+
+            var player = CreatePlayer().transform;
+            var input = player.gameObject.AddComponent<TestPlayerInput>();
+
+            var spawnerGo = new GameObject("Spawner");
+            var spawner = spawnerGo.AddComponent<WildAnimalSpawner>();
+            spawner.Configure(catalog.HuntingConfig, catalog.WildAnimalPrefabs, player, center);
+            spawner.Initialize(input, new CaughtAnimalTracker());
+
+            GameObject spawned = null;
+
+            Assert.That(() => spawned = spawner.TrySpawnNow(), Throws.Nothing);
+            Assert.That(spawned, Is.Not.Null);
+        }
+
         private static GameObject CreatePlayer()
         {
             var player = new GameObject("ExplorationPlayer");

@@ -1,6 +1,7 @@
 using UnityEngine;
 using FarmSimVR.Core.Hunting;
 using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
 namespace FarmSimVR.MonoBehaviours.Hunting
 {
@@ -100,12 +101,13 @@ namespace FarmSimVR.MonoBehaviours.Hunting
                 attempts++;
             } while (IsInsidePen(spawnPos) && attempts < 10);
 
-            int prefabIndex = Random.Range(0, animalPrefabs.Length);
-            GameObject animal = Instantiate(animalPrefabs[prefabIndex], spawnPos, Quaternion.identity, transform);
+            if (!TryInstantiateAnimal(spawnPos, out var sourcePrefab, out var animal))
+                return null;
+
             animal.SetActive(true);
 
             // Determine animal type from prefab name
-            AnimalType type = GuessAnimalType(animalPrefabs[prefabIndex].name);
+            AnimalType type = GuessAnimalType(sourcePrefab.name);
 
             // Ensure AnimalWander — keep wild animals out of the pen
             var wander = animal.GetComponent<AnimalWander>();
@@ -131,6 +133,62 @@ namespace FarmSimVR.MonoBehaviours.Hunting
             _activeAnimals.Add(animal);
             FarmSimVR.MonoBehaviours.Diagnostics.GameStateLogger.Instance?.LogEvent($"Spawned wild {type} at ({spawnPos.x:F1}, {spawnPos.z:F1})");
             return animal;
+        }
+
+        private bool TryInstantiateAnimal(Vector3 spawnPos, out GameObject sourcePrefab, out GameObject animal)
+        {
+            sourcePrefab = null;
+            animal = null;
+
+            if (animalPrefabs == null || animalPrefabs.Length == 0)
+                return false;
+
+            var startIndex = Random.Range(0, animalPrefabs.Length);
+            for (var offset = 0; offset < animalPrefabs.Length; offset++)
+            {
+                var prefab = animalPrefabs[(startIndex + offset) % animalPrefabs.Length];
+                if (prefab == null)
+                    continue;
+
+                if (!TryInstantiatePrefab(prefab, spawnPos, out animal))
+                    continue;
+
+                sourcePrefab = prefab;
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool TryInstantiatePrefab(GameObject prefab, Vector3 spawnPos, out GameObject animal)
+        {
+            animal = null;
+            if (prefab == null)
+                return false;
+
+            try
+            {
+                var instance = Object.Instantiate((Object)prefab, spawnPos, Quaternion.identity, transform);
+                animal = instance as GameObject;
+                if (animal != null)
+                    return true;
+
+                DestroyUnityObject(instance);
+            }
+            catch (System.ArgumentException)
+            {
+                return false;
+            }
+            catch (System.InvalidCastException)
+            {
+                return false;
+            }
+            catch (MissingReferenceException)
+            {
+                return false;
+            }
+
+            return false;
         }
 
         private void HandleAnimalCaught(CatchZone zone)
@@ -178,6 +236,20 @@ namespace FarmSimVR.MonoBehaviours.Hunting
             }
 
             DestroyImmediate(animal);
+        }
+
+        private static void DestroyUnityObject(Object unityObject)
+        {
+            if (unityObject == null)
+                return;
+
+            if (Application.isPlaying)
+            {
+                Destroy(unityObject);
+                return;
+            }
+
+            DestroyImmediate(unityObject);
         }
     }
 }
