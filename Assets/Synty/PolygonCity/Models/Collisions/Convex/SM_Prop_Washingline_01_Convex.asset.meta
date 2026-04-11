@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b9573e42e312b9643bde105e3d605ed0
+timeCreated: 1579739026
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43965947945985670
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Washingline_01_Convex.asset
+  uploadId: 861056

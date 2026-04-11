@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6f13e404c814e8d4aa20a5f3d4469109
+timeCreated: 1499290739
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_Sign_Barber_01.prefab
+  uploadId: 861056

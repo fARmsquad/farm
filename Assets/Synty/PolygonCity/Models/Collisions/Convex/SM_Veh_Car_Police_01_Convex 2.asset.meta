@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 72dd017c2050810499eafaeb5fced80e
+timeCreated: 1580418814
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43094594141473514
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Veh_Car_Police_01_Convex
+    2.asset
+  uploadId: 861056

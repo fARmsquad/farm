@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 25c94a1d129f4dc48bf294a463a2bc1b
+timeCreated: 1579737400
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43446545670951312
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_Sidewalk_Straight_01_Convex.asset
+  uploadId: 861056

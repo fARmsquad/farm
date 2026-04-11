@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d459d9754445d414397f9c4c5201238e
+timeCreated: 1579739051
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43942675972517354
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Sign_Bustop_01_Convex.asset
+  uploadId: 861056

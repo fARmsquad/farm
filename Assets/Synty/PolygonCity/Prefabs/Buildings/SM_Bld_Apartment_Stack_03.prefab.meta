@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a2d22ce70dfdb254e9cf1a761853209a
+timeCreated: 1499290739
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Buildings/SM_Bld_Apartment_Stack_03.prefab
+  uploadId: 861056

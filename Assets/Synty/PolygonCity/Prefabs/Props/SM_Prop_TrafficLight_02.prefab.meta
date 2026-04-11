@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0ba99da88f5077845b463335f529a335
+timeCreated: 1499395643
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_TrafficLight_02.prefab
+  uploadId: 861056

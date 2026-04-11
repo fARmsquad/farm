@@ -10,8 +10,8 @@ ScriptedImporter:
   script: {fileID: 11500000, guid: 625f186215c104763be7675aa2d941aa, type: 3}
 AssetOrigin:
   serializedVersion: 1
-  productId: 146192
-  packageName: POLYGON - Farm Pack - Art by Synty
-  packageVersion: 1.7.0
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
   assetPath: Assets/Synty/PolygonGeneric/Shaders/Generic_Basic_Bloody.shadergraph
-  uploadId: 864500
+  uploadId: 861056

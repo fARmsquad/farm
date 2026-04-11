@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 005add2e805dff846a22a816bce2f715
+timeCreated: 1499290742
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Environments/SM_Env_WaterEdge_Straight_02.prefab
+  uploadId: 861056

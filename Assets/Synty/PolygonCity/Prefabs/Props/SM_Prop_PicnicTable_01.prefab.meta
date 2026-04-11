@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 41513fd395dbe4942ae6a147484bc996
+timeCreated: 1499650422
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_PicnicTable_01.prefab
+  uploadId: 861056

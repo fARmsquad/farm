@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 416c46ca128db5f4bb76f235b4f991d5
+timeCreated: 1499396471
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Vehicles/SM_Veh_Car_Ambo_01.prefab
+  uploadId: 861056

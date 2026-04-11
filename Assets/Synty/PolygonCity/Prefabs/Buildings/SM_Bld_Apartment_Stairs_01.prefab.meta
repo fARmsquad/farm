@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: afe0ad4fc8b424945846ae10043c796b
+timeCreated: 1499290756
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Buildings/SM_Bld_Apartment_Stairs_01.prefab
+  uploadId: 861056

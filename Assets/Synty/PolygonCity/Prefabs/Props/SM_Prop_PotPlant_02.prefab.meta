@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 31fa0b36e57a33f44ae905116d606e3a
+timeCreated: 1499290748
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_PotPlant_02.prefab
+  uploadId: 861056

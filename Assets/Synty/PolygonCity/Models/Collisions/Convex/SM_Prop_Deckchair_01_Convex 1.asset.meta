@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: a5b0405fbf2da7341aa401bffee849aa
+timeCreated: 1579739449
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43591426305075808
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Deckchair_01_Convex
+    1.asset
+  uploadId: 861056

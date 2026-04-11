@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3e999e4aee3cf994a8f776f9aa9bc3b7
+timeCreated: 1579739079
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43501795980105734
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Pipe_Part_Connect_01_Convex.asset
+  uploadId: 861056

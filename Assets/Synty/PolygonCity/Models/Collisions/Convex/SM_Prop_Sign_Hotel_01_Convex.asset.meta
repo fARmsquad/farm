@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 56dbd9cd7beb5f24b95d37992abdad3b
+timeCreated: 1579739046
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43060891256214226
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Sign_Hotel_01_Convex.asset
+  uploadId: 861056

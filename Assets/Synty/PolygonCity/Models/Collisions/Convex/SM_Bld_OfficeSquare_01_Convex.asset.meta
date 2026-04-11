@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b6fd2dfa5705da540b4f2425200445cb
+timeCreated: 1579742632
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43392302331891494
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Bld_OfficeSquare_01_Convex.asset
+  uploadId: 861056

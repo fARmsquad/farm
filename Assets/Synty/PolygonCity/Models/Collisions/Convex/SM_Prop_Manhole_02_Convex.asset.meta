@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: edd48df2643778c4eba730fdb643c09e
+timeCreated: 1579739085
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43576622065284154
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Manhole_02_Convex.asset
+  uploadId: 861056

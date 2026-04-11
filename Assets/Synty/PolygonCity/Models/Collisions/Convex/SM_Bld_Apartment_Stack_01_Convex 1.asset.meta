@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 786104971c0b24244bd4083b3272a39f
+timeCreated: 1579742111
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43145123891503732
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Bld_Apartment_Stack_01_Convex
+    1.asset
+  uploadId: 861056

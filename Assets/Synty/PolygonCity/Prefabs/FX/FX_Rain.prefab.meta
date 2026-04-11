@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 004c0bf81fbf1a342af7262f965b564f
+timeCreated: 1496978236
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/FX/FX_Rain.prefab
+  uploadId: 861056

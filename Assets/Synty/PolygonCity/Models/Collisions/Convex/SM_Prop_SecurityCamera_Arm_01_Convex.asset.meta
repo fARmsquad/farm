@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b34653488d0091241bf3f56c937cf5aa
+timeCreated: 1579739064
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43159139123302402
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_SecurityCamera_Arm_01_Convex.asset
+  uploadId: 861056

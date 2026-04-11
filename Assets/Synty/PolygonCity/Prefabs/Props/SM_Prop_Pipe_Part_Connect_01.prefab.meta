@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b0a54232ae05a044dba83bfeab0610a6
+timeCreated: 1499290742
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_Pipe_Part_Connect_01.prefab
+  uploadId: 861056

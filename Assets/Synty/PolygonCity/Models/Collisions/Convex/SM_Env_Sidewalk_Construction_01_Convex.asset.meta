@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1861128883844cb4e92ec43429c83381
+timeCreated: 1579737402
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43321681096923262
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_Sidewalk_Construction_01_Convex.asset
+  uploadId: 861056

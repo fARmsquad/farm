@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e2b1e7ce58c743c4d8d59a66eec6422b
+timeCreated: 1499307146
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Buildings/SM_Bld_OfficeSquare_Base_01.prefab
+  uploadId: 861056

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0ee83c502303ccb449f61a2877cc57c8
+timeCreated: 1499309660
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Buildings/SM_Bld_OfficeOctagon_01.prefab
+  uploadId: 861056

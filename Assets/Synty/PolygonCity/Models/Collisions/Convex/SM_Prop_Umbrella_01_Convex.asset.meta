@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 64b7c92b502371f4caadcc8d24685d7c
+timeCreated: 1579739031
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43139833840751848
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Umbrella_01_Convex.asset
+  uploadId: 861056

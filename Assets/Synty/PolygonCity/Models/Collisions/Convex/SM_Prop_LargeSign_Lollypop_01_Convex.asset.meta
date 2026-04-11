@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3f0a72c9bcc950247baefef35d8e2ea3
+timeCreated: 1579739095
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43749211744912768
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_LargeSign_Lollypop_01_Convex.asset
+  uploadId: 861056

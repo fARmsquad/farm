@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: d49906f1cd194f54ba59e4e710513a77
+timeCreated: 1579742686
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43048858028752432
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Water_Tower_01_Convex
+    1.asset
+  uploadId: 861056

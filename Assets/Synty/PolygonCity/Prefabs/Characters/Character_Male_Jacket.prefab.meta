@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d461c345ada76d14f94fe72087cec0f9
+timeCreated: 1545009962
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Characters/Character_Male_Jacket.prefab
+  uploadId: 861056

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e74203ea62daad341816376fb141a8b5
+timeCreated: 1499290741
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_Couch_01.prefab
+  uploadId: 861056

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 94a7e311b5cf22f4898fa342bfef126e
+timeCreated: 1499290742
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_ParkingMeter_02.prefab
+  uploadId: 861056

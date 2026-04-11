@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 91a38bc01369dd149b1974f881adaf5c
+timeCreated: 1579739084
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43072775882180854
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Newspaper_02_Convex.asset
+  uploadId: 861056

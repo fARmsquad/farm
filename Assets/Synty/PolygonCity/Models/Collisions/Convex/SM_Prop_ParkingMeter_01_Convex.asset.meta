@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 73b8147a244d60548aadbde24799118f
+timeCreated: 1579739082
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43437773302094732
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_ParkingMeter_01_Convex.asset
+  uploadId: 861056

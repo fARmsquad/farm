@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 469e38b8efc09a84a9ed5a4b455d7f1e
+timeCreated: 1579742428
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43160724726929318
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Bld_Roof_Access_01_Convex
+    1.asset
+  uploadId: 861056

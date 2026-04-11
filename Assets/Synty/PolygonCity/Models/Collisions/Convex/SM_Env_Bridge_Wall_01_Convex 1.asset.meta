@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 7060787e086bcea4d9b099d024413d10
+timeCreated: 1579737664
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43466903989970754
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_Bridge_Wall_01_Convex
+    1.asset
+  uploadId: 861056

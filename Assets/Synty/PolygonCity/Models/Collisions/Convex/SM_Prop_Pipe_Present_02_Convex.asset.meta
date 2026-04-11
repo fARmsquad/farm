@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9bf62cb849508fe4980ba4b671b8a675
+timeCreated: 1579739076
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43670528079003920
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Pipe_Present_02_Convex.asset
+  uploadId: 861056

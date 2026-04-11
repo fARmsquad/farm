@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: f57fbe9b7bb37124c818414bcf80549f
+timeCreated: 1579739441
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43006618351465988
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Vents_Straight_01_Convex
+    1.asset
+  uploadId: 861056

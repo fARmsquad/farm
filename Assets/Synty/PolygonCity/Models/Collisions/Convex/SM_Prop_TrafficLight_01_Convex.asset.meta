@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a38557ae9e6ce0b4e9a4eef81de89540
+timeCreated: 1579739038
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43344654932063668
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_TrafficLight_01_Convex.asset
+  uploadId: 861056

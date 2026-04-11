@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 164801fa5f6e51f4ea2c7655d76a2e26
+timeCreated: 1580418866
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43036336333263810
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Veh_Car_Muscle_01_Convex
+    1.asset
+  uploadId: 861056

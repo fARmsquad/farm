@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c0f44381dd01e904c87fad2431087f45
+timeCreated: 1545009885
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Characters/Character_BusinessWoman.prefab
+  uploadId: 861056

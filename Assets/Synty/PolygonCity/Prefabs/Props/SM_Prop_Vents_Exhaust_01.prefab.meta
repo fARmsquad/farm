@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e43280ef66994c74f925cf8a64e966ed
+timeCreated: 1499290739
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_Vents_Exhaust_01.prefab
+  uploadId: 861056

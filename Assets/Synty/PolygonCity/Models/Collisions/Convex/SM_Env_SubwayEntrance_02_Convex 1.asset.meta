@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: fde106306e5531143bd6acff06cb3614
+timeCreated: 1579737622
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43422378466861114
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_SubwayEntrance_02_Convex
+    1.asset
+  uploadId: 861056

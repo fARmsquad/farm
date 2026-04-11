@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: cc8a6a76302252b4d88ba76caa1f1cfd
+timeCreated: 1579739086
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43840884233787176
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Mailbox_01_Convex.asset
+  uploadId: 861056

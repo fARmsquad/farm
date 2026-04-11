@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ead5aba10b16b5847ab0c9c07fc5d7bb
+timeCreated: 1579739097
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43946935849484028
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_LargeSign_Guitar_01_Convex.asset
+  uploadId: 861056

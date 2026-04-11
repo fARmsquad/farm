@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b5ab7789dd0b3c84eb8208ec5ca03577
+timeCreated: 1579739067
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43688092181248474
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Roof_Aircon_01_Convex.asset
+  uploadId: 861056

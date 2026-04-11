@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e83fcfbcf26241c449483ad6639aed68
+timeCreated: 1499290736
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Buildings/SM_Bld_Cover_01.prefab
+  uploadId: 861056

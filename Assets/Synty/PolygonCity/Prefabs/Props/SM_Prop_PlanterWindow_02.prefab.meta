@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 385e440e39a69044bbd3453c1caa8158
+timeCreated: 1499290752
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_PlanterWindow_02.prefab
+  uploadId: 861056

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4fa42fc4cca532640a6592f05bb6414a
+timeCreated: 1499290740
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_Vents_Straight_01.prefab
+  uploadId: 861056

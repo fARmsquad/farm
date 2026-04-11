@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 06cc8d0d43cd6f74fae5399ceeff2be8
+timeCreated: 1579739095
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43394630795621924
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_LargeSign_Milkshake_01_Convex.asset
+  uploadId: 861056

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6702d719a0fd01142ab7529f2a36d350
+timeCreated: 1499290756
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_LightPole_Lights_02.prefab
+  uploadId: 861056

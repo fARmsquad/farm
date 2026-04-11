@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 5e4124995f6a4124f88614e4e0a837a5
+timeCreated: 1579739439
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43470087305341498
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Skip_01_Convex
+    1.asset
+  uploadId: 861056

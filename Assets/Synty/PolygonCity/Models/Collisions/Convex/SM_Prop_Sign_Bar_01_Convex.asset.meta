@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 29b0d5fa0f8a17f49a962262ae4d2d7f
+timeCreated: 1579739052
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43281819131058170
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Sign_Bar_01_Convex.asset
+  uploadId: 861056

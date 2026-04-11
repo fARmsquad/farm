@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 24785933d7ceaad4a800f09511c371db
+timeCreated: 1499290746
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_Table_02.prefab
+  uploadId: 861056

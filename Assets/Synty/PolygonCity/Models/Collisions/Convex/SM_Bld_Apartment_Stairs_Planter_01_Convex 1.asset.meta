@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 02d29f0bdbdefd7489b393a50291b83f
+timeCreated: 1579738628
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43070693923599294
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Bld_Apartment_Stairs_Planter_01_Convex
+    1.asset
+  uploadId: 861056

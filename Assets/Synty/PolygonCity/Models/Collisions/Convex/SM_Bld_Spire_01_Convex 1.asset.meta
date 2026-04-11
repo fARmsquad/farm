@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: ba2b512393eab4341a488fa8681866c2
+timeCreated: 1579743311
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43109697441109772
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Bld_Spire_01_Convex
+    1.asset
+  uploadId: 861056

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 02569c08ab29ca94481dbec225d65225
+timeCreated: 1499290753
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_BusStop_01.prefab
+  uploadId: 861056

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 48a45c6fc26afb044aa8c203da5ca6a1
+timeCreated: 1579737662
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43195835643253976
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_Fence_End_01_Convex
+    1.asset
+  uploadId: 861056

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 5a856496cd41bd8408cc88c309515b0f
+timeCreated: 1579737582
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43106762294346364
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_WaterEdge_Pipe_01_Convex
+    1.asset
+  uploadId: 861056

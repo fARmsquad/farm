@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 7ecd21011b742804aa0892c63b1fa2dc
+timeCreated: 1579737582
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43055695756830288
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_WaterEdge_Corner_02_Convex
+    1.asset
+  uploadId: 861056

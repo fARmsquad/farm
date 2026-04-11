@@ -16,7 +16,7 @@ public class polygonShader_UI : ShaderGUI
 
     void CheckRenderPipeline()
     {
-        var pipelineAsset = GraphicsSettings.defaultRenderPipeline;
+        var pipelineAsset = GraphicsSettings.renderPipelineAsset;
 
         if (pipelineAsset == null)
         {

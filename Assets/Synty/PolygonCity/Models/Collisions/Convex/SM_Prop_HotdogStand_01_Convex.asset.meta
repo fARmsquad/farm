@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e12348ce0d00f7b48bf1a255abe8336b
+timeCreated: 1579739103
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43148076074740952
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_HotdogStand_01_Convex.asset
+  uploadId: 861056

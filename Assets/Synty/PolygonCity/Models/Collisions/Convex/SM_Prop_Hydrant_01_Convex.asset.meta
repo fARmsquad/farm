@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e3d9d6de8c2fd36419c49c00938bd4a9
+timeCreated: 1579739102
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43494689567649082
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Hydrant_01_Convex.asset
+  uploadId: 861056

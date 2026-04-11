@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 283736ea9955d7141bd3a4b0a155ddb7
+timeCreated: 1499290739
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Environments/SM_Env_Fence_End_01.prefab
+  uploadId: 861056

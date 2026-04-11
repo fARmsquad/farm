@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 16be898bd2ea17645b0aa9e5614171a6
+timeCreated: 1579739108
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43973932110380596
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_CarboardBox_03_Convex.asset
+  uploadId: 861056

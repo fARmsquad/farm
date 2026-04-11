@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3d7cad8f008896d4184f590aff04d0e8
+timeCreated: 1579739110
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43821057981625824
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Billboard_01_Convex.asset
+  uploadId: 861056

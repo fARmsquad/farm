@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f0924feddc9f45147a1b3b077269f520
+timeCreated: 1499388579
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Environments/SM_Env_Sidewalk_Panel_02.prefab
+  uploadId: 861056

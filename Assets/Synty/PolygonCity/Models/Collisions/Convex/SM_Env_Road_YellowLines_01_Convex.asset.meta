@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4f4c7f0068c3b15408098a421a374bc4
+timeCreated: 1579748518
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43585135977397100
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_Road_YellowLines_01_Convex.asset
+  uploadId: 861056

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 51dec50e04d33084a989576c0d189f12
+timeCreated: 1579737579
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43111651957847222
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_WaterEdge_Straight_02_Convex
+    1.asset
+  uploadId: 861056

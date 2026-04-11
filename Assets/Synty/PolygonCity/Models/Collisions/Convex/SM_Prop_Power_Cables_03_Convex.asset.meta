@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c077092641cdae5419f39452ca5cddcc
+timeCreated: 1579739068
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43930308232607970
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Power_Cables_03_Convex.asset
+  uploadId: 861056

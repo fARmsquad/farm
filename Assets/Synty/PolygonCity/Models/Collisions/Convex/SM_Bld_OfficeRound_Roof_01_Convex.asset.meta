@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: cb24ac5cab5bf544d898730dcdb95572
+timeCreated: 1579743404
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43397930051437352
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Bld_OfficeRound_Roof_01_Convex.asset
+  uploadId: 861056

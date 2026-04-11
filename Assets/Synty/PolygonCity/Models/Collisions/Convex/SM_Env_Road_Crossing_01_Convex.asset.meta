@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2c858a1bf61222d4c8dd396cba9445f7
+timeCreated: 1579748645
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43731194315014108
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_Road_Crossing_01_Convex.asset
+  uploadId: 861056

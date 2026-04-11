@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: fc6f9f7e6d462034f8372d5d91ad3b2e
+timeCreated: 1579743042
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43010291455737908
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Bld_FireEscape_02_Convex
+    1.asset
+  uploadId: 861056

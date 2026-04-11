@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b408ff046e97d28428f851dbcce2f2d5
+timeCreated: 1499290747
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Environments/SM_Env_WaterEdge_Rock_01.prefab
+  uploadId: 861056

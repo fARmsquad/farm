@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 875bf8b9cb4017b42aef1cc8aaf83aae
+timeCreated: 1579739433
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43070383946669572
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Trashbin_02_Convex
+    1.asset
+  uploadId: 861056

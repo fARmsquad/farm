@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 02c882be55c48dc44a39b0688715f981
+timeCreated: 1579739109
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43495560659606826
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Buger_01_Convex.asset
+  uploadId: 861056

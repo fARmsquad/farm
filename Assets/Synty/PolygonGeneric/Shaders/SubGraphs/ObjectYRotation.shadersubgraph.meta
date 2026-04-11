@@ -10,8 +10,8 @@ ScriptedImporter:
   script: {fileID: 11500000, guid: 60072b568d64c40a485e0fc55012dc9f, type: 3}
 AssetOrigin:
   serializedVersion: 1
-  productId: 146192
-  packageName: POLYGON - Farm Pack - Art by Synty
-  packageVersion: 1.7.0
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
   assetPath: Assets/Synty/PolygonGeneric/Shaders/SubGraphs/ObjectYRotation.shadersubgraph
-  uploadId: 864500
+  uploadId: 861056

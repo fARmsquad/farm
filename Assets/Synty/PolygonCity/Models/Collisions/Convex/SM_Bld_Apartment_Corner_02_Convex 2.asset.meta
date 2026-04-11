@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 37045fac998129c4d9bc99b9a4b8525d
+timeCreated: 1579741861
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43574874062468182
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Bld_Apartment_Corner_02_Convex
+    2.asset
+  uploadId: 861056

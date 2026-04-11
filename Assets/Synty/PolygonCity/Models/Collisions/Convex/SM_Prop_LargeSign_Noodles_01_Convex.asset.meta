@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6c299de727247ec44a9af1ce9f08aa0e
+timeCreated: 1579739094
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43002386461216116
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_LargeSign_Noodles_01_Convex.asset
+  uploadId: 861056

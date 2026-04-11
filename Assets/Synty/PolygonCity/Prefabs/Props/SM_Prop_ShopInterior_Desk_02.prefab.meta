@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 30c80b9834fd8f248b24cf47fa3329b4
+timeCreated: 1499290747
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_ShopInterior_Desk_02.prefab
+  uploadId: 861056

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d21898f357d4c2642b7635d08fde7301
+timeCreated: 1579739039
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43794339436908854
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Soda_03_Convex.asset
+  uploadId: 861056

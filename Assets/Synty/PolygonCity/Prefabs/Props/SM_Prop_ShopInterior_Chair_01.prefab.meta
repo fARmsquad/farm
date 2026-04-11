@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f710382517201604d939dd1e30c50b66
+timeCreated: 1499290738
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_ShopInterior_Chair_01.prefab
+  uploadId: 861056

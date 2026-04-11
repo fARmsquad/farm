@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f539f0390d17a9f4a922b722e47998fe
+timeCreated: 1499396471
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Vehicles/SM_Veh_Car_Police_01.prefab
+  uploadId: 861056

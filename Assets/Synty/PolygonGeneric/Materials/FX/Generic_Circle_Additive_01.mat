@@ -25,7 +25,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 10
+  version: 7
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -34,7 +34,8 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Generic_Circle_Additive_01
-  m_Shader: {fileID: -6465566751694194690, guid: 0736e099ec10c9e46b9551b2337d0cc7, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 0736e099ec10c9e46b9551b2337d0cc7,
+    type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
@@ -44,9 +45,8 @@ Material:
   m_InvalidKeywords:
   - _ALPHABLEND_ON
   - _COLORCOLOR_ON
-  - _EMISSION
   - _FADING_ON
-  m_LightmapFlags: 2
+  m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -56,7 +56,6 @@ Material:
   - GRABPASS
   - DepthOnly
   - SHADOWCASTER
-  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -112,7 +111,6 @@ Material:
     - _DistortionStrength: 1
     - _DistortionStrengthScaled: 0
     - _DstBlend: 10
-    - _DstBlendAlpha: 10
     - _EmissionEnabled: 0
     - _Enable_Camera_Fade: 0
     - _Enable_Emission: 0
@@ -138,7 +136,6 @@ Material:
     - _Soft_Power: 1
     - _SpecularHighlights: 1
     - _SrcBlend: 5
-    - _SrcBlendAlpha: 1
     - _Surface: 1
     - _UVSec: 0
     - _Use_View_Edge_Compensation: 1
@@ -157,4 +154,3 @@ Material:
     - _SoftParticleFadeParams: {r: 0, g: 1, b: 0, a: 0}
     - _TintColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
   m_BuildTextureStacks: []
-  m_AllowLocking: 1

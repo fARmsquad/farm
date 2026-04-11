@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e2e2cc90fb37ba1488821cdc6e0a4c6a
+timeCreated: 1579748640
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43157296929038658
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_Sidewalk_Grate_02_Convex.asset
+  uploadId: 861056

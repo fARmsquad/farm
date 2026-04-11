@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ad06d608909e4f4419a1cdc20452fccf
+timeCreated: 1499290746
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_Door_02.prefab
+  uploadId: 861056

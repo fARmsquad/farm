@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 21d55246b98210448bd889b79a31954b
+timeCreated: 1579739097
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43827043053351604
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_LargeSign_Hotdog_01_Convex.asset
+  uploadId: 861056

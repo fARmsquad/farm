@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8645f79a5767933459ee6efa84f02e22
+timeCreated: 1579739071
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43815639352193456
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Poster_Frame_01_Convex.asset
+  uploadId: 861056

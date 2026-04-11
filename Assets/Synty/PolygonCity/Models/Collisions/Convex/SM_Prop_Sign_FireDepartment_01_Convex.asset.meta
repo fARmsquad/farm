@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 990bec327a2acad4699a8347e2cd20f8
+timeCreated: 1579739048
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43116709307918918
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Sign_FireDepartment_01_Convex.asset
+  uploadId: 861056

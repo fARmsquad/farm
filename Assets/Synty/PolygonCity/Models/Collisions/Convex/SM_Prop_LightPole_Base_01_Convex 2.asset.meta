@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 237e8588bbe35e041a82f615f8718159
+timeCreated: 1579750993
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43391506149011906
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_LightPole_Base_01_Convex
+    2.asset
+  uploadId: 861056

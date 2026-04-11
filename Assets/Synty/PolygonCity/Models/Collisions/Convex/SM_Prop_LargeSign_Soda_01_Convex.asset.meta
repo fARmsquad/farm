@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d96dc2ae87528cc429f3c08d7728dc2b
+timeCreated: 1579739093
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43679534955826882
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_LargeSign_Soda_01_Convex.asset
+  uploadId: 861056

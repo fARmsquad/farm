@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 15dc232cd3fb7284497126cd68dc7ba7
+timeCreated: 1499290737
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Prefabs/Props/SM_Prop_Sign_Hotel_01.prefab
+  uploadId: 861056

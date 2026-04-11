@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e0e9938ed6ad5db45916879aa3fe1b37
+timeCreated: 1579742848
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43472103042027156
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Bld_OfficeOctagon_Floor_01_Convex.asset
+  uploadId: 861056

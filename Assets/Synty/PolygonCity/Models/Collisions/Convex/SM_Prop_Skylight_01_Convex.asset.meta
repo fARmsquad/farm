@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: fc2d1af9045b6a04ba1e198772d298ae
+timeCreated: 1579739041
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43368602784815448
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Skylight_01_Convex.asset
+  uploadId: 861056

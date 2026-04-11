@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 40ef1ab2fa9968349a4ff61add2a35e6
+timeCreated: 1579739109
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43409282837684556
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_BusStop_01_Convex.asset
+  uploadId: 861056

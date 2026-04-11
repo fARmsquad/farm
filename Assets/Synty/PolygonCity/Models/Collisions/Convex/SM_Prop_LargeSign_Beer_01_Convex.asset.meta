@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 28905ea446f6d6c4a9d94dd9efb79435
+timeCreated: 1579739101
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43032375745203696
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_LargeSign_Beer_01_Convex.asset
+  uploadId: 861056

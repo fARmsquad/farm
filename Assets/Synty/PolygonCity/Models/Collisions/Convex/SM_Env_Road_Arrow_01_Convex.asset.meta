@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9af803fe89f99e54a89bc074b24305b3
+timeCreated: 1579748647
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43686313357749498
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_Road_Arrow_01_Convex.asset
+  uploadId: 861056

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e2244196e2874a343b7f19a0ed248139
+timeCreated: 1579739051
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43989492058991834
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_Sign_Barber_01_Convex.asset
+  uploadId: 861056

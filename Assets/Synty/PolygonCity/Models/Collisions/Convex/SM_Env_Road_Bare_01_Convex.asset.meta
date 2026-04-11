@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8f468a82d04cde24baaa5beac5825d35
+timeCreated: 1579748646
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43264618515248966
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Env_Road_Bare_01_Convex.asset
+  uploadId: 861056

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2fa24c546ed6be64aa99119cab5d0929
+timeCreated: 1579739070
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43683482501068326
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 95214
+  packageName: POLYGON - City Pack - Art by Synty
+  packageVersion: 1.12.2
+  assetPath: Assets/Synty/PolygonCity/Models/Collisions/Convex/SM_Prop_PotPlant_02_Convex.asset
+  uploadId: 861056
