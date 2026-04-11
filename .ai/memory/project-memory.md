@@ -47,6 +47,10 @@
 - PlayMode tests for MonoBehaviour integration
 - Every public method in Core/ must have a test
 
+### Scene Handoffs
+- Use the stable numbered scene map in `.ai/docs/scene-work-map.md` when splitting scene-scoped work across agents or teammates.
+- Runtime scene labels and shared scene numbering come from `SceneWorkCatalog`; do not invent ad hoc scene numbers in prompts or docs.
+
 ### Git
 - Feature branches: `feature/<story-id>-<slug>`
 - Commit prefix: `[cc]` for Claude Code, `[codex]` for Codex

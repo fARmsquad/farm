@@ -89,6 +89,21 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(playbackSpeed.floatValue, Is.GreaterThan(1f));
         }
 
+        [Test]
+        public void SceneWorkLabelOverlay_ResolvesIntroSceneAssignment()
+        {
+            var scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/Intro.unity", OpenSceneMode.Single);
+
+            Assert.That(scene.IsValid(), Is.True);
+
+            var overlayObject = new GameObject("SceneWorkLabelOverlay");
+            var overlay = overlayObject.AddComponent<SceneWorkLabelOverlay>();
+
+            Assert.That(overlay.TryGetCurrentScene(out var definition), Is.True);
+            Assert.That(definition.Number, Is.EqualTo(1));
+            Assert.That(definition.DisplayName, Is.EqualTo("Intro Cutscene"));
+        }
+
         [TestCase(TutorialSceneCatalog.PostChickenCutsceneSceneName)]
         [TestCase(TutorialSceneCatalog.MidpointPlaceholderSceneName)]
         [TestCase(TutorialSceneCatalog.PreFarmCutsceneSceneName)]

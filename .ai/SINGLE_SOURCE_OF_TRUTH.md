@@ -1,11 +1,12 @@
 # Single Source of Truth — FarmSim VR
 
-Last updated: 2026-04-06
+Last updated: 2026-04-11
 
 ## Current State
 
 - **Current story**: none
 - **Story phase**: idle
+- **Scene work map**: `.ai/docs/scene-work-map.md`
 - **Tests**: 0 EditMode passing, 0 PlayMode passing
 - **Main status**: green
 - **Last push**: none yet
