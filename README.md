@@ -106,18 +106,6 @@ Wake up > Check farm (AR or map view) > Water/harvest crops
 
 ---
 
-## Team
-
-| Name | Role |
-|---|---|
-| **Youssef** | Project lead, systems architecture |
-| **Jack** | Gameplay systems, farming mechanics |
-| **Olivia** | Environment, art pipeline, UX |
-
-Each team member has an assignment folder at `Assets/Specs/Assignments/<Name>/`.
-
----
-
 ## Key Docs
 
 | Doc | What it covers |
