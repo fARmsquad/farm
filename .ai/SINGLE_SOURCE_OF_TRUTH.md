@@ -6,6 +6,7 @@ Last updated: 2026-04-11
 
 - **Current story**: none
 - **Story phase**: idle
+- **Recent fix**: Added a dedicated `FarmVegetableStates` title-screen slice for crop-state review while keeping the in-scene `SoilOptions_Showcase` available for base-selection follow-up
 - **Scene work map**: `.ai/docs/scene-work-map.md`
 - **Tests**: 0 EditMode passing, 0 PlayMode passing
 - **Main status**: green

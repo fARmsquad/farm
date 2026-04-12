@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c2b0d1c41cf032d4a807ea0142dec4f0
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Radish_01.prefab
+  uploadId: 447537

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 95b04726993570740af74c1026fbccb8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Materials/M_Cabbage_01.mat
+  uploadId: 447537

@@ -5,6 +5,7 @@ namespace FarmSimVR.Core.Tutorial
         public SceneWorkDefinition(
             int number,
             string sceneName,
+            string scenePath,
             string displayName,
             string focusDescription,
             SceneWorkKind kind,
@@ -12,6 +13,7 @@ namespace FarmSimVR.Core.Tutorial
         {
             Number = number;
             SceneName = sceneName;
+            ScenePath = scenePath;
             DisplayName = displayName;
             FocusDescription = focusDescription;
             Kind = kind;
@@ -20,6 +22,7 @@ namespace FarmSimVR.Core.Tutorial
 
         public int Number { get; }
         public string SceneName { get; }
+        public string ScenePath { get; }
         public string DisplayName { get; }
         public string FocusDescription { get; }
         public SceneWorkKind Kind { get; }

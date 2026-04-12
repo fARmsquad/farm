@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ba63a648a63f89b45bb85f0922857310
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/PlanterModules/PlankModuleLow_3m.prefab
+  uploadId: 447537

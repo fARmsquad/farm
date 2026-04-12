@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c6703833f1fa2494f96e543c26bd49d7
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Planters/StonePlanterLow_2x4m_01.prefab
+  uploadId: 447537

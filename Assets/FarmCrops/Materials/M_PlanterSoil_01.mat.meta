@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ec597753402da924aba5e28ab1b42088
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Materials/M_PlanterSoil_01.mat
+  uploadId: 447537

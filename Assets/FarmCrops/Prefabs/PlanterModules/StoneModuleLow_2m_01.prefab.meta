@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 97282ce4e60478c489d88c1459517c14
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/PlanterModules/StoneModuleLow_2m_01.prefab
+  uploadId: 447537

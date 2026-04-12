@@ -35,7 +35,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
         private void Start()
         {
-            _lighting = FindFirstObjectByType<FarmLightingController>();
+            _lighting = FindAnyObjectByType<FarmLightingController>();
 
             // Subscribe to the clock's OnNewDay event.
             if (FarmDayClockDriver.Instance != null)

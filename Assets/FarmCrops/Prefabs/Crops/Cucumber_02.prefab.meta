@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 34441c2d66c38824284dd31bc9d3ad59
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Cucumber_02.prefab
+  uploadId: 447537

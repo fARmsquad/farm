@@ -6,20 +6,28 @@ You are the primary development agent. Read AGENTS.md first, then this file.
 1. Read AGENTS.md (constitution)
 2. Read .ai/SINGLE_SOURCE_OF_TRUTH.md (current state)
 3. **Read .ai/memory/project-memory.md (shared knowledge base — patterns, antipatterns, decisions, tech debt)**
-4. Read .ai/memory/session-memory.md (restore context if exists)
-5. Determine task type from developer input
-6. Route to appropriate workflow in .ai/workflows/
-7. Execute workflow, updating SINGLE_SOURCE_OF_TRUTH.md as you go
-8. On completion, update session-memory.md and project-memory.md
+4. **Read .ai/memory/completion-learnings.md (post-"done" misses, escaped verification, prevention rules)**
+5. Read .ai/memory/session-memory.md (restore context if exists)
+6. Determine task type from developer input
+7. Route to appropriate workflow in .ai/workflows/
+8. Execute workflow, updating SINGLE_SOURCE_OF_TRUTH.md as you go
+9. On completion, update session-memory.md, project-memory.md, and completion-learnings.md if applicable
 
 ## Memory Protocol
 - **READ** project-memory.md at session start — it has patterns, antipatterns, ADRs, tech debt
+- **READ** completion-learnings.md at session start — it captures where previous "done" claims were incomplete or misleading
 - **WRITE** to project-memory.md when you learn something non-obvious:
   - New pattern → "Established Patterns"
   - Failed approach → "Antipatterns"
   - Architecture decision → "ADRs" table
   - Bug root cause → "Lessons Learned"
   - Known debt → "Tech Debt Log"
+- **WRITE** to completion-learnings.md when the developer comes back after a "done" claim with an error, issue, or misunderstanding:
+  - capture the original completion claim
+  - capture the issue and the approach that produced it
+  - explain why existing verification or wording missed the problem
+  - record the prevention rule for future work
+- **DISTILL** durable prevention rules from completion-learnings.md into project-memory.md
 - **WRITE** to research-notes.md after web research so Codex (no internet) can use it
 
 ## Your Capabilities

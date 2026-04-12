@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b2eb6e151a14f5148afb1b06caca71e5
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/PumpkinSeed_01.prefab
+  uploadId: 447537

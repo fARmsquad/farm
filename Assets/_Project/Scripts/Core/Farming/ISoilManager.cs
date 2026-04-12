@@ -46,5 +46,14 @@ namespace FarmSimVR.Core.Farming
         /// No-ops if the plot is not in Growing status.
         /// </summary>
         void MarkHarvestable(string plotId);
+
+        /// <summary>
+        /// Signal from the growth system that a plot's crop has died from drought.
+        /// Clears the crop id and sets status back to Empty so it can be replanted.
+        /// </summary>
+        void MarkDead(string plotId);
+
+        /// <summary>Remove a dead plant from the plot, returning it to Empty status.</summary>
+        void ClearDead(string plotId);
     }
 }

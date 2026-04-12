@@ -3,6 +3,7 @@
     "rootNamespace": "FarmSimVR.MonoBehaviours",
     "references": [
         "FarmSimVR.Core",
+        "glTFast",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "Unity.Postprocessing.Runtime"

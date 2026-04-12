@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 33e33c65bb086b74f9419a8ecd2448f9
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Garlic_03.prefab
+  uploadId: 447537

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 162a81674ada7644480e6d007dc34c9d
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Planters/PlankPlanterLow_2x2m.prefab
+  uploadId: 447537

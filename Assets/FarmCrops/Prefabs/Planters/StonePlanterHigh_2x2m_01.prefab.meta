@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 3cd20964a40287e429cdc1ace01b6fa3
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Planters/StonePlanterHigh_2x2m_01.prefab
+  uploadId: 447537

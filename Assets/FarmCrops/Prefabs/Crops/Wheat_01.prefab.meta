@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 42a73693396e1f047ba69cbd364fa8b6
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Wheat_01.prefab
+  uploadId: 447537

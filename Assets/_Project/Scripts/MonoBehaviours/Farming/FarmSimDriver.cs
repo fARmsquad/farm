@@ -31,9 +31,10 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private static readonly string[] SeedLabels = { "Tomato", "Carrot", "Lettuce" };
         private static readonly CropData[] Crops =
         {
-            new CropData(baseGrowthRate: 0.05f, maxGrowth: 1f),
-            new CropData(baseGrowthRate: 0.08f, maxGrowth: 1f),
-            new CropData(baseGrowthRate: 0.10f, maxGrowth: 1f),
+            // baseGrowthRate: 0.04/s → each 0.2-unit phase gate takes 5 seconds at standard conditions
+            new CropData(baseGrowthRate: 0.04f, maxGrowth: 1f),
+            new CropData(baseGrowthRate: 0.04f, maxGrowth: 1f),
+            new CropData(baseGrowthRate: 0.04f, maxGrowth: 1f),
         };
 
         private int _plot;
@@ -114,17 +115,57 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
             bool success = action switch
             {
+                FarmPlotAction.PrimaryInteract => TryPrimaryInteract(index, out message),
                 FarmPlotAction.PlantTomato => TryPlant(index, 0, out message),
                 FarmPlotAction.PlantCarrot => TryPlant(index, 1, out message),
                 FarmPlotAction.PlantLettuce => TryPlant(index, 2, out message),
                 FarmPlotAction.Water => TryWater(index, out message),
                 FarmPlotAction.Harvest => TryHarvest(index, out message),
                 FarmPlotAction.Compost => TryCompost(index, out message),
+                FarmPlotAction.ClearDead => TryClearDead(index, out message),
                 _ => Fail("Unsupported action.", out message)
             };
 
             _log = message;
             return success;
+        }
+
+        public bool TryCompleteCurrentCropTask(string plotName, out string message)
+        {
+            if (!TryGetPlotIndex(plotName, out var index))
+                return Fail($"Unknown plot '{plotName}'.", out message);
+
+            var soil = _soil.AllPlots[index];
+            var cropPlot = _sim.Plots[index];
+            if (!cropPlot.IsTutorialTaskMode)
+                return Fail("No stage task is active on this plot.", out message);
+
+            var taskId = cropPlot.CurrentTaskId;
+            if (taskId == CropTaskId.None)
+                return Fail("No stage task is active on this plot.", out message);
+
+            var finishedActionLabel = cropPlot.CurrentActionLabel;
+            var completesHarvest = cropPlot.CurrentTaskCompletesHarvest;
+            if (!cropPlot.TryCompleteTask(taskId))
+                return Fail("That task is not ready yet.", out message);
+
+            if (cropPlot.Phase == PlotPhase.Ready)
+            {
+                if (soil.Status == PlotStatus.Planted)
+                    soil.SetStatus(PlotStatus.Growing);
+                if (soil.Status == PlotStatus.Growing)
+                    _soil.MarkHarvestable(soil.PlotId);
+            }
+
+            if (!completesHarvest)
+            {
+                message = string.IsNullOrEmpty(cropPlot.CurrentActionLabel)
+                    ? $"{finishedActionLabel} complete."
+                    : $"{finishedActionLabel} complete. Next: {cropPlot.CurrentActionLabel}.";
+                return true;
+            }
+
+            return TryHarvest(index, out message);
         }
 
         public bool TrySellAllHarvested(FarmProgressionService progression, out string message)
@@ -205,6 +246,14 @@ namespace FarmSimVR.MonoBehaviours.Farming
             for (int i = 0; i < _sim.Plots.Count && i < _soil.AllPlots.Count; i++)
             {
                 var soil = _soil.AllPlots[i];
+                var cropPlot = _sim.Plots[i];
+
+                if (soil.Moisture > cropPlot.Moisture + 0.0001f)
+                    cropPlot.NotifyWatered();
+
+                // Sync live moisture into the crop state so it can gate growth and trigger wilt
+                cropPlot.SetMoisture(soil.Moisture);
+
                 var conditions = FarmGrowthConditionResolver.Build(
                     weather,
                     dayPhase,
@@ -213,10 +262,14 @@ namespace FarmSimVR.MonoBehaviours.Farming
                     season,
                     22f);
 
-                _sim.Plots[i].Tick(conditions, deltaTime * growthMultiplier);
+                cropPlot.Tick(conditions, deltaTime * growthMultiplier);
 
-                if (_sim.Plots[i].Phase == PlotPhase.Ready && soil.Status == PlotStatus.Growing)
+                if (cropPlot.Phase == PlotPhase.Ready && soil.Status == PlotStatus.Growing)
                     _soil.MarkHarvestable(soil.PlotId);
+
+                // Dead plant — reset soil so the plot can be replanted after clearing
+                if (cropPlot.Phase == PlotPhase.Dead && soil.Status == PlotStatus.Growing)
+                    _soil.MarkDead(soil.PlotId);
             }
         }
 
@@ -245,11 +298,26 @@ namespace FarmSimVR.MonoBehaviours.Farming
             return true;
         }
 
+        private bool TryPrimaryInteract(int plotIndex, out string message)
+        {
+            var soil = _soil.AllPlots[plotIndex];
+            var cropPlot = _sim.Plots[plotIndex];
+
+            if (soil.Status == PlotStatus.Empty && cropPlot.Phase == PlotPhase.Empty)
+                return TryPlant(plotIndex, 0, out message);
+
+            if (cropPlot.IsTutorialTaskMode)
+                return Fail("Open the stage minigame to complete that task.", out message);
+
+            return Fail("Primary interaction is not available here.", out message);
+        }
+
         private bool TryWater(int plotIndex, out string message)
         {
             var soil = _soil.AllPlots[plotIndex];
             var waterAmount = 0.4f * (_progression != null ? _progression.WateringMultiplier : 1f);
             _soil.Water(soil.PlotId, waterAmount);
+            _sim.Plots[plotIndex].NotifyWatered();
             message = $"Watered {soil.PlotId} — moisture now {soil.Moisture:F2}";
             return true;
         }
@@ -258,14 +326,27 @@ namespace FarmSimVR.MonoBehaviours.Farming
         {
             var soil = _soil.AllPlots[plotIndex];
             var cropPlot = _sim.Plots[plotIndex];
-            if (soil.Status != PlotStatus.Harvestable || cropPlot.Phase != PlotPhase.Ready)
-                return Fail($"Not ready — {soil.Status}", out message);
+            if (cropPlot.Phase != PlotPhase.Ready)
+                return Fail($"Not ready to harvest — plant is {cropPlot.Phase}", out message);
 
             string cropId = (soil.CurrentCropId ?? SeedIds[0]).Replace("seed_", "crop_");
             _soil.Harvest(soil.PlotId);
             cropPlot.Harvest();
             _inv.AddItem(cropId, 1);
             message = $"Harvested {cropId.Replace("crop_", string.Empty)}! bag: {_inv.GetCount(cropId)}";
+            return true;
+        }
+
+        private bool TryClearDead(int plotIndex, out string message)
+        {
+            var soil = _soil.AllPlots[plotIndex];
+            var cropPlot = _sim.Plots[plotIndex];
+            if (cropPlot.Phase != PlotPhase.Dead)
+                return Fail($"Plot is not dead — currently {cropPlot.Phase}", out message);
+
+            cropPlot.ClearDead();
+            _soil.ClearDead(soil.PlotId);
+            message = $"Cleared dead plant from {soil.PlotId}";
             return true;
         }
 
@@ -281,6 +362,16 @@ namespace FarmSimVR.MonoBehaviours.Farming
         {
             TickSimulation(fastForwardSeconds);
             _log = $"+{fastForwardSeconds:F0}s — check status";
+        }
+
+        /// <summary>
+        /// Advances the simulation by <paramref name="seconds"/> from an external caller
+        /// (e.g. <see cref="FarmSimVR.MonoBehaviours.Tutorial.TutorialFarmSceneController"/>).
+        /// </summary>
+        public void TryFastForward(float seconds)
+        {
+            if (seconds > 0f)
+                TickSimulation(seconds);
         }
 
         private static void EnsureCropVisual(GameObject plotGo)

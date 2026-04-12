@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c0f8d9590af8a254fbb0bd40d6966b75
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/PlanterModules/StoneModuleHigh_3m_01.prefab
+  uploadId: 447537

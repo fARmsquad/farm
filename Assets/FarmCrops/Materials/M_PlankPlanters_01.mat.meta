@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b3b47ff3d696f6a4c9eccfc74c582729
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Materials/M_PlankPlanters_01.mat
+  uploadId: 447537

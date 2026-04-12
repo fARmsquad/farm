@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 21a5b0b4116f30b4ca08de2b19a1a4ae
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Materials/M_Poato_01.mat
+  uploadId: 447537

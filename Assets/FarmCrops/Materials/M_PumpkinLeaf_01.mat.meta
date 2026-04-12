@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3577dedc7cedfad4d903193483e9255d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Materials/M_PumpkinLeaf_01.mat
+  uploadId: 447537

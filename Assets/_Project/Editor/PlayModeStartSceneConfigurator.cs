@@ -1,12 +1,13 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using FarmSimVR.Core.Tutorial;
 
 namespace FarmSimVR.Editor
 {
     [InitializeOnLoad]
     public static class PlayModeStartSceneConfigurator
     {
-        public const string IntroScenePath = "Assets/_Project/Scenes/Intro.unity";
+        public const string TitleScreenScenePath = SceneWorkCatalog.TitleScreenScenePath;
 
         static PlayModeStartSceneConfigurator()
         {
@@ -15,7 +16,7 @@ namespace FarmSimVR.Editor
 
         public static SceneAsset Apply()
         {
-            var sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(IntroScenePath);
+            var sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(TitleScreenScenePath);
             if (sceneAsset != null)
                 EditorSceneManager.playModeStartScene = sceneAsset;
 

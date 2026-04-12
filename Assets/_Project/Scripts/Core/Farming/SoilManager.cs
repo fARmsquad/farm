@@ -143,6 +143,28 @@ namespace FarmSimVR.Core.Farming
             state.SetStatus(PlotStatus.Harvestable);
         }
 
+        // ── MarkDead / ClearDead ──────────────────────────────────────────────
+
+        public void MarkDead(string plotId)
+        {
+            if (!_plotsById.TryGetValue(plotId, out var state))
+                return;
+            // Mark as dead: keep crop id visible but flag as non-growing
+            state.SetStatus(PlotStatus.Dead);
+        }
+
+        public void ClearDead(string plotId)
+        {
+            if (!_plotsById.TryGetValue(plotId, out var state))
+                return;
+            if (state.Status != PlotStatus.Dead)
+                return;
+
+            state.DeductNutrients(state.NutrientDepletionPerHarvest * 0.5f);
+            state.SetCropId(null);
+            state.SetStatus(state.Nutrients <= 0f ? PlotStatus.Depleted : PlotStatus.Empty);
+        }
+
         // ── Helpers ───────────────────────────────────────────────────────────
 
         private void RequirePlot(string plotId, out SoilState state)

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5f3ad5987c000734fa8111aa46641309
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Materials/M_TomatoLeaf_01.mat
+  uploadId: 447537

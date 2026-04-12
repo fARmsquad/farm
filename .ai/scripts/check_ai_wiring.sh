@@ -78,6 +78,11 @@ echo -e "  ${GREEN}✓ Script files checked${NC}"
 # 6. Orchestrator consistency
 echo -e "\n${YELLOW}[6/6] Orchestrator consistency${NC}"
 ORCH_OK=1
+if [ ! -f ".ai/memory/completion-learnings.md" ]; then
+    echo -e "  ${RED}✗ .ai/memory/completion-learnings.md not found${NC}"
+    ERRORS=$((ERRORS+1))
+    ORCH_OK=0
+fi
 for orch in claude codex; do
     if [ -f ".ai/$orch.md" ]; then
         if ! grep -q "AGENTS.md" ".ai/$orch.md"; then
@@ -87,6 +92,11 @@ for orch in claude codex; do
         fi
         if ! grep -q "SINGLE_SOURCE_OF_TRUTH" ".ai/$orch.md"; then
             echo -e "  ${RED}✗ .ai/$orch.md doesn't reference SINGLE_SOURCE_OF_TRUTH${NC}"
+            ERRORS=$((ERRORS+1))
+            ORCH_OK=0
+        fi
+        if ! grep -q "completion-learnings" ".ai/$orch.md"; then
+            echo -e "  ${RED}✗ .ai/$orch.md doesn't reference completion-learnings.md${NC}"
             ERRORS=$((ERRORS+1))
             ORCH_OK=0
         fi

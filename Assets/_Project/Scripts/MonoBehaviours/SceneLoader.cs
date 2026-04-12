@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using FarmSimVR.MonoBehaviours.Tutorial;
 
 namespace FarmSimVR.MonoBehaviours
 {
@@ -11,7 +12,11 @@ namespace FarmSimVR.MonoBehaviours
     {
         public void LoadScene(string sceneName)
         {
-            SceneManager.LoadScene(sceneName);
+            var controller = TutorialFlowController.Instance;
+            var resolvedScene = controller != null
+                ? controller.ResolveSceneRequest(sceneName)
+                : sceneName;
+            SceneManager.LoadScene(resolvedScene);
         }
     }
 }

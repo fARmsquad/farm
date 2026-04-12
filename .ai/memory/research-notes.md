@@ -10,6 +10,8 @@ Codex agents (which have no internet) read this file to access research findings
 ## Index
 <!-- Append entries here as: - [Feature/Task Name](#anchor) — date -->
 - [Starter Tool Discovery & Ability Unlocks](#research-starter-tool-discovery--ability-unlocks) — 2026-04-10
+- [Tutorial Title Screen Slice Launcher](#research-tutorial-title-screen-slice-launcher) — 2026-04-11
+- [Horse Training Title Slice](#research-horse-training-title-slice) — 2026-04-11
 
 ---
 
@@ -74,3 +76,77 @@ return ToolGateResult.FromAbilityResult(result);
 1. [Unity Manual: Character Controller component reference](https://docs.unity3d.com/Manual/class-CharacterController.html) — Supports the current first-person exploration model already present in the repo.
 2. [Unity Scripting API: Physics.Raycast](https://docs.unity3d.com/ScriptReference/Physics.Raycast.html) — Matches the current camera-to-plot targeting pattern and informs tool pickup focus.
 3. [Unity Input System Quickstart Guide](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.19/manual/QuickStartGuide.html) — Reinforces staying on the new Input System for the current 3D playable slice.
+
+## Research: Tutorial Title Screen Slice Launcher
+**Date**: 2026-04-11
+**Queries**:
+- `site:docs.unity3d.com SceneManager.LoadScene scene name build settings`
+- `site:docs.unity3d.com EditorSceneManager playModeStartScene`
+- `site:docs.unity3d.com EditorBuildSettingsScene EditorBuildSettings.scenes`
+
+### Recommended Packages
+No packages found — custom implementation required.
+
+### Key Patterns Found
+- Keep runtime scene launches on stable scene names already present in Build Settings. Unity's `SceneManager.LoadScene` accepts scene names or paths, but using one shared catalog avoids divergence between UI launchers and scene flow. Source: https://docs.unity3d.com/ru/current/ScriptReference/SceneManagement.SceneManager.LoadScene.html
+- Use `EditorSceneManager.playModeStartScene` to force a predictable development entry scene when quick testing matters more than the currently open editor scene. Source: https://docs.unity3d.com/es/2021.1/ScriptReference/SceneManagement.EditorSceneManager-playModeStartScene.html
+- Use `EditorBuildSettingsScene` plus `EditorBuildSettings.scenes` to script build-order updates from editor tooling instead of hand-maintaining the Build Settings list. Source: https://docs.unity3d.com/cn/2022.3/ScriptReference/EditorBuildSettingsScene.html and https://docs.unity3d.com/es/ScriptReference/EditorBuildSettings-scenes.html
+
+### Recommended Approach
+Keep the ordered tutorial scenes in one shared catalog that carries both scene
+names and asset paths. Use that catalog to drive the title-screen slice
+launcher, the editor play-mode start scene, and build-settings ordering so the
+development launcher and the actual tutorial sequence cannot drift apart.
+
+### Code Reference
+```csharp
+foreach (var slice in SceneWorkCatalog.TutorialOrderedScenes)
+{
+    AddButton(slice.NumberLabel, slice.SceneName);
+    buildScenes.Add(slice.ScenePath);
+}
+```
+
+### Gotchas & Pitfalls
+- If scene names are duplicated or renamed without updating build settings, `LoadScene` can resolve the wrong scene or fail. Keep build-order updates scripted from the same catalog that feeds the launcher.
+- A play-mode start scene that bypasses the title entry makes a slice launcher ineffective for editor testing. If the launcher is the intended dev entry, point `playModeStartScene` at the title scene.
+
+### Quest/Mobile Considerations
+- Keep the slice launcher editor/dev only. It is useful for iteration, but it
+  should not become required runtime UI for headset players.
+
+### Sources
+1. [Unity Scripting API: SceneManager.LoadScene](https://docs.unity3d.com/ru/current/ScriptReference/SceneManagement.SceneManager.LoadScene.html) — Confirms scene-name/path loading behavior and the need for Build Settings alignment.
+2. [Unity Scripting API: EditorSceneManager.playModeStartScene](https://docs.unity3d.com/es/2021.1/ScriptReference/SceneManagement.EditorSceneManager-playModeStartScene.html) — Confirms editor-time start-scene override is the supported way to standardize play-mode entry.
+3. [Unity Scripting API: EditorBuildSettingsScene](https://docs.unity3d.com/cn/2022.3/ScriptReference/EditorBuildSettingsScene.html) — Confirms scripted build-scene entries are the supported automation path.
+4. [Unity Scripting API: EditorBuildSettings.scenes](https://docs.unity3d.com/es/ScriptReference/EditorBuildSettings-scenes.html) — Confirms the build-scene list is writable from editor scripts.
+
+## Research: Horse Training Title Slice
+**Date**: 2026-04-11
+**Queries**:
+- `site:docs.unity3d.com SceneManager.LoadScene Unity 6`
+- `site:docs.unity3d.com Character Controller component reference Unity 6`
+- `site:docs.unity3d.com Collider.OnTriggerEnter Unity 6`
+
+### Recommended Packages
+No new packages found. The repo's current first-person + scene-loading stack is enough for a greybox horse-training slice.
+
+### Key Patterns Found
+- Keep the slice on the existing `CharacterController`-style first-person rig for grounded tutorial movement instead of introducing rigidbody locomotion for a one-scene prototype. Unity's manual explicitly positions `CharacterController` for first-person or third-person control that should not rely on rigidbody physics. Source: https://docs.unity3d.com/Manual/class-CharacterController.html
+- Launch the slice by stable scene name or path that is already present in Build Settings. Unity's `SceneManager.LoadScene` resolves names from Build Settings and warns that duplicate names should use the full path to avoid ambiguity. Source: https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadScene.html
+- Use trigger volumes to mark treat pickups, jump rails, and slalom checkpoints. Unity's `Collider.OnTriggerEnter` flow is the built-in pattern for overlap-driven gameplay events without requiring collision impulses. Source: https://docs.unity3d.com/ScriptReference/Collider.OnTriggerEnter.html
+
+### Recommended Approach
+Model the horse-training beat as a self-contained greybox scene launched from the title screen's shared scene catalog, but keep it out of the mandatory linear tutorial order. Put the sequence logic in a pure C# service that tracks storyboard phases (`Setup`, `GuidedWalk`, `Jumping`, `Slalom`, `Success`, `Failure`) and let a thin MonoBehaviour scene controller translate trigger hits and button presses into service calls.
+
+This preserves the repo's Core-first architecture, gives the title screen a real launch target, and keeps the storyboarded experience readable without rewriting the existing intro-to-farm sequence.
+
+### Gotchas & Pitfalls
+- Do not add the horse slice by hardcoding one more title-screen button in isolation. The launch entry, build-settings inclusion, and scene metadata should come from the same shared catalog so the title screen does not drift from editor tooling.
+- Do not put the training progression rules in the MonoBehaviour only. If failure rules, treat counts, or slalom balance live only in scene code, they will be hard to test and harder to tune.
+- Avoid force-driven horse or player physics for this slice. The storyboard needs readable gates and failure states, not systemic simulation complexity.
+
+### Sources
+1. [Unity Manual: Character Controller component reference](https://docs.unity3d.com/Manual/class-CharacterController.html) — Supports staying on the current grounded first-person rig for the slice.
+2. [Unity Scripting API: SceneManager.LoadScene](https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadScene.html) — Supports title-screen launch wiring through a shared scene catalog and Build Settings.
+3. [Unity Scripting API: Collider.OnTriggerEnter](https://docs.unity3d.com/ScriptReference/Collider.OnTriggerEnter.html) — Supports trigger-driven checkpoint and pickup interactions for the training course.

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: a45fa70c87d62694db818249b0c8bd09
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Carrot_07.prefab
+  uploadId: 447537

@@ -10,6 +10,8 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         public const string ShortcutSummary =
             "Shift+. Next  Shift+, Back  Shift+/ Reload  Shift+1-7 Scene 01-07  Shift+0 Reset";
 
+        [SerializeField] private bool showOverlay = TutorialDevTuning.ShowTutorialShortcutOverlayByDefault;
+
         private GUIStyle _boxStyle;
         private GUIStyle _labelStyle;
 
@@ -52,6 +54,9 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         private void OnGUI()
         {
+            if (!showOverlay)
+                return;
+
             var controller = TutorialFlowController.Instance;
             if (controller == null)
                 return;

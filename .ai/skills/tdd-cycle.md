@@ -15,7 +15,8 @@ Full TDD orchestration: RED → GREEN → VERIFY → REFACTOR → ASSEMBLE → X
    - Antipatterns to avoid (especially asset paths, MCP workflow, Input System)
    - Lessons learned from similar past work
    - Tech debt that might affect this task
-2. **READ .ai/memory/research-notes.md** — check for prior research on this feature
+2. **READ .ai/memory/completion-learnings.md** — scan for prior "done but not done" misses that match this system, surface area, or verification path
+3. **READ .ai/memory/research-notes.md** — check for prior research on this feature
 
 ## Step Sequence
 
@@ -33,7 +34,7 @@ Full TDD orchestration: RED → GREEN → VERIFY → REFACTOR → ASSEMBLE → X
 
 3. **VERIFY**: Delegate to .ai/agents/verifier.md
    - Check for overfitting
-   - Add boundary/edge case tests
+   - Add boundary/edge case tests, including any scenario implied by relevant completion-learnings
    - If overfitting: loop back to GREEN
    - Commit: `[tests] add boundary tests for [task]`
 
@@ -78,6 +79,7 @@ If anything non-obvious was learned during implementation:
 - New pattern → WRITE to project-memory.md "Established Patterns"
 - Gotcha or trap → WRITE to project-memory.md "Antipatterns" or "Lessons Learned"
 - Performance discovery → WRITE to project-memory.md "Performance Budgets"
+- If the developer later reports a post-"done" issue on this work → WRITE a structured entry to completion-learnings.md and add the missing guardrail to tests or verification
 Skip if the cycle was routine with no new insights.
 
 ## Exit Criteria
@@ -90,3 +92,4 @@ Skip if the cycle was routine with no new insights.
 - All commits follow `[tag] message` format
 - Branch pushed to origin and synced with main
 - project-memory.md updated if new lessons learned
+- Relevant completion-learnings reviewed and addressed in verification

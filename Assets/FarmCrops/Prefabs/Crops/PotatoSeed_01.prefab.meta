@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c6d49e06ce114d8468704ff126258c06
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/PotatoSeed_01.prefab
+  uploadId: 447537

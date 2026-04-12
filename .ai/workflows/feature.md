@@ -18,8 +18,13 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
 
 ## Phase 1: Intake
 → **READ .ai/memory/project-memory.md** — load patterns, antipatterns, lessons learned
+→ **READ .ai/memory/completion-learnings.md** — scan for earlier "done but not done" misses that resemble this feature
 → Check .ai/inbox/ for any pending items related to this feature
 → Skill: .ai/skills/story-lookup.md
+→ If Unity MCP/editor setup appears broken or uncertain on the current machine:
+  first use the repo MCP/bootstrap notes in `.ai/codex.md` and `.ai/claude.md`
+  before continuing; load global `unity-initial-setup` only if that exact
+  skill is later installed into Codex
 → If existing story: load context, resume from last phase
 → If new: create story card from template
 → Auto-proceed to Phase 2
@@ -35,10 +40,12 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
 → **Step 2b: Spec Generation**
 → Skill: .ai/skills/spec-driven-delivery.md
 → **READ .ai/memory/project-memory.md** — check for relevant ADRs, patterns, and antipatterns
+→ **READ .ai/memory/completion-learnings.md** — look for prior completion misses in similar systems, test gaps, or handoff wording failures
 → Cross-reference: does the proposed approach conflict with any established pattern or ADR?
 → Generate: Feature Spec → Technical Plan (with Research Reference) → Task Breakdown
 → Technical Plan MUST reference research findings and adopted patterns
 → Technical Plan MUST reference relevant entries from project-memory.md if they exist
+→ Technical Plan MUST reference relevant entries from completion-learnings.md when the feature resembles a prior completion miss
 → Save to Assets/Specs/Features/[feature].md
 → Commit: `[spec] add specification for [feature]`
 → `git push origin main`
@@ -56,15 +63,22 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
     ┌─────────────────────────────────────────────────┐
     │  MEMORY CHECK (before each task)                │
     │  → READ .ai/memory/project-memory.md            │
+    │  → READ relevant .ai/memory/completion-learnings│
+    │    .md entries                                  │
     │    Check: patterns, antipatterns, lessons that   │
     │    apply to THIS task (asset paths, naming,      │
-    │    API gotchas, performance traps)               │
+    │    API gotchas, performance traps, false-done    │
+    │    failure modes)                                │
     │  ──────────────── then ────────────────────────│
     │                                                 │
     │  RESEARCH CHECK (before each task)              │
     │  If task involves a Unity API, pattern, or      │
     │  system the agent hasn't used before:           │
     │  → Skill: .ai/skills/unity-research.md          │
+    │  → For general Unity implementation work,       │
+    │    also load global `unity-developer`           │
+    │  → For DOTS / ECS / Jobs / Burst tasks,         │
+    │    also load global `unity-ecs-patterns`        │
     │  → Quick search (1-2 queries, task-scoped)      │
     │  → Append findings to research-notes.md         │
     │  → Implementer MUST read before writing code    │
@@ -108,6 +122,7 @@ the inbox or direct interrupt, but the pipeline does not WAIT for them.
 ### 3b. ASSEMBLE (MCP-powered, after REFACTOR)
 If this task produced a MonoBehaviour or anything that lives in the scene:
 → Skill: .ai/skills/scene-assembly.md
+→ Global skill: `unity-mcp-orchestrator`
 → **READ project-memory.md "Asset Paths" antipattern** — verify all prefab/asset paths before use
 
 1. **Check editor state** — read editor_state, verify not compiling/playing
@@ -128,6 +143,8 @@ If editor is closed, queue operations in .ai/coordination/mcp-queue.json.
 ### 3c. XR WIRING (MCP, Quest-specific, after ASSEMBLE)
 If this task involves VR interaction:
 
+→ Prefer global `unity-mcp-orchestrator` for editor execution support
+
 1. **Add XR components** — manage_components to add:
    - XRGrabInteractable (for grabbable objects)
    - XRSocketInteractor (for snap points)
@@ -143,6 +160,8 @@ If this task involves VR interaction:
 
 ### 3d. VISUAL POLISH (MCP, optional, after XR WIRING)
 If this task has visual elements:
+
+→ Prefer global `unity-developer` for render/asset-side guidance when needed
 
 1. **Materials** — manage_material to create/assign
 2. **Textures** — manage_texture to set import settings (ASTC, max size)
@@ -174,6 +193,7 @@ If the feature requires new 3D models:
 → Mark spec acceptance criteria as [x]
 → Run full test suite: `.ai/scripts/run-tests.sh all`
 → Run preflight — if fails, fix and retry (up to 3 attempts)
+→ **READ .ai/memory/completion-learnings.md** — explicitly check relevant prior completion-miss failure modes before saying "done"
 → **WRITE to project-memory.md** — add any new patterns/antipatterns discovered during this feature
 
 **Step 4b: Push**
@@ -184,6 +204,10 @@ If the feature requires new 3D models:
 → `.ai/scripts/run-tests.sh all` (verify main is still green after push)
 → If red on main: **P0** — investigate immediately, do NOT proceed
 → If green: update SINGLE_SOURCE_OF_TRUTH.md
+→ Completion summary MUST distinguish:
+  - what was directly verified
+  - what was not directly verified
+  - any remaining risk or uncertainty
 → Auto-proceed to Phase 5
 
 ## Phase 5: Playtest Checkpoint (HUMAN GATE — the only one)
@@ -213,19 +237,25 @@ If the feature requires new 3D models:
   - "What if we also..." → new feature suggestion
     → Create story card in .ai/inbox/ideas/
     → Acknowledge and continue with current story closure
+  - Issue after a previous "done" claim
+    → Append a structured entry to `.ai/memory/completion-learnings.md` before the fix starts
+    → Capture: original completion claim, failing behavior, approach used, why verification missed it, and prevention rules
+    → Distill durable rules into `.ai/memory/project-memory.md`
+    → Add the missing test or verification step that would have caught it
+    → Route to bugfix workflow or re-enter Phase 3 with targeted fix tasks
 
 ## Memory Touchpoints (Summary)
-Agents interact with `.ai/memory/project-memory.md` at these moments:
+Agents interact with `.ai/memory/project-memory.md` and `.ai/memory/completion-learnings.md` at these moments:
 
 | When | Action | What |
 |------|--------|------|
-| Phase 1 (Intake) | **READ** | Load all patterns, antipatterns, lessons before starting |
-| Phase 2 (Spec) | **READ** | Check ADRs and patterns that affect the design |
-| Phase 3 (each task start) | **READ** | Check relevant antipatterns before implementation |
+| Phase 1 (Intake) | **READ** | Load patterns, antipatterns, lessons, and relevant completion-miss history before starting |
+| Phase 2 (Spec) | **READ** | Check ADRs, patterns, and prior completion misses that should shape the plan |
+| Phase 3 (each task start) | **READ** | Check relevant antipatterns and completion-learnings before implementation |
 | Phase 3 (each task end) | **WRITE** | Record new pattern, gotcha, or lesson if any |
 | Phase 3b (Assembly) | **READ** | Verify asset paths, check MCP antipatterns |
 | Phase 4 (Finalization) | **WRITE** | Consolidate all lessons from this feature |
-| Phase 6 (Feedback) | **WRITE** | Record what the playtest revealed (feels wrong = lesson) |
+| Phase 6 (Feedback) | **WRITE** | Record what the playtest revealed; if a post-"done" issue appears, add a completion-learning entry before fixing |
 
 **Rule: if you learned something non-obvious, write it down. If it's routine, skip.**
 

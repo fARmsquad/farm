@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 66ef87d255873294e8bbe7d8935c8908
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Planters/LogPlanter1High_1x2m_01.prefab
+  uploadId: 447537

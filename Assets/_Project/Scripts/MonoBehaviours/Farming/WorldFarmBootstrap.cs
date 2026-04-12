@@ -8,8 +8,9 @@ namespace FarmSimVR.MonoBehaviours.Farming
     {
         private const string FarmRootName = "Farm";
         private const string PlotsRootName = "Plots";
-        private const float PlotSurfaceSize = 1f;
         private const float PlotSurfaceHeight = 0.08f;
+
+        public static float RecommendedPlotSurfaceSizeMeters => CropArtCatalog.RecommendedPlotSurfaceSizeMeters;
 
         public static bool EnsureInstalled(GameObject host)
         {
@@ -123,7 +124,10 @@ namespace FarmSimVR.MonoBehaviours.Farming
                 new Vector3(bounds.center.x, bounds.min.y + 0.05f, bounds.center.z));
             surface.transform.localScale = BuildLocalScale(
                 plot.transform,
-                new Vector3(PlotSurfaceSize, PlotSurfaceHeight, PlotSurfaceSize));
+                new Vector3(
+                    CropArtCatalog.RecommendedPlotSurfaceSizeMeters,
+                    PlotSurfaceHeight,
+                    CropArtCatalog.RecommendedPlotSurfaceSizeMeters));
             surface.layer = plot.layer;
             EnsureComponent<PlotVisualUpdater>(surface);
         }
@@ -133,20 +137,11 @@ namespace FarmSimVR.MonoBehaviours.Farming
             if (plot.transform.Find("CropVisual") != null)
                 return;
 
-            var crop = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            crop.name = "CropVisual";
+            var crop = new GameObject("CropVisual");
             crop.transform.SetParent(plot.transform, false);
             crop.transform.localPosition = plot.transform.InverseTransformPoint(worldCenter);
-            crop.transform.localScale = BuildLocalScale(
-                plot.transform,
-                new Vector3(0.6f, 0.12f, 0.6f));
+            crop.transform.localScale = Vector3.one;
             crop.layer = plot.layer;
-
-            var collider = crop.GetComponent<Collider>();
-            if (collider != null)
-                DestroyObject(collider);
-
-            crop.GetComponent<Renderer>().enabled = false;
             EnsureComponent<CropVisualUpdater>(crop);
         }
 

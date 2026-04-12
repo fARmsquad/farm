@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 160258338f95a904ab5c62332f985dd1
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8574412962073106934
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Terrain/GravelLayer_01.terrainlayer
+  uploadId: 447537

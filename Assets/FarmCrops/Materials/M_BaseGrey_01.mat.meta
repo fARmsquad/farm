@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6cd6d40b8d338064886011692776c2af
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Materials/M_BaseGrey_01.mat
+  uploadId: 447537

@@ -44,6 +44,9 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 case TutorialSceneCatalog.FarmTutorialSceneName:
                     EnsureComponent<TutorialFarmSceneController>("TutorialFarmSceneController");
                     break;
+                case SceneWorkCatalog.HorseTrainingSceneName:
+                    EnsureComponent<TutorialHorseTrainingSceneController>("TutorialHorseTrainingSceneController");
+                    break;
             }
         }
 

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 984484d77be3fa64c9e9a5a57c8e03c6
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Sunflower_02.prefab
+  uploadId: 447537

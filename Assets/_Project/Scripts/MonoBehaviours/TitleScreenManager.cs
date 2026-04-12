@@ -1,13 +1,18 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using FarmSimVR.Core.Tutorial;
 
 namespace FarmSimVR.MonoBehaviours
 {
     public class TitleScreenManager : MonoBehaviour
     {
-        [SerializeField] private string targetSceneName = "WorldMain";
+        public const string TutorialSliceLauncherRootName = "TutorialSliceLauncher";
+
+        [FormerlySerializedAs("farmMainSceneName")]
+        [SerializeField] private string targetSceneName = TutorialSceneCatalog.IntroSceneName;
         [SerializeField] private AudioSource musicSource;
         [SerializeField] private float fadeDuration = 1.2f;
 
@@ -20,12 +25,19 @@ namespace FarmSimVR.MonoBehaviours
             if (musicSource != null && !musicSource.isPlaying)
                 musicSource.Play();
 
+            CreateTutorialSliceLauncher();
             CreateFadeOverlay();
         }
 
         public void StartGame()
         {
+            StartScene(SceneWorkCatalog.FirstTutorialSceneName);
+        }
+
+        public void StartScene(string sceneName)
+        {
             if (isTransitioning) return;
+            targetSceneName = ResolveTargetSceneName(sceneName);
             isTransitioning = true;
             StartCoroutine(TransitionToGame());
         }
@@ -48,7 +60,8 @@ namespace FarmSimVR.MonoBehaviours
             if (musicSource != null)
                 musicSource.Stop();
 
-            SceneManager.LoadScene(targetSceneName);
+            var sceneName = ResolveTargetSceneName(targetSceneName);
+            SceneManager.LoadScene(sceneName);
         }
 
         private void CreateFadeOverlay()
@@ -69,6 +82,142 @@ namespace FarmSimVR.MonoBehaviours
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
             rect.sizeDelta = Vector2.zero;
+        }
+
+        private static string ResolveTargetSceneName(string sceneName)
+        {
+            return string.IsNullOrWhiteSpace(sceneName)
+                ? SceneWorkCatalog.FirstTutorialSceneName
+                : sceneName;
+        }
+
+        private void CreateTutorialSliceLauncher()
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (GameObject.Find(TutorialSliceLauncherRootName) != null)
+                return;
+
+            var canvas = FindFirstObjectByType<Canvas>();
+            if (canvas == null)
+                return;
+
+            var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var root = new GameObject(TutorialSliceLauncherRootName);
+            root.transform.SetParent(canvas.transform, false);
+
+            var rootRect = root.AddComponent<RectTransform>();
+            root.AddComponent<CanvasRenderer>();
+            var rootImage = root.AddComponent<Image>();
+            rootImage.color = new Color(0.05f, 0.06f, 0.05f, 0.86f);
+
+            var height = 72f + (SceneWorkCatalog.TitleScreenLaunchableScenes.Count * 46f);
+            rootRect.anchorMin = new Vector2(1f, 1f);
+            rootRect.anchorMax = new Vector2(1f, 1f);
+            rootRect.pivot = new Vector2(1f, 1f);
+            rootRect.sizeDelta = new Vector2(320f, height);
+            rootRect.anchoredPosition = new Vector2(-32f, -32f);
+
+            CreateLabel(
+                "Header",
+                root.transform,
+                font,
+                "Playable Slices",
+                22,
+                FontStyle.Bold,
+                TextAnchor.MiddleLeft,
+                new Rect(16f, 12f, 288f, 28f),
+                Color.white);
+
+            for (int i = 0; i < SceneWorkCatalog.TitleScreenLaunchableScenes.Count; i++)
+            {
+                var scene = SceneWorkCatalog.TitleScreenLaunchableScenes[i];
+                CreateSliceButton(root.transform, font, scene, 48f + (i * 46f));
+            }
+#endif
+        }
+
+        private void CreateSliceButton(Transform parent, Font font, SceneWorkDefinition scene, float topOffset)
+        {
+            var buttonObject = new GameObject($"TutorialSlice_{scene.NumberLabel}_{scene.SceneName}");
+            buttonObject.transform.SetParent(parent, false);
+
+            var buttonRect = buttonObject.AddComponent<RectTransform>();
+            buttonRect.anchorMin = new Vector2(0f, 1f);
+            buttonRect.anchorMax = new Vector2(1f, 1f);
+            buttonRect.pivot = new Vector2(0.5f, 1f);
+            buttonRect.sizeDelta = new Vector2(-24f, 36f);
+            buttonRect.anchoredPosition = new Vector2(0f, -topOffset);
+
+            var buttonImage = buttonObject.AddComponent<Image>();
+            buttonImage.color = new Color(0.17f, 0.25f, 0.17f, 0.95f);
+
+            var button = buttonObject.AddComponent<Button>();
+            button.targetGraphic = buttonImage;
+
+            var colors = button.colors;
+            colors.normalColor = new Color(0.17f, 0.25f, 0.17f, 0.95f);
+            colors.highlightedColor = new Color(0.22f, 0.36f, 0.22f, 0.95f);
+            colors.pressedColor = new Color(0.12f, 0.18f, 0.12f, 0.95f);
+            button.colors = colors;
+
+            var sceneName = scene.SceneName;
+            button.onClick.AddListener(() => StartScene(sceneName));
+
+            CreateLabel(
+                "Label",
+                buttonObject.transform,
+                font,
+                $"{scene.NumberLabel} {scene.DisplayName}",
+                15,
+                FontStyle.Bold,
+                TextAnchor.MiddleCenter,
+                new Rect(0f, 0f, 0f, 0f),
+                Color.white,
+                stretchToParent: true);
+        }
+
+        private static Text CreateLabel(
+            string name,
+            Transform parent,
+            Font font,
+            string text,
+            int fontSize,
+            FontStyle fontStyle,
+            TextAnchor alignment,
+            Rect rect,
+            Color color,
+            bool stretchToParent = false)
+        {
+            var labelObject = new GameObject(name);
+            labelObject.transform.SetParent(parent, false);
+
+            var labelRect = labelObject.AddComponent<RectTransform>();
+            if (stretchToParent)
+            {
+                labelRect.anchorMin = Vector2.zero;
+                labelRect.anchorMax = Vector2.one;
+                labelRect.sizeDelta = Vector2.zero;
+                labelRect.anchoredPosition = Vector2.zero;
+            }
+            else
+            {
+                labelRect.anchorMin = new Vector2(0f, 1f);
+                labelRect.anchorMax = new Vector2(0f, 1f);
+                labelRect.pivot = new Vector2(0f, 1f);
+                labelRect.anchoredPosition = new Vector2(rect.x, -rect.y);
+                labelRect.sizeDelta = new Vector2(rect.width, rect.height);
+            }
+
+            var label = labelObject.AddComponent<Text>();
+            label.font = font;
+            label.text = text;
+            label.fontSize = fontSize;
+            label.fontStyle = fontStyle;
+            label.alignment = alignment;
+            label.color = color;
+            label.horizontalOverflow = HorizontalWrapMode.Wrap;
+            label.verticalOverflow = VerticalWrapMode.Overflow;
+            return label;
         }
     }
 }

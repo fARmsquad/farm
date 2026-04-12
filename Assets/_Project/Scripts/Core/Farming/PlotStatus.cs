@@ -3,7 +3,7 @@ namespace FarmSimVR.Core.Farming
     /// <summary>
     /// Life-cycle status of a single crop plot.
     /// Transitions: Empty → Planted → Growing → Harvestable → Empty (or Depleted).
-    /// Cannot plant in any status other than Empty.
+    /// Drought path: Growing → Dead → Empty (after ClearDead).
     /// </summary>
     public enum PlotStatus
     {
@@ -20,6 +20,9 @@ namespace FarmSimVR.Core.Farming
         Harvestable,
 
         /// <summary>Nutrients have been exhausted. Must be composted before planting again.</summary>
-        Depleted
+        Depleted,
+
+        /// <summary>Crop died from drought. Must be cleared before replanting.</summary>
+        Dead
     }
 }

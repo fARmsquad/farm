@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 43556211088f45f4e99ecc5a4f1edc3d
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/PlanterModules/StoneVertHigh_01.prefab
+  uploadId: 447537

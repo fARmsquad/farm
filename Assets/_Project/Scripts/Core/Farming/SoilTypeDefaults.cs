@@ -44,30 +44,30 @@ namespace FarmSimVR.Core.Farming
             return type switch
             {
                 SoilType.Sandy => new SoilTypeDefaults(
-                    initialMoisture: 0.30f,
+                    initialMoisture: 0.80f,
                     initialNutrients: 0.60f,
-                    moistureDecayRate: 0.020f,
+                    moistureDecayRate: 0.030f,   // drains in ~27s — needs watering every ~2 phases
                     nutrientDepletionPerHarvest: 0.25f,
                     growthMultiplier: 0.70f),
 
                 SoilType.Loam => new SoilTypeDefaults(
-                    initialMoisture: 0.60f,
+                    initialMoisture: 0.80f,
                     initialNutrients: 0.80f,
-                    moistureDecayRate: 0.010f,
+                    moistureDecayRate: 0.018f,   // drains in ~44s — needs one watering mid-cycle
                     nutrientDepletionPerHarvest: 0.20f,
                     growthMultiplier: 1.00f),
 
                 SoilType.Clay => new SoilTypeDefaults(
-                    initialMoisture: 0.70f,
+                    initialMoisture: 0.80f,
                     initialNutrients: 0.70f,
-                    moistureDecayRate: 0.008f,
+                    moistureDecayRate: 0.010f,   // drains in ~80s — forgiving for beginners
                     nutrientDepletionPerHarvest: 0.20f,
                     growthMultiplier: 0.80f),
 
                 SoilType.Rich => new SoilTypeDefaults(
-                    initialMoisture: 0.70f,
+                    initialMoisture: 0.80f,
                     initialNutrients: 1.00f,
-                    moistureDecayRate: 0.005f,
+                    moistureDecayRate: 0.012f,   // drains in ~67s — still needs watering
                     nutrientDepletionPerHarvest: 0.15f,
                     growthMultiplier: 1.30f),
 

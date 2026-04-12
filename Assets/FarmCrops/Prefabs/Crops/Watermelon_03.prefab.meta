@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7dd2ad44a411c634aa70883943c5d7b0
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Watermelon_03.prefab
+  uploadId: 447537

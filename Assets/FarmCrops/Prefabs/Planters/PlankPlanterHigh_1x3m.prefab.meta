@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 813c8a7235e2e2d40841bfe9af127f87
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Planters/PlankPlanterHigh_1x3m.prefab
+  uploadId: 447537

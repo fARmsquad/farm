@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 73da6597a1f4f5e488a535d5a42f89ab
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Potato_03.prefab
+  uploadId: 447537

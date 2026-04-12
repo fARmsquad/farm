@@ -174,6 +174,10 @@ There should also be a small overlay showing:
 - current scene
 - next scene
 
+For editor and development builds, the title screen should also expose one
+button per tutorial scene so the team can enter any beat from the same ordered
+catalog the runtime flow uses.
+
 ## Team Handoff Rule
 
 When dividing work, refer to the beats by scene number first and by scene name

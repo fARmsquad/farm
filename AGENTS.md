@@ -25,6 +25,8 @@
 6. If you change .ai/, AGENTS.md, or any harness file, run the AI wiring audit.
 7. Every story ends with a playtest guide and handoff checklist.
 8. Quest performance budget is a hard constraint, not a suggestion.
+9. If an agent says work is done and the developer later reports an issue, record a completion learning before the fix proceeds.
+10. Completion reports must separate what was verified, what was assumed, and what still carries risk.
 
 ## Autonomy Model
 Agents are FULLY AUTONOMOUS through the pipeline. No human gates between
@@ -41,6 +43,11 @@ Human touchpoints are INVITATIONS, not gates:
   Agents check the inbox at the start of every new story and between phases.
 - **Steering**: the developer can interrupt any phase with new direction.
   Agents treat interrupts as priority input, not errors.
+- **Post-completion correction**: if the developer returns after a "done"
+  claim with an error, issue, or misunderstanding, agents treat it as a
+  completion miss. They must log it in `.ai/memory/completion-learnings.md`,
+  distill any durable rule into `.ai/memory/project-memory.md`, and cite the
+  relevant learning before the next implementation or verification pass.
 
 The pipeline is a river, not a checklist. It flows continuously.
 The developer stands on the bank and can redirect the current at any point.
@@ -71,6 +78,10 @@ Route your current task to the appropriate workflow:
 - Type hints: all public APIs fully typed, no `object` or `dynamic`
 - No `Debug.Log` in committed code (use conditional compilation)
 - No `TODO`/`FIXME` in merge-ready code (resolve or create issue)
+- Completion reports must state:
+  - what was directly verified
+  - what was not directly verified
+  - any remaining risk or uncertainty
 
 ## Validation Commands
 ```bash

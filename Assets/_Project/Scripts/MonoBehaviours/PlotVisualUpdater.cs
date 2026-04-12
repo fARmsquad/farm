@@ -41,7 +41,9 @@ namespace FarmSimVR.MonoBehaviours
             if (_controller == null || _renderer == null)
                 return;
 
-            var targetColor = ResolveSoilColor();
+            var targetColor = ResolveSoilColor(
+                _controller.SoilState,
+                _controller.State?.Phase ?? PlotPhase.Empty);
 
             _renderer.GetPropertyBlock(_propBlock);
             _propBlock.SetColor(ColorId, targetColor);
@@ -49,11 +51,10 @@ namespace FarmSimVR.MonoBehaviours
             _renderer.SetPropertyBlock(_propBlock);
         }
 
-        private Color ResolveSoilColor()
+        internal static Color ResolveSoilColor(SoilState soil, PlotPhase phase)
         {
-            var soil = _controller.SoilState;
             if (soil == null)
-                return ColorForPhase(_controller.State?.Phase ?? PlotPhase.Empty);
+                return ColorForPhase(phase);
 
             var baseColor = soil.Status switch
             {
@@ -79,10 +80,15 @@ namespace FarmSimVR.MonoBehaviours
         {
             return phase switch
             {
-                PlotPhase.Planted => PlantedSoilColor,
-                PlotPhase.Growing => GrowingSoilColor,
-                PlotPhase.Ready => HarvestableSoilColor,
-                _ => EmptySoilColor
+                PlotPhase.Planted    => PlantedSoilColor,
+                PlotPhase.Sprout     => GrowingSoilColor,
+                PlotPhase.YoungPlant => GrowingSoilColor,
+                PlotPhase.Budding    => GrowingSoilColor,
+                PlotPhase.Fruiting   => GrowingSoilColor,
+                PlotPhase.Ready      => HarvestableSoilColor,
+                PlotPhase.Wilting    => PlantedSoilColor,
+                PlotPhase.Dead       => DepletedSoilColor,
+                _                    => EmptySoilColor
             };
         }
     }

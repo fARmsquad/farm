@@ -14,6 +14,7 @@ This is the central tracker for all feature specs. Before building anything, fin
 | -- | [Farm Scene Demo](Assets/Specs/Features/farm-scene-demo.md) | Demo | Done | Youssef | Crop Growth Calc |
 | L2-008 | [Starter Tool Discovery & Ability Unlocks](Assets/Specs/Features/L2-008-starter-tool-discovery-and-ability-unlocks.md) | L2 | Open | -- | L2-001 thru L2-006 |
 | L2-007 | [Hunting Chore (Catch Animals)](Assets/Specs/Features/L2-007-hunting-chore.md) | L2 | Done | AI | L1-001 |
+| TUT-001 | [Linear Tutorial Sequence](Assets/Specs/Features/TUT-001-linear-tutorial-sequence.md) | TUT | Open | -- | INT-008, L2-007, L2-000 |
 | INT-001 | [Screen Effects](Assets/Specs/Features/INT-001-screen-effects.md) | INT | Done | Youssef | -- |
 | INT-002 | [Simple Audio Manager](Assets/Specs/Features/INT-002-simple-audio-manager.md) | INT | Done | Youssef | -- |
 | INT-003 | [Dialogue System](Assets/Specs/Features/INT-003-dialogue-system.md) | INT | Done | Youssef | -- |
@@ -42,6 +43,7 @@ Specs are organized in layers. Lower layers are built first.
 |-------|------|---------|
 | **L1** | Environment & scene setup | Ground plane, skybox, lighting |
 | **L2** | Gameplay systems (Core/ C#) | Soil, crops, planting, watering, harvest, inventory |
+| **TUT** | Tutorial scene chain & onboarding flow | Intro -> minigame -> cutscene -> farm tutorial |
 | **L3** | Polish & effects | Day/night cycle, weather, VFX, audio (not yet specced) |
 | **INT** | Intro/Cinematic systems | Screen effects, dialogue, cutscene camera, sequencer |
 | **Core** | Foundation logic | Calculators, data types, utilities |

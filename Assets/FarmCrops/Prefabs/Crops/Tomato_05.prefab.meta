@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: bf4d66e277953634c9e78dfd1db713bb
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Tomato_05.prefab
+  uploadId: 447537

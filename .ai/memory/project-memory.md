@@ -4,6 +4,9 @@
 > Both agents MUST read this on startup and append to it when learning something new.
 > If you discover a pattern, antipattern, gotcha, or make an architecture decision,
 > write it here so the next agent (or the next session) doesn't repeat the mistake.
+> Detailed post-"done" misses live in `.ai/memory/completion-learnings.md`.
+> When a developer comes back with an issue after a completion claim, log the full
+> case there first, then copy the durable rule back here.
 
 ---
 
@@ -42,6 +45,12 @@
   3. If multiple matches, pick the best one and log the choice in the commit message
 - This applies to Synty packs, Unity starter assets, Asset Store downloads, etc.
 
+### Crop Prefab Selection
+- For player-reachable crop plots, prefer the `a`-suffix interactive prefab variants whenever the pack provides them.
+- Treat the visible fruit/root material slot as the clearest produce-emergence signal: tomato fruit appears at `Tomato_02/_02a`, carrot root appears at `Carrot_04`, and corn produce appears at `Corn_06`.
+- Treat `TomatoStick_01` as a separate support prop, not as a lifecycle replacement mesh.
+- Wheat uses paired seeds and `a` alternates as density variants, not as a single strictly linear ladder.
+
 ### Testing
 - EditMode tests for Core/ pure C# logic
 - PlayMode tests for MonoBehaviour integration
@@ -50,6 +59,12 @@
 ### Scene Handoffs
 - Use the stable numbered scene map in `.ai/docs/scene-work-map.md` when splitting scene-scoped work across agents or teammates.
 - Runtime scene labels and shared scene numbering come from `SceneWorkCatalog`; do not invent ad hoc scene numbers in prompts or docs.
+
+### Tutorial Entry Points
+- Title-screen launchers, play-mode start-scene helpers, and scripted Build Settings updates for the tutorial should all read from `SceneWorkCatalog` instead of maintaining separate hardcoded scene lists. If the tutorial sequence changes, update the catalog once and let the editor/runtime entry points follow it.
+
+### Scene Art Review
+- When the developer is still choosing the look of a mechanic, place curated asset options directly in the scene and get a pick before adding more lifecycle-specific logic or polish.
 
 ### Git
 - Feature branches: `feature/<story-id>-<slug>`
@@ -84,6 +99,10 @@
 
 ### Harness
 - DON'T let repo-wide legacy debt block every branch. Preflight checks should validate the branch delta, not fail forever because `main` already contains oversized scripts or unchecked planning specs.
+
+### Completion Claims
+- DON'T say work is fully done without stating what was directly verified vs what was assumed
+- DON'T treat a developer-reported post-"done" issue as routine feedback — log it as a completion learning and update the guardrail
 
 ---
 
@@ -125,6 +144,78 @@ builder that creates an `EventSystem` must use `InputSystemUIInputModule`, not
 `StandaloneInputModule`. The legacy module calls `UnityEngine.Input` and will
 throw `InvalidOperationException` every frame in play mode once the old input
 manager is disabled.
+
+### Completion Claims (2026-04-11)
+When the developer reports an issue after an agent said work was done, capture
+the full miss in `.ai/memory/completion-learnings.md` before fixing it. The
+entry must explain the original claim, the failing behavior, the approach that
+produced it, why verification missed it, and what future work must verify or
+phrase differently. Completion summaries must also separate verified facts from
+unverified assumptions so "done" has a clear boundary.
+
+### Global Codex Unity Skills (2026-04-11)
+When this repo wires external Codex Unity skills into `.ai` workflows, keep
+the repo-local `.ai/skills/` files as the authoritative process contract and
+document the external skills in `.ai/CODEX_SKILLS.md` plus the exact workflow
+entry points that should invoke them. Treat global skills as augmentations, not
+hidden requirements. Current Codex-installed Unity skills are
+`unity-mcp-orchestrator`, `unity-developer`, `unity-ecs-patterns`, and
+`unity-profiler`; `unity-initial-setup` was requested but not exposed as a
+Codex-installable skill in either `IvanMurzak/Unity-MCP` or
+`devwinsoft/devian` at install time, so workflows must not assume it exists.
+
+### Namespace Imports After Cross-Assembly Wiring (2026-04-11)
+When a C# change introduces new references across `Core`, `MonoBehaviours`,
+`Editor`, or sibling MonoBehaviour namespaces, do a compile-oriented scan of
+every edited file for missing `using` directives before handoff. If Unity
+compile/test execution is blocked, do not imply compile confidence beyond what
+that static import check actually proved.
+
+### New C# Files Need EOF Structure Checks (2026-04-11)
+When creating a brand-new C# file, do a final top-to-bottom structural pass and
+confirm the file closes every namespace, type, and method correctly. If Unity
+cannot run a fresh compile, this EOF brace/structure check is mandatory before
+handoff because parser-level mistakes are otherwise easy to miss.
+
+### C# API Member Name Collision Scan (2026-04-11)
+When adding or changing public C# API types, do a same-type member-name
+collision scan before handoff, especially if a factory method shares a domain
+noun with a data property. Prefer explicit collection property names such as
+`InputSequence` when the factory method is named `Sequence(...)`.
+
+### Tutorial Scene Wiring Must Not Depend On Start Order (2026-04-11)
+When a tutorial scene depends on runtime-initialized plot state or other data
+that another MonoBehaviour sets up in `Start`, do not perform one-shot
+configuration only once in `Start`. Retry or ensure the configuration on
+demand before prompt building or mission reads so the first interaction
+affordance does not vanish because Unity called sibling `Start` methods in an
+unexpected order.
+
+### Tutorial State Progression Must Match Player Actions (2026-04-11)
+For guided tutorial scenes, do not leave hidden autoplay loops that advance the
+core mechanic after the first valid input unless that autoplay behavior is part
+of the explicit spec. Verify the mission state, allowed prompt actions, and
+visible world state together in the real player loop so the scene never asks
+for a later action while the plot still looks wrong or idle.
+
+### Persistent Tutorial Props Are Not Lifecycle Stages (2026-04-11)
+When a scene uses support props such as the tomato plank/stake, model them as
+persistent visuals that stay active across a phase range instead of forcing
+them into the mutually exclusive crop lifecycle mapping. Verify persistent
+props and lifecycle-swapped crop meshes separately so the scene does not drop a
+support asset or skip an intermediate fruit stage.
+
+### Stage Art Options In-Scene Before Encoding More Lifecycle Logic (2026-04-11)
+When a mechanic still feels wrong to the developer at the art direction level,
+stop extending lifecycle logic and place a small, reviewable set of candidate
+base assets directly in the scene first. Use the chosen base as the anchor for
+later sequencing work instead of trying to reason the final look out in code.
+
+### Selection Slice Names Must Match The Current Review Target (2026-04-11)
+When building a new title-screen or in-scene review slice during visual tuning,
+name and populate the slice after the most recent requested review subject
+(soil base, crop state, tomato stage, planter style, and so on), not whichever
+earlier asset family happened to be under discussion first.
 
 ---
 

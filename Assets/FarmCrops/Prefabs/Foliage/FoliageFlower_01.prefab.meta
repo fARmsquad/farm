@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d95b157af528d114597b4d0a4f8398e0
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Foliage/FoliageFlower_01.prefab
+  uploadId: 447537

@@ -83,13 +83,15 @@ namespace FarmSimVR.Tests.EditMode
                 Assert.That(surface, Is.Not.Null);
                 Assert.That(surface.GetComponent<PlotVisualUpdater>(), Is.Not.Null);
                 Assert.That(surface.GetComponent<Collider>(), Is.Not.Null);
-                Assert.That(surface.lossyScale.x, Is.EqualTo(1f).Within(0.001f));
+                Assert.That(surface.lossyScale.x, Is.EqualTo(WorldFarmBootstrap.RecommendedPlotSurfaceSizeMeters).Within(0.001f));
                 Assert.That(surface.lossyScale.y, Is.EqualTo(0.08f).Within(0.001f));
-                Assert.That(surface.lossyScale.z, Is.EqualTo(1f).Within(0.001f));
+                Assert.That(surface.lossyScale.z, Is.EqualTo(WorldFarmBootstrap.RecommendedPlotSurfaceSizeMeters).Within(0.001f));
 
                 var cropVisual = plot.Find("CropVisual");
                 Assert.That(cropVisual, Is.Not.Null);
                 Assert.That(cropVisual.GetComponent<CropVisualUpdater>(), Is.Not.Null);
+                Assert.That(cropVisual.position.x, Is.EqualTo(surface.position.x).Within(0.001f));
+                Assert.That(cropVisual.position.z, Is.EqualTo(surface.position.z).Within(0.001f));
             }
         }
 

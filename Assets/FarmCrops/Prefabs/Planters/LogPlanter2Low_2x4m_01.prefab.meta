@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 4c3de85f4431a8341a623ac5778deae7
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Planters/LogPlanter2Low_2x4m_01.prefab
+  uploadId: 447537

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 95356fc9cd74c0e409dd10aa68a2593f
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/RedBeet_02.prefab
+  uploadId: 447537

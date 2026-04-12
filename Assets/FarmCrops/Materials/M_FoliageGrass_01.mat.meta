@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 08313ece4d763cf43a7c2bbc8649cd88
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Materials/M_FoliageGrass_01.mat
+  uploadId: 447537

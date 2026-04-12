@@ -149,7 +149,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             panelTmpText.fontSize = fontSize;
             panelTmpText.color = color;
             panelTmpText.alignment = TextAlignmentOptions.Center;
-            panelTmpText.enableWordWrapping = true;
+            panelTmpText.textWrappingMode = TextWrappingModes.Normal;
 
             activeObjects.Add(panelTextObject);
         }
@@ -254,7 +254,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             burstTmpText.color = color;
             burstTmpText.alignment = TextAlignmentOptions.Center;
             burstTmpText.fontStyle = FontStyles.Bold;
-            burstTmpText.enableWordWrapping = false;
+            burstTmpText.textWrappingMode = TextWrappingModes.NoWrap;
 
             if (outlineColor.HasValue)
             {
@@ -430,7 +430,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             refs.mainText.fontSize = 28f;
             refs.mainText.color = Color.black;
             refs.mainText.alignment = TextAlignmentOptions.Center;
-            refs.mainText.enableWordWrapping = true;
+            refs.mainText.textWrappingMode = TextWrappingModes.Normal;
             refs.mainText.maxVisibleCharacters = 0;
 
             // Translation text (optional)
@@ -450,7 +450,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                 refs.translationTmpText.color = new Color(0.3f, 0.3f, 0.3f, 1f);
                 refs.translationTmpText.fontStyle = FontStyles.Italic;
                 refs.translationTmpText.alignment = TextAlignmentOptions.Center;
-                refs.translationTmpText.enableWordWrapping = true;
+                refs.translationTmpText.textWrappingMode = TextWrappingModes.Normal;
                 refs.translationTmpText.maxVisibleCharacters = 0;
             }
 

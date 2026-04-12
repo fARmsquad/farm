@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2c4b5e32066e1ce4cb3e1e860d7b76a3
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Onion_01.prefab
+  uploadId: 447537

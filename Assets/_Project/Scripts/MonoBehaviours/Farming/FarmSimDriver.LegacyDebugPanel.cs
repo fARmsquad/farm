@@ -67,7 +67,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
                     continue;
 
                 provider.Force(weather);
-                FindFirstObjectByType<FarmLightingController>()?.ApplyWeather(weather);
+                FindAnyObjectByType<FarmLightingController>()?.ApplyWeather(weather);
                 _log = $"Weather forced: {weather}";
             }
 

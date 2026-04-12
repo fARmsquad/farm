@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2cb574e49d814c9499a863cdaeee8fca
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/CornSeed_01.prefab
+  uploadId: 447537

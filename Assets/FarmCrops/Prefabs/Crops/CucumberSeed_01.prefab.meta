@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: bb8404175e47ad44fbf0c3a69c891557
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/CucumberSeed_01.prefab
+  uploadId: 447537

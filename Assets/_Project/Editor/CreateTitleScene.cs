@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using FarmSimVR.Core.Tutorial;
+using System.Collections.Generic;
 
 namespace FarmSimVR.Editor
 {
@@ -106,7 +107,7 @@ namespace FarmSimVR.Editor
             audioSource.volume = 1f;
 
             var mgrSO = new SerializedObject(mgr);
-            mgrSO.FindProperty("targetSceneName").stringValue = TutorialSceneCatalog.IntroSceneName;
+            mgrSO.FindProperty("targetSceneName").stringValue = SceneWorkCatalog.FirstTutorialSceneName;
             mgrSO.FindProperty("musicSource").objectReferenceValue = audioSource;
             mgrSO.ApplyModifiedPropertiesWithoutUndo();
 
@@ -121,14 +122,23 @@ namespace FarmSimVR.Editor
             esGO.AddComponent<InputSystemUIInputModule>();
 
             // Save
-            string scenePath = "Assets/_Project/Scenes/TitleScreen.unity";
+            string scenePath = SceneWorkCatalog.TitleScreenScenePath;
             EditorSceneManager.SaveScene(scene, scenePath);
             AssetDatabase.Refresh();
 
-            AddScenesToBuild(scenePath,
-                "Assets/_Project/Scenes/WorldMain.unity",
-                "Assets/_Project/Scenes/FarmMain.unity");
+            SyncBuildSettings();
             Debug.Log("[TitleScene] Done! TitleScreen.unity created.");
+        }
+
+        [MenuItem("FarmSimVR/Sync Title Screen Build Settings")]
+        public static void SyncBuildSettings()
+        {
+            AddScenesToBuild(GetOrderedBuildScenePaths());
+        }
+
+        public static IReadOnlyList<string> GetOrderedBuildScenePaths()
+        {
+            return SceneWorkCatalog.TitleScreenBuildScenePaths;
         }
 
         static GameObject CreateImage(string name, Transform parent, Sprite sprite)
@@ -144,24 +154,37 @@ namespace FarmSimVR.Editor
             return go;
         }
 
-        static void AddScenesToBuild(params string[] scenePaths)
+        static void AddScenesToBuild(IReadOnlyList<string> scenePaths)
         {
-            var existing = new System.Collections.Generic.List<EditorBuildSettingsScene>(
-                EditorBuildSettings.scenes);
+            var existingScenes = EditorBuildSettings.scenes;
+            var existingByPath = new Dictionary<string, EditorBuildSettingsScene>();
+            foreach (var scene in existingScenes)
+                existingByPath[scene.path] = scene;
 
-            for (int i = 0; i < scenePaths.Length; i++)
+            var ordered = new List<EditorBuildSettingsScene>(scenePaths.Count + existingByPath.Count);
+            for (int i = 0; i < scenePaths.Count; i++)
             {
                 string path = scenePaths[i];
-                bool found = false;
-                foreach (var s in existing)
+                if (existingByPath.TryGetValue(path, out var existing))
                 {
-                    if (s.path == path) { found = true; break; }
+                    ordered.Add(new EditorBuildSettingsScene(existing.path, true));
+                    existingByPath.Remove(path);
+                    continue;
                 }
-                if (!found)
-                    existing.Insert(i, new EditorBuildSettingsScene(path, true));
+
+                ordered.Add(new EditorBuildSettingsScene(path, true));
             }
 
-            EditorBuildSettings.scenes = existing.ToArray();
+            var configuredPaths = new HashSet<string>(scenePaths);
+            foreach (var remaining in existingScenes)
+            {
+                if (configuredPaths.Contains(remaining.path))
+                    continue;
+
+                ordered.Add(remaining);
+            }
+
+            EditorBuildSettings.scenes = ordered.ToArray();
             Debug.Log("[TitleScene] Build Settings updated.");
         }
     }

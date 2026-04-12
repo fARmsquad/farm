@@ -56,7 +56,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private void TryResolveLighting()
         {
             if (lighting == null)
-                lighting = FindFirstObjectByType<FarmLightingController>();
+                lighting = FindAnyObjectByType<FarmLightingController>();
         }
     }
 }

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a97f17fe9c56f7a49bbd47617cd83b15
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Materials/M_Watermelon_01.mat
+  uploadId: 447537

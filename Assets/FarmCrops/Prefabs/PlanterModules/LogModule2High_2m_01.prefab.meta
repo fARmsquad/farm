@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d2280c3100ccc7a4d8794318047b9e10
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/PlanterModules/LogModule2High_2m_01.prefab
+  uploadId: 447537

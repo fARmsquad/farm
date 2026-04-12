@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 4058c612252d4bc47ba17fb221b0aa5f
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 625f186215c104763be7675aa2d941aa, type: 3}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/ShaderGraphs/SG_Leaf_01.shadergraph
+  uploadId: 447537

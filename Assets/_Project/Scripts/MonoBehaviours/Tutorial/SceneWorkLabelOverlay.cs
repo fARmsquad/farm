@@ -6,7 +6,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 {
     public sealed class SceneWorkLabelOverlay : MonoBehaviour
     {
-        [SerializeField] private bool showOverlay = true;
+        [SerializeField] private bool showOverlay = TutorialDevTuning.ShowSceneWorkOverlayByDefault;
 
         private GUIStyle _titleStyle;
         private GUIStyle _bodyStyle;

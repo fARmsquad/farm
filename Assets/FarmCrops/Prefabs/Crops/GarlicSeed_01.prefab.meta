@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: efac7883af954cc42a9696c9ced452e3
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/GarlicSeed_01.prefab
+  uploadId: 447537

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 58e9a3ff8fd1c124aa3465b5876f4660
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/OnionSeed_01.prefab
+  uploadId: 447537

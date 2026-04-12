@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0d0bf175d7ff2604a8684a936da87bc0
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/PlanterModules/PlankVert_01.prefab
+  uploadId: 447537

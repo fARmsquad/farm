@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0494b2981254c0942b5214a44aedaa05
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/PlanterModules/Plank_4m.prefab
+  uploadId: 447537

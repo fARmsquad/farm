@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 44ebd9d72b130cc4ab40ff7e772d80ba
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Materials/M_RadishLeaf_01.mat
+  uploadId: 447537

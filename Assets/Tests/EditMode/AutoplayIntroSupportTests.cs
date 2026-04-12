@@ -1,7 +1,10 @@
 using NUnit.Framework;
 using UnityEngine;
-using FarmSimVR.MonoBehaviours.Autoplay;
 using FarmSimVR.MonoBehaviours.Cinematics;
+using AutoplayChaosMeter = FarmSimVR.MonoBehaviours.Autoplay.ChaosMeter;
+using AutoplayElPolloController = FarmSimVR.MonoBehaviours.Autoplay.ElPolloController;
+using AutoplayElPolloPhase = FarmSimVR.MonoBehaviours.Autoplay.ElPolloPhase;
+using AutoplayIntroSequenceBuilder = FarmSimVR.MonoBehaviours.Autoplay.IntroSequenceBuilder;
 
 namespace FarmSimVR.Tests.EditMode
 {
@@ -11,10 +14,10 @@ namespace FarmSimVR.Tests.EditMode
         [TearDown]
         public void TearDown()
         {
-            foreach (var meter in Object.FindObjectsByType<ChaosMeter>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (var meter in Object.FindObjectsByType<AutoplayChaosMeter>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 Object.DestroyImmediate(meter.gameObject);
 
-            foreach (var pollo in Object.FindObjectsByType<ElPolloController>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (var pollo in Object.FindObjectsByType<AutoplayElPolloController>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 Object.DestroyImmediate(pollo.gameObject);
 
             foreach (var sequencer in Object.FindObjectsByType<CinematicSequencer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
@@ -27,7 +30,7 @@ namespace FarmSimVR.Tests.EditMode
             var sequencerObject = new GameObject("Sequencer");
             var sequencer = sequencerObject.AddComponent<CinematicSequencer>();
 
-            var sequence = IntroSequenceBuilder.Build();
+            var sequence = AutoplayIntroSequenceBuilder.Build();
 
             Assert.That(sequence, Is.Not.Null);
             Assert.That(sequence.steps, Is.Not.Null);
@@ -41,7 +44,7 @@ namespace FarmSimVR.Tests.EditMode
         public void ChaosMeter_AddFill_ClampsToValidRange()
         {
             var meterObject = new GameObject("ChaosMeter");
-            var meter = meterObject.AddComponent<ChaosMeter>();
+            var meter = meterObject.AddComponent<AutoplayChaosMeter>();
 
             meter.AddFill(0.35f);
             meter.AddFill(0.9f);
@@ -57,11 +60,11 @@ namespace FarmSimVR.Tests.EditMode
         public void ElPolloController_HighChaos_BecomesCatchable()
         {
             var polloObject = new GameObject("ElPollo");
-            var pollo = polloObject.AddComponent<ElPolloController>();
+            var pollo = polloObject.AddComponent<AutoplayElPolloController>();
 
             pollo.UpdateFromChaosMeter(0.9f);
 
-            Assert.That(pollo.CurrentPhase, Is.EqualTo(ElPolloPhase.Tired));
+            Assert.That(pollo.CurrentPhase, Is.EqualTo(AutoplayElPolloPhase.Tired));
             Assert.That(pollo.IsCatchable, Is.True);
         }
     }

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 8250c16938039e84b80fba768d75ec4a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Cabbage_01.prefab
+  uploadId: 447537

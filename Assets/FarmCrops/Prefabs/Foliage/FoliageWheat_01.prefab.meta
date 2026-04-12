@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 9244c272a3cbc564caa3db40d6a1a75f
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Foliage/FoliageWheat_01.prefab
+  uploadId: 447537

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f9f893c3fbf53454fa88f371715a18b7
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/PlanterModules/LogVertHigh_01.prefab
+  uploadId: 447537

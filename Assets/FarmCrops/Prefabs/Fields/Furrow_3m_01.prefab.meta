@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 74d069dd6da1f30459a5456fdbd6e818
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Fields/Furrow_3m_01.prefab
+  uploadId: 447537

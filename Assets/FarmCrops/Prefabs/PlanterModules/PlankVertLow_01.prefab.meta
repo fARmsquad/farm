@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 45ef138283fc700468f0645c529a0327
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/PlanterModules/PlankVertLow_01.prefab
+  uploadId: 447537

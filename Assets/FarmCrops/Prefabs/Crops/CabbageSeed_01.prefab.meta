@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ccd20f66dcb740045ad9f9874361e979
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/CabbageSeed_01.prefab
+  uploadId: 447537

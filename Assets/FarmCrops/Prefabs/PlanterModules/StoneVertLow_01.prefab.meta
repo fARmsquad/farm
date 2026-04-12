@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 27e087b9f91ad0f4d8dc99c2a67177ef
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/PlanterModules/StoneVertLow_01.prefab
+  uploadId: 447537

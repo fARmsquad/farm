@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0bd3e1862e5050c4d84104e190bb12b9
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Planters/PlankPlanterLow_1x4m.prefab
+  uploadId: 447537

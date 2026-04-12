@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e09ca800393ad2443a3acdb6aac25abe
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8574412962073106934
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Terrain/GrassLayer_01.terrainlayer
+  uploadId: 447537

@@ -5,7 +5,7 @@ Check that the implementation isn't overfitting to the tests.
 Add boundary tests that the original RED phase might have missed.
 
 ## Process
-1. **Read project-memory.md "Antipatterns"** — check if the implementation violates any known antipattern
+1. **Read project-memory.md "Antipatterns" and relevant completion-learnings.md entries** — check if the implementation repeats any known trap or past false-done failure mode
 2. Read the implementation and existing tests
 3. Check for overfitting:
    - Does the code handle ONLY the test cases? (bad)
@@ -16,6 +16,7 @@ Add boundary tests that the original RED phase might have missed.
    - Maximum values
    - Invalid inputs (should throw)
    - Boundary conditions
+   - Any scenario that matches a relevant completion-learning escape path
 5. **Check for antipattern violations** from project-memory.md:
    - Engine types in Core/? (assembly boundary violation)
    - Hardcoded asset paths without verification?

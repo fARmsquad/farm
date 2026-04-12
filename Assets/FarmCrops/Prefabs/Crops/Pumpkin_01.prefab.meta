@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 6f1d73cde911d7f4882f508eeea4f6bf
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Pumpkin_01.prefab
+  uploadId: 447537

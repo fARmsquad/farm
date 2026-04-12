@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f2dc27181d20e4d4b97c2b1442b31e9d
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Planters/PlankPlanterHigh_1x1m.prefab
+  uploadId: 447537

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d2d38fa8c6a946f4b8e186d92b3aa521
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 200949
+  packageName: Farm Crops
+  packageVersion: 1.0
+  assetPath: Assets/FarmCrops/Prefabs/Crops/Corn_02.prefab
+  uploadId: 447537
