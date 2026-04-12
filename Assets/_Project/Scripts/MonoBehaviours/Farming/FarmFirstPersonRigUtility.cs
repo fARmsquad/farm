@@ -6,6 +6,45 @@ namespace FarmSimVR.MonoBehaviours.Farming
     {
         private const float CameraHeight = 1.6f;
 
+        /// <summary>
+        /// Spawns a third-person rig (orbit camera behind the player). Main Camera is left in world space.
+        /// </summary>
+        public static ThirdPersonFarmExplorer EnsureThirdPersonRig()
+        {
+            var existing = Object.FindAnyObjectByType<ThirdPersonFarmExplorer>();
+            if (existing != null)
+            {
+                EnsureCharacterController(existing.gameObject);
+                EnsureThirdPersonCameraDetached();
+                return existing;
+            }
+
+            var player = new GameObject("Player");
+            player.tag = "Player";
+            player.transform.position = ResolveSpawnPosition();
+            EnsureCharacterController(player);
+            EnsureThirdPersonCameraDetached();
+            return player.AddComponent<ThirdPersonFarmExplorer>();
+        }
+
+        private static void EnsureThirdPersonCameraDetached()
+        {
+            var main = Camera.main;
+            if (main != null)
+            {
+                main.transform.SetParent(null, true);
+                EnsureMainCameraTag(main.gameObject);
+                if (main.GetComponent<AudioListener>() == null)
+                    main.gameObject.AddComponent<AudioListener>();
+                return;
+            }
+
+            var cameraGo = new GameObject("Main Camera");
+            cameraGo.tag = "MainCamera";
+            cameraGo.AddComponent<Camera>();
+            cameraGo.AddComponent<AudioListener>();
+        }
+
         public static FirstPersonExplorer EnsureRig()
         {
             var existing = Object.FindAnyObjectByType<FirstPersonExplorer>();

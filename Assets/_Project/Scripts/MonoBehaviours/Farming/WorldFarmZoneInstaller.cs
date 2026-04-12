@@ -124,6 +124,10 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
         private static GameObject ResolvePlayer()
         {
+            var third = Object.FindAnyObjectByType<ThirdPersonFarmExplorer>();
+            if (third != null)
+                return third.gameObject;
+
             var explorer = Object.FindAnyObjectByType<FirstPersonExplorer>();
             if (explorer != null)
                 return explorer.gameObject;

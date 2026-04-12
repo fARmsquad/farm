@@ -49,7 +49,10 @@ namespace FarmSimVR.MonoBehaviours.Farming
                 _driver = FindAnyObjectByType<FarmSimDriver>();
 
             _mission = FindAnyObjectByType<TutorialFarmSceneController>();
-            FarmFirstPersonRigUtility.EnsureRig();
+            if (_driver != null && _driver.UseThirdPersonRig)
+                FarmFirstPersonRigUtility.EnsureThirdPersonRig();
+            else
+                FarmFirstPersonRigUtility.EnsureRig();
             _camera = Camera.main;
             BuildHighlightRing();
         }

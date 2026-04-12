@@ -10,6 +10,12 @@ namespace FarmSimVR.MonoBehaviours.Farming
         [Header("Interaction")]
         [SerializeField] private bool showLegacyDebugPanel = false;
 
+        [Header("Player rig")]
+        [Tooltip("When true, FarmPlotInteractionController spawns a third-person orbit camera instead of first-person.")]
+        [SerializeField] private bool useThirdPersonRig;
+
+        public bool UseThirdPersonRig => useThirdPersonRig;
+
         [Header("Soil")]
         [SerializeField] private SoilType defaultSoilType = SoilType.Loam;
 
