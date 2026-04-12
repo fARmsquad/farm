@@ -38,6 +38,14 @@ namespace FarmSimVR.Editor
         private const string Tree2Path      = "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Tree_02.prefab";
         private const string SkyboxPath     = "Assets/_Project/Materials/SkyboxProcedural.mat";
 
+        private const string SfxBawkPath    = "Assets/_Project/Sounds/SFX/bawk-bawk.mp3";
+        private const string SfxChickletsPath = "Assets/_Project/Sounds/SFX/chicklets.mp3";
+        private const string SfxWingFlapPath = "Assets/_Project/Sounds/SFX/wing-flap.mp3";
+        private const string SpeechIntroPath = "Assets/_Project/Sounds/Speech/ya-darn-chicken.mp3";
+        private const string MusicBanjoPath = "Assets/_Project/Sounds/Music/banjo-fast.mp3";
+        private const string SpeechGrabPath = "Assets/_Project/Sounds/Speech/you-aint-gettin-away.mp3";
+        private const string SpeechDropPath = "Assets/_Project/Sounds/Speech/i-aint-cluckin-around.mp3";
+
         [MenuItem("FarmSim/Build Chicken Game Scene")]
         public static void BuildScene()
         {
@@ -370,6 +378,20 @@ namespace FarmSimVR.Editor
 
             var ai        = go.AddComponent<ChickenAI>();
             ai.arenaRadius = ArenaRadius;
+
+            var cluck = go.AddComponent<ChickenCluckAudio>();
+            var cluckSo = new SerializedObject(cluck);
+            cluckSo.FindProperty("_chicken").objectReferenceValue = ai;
+            var clipsProp = cluckSo.FindProperty("_cluckClips");
+            clipsProp.arraySize = 3;
+            clipsProp.GetArrayElementAtIndex(0).objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<AudioClip>(SfxBawkPath);
+            clipsProp.GetArrayElementAtIndex(1).objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<AudioClip>(SfxChickletsPath);
+            clipsProp.GetArrayElementAtIndex(2).objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<AudioClip>(SfxWingFlapPath);
+            cluckSo.ApplyModifiedProperties();
+
             return go;
         }
 
@@ -382,6 +404,18 @@ namespace FarmSimVR.Editor
             mgr.chicken   = chickenGO.GetComponent<ChickenAI>();
             mgr.player    = player;
             mgr.timeLimit = 45f;
+
+            var sceneAudio = go.AddComponent<ChickenGameSceneAudio>();
+            var audioSo    = new SerializedObject(sceneAudio);
+            audioSo.FindProperty("_introClip").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<AudioClip>(SpeechIntroPath);
+            audioSo.FindProperty("_musicClip").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<AudioClip>(MusicBanjoPath);
+            audioSo.FindProperty("_grabClip").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<AudioClip>(SpeechGrabPath);
+            audioSo.FindProperty("_dropClip").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<AudioClip>(SpeechDropPath);
+            audioSo.ApplyModifiedProperties();
         }
 
         // ── Helpers ──────────────────────────────────────────────────────────

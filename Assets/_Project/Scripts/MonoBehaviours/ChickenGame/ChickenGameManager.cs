@@ -16,6 +16,8 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         [SerializeField] public Transform player;
         [SerializeField] private Transform _coopTransform;
 
+        private ChickenGameSceneAudio _sceneAudio;
+
         [Header("Timer")]
         [SerializeField] public float timeLimit = 45f;
 
@@ -36,6 +38,11 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         private Vector3    _chickenStartPos;
         private Keyboard _keyboard;
         private Mouse    _mouse;
+
+        private void Awake()
+        {
+            TryGetComponent(out _sceneAudio);
+        }
 
         private void Start()
         {
@@ -155,6 +162,8 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             _isHoldingChicken = true;
             _gripMeter        = 1f;
             chicken.Catch(player);
+            if (_sceneAudio != null)
+                _sceneAudio.PlayGrabLine();
         }
 
         private void ReleaseChicken()
@@ -162,10 +171,14 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             _isHoldingChicken = false;
             _gripMeter        = 0f;
             chicken.Escape();
+            if (_sceneAudio != null)
+                _sceneAudio.PlayDropLine();
         }
 
         private void EndGame(bool won)
         {
+            bool wasHolding = _isHoldingChicken;
+
             if (_isHoldingChicken)
             {
                 _isHoldingChicken = false;
@@ -175,6 +188,9 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
 
             _gameOver = true;
             IsWon     = won;
+
+            if (!won && wasHolding && _sceneAudio != null)
+                _sceneAudio.PlayDropLine();
 
             if (chicken != null)
             {

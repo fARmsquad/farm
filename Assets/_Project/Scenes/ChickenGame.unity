@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 1
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: 18575026418a146d9bd24dbc53f470ac, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 239cec2e0b8e34056989c75646f91ebc, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 0}
+  m_Sun: {fileID: 1890775315}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -638,6 +638,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4424461213063070902, guid: 87bcaceac037e4a55a7d7638742a87f6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 71662263}
+    - targetCorrespondingSourceObject: {fileID: 4424461213063070902, guid: 87bcaceac037e4a55a7d7638742a87f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 71662265}
   m_SourcePrefab: {fileID: 100100000, guid: 87bcaceac037e4a55a7d7638742a87f6, type: 3}
 --- !u!1 &71662262 stripped
 GameObject:
@@ -692,6 +695,25 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.3, z: 0}
+--- !u!114 &71662265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 71662262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4a19e2d7c3f401ab8e5c2d1f9a7b6c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.ChickenGame.ChickenCluckAudio
+  _chicken: {fileID: 71662263}
+  _cluckClips:
+  - {fileID: 8300000, guid: da796652622264dc79ca23c89bcd8f3f, type: 3}
+  - {fileID: 8300000, guid: 9aa20f8b1f31242cc88bcca7aabe1978, type: 3}
+  - {fileID: 8300000, guid: 298384cb45b9e403d883c12b3c7e255e, type: 3}
+  _minInterval: 2.2
+  _maxInterval: 5.5
 --- !u!1 &81293151
 GameObject:
   m_ObjectHideFlags: 0
@@ -849,6 +871,7 @@ GameObject:
   m_Component:
   - component: {fileID: 105486089}
   - component: {fileID: 105486088}
+  - component: {fileID: 105486090}
   m_Layer: 0
   m_Name: ChickenGameManager
   m_TagString: Untagged
@@ -875,6 +898,22 @@ MonoBehaviour:
   gripDrainRate: 0.18
   gripClickRefill: 0.2
   coopDropRadius: 1.5
+--- !u!114 &105486090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105486087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7f32a1c8b5d4120a9e3f2c1b8d4a6e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.ChickenGame.ChickenGameSceneAudio
+  _introClip: {fileID: 8300000, guid: 01365940532e04268b3c463a7569c3b9, type: 3}
+  _musicClip: {fileID: 8300000, guid: 0ce60147c8df2444fb40c3c7efeb138e, type: 3}
+  _grabClip: {fileID: 8300000, guid: 0c3f9cfc8ab2a410aa80beb06ec4849a, type: 3}
+  _dropClip: {fileID: 8300000, guid: f4a8c21d9e3b4a6f8e2d1c0b9a8f7e6d, type: 3}
 --- !u!4 &105486089
 Transform:
   m_ObjectHideFlags: 0
@@ -7488,6 +7527,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1489770324}
   - component: {fileID: 1489770323}
+  - component: {fileID: 1489770325}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -7546,6 +7586,14 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!81 &1489770325
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1489770322}
+  m_Enabled: 1
 --- !u!4 &1489770324
 Transform:
   m_ObjectHideFlags: 0
