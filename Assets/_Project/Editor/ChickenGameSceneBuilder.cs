@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEditor;
@@ -25,9 +24,6 @@ namespace FarmSimVR.Editor
         // ── Asset paths ───────────────────────────────────────────────────────
         private const string FarmgirlPath   = "Assets/_Project/Prefabs/Models/farmgirl.prefab";
         private const string ChickenPath    = "Assets/_Project/Prefabs/Models/chicken.prefab";
-        private const string FencePath        = "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Fence_Wood_01.prefab";
-        private const string FencePolePath   = "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Fence_Wood_Pole_01.prefab";
-        private const string FenceGatePath   = "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Fence_Wood_Gate_01.prefab";
         private const string GroundPath     = "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Ground_Flat_01.prefab";
         private const string DirtPath       = "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Ground_Dirt_01.prefab";
         private const string GrassPatch1    = "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Grass_Patch_01.prefab";
@@ -36,6 +32,7 @@ namespace FarmSimVR.Editor
         private const string CoopPath       = "Assets/_Project/Prefabs/Models/coop.prefab";
         private const string Tree1Path      = "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Tree_01.prefab";
         private const string Tree2Path      = "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Tree_02.prefab";
+        private const string FenceRoundPath = "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Fence_Wood_Round_01.prefab";
         private const string SkyboxPath     = "Assets/_Project/Materials/SkyboxProcedural.mat";
 
         private const string SfxBawkPath    = "Assets/_Project/Sounds/SFX/bawk-bawk.mp3";
@@ -68,6 +65,40 @@ namespace FarmSimVR.Editor
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log("[ChickenGameSceneBuilder] ChickenGame scene built and saved.");
+        }
+
+        /// <summary>
+        /// Adds or replaces <c>Environment/FenceRing</c> in the <b>active</b> scene only — does not delete
+        /// other objects. Use this when you already have a Chicken Game scene open and do not want
+        /// <see cref="BuildScene"/> (which wipes the scene and rebuilds everything from scratch).
+        /// </summary>
+        [MenuItem("FarmSim/Add Chicken Game Fence Ring (current scene)")]
+        public static void AddFenceRingToCurrentScene()
+        {
+            var scene = EditorSceneManager.GetActiveScene();
+            if (!scene.IsValid() || !scene.isLoaded)
+            {
+                Debug.LogWarning("[ChickenGameSceneBuilder] No valid active scene.");
+                return;
+            }
+
+            Transform parent;
+            var env = GameObject.Find("Environment");
+            if (env != null)
+                parent = env.transform;
+            else
+            {
+                var go = new GameObject("Environment");
+                parent = go.transform;
+            }
+
+            var existing = parent.Find("FenceRing");
+            if (existing != null)
+                Object.DestroyImmediate(existing.gameObject);
+
+            PlaceCircularFence(parent);
+            EditorSceneManager.MarkSceneDirty(scene);
+            Debug.Log("[ChickenGameSceneBuilder] Fence ring added under Environment.");
         }
 
         // ── Lighting ─────────────────────────────────────────────────────────
@@ -107,8 +138,8 @@ namespace FarmSimVR.Editor
 
             PlaceGround(env.transform);
             AddGroundCollider(env.transform);
-            PlaceFence(env.transform);
             PlaceWallColliders(env.transform);
+            PlaceCircularFence(env.transform);
             PlaceProps(env.transform);
         }
 
@@ -178,93 +209,6 @@ namespace FarmSimVR.Editor
             }
         }
 
-        static void PlaceFence(Transform parent)
-        {
-            var fenceModel  = AssetDatabase.LoadAssetAtPath<GameObject>(FencePath);
-            var polePrefab  = AssetDatabase.LoadAssetAtPath<GameObject>(FencePolePath);
-            var gatePrefab  = AssetDatabase.LoadAssetAtPath<GameObject>(FenceGatePath);
-
-            var fenceParent = new GameObject("Fences");
-            fenceParent.transform.SetParent(parent);
-
-            var panelCombines = new List<CombineInstance>();
-
-            // Square pen — four straight walls, corners at ±PenHalf
-            // faceAngle: the Y-rotation that makes the panel face INWARD
-            //   South wall (z=-PenHalf): faces +Z → 0°
-            //   East  wall (x=+PenHalf): faces -X → 270°
-            //   North wall (z=+PenHalf): faces -Z → 180°
-            //   West  wall (x=-PenHalf): faces +X → 90°
-            PlaceWall(fenceParent.transform, fenceModel, polePrefab, gatePrefab, panelCombines,
-                new Vector3(-PenHalf, 0, -PenHalf), new Vector3(PenHalf, 0, -PenHalf),   0f, addGate: true);
-            PlaceWall(fenceParent.transform, fenceModel, polePrefab, null, panelCombines,
-                new Vector3( PenHalf, 0, -PenHalf), new Vector3(PenHalf, 0,  PenHalf), 270f, addGate: false);
-            PlaceWall(fenceParent.transform, fenceModel, polePrefab, null, panelCombines,
-                new Vector3( PenHalf, 0,  PenHalf), new Vector3(-PenHalf, 0, PenHalf), 180f, addGate: false);
-            PlaceWall(fenceParent.transform, fenceModel, polePrefab, null, panelCombines,
-                new Vector3(-PenHalf, 0,  PenHalf), new Vector3(-PenHalf, 0, -PenHalf),  90f, addGate: false);
-
-            ChickenGameFenceCombiner.CreateCombinedFencePanels(
-                fenceParent.transform, panelCombines, fenceModel, "Fence_Combined");
-        }
-
-        static void PlaceWall(Transform parent, GameObject fencePrefab, GameObject polePrefab,
-            GameObject gatePrefab, List<CombineInstance> panelCombines, Vector3 start, Vector3 end,
-            float faceAngle, bool addGate)
-        {
-            // Corner post at the start of this wall
-            if (polePrefab != null)
-            {
-                var corner = (GameObject)PrefabUtility.InstantiatePrefab(polePrefab, parent);
-                corner.transform.SetPositionAndRotation(start, Quaternion.Euler(0f, faceAngle, 0f));
-            }
-
-            if (fencePrefab == null) return;
-
-            float wallLength = Vector3.Distance(start, end);
-            Vector3 dir      = (end - start).normalized;
-            var rot          = Quaternion.Euler(0f, faceAngle, 0f);
-
-            // SM_Prop_Fence_Wood_01: pivot at right edge, extends 2.5 units left in local -X.
-            // Panels must be placed going END→START so each panel fills from its pivot
-            // backward, tiling correctly along the wall.
-            const float PanelWidth = 2.5f;
-            int   count            = Mathf.CeilToInt(wallLength / PanelWidth); // 5 for 12-unit wall
-            float step             = wallLength / count;                        // 2.4
-
-            // Gate centred at wall midpoint
-            var wallMid = (start + end) * 0.5f;
-            if (addGate && gatePrefab != null)
-            {
-                var gate = (GameObject)PrefabUtility.InstantiatePrefab(gatePrefab, parent);
-                gate.transform.SetPositionAndRotation(wallMid, rot);
-            }
-            const float GateHalfW = 1.5f; // 3-unit clear zone for the gate
-
-            for (int i = 0; i < count; i++)
-            {
-                // Pivot placed from end back toward start
-                Vector3 pos = start + dir * (wallLength - step * i);
-                pos.y = 0f;
-
-                // Skip panels whose pivot falls inside the gate exclusion zone
-                if (addGate)
-                {
-                    float t = Vector3.Dot(pos - wallMid, dir);
-                    if (Mathf.Abs(t) < GateHalfW + PanelWidth * 0.5f) continue;
-                }
-
-                ChickenGameFenceCombiner.AppendPrefabAtWorldPose(fencePrefab, pos, rot, panelCombines);
-
-                // Mid-pole every 2 panels
-                if (polePrefab != null && i > 0 && i % 2 == 0)
-                {
-                    var mp  = (GameObject)PrefabUtility.InstantiatePrefab(polePrefab, parent);
-                    mp.transform.SetPositionAndRotation(pos, rot);
-                }
-            }
-        }
-
         static void PlaceWallColliders(Transform parent)
         {
             var walls = new GameObject("InvisibleWalls");
@@ -290,12 +234,47 @@ namespace FarmSimVR.Editor
             }
         }
 
+        /// <summary>
+        /// Curved Synty fence segments in a ring at the pen edge (visual only — colliders stripped so
+        /// <see cref="PlaceWallColliders"/> remains the gameplay boundary).
+        /// </summary>
+        static void PlaceCircularFence(Transform parent)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(FenceRoundPath);
+            if (prefab == null)
+                return;
+
+            var root = new GameObject("FenceRing");
+            root.transform.SetParent(parent);
+            root.transform.localPosition = Vector3.zero;
+
+            const int segments = 12;
+            var center = Vector3.zero;
+            for (int i = 0; i < segments; i++)
+            {
+                float angleDeg = i * (360f / segments);
+                float rad      = angleDeg * Mathf.Deg2Rad;
+                var pos = center + new Vector3(
+                    Mathf.Sin(rad) * PenHalf,
+                    0f,
+                    Mathf.Cos(rad) * PenHalf);
+                var rot = Quaternion.Euler(0f, angleDeg, 0f);
+
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab, root.transform);
+                inst.name = $"Fence_{i:00}";
+                inst.transform.SetPositionAndRotation(pos, rot);
+
+                foreach (var col in inst.GetComponentsInChildren<Collider>())
+                    Object.DestroyImmediate(col);
+            }
+        }
+
         static void PlaceProps(Transform parent)
         {
             var props = new GameObject("Props");
             props.transform.SetParent(parent);
 
-            // Chicken coop — just outside the fence
+            // Chicken coop — arena edge
             var coopPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(CoopPath);
             if (coopPrefab != null)
             {

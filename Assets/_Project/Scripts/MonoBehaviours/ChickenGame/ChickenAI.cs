@@ -11,9 +11,14 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         [SerializeField] public float catchRadius = 1.5f;
 
         [Header("Speed")]
-        [SerializeField] public float wanderSpeed = 1.5f;
-        [SerializeField] public float fleeSpeed = 4.2f;
-        [SerializeField] public float panicSpeed = 5.8f;
+        [SerializeField] public float wanderSpeed = 1.65f;
+        [SerializeField] public float fleeSpeed = 4.62f;
+        [SerializeField] public float panicSpeed = 6.38f;
+
+        [Header("Hop (visual child)")]
+        [SerializeField] private float hopAmplitude = 0.1f;
+        [SerializeField] private float hopFrequencyPerUnitSpeed = 18f;
+        [SerializeField] private float hopSpeedThreshold = 0.08f;
 
         [Header("Behaviour")]
         [SerializeField] public float arenaRadius = 10f;
@@ -47,9 +52,18 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         private const float DirectionSmoothTime = 0.08f;
         private const float CarryLerpSpeed = 18f;
 
+        private Transform _visual;
+        private Vector3 _visualBaseLocalPos;
+        private float _hopPhase;
+
         private void Awake()
         {
             _cc = GetComponent<CharacterController>();
+            if (transform.childCount > 0)
+            {
+                _visual = transform.GetChild(0);
+                _visualBaseLocalPos = _visual.localPosition;
+            }
         }
 
         private void Start()
@@ -57,6 +71,27 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             var playerGO = GameObject.FindGameObjectWithTag("Player");
             if (playerGO != null) _player = playerGO.transform;
             PickNewWanderTarget();
+        }
+
+        private void LateUpdate()
+        {
+            if (_visual == null)
+                return;
+            if (IsCaught || IsStunned || _player == null)
+            {
+                ResetVisualBob();
+                return;
+            }
+
+            if (_currentSpeed < hopSpeedThreshold)
+            {
+                ResetVisualBob();
+                return;
+            }
+
+            _hopPhase += _currentSpeed * hopFrequencyPerUnitSpeed * Time.deltaTime;
+            float y = Mathf.Sin(_hopPhase) * hopAmplitude;
+            _visual.localPosition = _visualBaseLocalPos + new Vector3(0f, y, 0f);
         }
 
         private void Update()
@@ -119,6 +154,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             _currentSpeed     = 0f;
             _currentMoveDir   = Vector3.zero;
             PickNewWanderTarget();
+            ResetVisualBob();
         }
 
         /// <summary>Attaches the chicken to the player's carry position and disables physics movement.</summary>
@@ -128,6 +164,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             _carriedBy    = carrier;
             _stunnedTimer = 0f;
             _cc.enabled   = false;
+            ResetVisualBob();
         }
 
         /// <summary>Releases the chicken and triggers a frightened flee burst.</summary>
@@ -259,6 +296,14 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             if (_carriedBy == null) return;
             Vector3 target = _carriedBy.position + _carriedBy.forward * 0.5f + Vector3.up * 0.7f;
             transform.position = Vector3.Lerp(transform.position, target, CarryLerpSpeed * Time.deltaTime);
+        }
+
+        private void ResetVisualBob()
+        {
+            if (_visual == null)
+                return;
+            _hopPhase = 0f;
+            _visual.localPosition = _visualBaseLocalPos;
         }
     }
 }

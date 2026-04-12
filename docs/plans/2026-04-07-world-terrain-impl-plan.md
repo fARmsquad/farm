@@ -15,6 +15,7 @@
 ## Task 1: Create WorldSceneBuilder skeleton + test
 
 **Files:**
+
 - Create: `Assets/_Project/Editor/WorldSceneBuilder.cs`
 - Test: `Assets/Tests/EditMode/WorldSceneBuilderTests.cs`
 
@@ -196,6 +197,7 @@ git commit -m "feat(world): add WorldSceneBuilder skeleton with zone constants"
 ## Task 2: BuildSceneConfig — Lighting, fog, camera, reflection probe
 
 **Files:**
+
 - Modify: `Assets/_Project/Editor/WorldSceneBuilder.cs`
 
 **Step 1: Write the failing test**
@@ -301,6 +303,7 @@ git commit -m "feat(world): implement BuildSceneConfig with Synty-style fog and 
 ## Task 3: BuildTerrain — Unity Terrain with 7 texture layers + elevation
 
 **Files:**
+
 - Modify: `Assets/_Project/Editor/WorldSceneBuilder.cs`
 
 **Step 1: Write the failing test**
@@ -531,6 +534,7 @@ git commit -m "feat(world): implement terrain with 7 texture layers and elevatio
 ## Task 4: BuildZoneHierarchy — Empty zone parents with BoxCollider triggers
 
 **Files:**
+
 - Modify: `Assets/_Project/Editor/WorldSceneBuilder.cs`
 
 **Step 1: Implement BuildZoneHierarchy**
@@ -588,6 +592,7 @@ git commit -m "feat(world): add zone hierarchy with trigger colliders"
 ## Task 5: BuildWater — River, creek, farm pond
 
 **Files:**
+
 - Modify: `Assets/_Project/Editor/WorldSceneBuilder.cs`
 
 **Step 1: Write the failing test**
@@ -709,6 +714,7 @@ git commit -m "feat(world): add river, creek, farm pond with bank edges and reed
 ## Task 6: BuildPaths — Dirt/gravel road prefab chains
 
 **Files:**
+
 - Modify: `Assets/_Project/Editor/WorldSceneBuilder.cs`
 
 **Step 1: Implement BuildPaths**
@@ -796,6 +802,7 @@ git commit -m "feat(world): add road/path network with gravel and dirt prefabs"
 ## Task 7: BuildFarmZone — Buildings, pen, plots, pasture, props
 
 **Files:**
+
 - Modify: `Assets/_Project/Editor/WorldSceneBuilder.cs`
 
 This is the largest task. Implement in one method with clear sections.
@@ -975,6 +982,7 @@ git commit -m "feat(world): populate farm zone with buildings, pen, plots, pastu
 ## Task 8: BuildTownZone — Buildings, Main Street furniture, props
 
 **Files:**
+
 - Modify: `Assets/_Project/Editor/WorldSceneBuilder.cs`
 
 **Step 1: Implement BuildTownZone**
@@ -1098,6 +1106,7 @@ git commit -m "feat(world): populate town zone with buildings, Main Street, and 
 ## Task 9: BuildUnpopulatedZones — Markers + minimal vegetation
 
 **Files:**
+
 - Modify: `Assets/_Project/Editor/WorldSceneBuilder.cs`
 
 **Step 1: Implement**
@@ -1210,6 +1219,7 @@ git commit -m "feat(world): add markers and boundaries for unpopulated zones"
 ## Task 10: BuildVegetation — World-scattered trees, grass, rocks
 
 **Files:**
+
 - Modify: `Assets/_Project/Editor/WorldSceneBuilder.cs`
 
 **Step 1: Implement**
@@ -1391,6 +1401,7 @@ git commit -m "feat(world): scatter world vegetation with deterministic seeding"
 ## Task 11: BuildFX + BuildMarkers — Atmosphere and spawn points
 
 **Files:**
+
 - Modify: `Assets/_Project/Editor/WorldSceneBuilder.cs`
 
 **Step 1: Implement**
@@ -1446,18 +1457,19 @@ Expected: ALL PASS
 **Step 2: Open Unity Editor, run FarmSim > Build World Scene (New)**
 
 Visual verification checklist:
-- [ ] Terrain renders with correct textures per zone
-- [ ] Fog fades world edges to golden haze
-- [ ] River water planes visible in carved channel
-- [ ] Creek crossing with bridge in trail zone
-- [ ] Farm buildings present and correctly positioned
-- [ ] Circular pen visible
-- [ ] Crop plots with dirt rows visible
-- [ ] Town buildings along Main Street
-- [ ] Gravel road visible through town
-- [ ] Dirt trail connecting town to farm
-- [ ] Zone markers present in hierarchy
-- [ ] No magenta (missing prefab) cubes
+
+- Terrain renders with correct textures per zone
+- Fog fades world edges to golden haze
+- River water planes visible in carved channel
+- Creek crossing with bridge in trail zone
+- Farm buildings present and correctly positioned
+- Circular pen visible
+- Crop plots with dirt rows visible
+- Town buildings along Main Street
+- Gravel road visible through town
+- Dirt trail connecting town to farm
+- Zone markers present in hierarchy
+- No magenta (missing prefab) cubes
 
 **Step 3: Commit the generated scene**
 
@@ -1478,18 +1490,21 @@ Expected: All gates pass (or warnings only for PlayMode which is empty)
 
 ## Task Summary
 
-| # | Task | Commits | Est. Lines |
-|---|------|---------|-----------|
-| 1 | WorldSceneBuilder skeleton + test | 1 | ~80 |
-| 2 | BuildSceneConfig (lighting, fog) | 1 | ~60 |
-| 3 | BuildTerrain (7 layers + elevation) | 1 | ~120 |
-| 4 | BuildZoneHierarchy (9 zones) | 1 | ~40 |
-| 5 | BuildWater (river, creek, pond) | 1 | ~70 |
-| 6 | BuildPaths (roads) | 1 | ~60 |
-| 7 | BuildFarmZone (buildings, pen, plots) | 1 | ~150 |
-| 8 | BuildTownZone (buildings, street) | 1 | ~120 |
-| 9 | BuildUnpopulatedZones (markers) | 1 | ~80 |
-| 10 | BuildVegetation (trees, grass, rocks) | 1 | ~140 |
-| 11 | BuildFX + BuildMarkers | 1 | ~30 |
-| 12 | Validation + scene generation | 1 | ~0 (testing) |
-| **Total** | | **12 commits** | **~950 lines** |
+
+| #         | Task                                  | Commits        | Est. Lines     |
+| --------- | ------------------------------------- | -------------- | -------------- |
+| 1         | WorldSceneBuilder skeleton + test     | 1              | ~80            |
+| 2         | BuildSceneConfig (lighting, fog)      | 1              | ~60            |
+| 3         | BuildTerrain (7 layers + elevation)   | 1              | ~120           |
+| 4         | BuildZoneHierarchy (9 zones)          | 1              | ~40            |
+| 5         | BuildWater (river, creek, pond)       | 1              | ~70            |
+| 6         | BuildPaths (roads)                    | 1              | ~60            |
+| 7         | BuildFarmZone (buildings, pen, plots) | 1              | ~150           |
+| 8         | BuildTownZone (buildings, street)     | 1              | ~120           |
+| 9         | BuildUnpopulatedZones (markers)       | 1              | ~80            |
+| 10        | BuildVegetation (trees, grass, rocks) | 1              | ~140           |
+| 11        | BuildFX + BuildMarkers                | 1              | ~30            |
+| 12        | Validation + scene generation         | 1              | ~0 (testing)   |
+| **Total** |                                       | **12 commits** | **~950 lines** |
+
+
