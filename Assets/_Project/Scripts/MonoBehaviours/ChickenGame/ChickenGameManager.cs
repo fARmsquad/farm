@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,6 +16,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         [SerializeField] public ChickenAI chicken;
         [SerializeField] public Transform player;
         [SerializeField] private Transform _coopTransform;
+        [SerializeField] private ChickenGameUI _ui;
 
         private ChickenGameSceneAudio _sceneAudio;
 
@@ -28,6 +30,12 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         [Header("Coop")]
         [SerializeField] private float coopDropRadius = 1.5f;
 
+        [Header("Win celebration")]
+        [SerializeField] private float winOverheadHeight   = 16f;
+        [SerializeField] private float winSwoopDuration    = 1.15f;
+        [SerializeField] private float winHoldAfterSwoop   = 0.4f;
+        [SerializeField] private AnimationCurve winSwoopEase = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
         private ChickenPlayerController _playerController;
         private float _timeRemaining;
         private bool  _gameOver;
@@ -39,9 +47,17 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         private Keyboard _keyboard;
         private Mouse    _mouse;
 
+        private bool _winCelebrationActive;
+        private bool _cameraDetached;
+        private Transform   _camStoredParent;
+        private Vector3     _camStoredLocalPos;
+        private Quaternion  _camStoredLocalRot;
+
         private void Awake()
         {
             TryGetComponent(out _sceneAudio);
+            if (winSwoopEase == null || winSwoopEase.length == 0)
+                winSwoopEase = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
         }
 
         private void Start()
@@ -71,6 +87,9 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
                 return;
             }
 
+            if (_winCelebrationActive)
+                return;
+
             _timeRemaining -= Time.deltaTime;
 
             if (_isHoldingChicken)
@@ -94,6 +113,9 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
 
         /// <summary>True once the game has ended (win or lose).</summary>
         public bool IsGameOver => _gameOver;
+
+        /// <summary>True while the overhead win sequence is playing (before <see cref="IsGameOver"/>).</summary>
+        public bool IsWinCelebration => _winCelebrationActive;
 
         /// <summary>True if the last game ended with the chicken dropped in the coop.</summary>
         public bool IsWon { get; private set; }
@@ -153,8 +175,94 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
 
         private void CheckCoopDrop()
         {
-            if (IsNearCoop())
-                EndGame(won: true);
+            if (!IsNearCoop())
+                return;
+
+            _winCelebrationActive = true;
+            StartCoroutine(WinCelebrationSequence());
+        }
+
+        private IEnumerator WinCelebrationSequence()
+        {
+            if (_isHoldingChicken && chicken != null)
+            {
+                _isHoldingChicken = false;
+                _gripMeter        = 0f;
+                chicken.Drop();
+                chicken.enabled = false;
+            }
+
+            if (_playerController != null)
+                _playerController.SetCelebrationFrozen(true);
+
+            if (_sceneAudio != null)
+                _sceneAudio.PlayVictory();
+
+            Camera fpCam = _playerController != null ? _playerController.fpCamera : null;
+            if (fpCam != null && _coopTransform != null)
+            {
+                Transform camTf = fpCam.transform;
+                _camStoredParent     = camTf.parent;
+                _camStoredLocalPos   = camTf.localPosition;
+                _camStoredLocalRot   = camTf.localRotation;
+                _cameraDetached      = true;
+
+                Vector3 startWorldPos = camTf.position;
+                Quaternion startWorldRot = camTf.rotation;
+
+                Vector3 focus = _coopTransform.position + Vector3.up * 0.6f;
+                Vector3 endPos = focus + Vector3.up * winOverheadHeight;
+                Vector3 lookDir = focus - endPos;
+                Quaternion endRot = lookDir.sqrMagnitude > 0.0001f
+                    ? Quaternion.LookRotation(lookDir.normalized, Vector3.up)
+                    : Quaternion.Euler(90f, 0f, 0f);
+
+                camTf.SetParent(null);
+
+                float swoop = Mathf.Max(0.05f, winSwoopDuration);
+                float elapsed = 0f;
+                while (elapsed < swoop)
+                {
+                    elapsed += Time.deltaTime;
+                    float u = winSwoopEase.Evaluate(Mathf.Clamp01(elapsed / swoop));
+                    camTf.position = Vector3.Lerp(startWorldPos, endPos, u);
+                    camTf.rotation = Quaternion.Slerp(startWorldRot, endRot, u);
+                    yield return null;
+                }
+
+                camTf.SetPositionAndRotation(endPos, endRot);
+            }
+
+            if (_ui != null)
+                yield return StartCoroutine(_ui.PlayVictoryCatchPhrase());
+            else
+                yield return new WaitForSeconds(0.55f);
+
+            float hold = Mathf.Max(0f, winHoldAfterSwoop);
+            if (hold > 0f)
+                yield return new WaitForSeconds(hold);
+
+            RestoreCelebrationCamera();
+            _winCelebrationActive = false;
+
+            EndGame(won: true);
+        }
+
+        private void RestoreCelebrationCamera()
+        {
+            if (!_cameraDetached || _playerController == null || _playerController.fpCamera == null)
+                return;
+
+            Transform camTf = _playerController.fpCamera.transform;
+            if (_camStoredParent != null)
+            {
+                camTf.SetParent(_camStoredParent);
+                camTf.localPosition = _camStoredLocalPos;
+                camTf.localRotation = _camStoredLocalRot;
+            }
+
+            _cameraDetached = false;
+            _camStoredParent = null;
         }
 
         private void CatchChicken()
@@ -205,6 +313,9 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
 
         private void RestartGame()
         {
+            RestoreCelebrationCamera();
+            _winCelebrationActive = false;
+
             _gameOver         = false;
             IsWon             = false;
             _isHoldingChicken = false;
@@ -227,6 +338,9 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
 
             if (_playerController != null)
                 _playerController.ResetState();
+
+            if (_ui != null)
+                _ui.ResetUI();
         }
     }
 }

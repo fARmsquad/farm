@@ -45,6 +45,7 @@ namespace FarmSimVR.Editor
         private const string MusicBanjoPath = "Assets/_Project/Sounds/Music/banjo-fast.mp3";
         private const string SpeechGrabPath = "Assets/_Project/Sounds/Speech/you-aint-gettin-away.mp3";
         private const string SpeechDropPath = "Assets/_Project/Sounds/Speech/i-aint-cluckin-around.mp3";
+        private const string SfxVictoryPath = "Assets/_Project/Sounds/SFX/victory.mp3";
 
         [MenuItem("FarmSim/Build Chicken Game Scene")]
         public static void BuildScene()
@@ -415,6 +416,8 @@ namespace FarmSimVR.Editor
                 AssetDatabase.LoadAssetAtPath<AudioClip>(SpeechGrabPath);
             audioSo.FindProperty("_dropClip").objectReferenceValue =
                 AssetDatabase.LoadAssetAtPath<AudioClip>(SpeechDropPath);
+            audioSo.FindProperty("_victoryClip").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<AudioClip>(SfxVictoryPath);
             audioSo.ApplyModifiedProperties();
         }
 

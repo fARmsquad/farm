@@ -12,9 +12,11 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         [SerializeField] private AudioClip _musicClip;
         [SerializeField] private AudioClip _grabClip;
         [SerializeField] private AudioClip _dropClip;
+        [SerializeField] private AudioClip _victoryClip;
 
         private AudioSource _musicSource;
         private AudioSource _voiceSource;
+        private AudioSource _sfxSource;
 
         private void Awake()
         {
@@ -27,6 +29,11 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             _voiceSource.playOnAwake = false;
             _voiceSource.loop = false;
             _voiceSource.spatialBlend = 0f;
+
+            _sfxSource = gameObject.AddComponent<AudioSource>();
+            _sfxSource.playOnAwake = false;
+            _sfxSource.loop = false;
+            _sfxSource.spatialBlend = 0f;
         }
 
         private void Start()
@@ -51,6 +58,12 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         {
             if (_dropClip != null)
                 _voiceSource.PlayOneShot(_dropClip);
+        }
+
+        public void PlayVictory()
+        {
+            if (_victoryClip != null)
+                _sfxSource.PlayOneShot(_victoryClip, 1f);
         }
     }
 }

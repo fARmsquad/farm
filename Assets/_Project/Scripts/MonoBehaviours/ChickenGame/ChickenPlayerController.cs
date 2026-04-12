@@ -47,6 +47,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         private float _stamina;
         private float _staminaRegenDelayTimer;
         private float _lungeMissTimer;
+        private bool  _celebrationFrozen;
 
         // Cached input devices — avoids per-frame property lookups
         private Keyboard _keyboard;
@@ -74,6 +75,9 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
 
         private void Update()
         {
+            if (_celebrationFrozen)
+                return;
+
             HandleCursorToggle();
             HandleMouseLook();
             HandleMovement();
@@ -91,11 +95,25 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         /// <summary>Resets stamina and any active penalties. Call this on game restart.</summary>
         public void ResetState()
         {
+            _celebrationFrozen        = false;
             _stamina                = maxStamina;
             _lungeMissTimer         = 0f;
             _staminaRegenDelayTimer = 0f;
             _smoothVelocity         = Vector3.zero;
             if (fpCamera != null) fpCamera.fieldOfView = _baseFov;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible   = false;
+        }
+
+        /// <summary>Freezes movement and look; unlocks cursor for the scripted camera.</summary>
+        public void SetCelebrationFrozen(bool frozen)
+        {
+            _celebrationFrozen = frozen;
+            if (frozen)
+            {
+                _smoothVelocity = Vector3.zero;
+                SetCursorLocked(false);
+            }
         }
 
         /// <summary>Called by ChickenGameManager when the game ends or restarts.</summary>

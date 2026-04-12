@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -27,6 +28,12 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         [Header("HUD — Grip Meter")]
         [SerializeField] private GameObject _gripMeterContainer;
         [SerializeField] private Image      _gripMeterFill;
+
+        [Header("Win celebration phrase")]
+        [SerializeField] private GameObject      _victoryPhraseRoot;
+        [SerializeField] private TextMeshProUGUI _victoryCatchPhrase;
+        [SerializeField] private RectTransform   _victoryCatchPhraseScaleRoot;
+        [SerializeField] private float             _victoryPhraseAnimDuration = 0.55f;
 
         [Header("Result Screen")]
         [SerializeField] private GameObject      _dimOverlay;
@@ -82,6 +89,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             if (_gripMeterContainer != null) _gripMeterContainer.SetActive(false);
             if (_dimOverlay         != null) _dimOverlay.SetActive(false);
             if (_resultPanel        != null) _resultPanel.SetActive(false);
+            if (_victoryPhraseRoot  != null) _victoryPhraseRoot.SetActive(false);
             if (_catchPromptText    != null) _catchPromptText.gameObject.SetActive(false);
             _wasGameOver = false;
             _lastTimerSec        = -1;
@@ -91,10 +99,42 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             _lastGripBucket      = -1;
         }
 
+        /// <summary>Elastic scale-in for the victory line; driven by the manager coroutine.</summary>
+        public IEnumerator PlayVictoryCatchPhrase()
+        {
+            if (_victoryCatchPhrase == null)
+                yield break;
+
+            if (_victoryPhraseRoot != null)
+                _victoryPhraseRoot.SetActive(true);
+
+            _victoryCatchPhrase.text = "CHICKEN CAUGHT!";
+            _victoryCatchPhrase.color = ColorWin;
+
+            Transform scaleTf = _victoryCatchPhraseScaleRoot != null
+                ? _victoryCatchPhraseScaleRoot
+                : _victoryCatchPhrase.transform;
+
+            float dur = Mathf.Max(0.05f, _victoryPhraseAnimDuration);
+            float t   = 0f;
+            while (t < dur)
+            {
+                t += Time.deltaTime;
+                float u = Mathf.Clamp01(t / dur);
+                // Overshoot ease-out (elastic-ish without extra deps)
+                float s = 1f + 0.22f * Mathf.Sin(u * Mathf.PI) * (1f - u);
+                float k = Mathf.SmoothStep(0.15f, 1f, u) * s;
+                scaleTf.localScale = new Vector3(k, k, 1f);
+                yield return null;
+            }
+
+            scaleTf.localScale = Vector3.one;
+        }
+
         private void UpdateTimer()
         {
             if (_timerContainer == null || _timerText == null) return;
-            bool active = !_manager.IsGameOver;
+            bool active = !_manager.IsGameOver && !_manager.IsWinCelebration;
             if (_timerContainer.activeSelf != active)
                 _timerContainer.SetActive(active);
             if (!active) return;
@@ -114,7 +154,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         {
             if (_catchPromptText == null) return;
 
-            if (_manager.IsGameOver)
+            if (_manager.IsGameOver || _manager.IsWinCelebration)
             {
                 if (_catchPromptText.gameObject.activeSelf)
                     _catchPromptText.gameObject.SetActive(false);
@@ -167,7 +207,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         private void UpdateHintBar()
         {
             if (_hintBar == null || _hintText == null) return;
-            bool show = !_manager.IsGameOver;
+            bool show = !_manager.IsGameOver && !_manager.IsWinCelebration;
             if (_hintBar.activeSelf != show)
                 _hintBar.SetActive(show);
             if (!show) return;
@@ -183,7 +223,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         private void UpdateGripMeter()
         {
             if (_gripMeterContainer == null) return;
-            bool holding = _manager.IsHoldingChicken && !_manager.IsGameOver;
+            bool holding = _manager.IsHoldingChicken && !_manager.IsGameOver && !_manager.IsWinCelebration;
             if (_gripMeterContainer.activeSelf != holding)
                 _gripMeterContainer.SetActive(holding);
             if (!holding || _gripMeterFill == null)
@@ -222,10 +262,13 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
 
             if (gameOver && !_wasGameOver)
             {
+                if (_victoryPhraseRoot != null)
+                    _victoryPhraseRoot.SetActive(false);
+
                 if (_manager.IsWon)
                 {
                     int elapsed = Mathf.CeilToInt(_manager.timeLimit - _manager.TimeRemaining);
-                    if (_resultText    != null) { _resultText.text = "COOP!"; _resultText.color = ColorWin; }
+                    if (_resultText    != null) { _resultText.text = "CHICKEN CAUGHT!"; _resultText.color = ColorWin; }
                     if (_resultSubText != null) _resultSubText.text = $"Dropped in <b>{elapsed}s</b>\n<size=28><color=#AAAAAA>SPACE to play again</color></size>";
                 }
                 else
