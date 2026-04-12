@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEditor;
@@ -174,8 +175,10 @@ namespace FarmSimVR.Editor
             var polePrefab  = AssetDatabase.LoadAssetAtPath<GameObject>(FencePolePath);
             var gatePrefab  = AssetDatabase.LoadAssetAtPath<GameObject>(FenceGatePath);
 
-            var fenceParent = new GameObject("Fence");
+            var fenceParent = new GameObject("Fences");
             fenceParent.transform.SetParent(parent);
+
+            var panelCombines = new List<CombineInstance>();
 
             // Square pen — four straight walls, corners at ±PenHalf
             // faceAngle: the Y-rotation that makes the panel face INWARD
@@ -183,18 +186,22 @@ namespace FarmSimVR.Editor
             //   East  wall (x=+PenHalf): faces -X → 270°
             //   North wall (z=+PenHalf): faces -Z → 180°
             //   West  wall (x=-PenHalf): faces +X → 90°
-            PlaceWall(fenceParent.transform, fenceModel, polePrefab, gatePrefab,
+            PlaceWall(fenceParent.transform, fenceModel, polePrefab, gatePrefab, panelCombines,
                 new Vector3(-PenHalf, 0, -PenHalf), new Vector3(PenHalf, 0, -PenHalf),   0f, addGate: true);
-            PlaceWall(fenceParent.transform, fenceModel, polePrefab, null,
+            PlaceWall(fenceParent.transform, fenceModel, polePrefab, null, panelCombines,
                 new Vector3( PenHalf, 0, -PenHalf), new Vector3(PenHalf, 0,  PenHalf), 270f, addGate: false);
-            PlaceWall(fenceParent.transform, fenceModel, polePrefab, null,
+            PlaceWall(fenceParent.transform, fenceModel, polePrefab, null, panelCombines,
                 new Vector3( PenHalf, 0,  PenHalf), new Vector3(-PenHalf, 0, PenHalf), 180f, addGate: false);
-            PlaceWall(fenceParent.transform, fenceModel, polePrefab, null,
+            PlaceWall(fenceParent.transform, fenceModel, polePrefab, null, panelCombines,
                 new Vector3(-PenHalf, 0,  PenHalf), new Vector3(-PenHalf, 0, -PenHalf),  90f, addGate: false);
+
+            ChickenGameFenceCombiner.CreateCombinedFencePanels(
+                fenceParent.transform, panelCombines, fenceModel, "Fence_Combined");
         }
 
         static void PlaceWall(Transform parent, GameObject fencePrefab, GameObject polePrefab,
-            GameObject gatePrefab, Vector3 start, Vector3 end, float faceAngle, bool addGate)
+            GameObject gatePrefab, List<CombineInstance> panelCombines, Vector3 start, Vector3 end,
+            float faceAngle, bool addGate)
         {
             // Corner post at the start of this wall
             if (polePrefab != null)
@@ -238,9 +245,7 @@ namespace FarmSimVR.Editor
                     if (Mathf.Abs(t) < GateHalfW + PanelWidth * 0.5f) continue;
                 }
 
-                var go = (GameObject)PrefabUtility.InstantiatePrefab(fencePrefab, parent);
-                go.name = "FencePanel";
-                go.transform.SetPositionAndRotation(pos, rot);
+                ChickenGameFenceCombiner.AppendPrefabAtWorldPose(fencePrefab, pos, rot, panelCombines);
 
                 // Mid-pole every 2 panels
                 if (polePrefab != null && i > 0 && i % 2 == 0)

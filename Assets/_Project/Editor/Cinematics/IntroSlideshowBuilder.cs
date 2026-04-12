@@ -10,7 +10,8 @@ namespace FarmSimVR.Editor.Cinematics
     /// <summary>
     /// Builds the illustrated slideshow for the Intro cutscene.
     /// Creates a full-screen SlideshowPanel under the existing Canvas, adds one
-    /// RawImage per illustration, then wires Activation Tracks (8 s each) into
+    /// RawImage per illustration (16:9 via AspectRatioFitter; RawImage has no preserveAspect),
+    /// then wires Activation Tracks (8 s each) into
     /// Intro.playable so the timeline controls visibility.
     ///
     /// Run via: FarmSimVR > Intro > Build Slideshow
@@ -80,6 +81,10 @@ namespace FarmSimVR.Editor.Cinematics
                 rect.anchorMax = Vector2.one;
                 rect.offsetMin = Vector2.zero;
                 rect.offsetMax = Vector2.zero;
+
+                var aspect = slideGO.AddComponent<AspectRatioFitter>();
+                aspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+                aspect.aspectRatio = 16f / 9f;
 
                 var rawImage         = slideGO.AddComponent<RawImage>();
                 rawImage.texture     = texture;

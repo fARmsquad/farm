@@ -1,19 +1,20 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace FarmSimVR.MonoBehaviours.Tutorial
 {
+    /// <summary>
+    /// Displays a placeholder cutscene with a title and body text,
+    /// then auto-advances to the next tutorial scene after a delay.
+    /// </summary>
     public sealed class TutorialCutsceneSceneController : MonoBehaviour
     {
-        private string _title = "Cutscene";
-        private string _body = "Placeholder";
-        private float _autoAdvanceDelay = 5f;
-        private float _sceneStartTime;
+        private string _title;
+        private string _body;
+        private float _autoAdvanceDelay;
+        private float _advanceAt = -1f;
         private GUIStyle _titleStyle;
         private GUIStyle _bodyStyle;
-        private GUIStyle _hintStyle;
         private bool _stylesReady;
-        private bool _advanceQueued;
 
         public void Configure(string title, string body, float autoAdvanceDelay)
         {
@@ -24,59 +25,32 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         private void Start()
         {
-            _sceneStartTime = Time.time;
-            var camera = Camera.main;
-            if (camera != null)
-                camera.backgroundColor = new Color(0.16f, 0.22f, 0.28f, 1f);
+            if (_autoAdvanceDelay > 0f)
+                _advanceAt = Time.time + _autoAdvanceDelay;
         }
 
         private void Update()
         {
-            if (_advanceQueued)
+            if (_advanceAt < 0f || Time.time < _advanceAt)
                 return;
 
-            var keyboard = Keyboard.current;
-            if (keyboard != null &&
-                (keyboard.enterKey.wasPressedThisFrame || keyboard.spaceKey.wasPressedThisFrame))
-            {
-                QueueAdvance();
-                return;
-            }
-
-            if (Time.time - _sceneStartTime >= _autoAdvanceDelay)
-                QueueAdvance();
+            _advanceAt = -1f;
+            TutorialFlowController.Instance?.CompleteCurrentSceneAndLoadNext();
         }
 
         private void OnGUI()
         {
             BuildStyles();
 
-            var width = Mathf.Min(720f, Screen.width - 80f);
-            var height = 250f;
-            var x = (Screen.width - width) * 0.5f;
-            var y = (Screen.height - height) * 0.5f;
-
-            GUI.color = new Color(0.03f, 0.04f, 0.05f, 0.86f);
-            GUI.DrawTexture(new Rect(x, y, width, height), Texture2D.whiteTexture);
+            GUI.color = new Color(0.04f, 0.05f, 0.04f, 0.85f);
+            GUI.DrawTexture(new Rect(18f, 120f, 400f, 100f), Texture2D.whiteTexture);
             GUI.color = Color.white;
 
-            GUI.Label(new Rect(x + 28f, y + 26f, width - 56f, 44f), _title, _titleStyle);
-            GUI.Label(new Rect(x + 28f, y + 88f, width - 56f, 96f), _body, _bodyStyle);
+            if (!string.IsNullOrEmpty(_title))
+                GUI.Label(new Rect(32f, 128f, 372f, 28f), _title, _titleStyle);
 
-            var countdown = Mathf.Max(0f, _autoAdvanceDelay - (Time.time - _sceneStartTime));
-            var hint = _advanceQueued
-                ? "Continuing..."
-                : $"Press Space or Enter to continue. Auto-advance in {countdown:0.0}s";
-            GUI.Label(new Rect(x + 28f, y + height - 46f, width - 56f, 24f), hint, _hintStyle);
-        }
-
-        private void QueueAdvance()
-        {
-            if (_advanceQueued)
-                return;
-
-            _advanceQueued = true;
-            TutorialFlowController.Instance?.CompleteCurrentSceneAndLoadNext();
+            if (!string.IsNullOrEmpty(_body))
+                GUI.Label(new Rect(32f, 158f, 372f, 52f), _body, _bodyStyle);
         }
 
         private void BuildStyles()
@@ -86,27 +60,18 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             _titleStyle = new GUIStyle(GUI.skin.label)
             {
-                fontSize = 28,
-                fontStyle = FontStyle.Bold,
-                alignment = TextAnchor.UpperCenter,
-                wordWrap = true
+                fontSize = 18,
+                fontStyle = FontStyle.Bold
             };
             _titleStyle.normal.textColor = Color.white;
 
             _bodyStyle = new GUIStyle(GUI.skin.label)
             {
-                fontSize = 18,
-                alignment = TextAnchor.UpperLeft,
+                fontSize = 14,
                 wordWrap = true
             };
-            _bodyStyle.normal.textColor = new Color(0.9f, 0.94f, 0.9f);
+            _bodyStyle.normal.textColor = new Color(0.9f, 0.9f, 0.9f);
 
-            _hintStyle = new GUIStyle(GUI.skin.label)
-            {
-                fontSize = 14,
-                alignment = TextAnchor.MiddleCenter
-            };
-            _hintStyle.normal.textColor = new Color(1f, 0.92f, 0.65f);
             _stylesReady = true;
         }
     }

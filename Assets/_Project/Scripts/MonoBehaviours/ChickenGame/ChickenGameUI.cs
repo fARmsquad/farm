@@ -45,6 +45,24 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
 
         private bool _wasGameOver;
 
+        // Cached HUD state — avoids TMP mesh rebuilds every frame (Editor play is sensitive to this).
+        private int  _lastTimerSec = -1;
+        private bool _lastTimerUrgent;
+        private bool? _lastHintWasHolding;
+
+        private enum CatchPromptKind
+        {
+            Invalid,
+            Hidden,
+            DropCoop,
+            CatchStunned,
+            CatchNormal,
+        }
+
+        private CatchPromptKind _catchPromptKind = CatchPromptKind.Invalid;
+        private float           _lastGripAnchor  = -1f;
+        private int             _lastGripBucket    = -1;
+
         private void Update()
         {
             if (_manager == null) return;
@@ -66,80 +84,141 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             if (_resultPanel        != null) _resultPanel.SetActive(false);
             if (_catchPromptText    != null) _catchPromptText.gameObject.SetActive(false);
             _wasGameOver = false;
+            _lastTimerSec        = -1;
+            _lastHintWasHolding  = null;
+            _catchPromptKind     = CatchPromptKind.Invalid;
+            _lastGripAnchor      = -1f;
+            _lastGripBucket      = -1;
         }
 
         private void UpdateTimer()
         {
             if (_timerContainer == null || _timerText == null) return;
             bool active = !_manager.IsGameOver;
-            _timerContainer.SetActive(active);
+            if (_timerContainer.activeSelf != active)
+                _timerContainer.SetActive(active);
             if (!active) return;
 
-            int secs         = Mathf.CeilToInt(_manager.TimeRemaining);
-            _timerText.text  = $"{secs}";
-            _timerText.color = _manager.TimeRemaining <= 10f ? ColorUrgent : ColorNormal;
+            int  secs   = Mathf.CeilToInt(_manager.TimeRemaining);
+            bool urgent = _manager.TimeRemaining <= 10f;
+            if (secs == _lastTimerSec && urgent == _lastTimerUrgent)
+                return;
+
+            _lastTimerSec    = secs;
+            _lastTimerUrgent = urgent;
+            _timerText.text  = secs.ToString();
+            _timerText.color = urgent ? ColorUrgent : ColorNormal;
         }
 
         private void UpdateCatchPrompt()
         {
-            if (_catchPromptText == null || _manager.IsGameOver) return;
+            if (_catchPromptText == null) return;
+
+            if (_manager.IsGameOver)
+            {
+                if (_catchPromptText.gameObject.activeSelf)
+                    _catchPromptText.gameObject.SetActive(false);
+                _catchPromptKind = CatchPromptKind.Hidden;
+                return;
+            }
 
             if (_manager.IsHoldingChicken)
             {
-                // Only show the prominent prompt when near the coop — the hint bar handles the rest
                 bool nearCoop = _manager.IsNearCoop();
-                _catchPromptText.gameObject.SetActive(nearCoop);
-                if (nearCoop)
+                if (!nearCoop)
                 {
+                    if (_catchPromptText.gameObject.activeSelf)
+                        _catchPromptText.gameObject.SetActive(false);
+                    _catchPromptKind = CatchPromptKind.Hidden;
+                    return;
+                }
+
+                if (_catchPromptKind != CatchPromptKind.DropCoop)
+                {
+                    _catchPromptText.gameObject.SetActive(true);
                     _catchPromptText.text  = "Drop in the coop!";
                     _catchPromptText.color = ColorWin;
+                    _catchPromptKind       = CatchPromptKind.DropCoop;
                 }
+
                 return;
             }
 
             bool inRange = _manager.IsInCatchRange();
-            _catchPromptText.gameObject.SetActive(inRange);
-            if (!inRange) return;
+            if (!inRange)
+            {
+                if (_catchPromptText.gameObject.activeSelf)
+                    _catchPromptText.gameObject.SetActive(false);
+                _catchPromptKind = CatchPromptKind.Hidden;
+                return;
+            }
 
-            _catchPromptText.text  = _manager.IsChickenStunned ? "It's stunned!  Press E!" : "Press E to catch!";
+            bool stunned = _manager.IsChickenStunned;
+            var  kind    = stunned ? CatchPromptKind.CatchStunned : CatchPromptKind.CatchNormal;
+            if (_catchPromptKind == kind && _catchPromptText.gameObject.activeSelf)
+                return;
+
+            _catchPromptText.gameObject.SetActive(true);
+            _catchPromptText.text  = stunned ? "It's stunned!  Press E!" : "Press E to catch!";
             _catchPromptText.color = ColorWarning;
+            _catchPromptKind       = kind;
         }
 
         private void UpdateHintBar()
         {
             if (_hintBar == null || _hintText == null) return;
             bool show = !_manager.IsGameOver;
-            _hintBar.SetActive(show);
+            if (_hintBar.activeSelf != show)
+                _hintBar.SetActive(show);
             if (!show) return;
 
-            _hintText.text = _manager.IsHoldingChicken ? HintHolding : HintChase;
+            bool holding = _manager.IsHoldingChicken;
+            if (_lastHintWasHolding.HasValue && _lastHintWasHolding.Value == holding)
+                return;
+
+            _lastHintWasHolding = holding;
+            _hintText.text      = holding ? HintHolding : HintChase;
         }
 
         private void UpdateGripMeter()
         {
             if (_gripMeterContainer == null) return;
             bool holding = _manager.IsHoldingChicken && !_manager.IsGameOver;
-            _gripMeterContainer.SetActive(holding);
-            if (!holding || _gripMeterFill == null) return;
+            if (_gripMeterContainer.activeSelf != holding)
+                _gripMeterContainer.SetActive(holding);
+            if (!holding || _gripMeterFill == null)
+            {
+                _lastGripAnchor = -1f;
+                _lastGripBucket = -1;
+                return;
+            }
 
             float grip = _manager.GripFraction;
 
             // Drive width via anchorMax so the rect physically shrinks left-to-right in real time.
-            // This works regardless of Image type or sprite assignment.
             RectTransform fillRect = _gripMeterFill.rectTransform;
-            fillRect.anchorMax = new Vector2(grip, fillRect.anchorMax.y);
+            if (!Mathf.Approximately(grip, _lastGripAnchor))
+            {
+                _lastGripAnchor = grip;
+                fillRect.anchorMax = new Vector2(grip, fillRect.anchorMax.y);
+            }
 
-            _gripMeterFill.color = grip > 0.5f  ? ColorWin
-                                 : grip > 0.25f ? ColorWarning
-                                 : ColorUrgent;
+            int bucket = grip > 0.5f ? 2 : grip > 0.25f ? 1 : 0;
+            if (_lastGripBucket != bucket)
+            {
+                _lastGripBucket = bucket;
+                _gripMeterFill.color = bucket == 2 ? ColorWin : bucket == 1 ? ColorWarning : ColorUrgent;
+            }
         }
 
         private void UpdateResultPanel()
         {
             if (_resultPanel == null) return;
             bool gameOver = _manager.IsGameOver;
-            _resultPanel.SetActive(gameOver);
-            if (_dimOverlay != null) _dimOverlay.SetActive(gameOver);
+            if (_resultPanel.activeSelf != gameOver)
+                _resultPanel.SetActive(gameOver);
+            if (_dimOverlay != null && _dimOverlay.activeSelf != gameOver)
+                _dimOverlay.SetActive(gameOver);
 
             if (gameOver && !_wasGameOver)
             {

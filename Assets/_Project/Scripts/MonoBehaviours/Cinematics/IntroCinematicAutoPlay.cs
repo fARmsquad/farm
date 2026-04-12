@@ -10,7 +10,6 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
     /// Starts the intro cutscene on Start by playing the PlayableDirector,
     /// which drives all cinematic events (camera, fades, subtitles, audio)
     /// through custom Timeline tracks.
-    /// Also activates SkipPrompt if present.
     /// </summary>
     public class IntroCinematicAutoPlay : MonoBehaviour
     {
@@ -20,17 +19,14 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         [SerializeField] private float playbackSpeed = TutorialDevTuning.IntroCutscenePlaybackSpeed;
 
         private PlayableDirector _director;
-        private SkipPrompt _skipPrompt;
         private SceneLoader _sceneLoader;
         private bool _completionHandled;
 
         private IEnumerator Start()
         {
-            // Wait one frame so all Awake/Start callbacks finish first
             yield return null;
 
             _director = GetComponent<PlayableDirector>();
-            _skipPrompt = GetComponent<SkipPrompt>();
             _sceneLoader = GetComponent<SceneLoader>();
 
             if (_director == null)
@@ -50,8 +46,6 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
             _director.stopped += HandleDirectorStopped;
 
-            _skipPrompt?.Activate();
-
             _director.Play();
             ApplyPlaybackSpeed();
         }
@@ -68,10 +62,6 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                 return;
 
             _completionHandled = true;
-
-            if (_skipPrompt != null)
-                _skipPrompt.Deactivate();
-
             _sceneLoader.LoadScene(completionSceneName);
         }
 

@@ -1,42 +1,25 @@
-using System;
-using System.Collections.Generic;
-
 namespace FarmSimVR.Core.Tutorial
 {
+    /// <summary>
+    /// Linear tutorial scene names and lookups (title / standalone scenes are named but not tutorial steps).
+    /// </summary>
     public static class TutorialSceneCatalog
     {
-        public const string TitleScreenSceneName = "TitleScreen";
         public const string IntroSceneName = "Intro";
         public const string ChickenGameSceneName = "ChickenGame";
-        public const string PostChickenCutsceneSceneName = "Tutorial_PostChickenCutscene";
-        public const string MidpointPlaceholderSceneName = "Tutorial_MidpointPlaceholder";
-        public const string FindToolsSceneName = "FindToolsGame";
-        public const string PreFarmCutsceneSceneName = "Tutorial_PreFarmCutscene";
+        public const string PostChickenCutsceneSceneName = "PostChickenCutscene";
+        public const string FindToolsSceneName = "PlayerGettingSeeds";
+        public const string MidpointPlaceholderSceneName = "MidpointPlaceholder";
+        public const string PreFarmCutsceneSceneName = "PreFarmCutscene";
         public const string FarmTutorialSceneName = "FarmMain";
 
-        private static readonly Dictionary<TutorialStep, string> StepToScene = new()
-        {
-            { TutorialStep.Intro, IntroSceneName },
-            { TutorialStep.ChickenHunt, ChickenGameSceneName },
-            { TutorialStep.PostChickenCutscene, PostChickenCutsceneSceneName },
-            { TutorialStep.MidpointPlaceholder, MidpointPlaceholderSceneName },
-            { TutorialStep.FindTools, FindToolsSceneName },
-            { TutorialStep.PreFarmCutscene, PreFarmCutsceneSceneName },
-            { TutorialStep.FarmTutorial, FarmTutorialSceneName },
-        };
+        /// <summary>Main menu; not a <see cref="TutorialStep"/>.</summary>
+        public const string TitleScreenSceneName = "TitleScreen";
 
-        private static readonly Dictionary<string, TutorialStep> SceneToStep = new(StringComparer.Ordinal)
-        {
-            { IntroSceneName, TutorialStep.Intro },
-            { ChickenGameSceneName, TutorialStep.ChickenHunt },
-            { PostChickenCutsceneSceneName, TutorialStep.PostChickenCutscene },
-            { MidpointPlaceholderSceneName, TutorialStep.MidpointPlaceholder },
-            { FindToolsSceneName, TutorialStep.FindTools },
-            { PreFarmCutsceneSceneName, TutorialStep.PreFarmCutscene },
-            { FarmTutorialSceneName, TutorialStep.FarmTutorial },
-        };
+        /// <summary>Top-down horse taming minigame (standalone; not in tutorial flow unless wired).</summary>
+        public const string HorseTamingSceneName = "HorseTaming";
 
-        public static IReadOnlyList<string> SceneOrder { get; } = new[]
+        public static readonly string[] SceneOrder =
         {
             IntroSceneName,
             ChickenGameSceneName,
@@ -49,43 +32,85 @@ namespace FarmSimVR.Core.Tutorial
 
         public static string GetSceneName(TutorialStep step)
         {
-            return StepToScene.TryGetValue(step, out var sceneName) ? sceneName : null;
+            switch (step)
+            {
+                case TutorialStep.Intro:
+                    return IntroSceneName;
+                case TutorialStep.ChickenHunt:
+                    return ChickenGameSceneName;
+                case TutorialStep.PostChickenCutscene:
+                    return PostChickenCutsceneSceneName;
+                case TutorialStep.MidpointPlaceholder:
+                    return MidpointPlaceholderSceneName;
+                case TutorialStep.FindTools:
+                    return FindToolsSceneName;
+                case TutorialStep.PreFarmCutscene:
+                    return PreFarmCutsceneSceneName;
+                case TutorialStep.FarmTutorial:
+                    return FarmTutorialSceneName;
+                default:
+                    return null;
+            }
         }
 
         public static TutorialStep GetStepForScene(string sceneName)
         {
-            if (string.IsNullOrWhiteSpace(sceneName))
+            if (string.IsNullOrEmpty(sceneName))
                 return TutorialStep.None;
 
-            return SceneToStep.TryGetValue(sceneName, out var step) ? step : TutorialStep.None;
+            if (sceneName == IntroSceneName) return TutorialStep.Intro;
+            if (sceneName == ChickenGameSceneName) return TutorialStep.ChickenHunt;
+            if (sceneName == PostChickenCutsceneSceneName) return TutorialStep.PostChickenCutscene;
+            if (sceneName == MidpointPlaceholderSceneName) return TutorialStep.MidpointPlaceholder;
+            if (sceneName == FindToolsSceneName) return TutorialStep.FindTools;
+            if (sceneName == PreFarmCutsceneSceneName) return TutorialStep.PreFarmCutscene;
+            if (sceneName == FarmTutorialSceneName) return TutorialStep.FarmTutorial;
+
+            return TutorialStep.None;
         }
 
         public static TutorialStep GetNextStep(TutorialStep step)
         {
-            return step switch
+            switch (step)
             {
-                TutorialStep.Intro => TutorialStep.ChickenHunt,
-                TutorialStep.ChickenHunt => TutorialStep.PostChickenCutscene,
-                TutorialStep.PostChickenCutscene => TutorialStep.MidpointPlaceholder,
-                TutorialStep.MidpointPlaceholder => TutorialStep.FindTools,
-                TutorialStep.FindTools => TutorialStep.PreFarmCutscene,
-                TutorialStep.PreFarmCutscene => TutorialStep.FarmTutorial,
-                _ => TutorialStep.None
-            };
+                case TutorialStep.Intro:
+                    return TutorialStep.ChickenHunt;
+                case TutorialStep.ChickenHunt:
+                    return TutorialStep.PostChickenCutscene;
+                case TutorialStep.PostChickenCutscene:
+                    return TutorialStep.MidpointPlaceholder;
+                case TutorialStep.MidpointPlaceholder:
+                    return TutorialStep.FindTools;
+                case TutorialStep.FindTools:
+                    return TutorialStep.PreFarmCutscene;
+                case TutorialStep.PreFarmCutscene:
+                    return TutorialStep.FarmTutorial;
+                case TutorialStep.FarmTutorial:
+                    return TutorialStep.None;
+                default:
+                    return TutorialStep.None;
+            }
         }
 
         public static TutorialStep GetPreviousStep(TutorialStep step)
         {
-            return step switch
+            switch (step)
             {
-                TutorialStep.ChickenHunt => TutorialStep.Intro,
-                TutorialStep.PostChickenCutscene => TutorialStep.ChickenHunt,
-                TutorialStep.MidpointPlaceholder => TutorialStep.PostChickenCutscene,
-                TutorialStep.FindTools => TutorialStep.MidpointPlaceholder,
-                TutorialStep.PreFarmCutscene => TutorialStep.FindTools,
-                TutorialStep.FarmTutorial => TutorialStep.PreFarmCutscene,
-                _ => TutorialStep.None
-            };
+                case TutorialStep.ChickenHunt:
+                    return TutorialStep.Intro;
+                case TutorialStep.PostChickenCutscene:
+                    return TutorialStep.ChickenHunt;
+                case TutorialStep.MidpointPlaceholder:
+                    return TutorialStep.PostChickenCutscene;
+                case TutorialStep.FindTools:
+                    return TutorialStep.MidpointPlaceholder;
+                case TutorialStep.PreFarmCutscene:
+                    return TutorialStep.FindTools;
+                case TutorialStep.FarmTutorial:
+                    return TutorialStep.PreFarmCutscene;
+                default:
+                    return TutorialStep.None;
+            }
         }
     }
 }

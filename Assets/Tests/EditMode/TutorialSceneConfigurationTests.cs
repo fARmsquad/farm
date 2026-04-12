@@ -61,13 +61,12 @@ namespace FarmSimVR.Tests.EditMode
         }
 
         [Test]
-        public void PlayModeStartScene_IsConfiguredToTitleScreen()
+        public void PlayModeStartScene_DoesNotForceFixedScene()
         {
-            var sceneAsset = PlayModeStartSceneConfigurator.Apply();
-
-            Assert.That(sceneAsset, Is.Not.Null);
-            Assert.That(EditorSceneManager.playModeStartScene, Is.SameAs(sceneAsset));
-            Assert.That(AssetDatabase.GetAssetPath(sceneAsset), Is.EqualTo(PlayModeStartSceneConfigurator.TitleScreenScenePath));
+            Assert.That(
+                EditorSceneManager.playModeStartScene,
+                Is.Null,
+                "Play Mode should use the scene open in the Editor, not a forced asset.");
         }
 
         [Test]
