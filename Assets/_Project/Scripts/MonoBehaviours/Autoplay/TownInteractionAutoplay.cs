@@ -6,19 +6,18 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
 {
     /// <summary>
     /// Autoplay controller for the Town scene.
-    /// Automatically walks the player toward the target NPC, triggers the opening
-    /// dialogue, then hands control to TownPlayerController for free exploration.
+    /// Automatically walks the player toward the target NPC, triggers an LLM
+    /// conversation, then hands control to TownPlayerController for free exploration.
     /// </summary>
     public class TownInteractionAutoplay : AutoplayBase
     {
-        private const float WalkSpeed       = 3.5f;
-        private const float ArrivalDistance = 2.5f;
-        private const float TurnSpeed       = 8f;
+        private const float WALK_SPEED      = 3.5f;
+        private const float ARRIVAL_DISTANCE = 2.5f;
+        private const float TURN_SPEED      = 8f;
 
         [SerializeField] private Transform playerTransform;
         [SerializeField] private NPCController targetNpc;
-        [SerializeField] private DialogueManager dialogueManager;
-        [SerializeField] private DialogueData conversationData;
+        [SerializeField] private LLMConversationController conversationController;
         [SerializeField] private TownPlayerController playerController;
 
         private CharacterController _characterController;
@@ -30,20 +29,20 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
             specTitle  = "Town Interaction – Autoplay";
             totalSteps = 4;
 
-            Step("Spotting the town person…");
+            Step("Spotting the town person...");
             yield return TurnTowardNpc(1.2f);
 
-            Step("Walking over to say hello…");
+            Step("Walking over to say hello...");
             yield return WalkToNpc();
 
-            Step("Pressing [E] to interact…");
+            Step("Pressing [E] to interact...");
             yield return new WaitForSeconds(0.6f);
 
-            if (dialogueManager != null && conversationData != null)
-                dialogueManager.StartDialogue(conversationData);
+            if (targetNpc != null)
+                targetNpc.TriggerInteraction();
 
-            Step("Having a chat…");
-            yield return WaitForDialogueEnd();
+            Step("Having a chat...");
+            yield return WaitForConversationEnd();
             yield return new WaitForSeconds(0.8f);
         }
 
@@ -83,7 +82,7 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
                 Vector3 toNpc = targetNpc.transform.position - playerTransform.position;
                 toNpc.y = 0f;
 
-                if (toNpc.magnitude <= ArrivalDistance) break;
+                if (toNpc.magnitude <= ARRIVAL_DISTANCE) break;
 
                 FaceTarget(targetNpc.transform.position);
                 MoveForward();
@@ -104,7 +103,7 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
 
             Quaternion target = Quaternion.LookRotation(dir);
             playerTransform.rotation = Quaternion.Slerp(
-                playerTransform.rotation, target, TurnSpeed * Time.deltaTime);
+                playerTransform.rotation, target, TURN_SPEED * Time.deltaTime);
         }
 
         private void MoveForward()
@@ -116,7 +115,7 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
             else
                 _verticalVelocity += Physics.gravity.y * Time.deltaTime;
 
-            Vector3 velocity = playerTransform.forward * WalkSpeed;
+            Vector3 velocity = playerTransform.forward * WALK_SPEED;
             velocity.y = _verticalVelocity;
 
             if (_characterController != null)
@@ -125,11 +124,11 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
                 playerTransform.position += velocity * Time.deltaTime;
         }
 
-        private IEnumerator WaitForDialogueEnd()
+        private IEnumerator WaitForConversationEnd()
         {
-            if (dialogueManager == null) { yield return new WaitForSeconds(5f); yield break; }
+            if (conversationController == null) { yield return new WaitForSeconds(5f); yield break; }
             yield return null;
-            while (dialogueManager.IsPlaying) yield return null;
+            while (conversationController.IsInConversation) yield return null;
         }
     }
 }

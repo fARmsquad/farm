@@ -36,6 +36,14 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         #region Public Properties
 
         public string NpcName => npcName;
+        public DialogueData DialogueData => dialogueData;
+
+        /// <summary>
+        /// Fired when the player presses E within range.
+        /// If this event has subscribers the legacy scripted dialogue is skipped —
+        /// the LLMConversationController handles the interaction instead.
+        /// </summary>
+        public event System.Action<NPCController> OnInteracted;
 
         public bool IsPlayerInRange
         {
@@ -81,8 +89,6 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             bool inRange = IsPlayerInRange;
 
             FacePlayer(inRange);
-            UpdatePrompt(inRange);
-            HandleInteraction(inRange);
         }
 
         #endregion
@@ -124,35 +130,47 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         private void HandleInteraction(bool inRange)
         {
             var kb = Keyboard.current;
-            if (kb == null) return;
+            if (kb == null || !kb.eKey.wasPressedThisFrame || !inRange) return;
 
-            if (!kb.eKey.wasPressedThisFrame) return;
-            if (!inRange) return;
-
-            if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying)
-                return;
-
-            if (dialogueData == null)
+            // LLM mode: delegate immediately — not gated by DialogueManager,
+            // since LLM conversations are entirely separate from scripted dialogue.
+            if (OnInteracted != null)
             {
-                Debug.LogWarning($"[NPCController] '{npcName}' has no DialogueData assigned.");
+                OnInteracted.Invoke(this);
                 return;
             }
 
-            DialogueManager.Instance.StartDialogue(dialogueData);
+            // Legacy fallback: play scripted DialogueData if no LLM subscriber
+            if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying) return;
+            if (dialogueData != null)
+                DialogueManager.Instance?.StartDialogue(dialogueData);
         }
 
         #endregion
 
         #region Public Methods
 
-        public void Activate()
-        {
-            gameObject.SetActive(true);
-        }
+        public void Activate()   => gameObject.SetActive(true);
+        public void Deactivate() => gameObject.SetActive(false);
 
-        public void Deactivate()
+        /// <summary>
+        /// Called by TownPlayerController when the player presses E within range.
+        /// Fires OnInteracted for LLM subscribers, or falls back to scripted dialogue.
+        /// </summary>
+        public void TriggerInteraction()
         {
-            gameObject.SetActive(false);
+            if (OnInteracted != null)
+            {
+                OnInteracted.Invoke(this);
+                return;
+            }
+
+            if (DialogueManager.Instance != null
+                && !DialogueManager.Instance.IsPlaying
+                && dialogueData != null)
+            {
+                DialogueManager.Instance.StartDialogue(dialogueData);
+            }
         }
 
         #endregion
