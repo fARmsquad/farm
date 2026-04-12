@@ -33,7 +33,13 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
             yield return RunDemo();
             finished = true;
             currentLabel = "Demo complete!";
+            OnDemoComplete();
         }
+
+        /// <summary>
+        /// Called once the demo coroutine finishes. Override to hand off control to the player.
+        /// </summary>
+        protected virtual void OnDemoComplete() { }
 
         protected void Step(string label)
         {
@@ -53,6 +59,7 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
 
         private void OnGUI()
         {
+            if (finished) return;  // hide HUD once player takes control
             // Top bar
             float barH = 56f;
             GUI.color = new Color(0f, 0f, 0f, 0.88f);
