@@ -62,7 +62,8 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                 return;
 
             _completionHandled = true;
-            _sceneLoader.LoadScene(completionSceneName);
+            var nextScene = StoryPackageRuntimeCatalog.GetNextSceneOrNull(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            _sceneLoader.LoadScene(string.IsNullOrWhiteSpace(nextScene) ? completionSceneName : nextScene);
         }
 
         private void ApplyPlaybackSpeed()

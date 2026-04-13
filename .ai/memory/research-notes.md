@@ -12,6 +12,7 @@ Codex agents (which have no internet) read this file to access research findings
 - [Starter Tool Discovery & Ability Unlocks](#research-starter-tool-discovery--ability-unlocks) — 2026-04-10
 - [Tutorial Title Screen Slice Launcher](#research-tutorial-title-screen-slice-launcher) — 2026-04-11
 - [Horse Training Title Slice](#research-horse-training-title-slice) — 2026-04-11
+- [Town NPC Text Streaming](#research-town-npc-text-streaming) — 2026-04-13
 
 ---
 
@@ -150,3 +151,72 @@ This preserves the repo's Core-first architecture, gives the title screen a real
 1. [Unity Manual: Character Controller component reference](https://docs.unity3d.com/Manual/class-CharacterController.html) — Supports staying on the current grounded first-person rig for the slice.
 2. [Unity Scripting API: SceneManager.LoadScene](https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadScene.html) — Supports title-screen launch wiring through a shared scene catalog and Build Settings.
 3. [Unity Scripting API: Collider.OnTriggerEnter](https://docs.unity3d.com/ScriptReference/Collider.OnTriggerEnter.html) — Supports trigger-driven checkpoint and pickup interactions for the training course.
+
+## Research: Town NPC Text Streaming
+**Date**: 2026-04-13
+**Queries**:
+- `OpenAI Responses API streaming text events`
+- `OpenAI Responses API structured outputs vs JSON mode`
+- `OpenAI Responses API previous_response_id conversation state`
+- `Unity DownloadHandlerScript ReceiveData UnityWebRequest`
+
+### Recommended Packages
+| Package | Source | Why | Status |
+|---------|--------|-----|--------|
+| `com.unity.modules.unitywebrequest` | `Packages/manifest.json` | Already installed HTTP transport for the Town scene client | In Use |
+| `com.unity.nuget.newtonsoft-json` | `Packages/manifest.json` | Already installed JSON parser better suited than ad hoc string slicing for final turn validation | In Use |
+| New OpenAI/streaming Unity package | Unity Registry/OpenUPM/GitHub package search | No clearly necessary package found for this narrow prototype slice; existing UnityWebRequest support is enough | Rejected for this slice |
+
+No new packages found - custom implementation on top of the existing UnityWebRequest and JSON packages is recommended.
+
+### Key Patterns Found
+- OpenAI's Responses API exposes explicit streaming lifecycle events for text generation, including `response.created`, `response.output_text.delta`, `response.completed`, and `error`. This is a better fit for a streamed NPC utterance than polling a full raw response buffer. Source: https://developers.openai.com/api/docs/guides/streaming-responses
+- OpenAI recommends the Responses API over the older Chat Completions API for new text generation work. Source: https://developers.openai.com/api/docs/guides/text#choosing-models-and-apis
+- When structured data is needed, OpenAI recommends Structured Outputs over JSON mode because schema adherence is stronger. Source: https://developers.openai.com/api/docs/guides/structured-outputs#structured-outputs-vs-json-mode
+- Unity's `DownloadHandlerScript` is the supported path when data must be handled incrementally as it arrives, and it can use a preallocated buffer to reduce garbage collection. Source: https://docs.unity3d.com/es/2017.4/Manual/UnityWebRequest-CreatingDownloadHandlers.html
+
+### Recommended Approach
+Use the Responses API for the visible NPC utterance stream, and parse server-sent events incrementally inside a dedicated Unity transport layer rather than in the UI. Treat the streamed text as one concern and any final structured turn payload as a second concern, so the Town scene never depends on partial JSON scraping to show words on screen.
+
+For this slice, keep the Unity runtime thin: use the already installed UnityWebRequest and JSON packages, keep one in-flight request at a time, and maintain conversation state locally in a bounded history object instead of turning the Town scene into the long-term narrative backend.
+
+### Code Reference
+```csharp
+request = BuildResponsesRequest(history, stream: true, store: false);
+
+transport.BeginStream(
+    request,
+    onEvent: evt =>
+    {
+        switch (evt.Type)
+        {
+            case StreamEventType.TextDelta:
+                conversation.AppendVisibleText(evt.TextDelta);
+                break;
+            case StreamEventType.Completed:
+                conversation.FinalizeTurn(evt.FinalText, evt.ValidatedOptions);
+                break;
+            case StreamEventType.Error:
+                conversation.FailTurn(evt.Message);
+                break;
+        }
+    });
+```
+
+### Gotchas & Pitfalls
+- Do not drive the visible UI by repeatedly scanning the entire accumulated raw stream for a `"response"` key. That produces avoidable allocations and makes the stream renderer depend on partial JSON syntax.
+- If JSON mode is used anywhere in the final turn payload path, the app still has to handle incomplete or malformed JSON. Structured Outputs are preferred when the model must return a typed payload.
+- `DownloadHandlerScript` callbacks run on Unity's main thread. Keep the parser lightweight and event-oriented; do not do heavy parsing or repeated full-buffer copies in `ReceiveData`.
+- `previous_response_id` is available for threaded conversations, but stored responses persist by default. For this prototype slice, a bounded local history plus an explicit storage choice should be part of the design instead of an accidental side effect.
+
+### Quest/Mobile Considerations
+- Text streaming itself is cheap; the real risk is per-token allocation, string rebuilding, and UI churn. Use a preallocated receive buffer and append-only visible text updates.
+- Keep only one active NPC stream at a time and cap local conversation history to a small fixed number of turns so request size does not grow without bound.
+- Reuse the existing Town dialogue canvas and TMP widgets; this feature should not add new heavy world-space canvases or per-frame scene scans.
+
+### Sources
+1. [OpenAI Streaming API responses](https://developers.openai.com/api/docs/guides/streaming-responses) — Defines the streaming lifecycle events to consume for visible text.
+2. [OpenAI Text generation: Choosing models and APIs](https://developers.openai.com/api/docs/guides/text#choosing-models-and-apis) — Recommends Responses over Chat Completions for new text-generation work.
+3. [OpenAI Structured Outputs vs JSON mode](https://developers.openai.com/api/docs/guides/structured-outputs#structured-outputs-vs-json-mode) — Explains why schema-validated output is safer than raw JSON mode.
+4. [OpenAI Conversation state](https://developers.openai.com/api/docs/guides/conversation-state#passing-context-from-the-previous-response) — Documents `previous_response_id` and the storage implications of threaded responses.
+5. [Unity Manual: Creating DownloadHandlers](https://docs.unity3d.com/es/2017.4/Manual/UnityWebRequest-CreatingDownloadHandlers.html) — Documents `DownloadHandlerScript`, `ReceiveData`, and preallocated buffers for incremental network handling.

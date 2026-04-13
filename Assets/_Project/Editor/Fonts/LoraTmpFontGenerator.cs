@@ -20,6 +20,9 @@ namespace FarmSimVR.Editor.Fonts
     {
         static LoraTmpFontBootstrap()
         {
+            if (Application.isBatchMode)
+                return;
+
             EditorApplication.delayCall += EnsureSdfExistsAfterLoad;
         }
 

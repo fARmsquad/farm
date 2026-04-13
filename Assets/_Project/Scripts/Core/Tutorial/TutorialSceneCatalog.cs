@@ -30,6 +30,26 @@ namespace FarmSimVR.Core.Tutorial
             FarmTutorialSceneName,
         };
 
+        public static string NormalizeRuntimeSceneName(string sceneName)
+        {
+            if (string.IsNullOrEmpty(sceneName))
+                return sceneName;
+
+            switch (sceneName)
+            {
+                case "Tutorial_PostChickenCutscene":
+                    return PostChickenCutsceneSceneName;
+                case "Tutorial_MidpointPlaceholder":
+                    return MidpointPlaceholderSceneName;
+                case "FindToolsGame":
+                    return FindToolsSceneName;
+                case "Tutorial_PreFarmCutscene":
+                    return PreFarmCutsceneSceneName;
+                default:
+                    return sceneName;
+            }
+        }
+
         public static string GetSceneName(TutorialStep step)
         {
             switch (step)
@@ -57,6 +77,8 @@ namespace FarmSimVR.Core.Tutorial
         {
             if (string.IsNullOrEmpty(sceneName))
                 return TutorialStep.None;
+
+            sceneName = NormalizeRuntimeSceneName(sceneName);
 
             if (sceneName == IntroSceneName) return TutorialStep.Intro;
             if (sceneName == ChickenGameSceneName) return TutorialStep.ChickenHunt;

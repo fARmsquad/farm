@@ -5,6 +5,7 @@
         "FarmSimVR.Core",
         "FarmSimVR.Editor",
         "FarmSimVR.MonoBehaviours",
+        "Unity.TextMeshPro",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

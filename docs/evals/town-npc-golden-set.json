@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "name": "town-npc-golden-set",
+  "feature": "TOWN-001",
+  "description": "Guardrails for Town NPC generations so prompt or model changes do not leak raw payload formatting back into the playable scene.",
+  "global_must_not_include": [
+    "\"response\":",
+    "\"options\":",
+    "```",
+    "assistant:",
+    "system:",
+    "user:"
+  ],
+  "cases": [
+    {
+      "id": "old-garrett-opening",
+      "npc": "Old Garrett",
+      "player_input": "[START_CONVERSATION]",
+      "must_include_any": ["village", "town", "farm", "story", "history"],
+      "max_sentences": 3
+    },
+    {
+      "id": "old-garrett-recipe",
+      "npc": "Old Garrett",
+      "player_input": "Can you share the recipe for the tomato pie?",
+      "must_include_all": ["tomato", "pie"],
+      "max_sentences": 3
+    },
+    {
+      "id": "mira-opening",
+      "npc": "Mira the Baker",
+      "player_input": "[START_CONVERSATION]",
+      "must_include_any": ["bakery", "bread", "oven", "dough", "flour"],
+      "max_sentences": 3
+    },
+    {
+      "id": "mira-local-ingredients",
+      "npc": "Mira the Baker",
+      "player_input": "What makes your baking special?",
+      "must_include_any": ["local", "ingredients", "mother", "farm", "bakery"],
+      "max_sentences": 3
+    },
+    {
+      "id": "young-pip-opening",
+      "npc": "Young Pip",
+      "player_input": "[START_CONVERSATION]",
+      "must_include_any": ["delivery", "deliveries", "village", "town", "adventure"],
+      "must_include_all": ["!"],
+      "max_sentences": 3
+    },
+    {
+      "id": "young-pip-chickens",
+      "npc": "Young Pip",
+      "player_input": "What have you been up to today?",
+      "must_include_any": ["chicken", "race", "deliveries", "tree", "adventure"],
+      "must_include_all": ["!"],
+      "max_sentences": 3
+    }
+  ]
+}

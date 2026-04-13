@@ -2125,7 +2125,6 @@ GameObject:
   m_Component:
   - component: {fileID: 616203855}
   - component: {fileID: 616203854}
-  - component: {fileID: 616203853}
   - component: {fileID: 616203856}
   - component: {fileID: 616203857}
   m_Layer: 0
@@ -2135,18 +2134,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &616203853
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 616203852}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cf442307b7db40ffa99802cf172a9bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.Tutorial.TutorialFarmSceneController
 --- !u!114 &616203854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4597,7 +4584,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4012734012178591657, guid: 6894b5aa7703ed549bf3086529074068, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 2.1
       objectReference: {fileID: 0}
     - target: {fileID: 4012734012178591657, guid: 6894b5aa7703ed549bf3086529074068, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4605,7 +4592,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4012734012178591657, guid: 6894b5aa7703ed549bf3086529074068, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4
+      value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: 4012734012178591657, guid: 6894b5aa7703ed549bf3086529074068, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4637,7 +4624,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4394326855830222099, guid: 6894b5aa7703ed549bf3086529074068, type: 3}
       propertyPath: m_Name
-      value: CropPlot_0
+      value: CropPlot_TutorialTomato
       objectReference: {fileID: 0}
     - target: {fileID: 4394326855830222099, guid: 6894b5aa7703ed549bf3086529074068, type: 3}
       propertyPath: m_TagString

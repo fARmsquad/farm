@@ -1,4 +1,5 @@
 using FarmSimVR.Core.Tutorial;
+using FarmSimVR.MonoBehaviours.Cinematics;
 using UnityEngine;
 
 namespace FarmSimVR.MonoBehaviours.Tutorial
@@ -11,6 +12,8 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         {
             if (controller == null)
                 return;
+
+            sceneName = TutorialSceneCatalog.NormalizeRuntimeSceneName(sceneName);
 
             switch (sceneName)
             {
@@ -52,6 +55,14 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         private static void EnsureCutscene(string objectName, string title, string body, float autoAdvanceDelay)
         {
+            if (StoryPackageRuntimeCatalog.TryGetCutsceneDisplayText(objectName, out var packageTitle, out var packageBody))
+            {
+                if (!string.IsNullOrWhiteSpace(packageTitle))
+                    title = packageTitle;
+                if (!string.IsNullOrWhiteSpace(packageBody))
+                    body = packageBody;
+            }
+
             var controller = EnsureComponent<TutorialCutsceneSceneController>(objectName);
             controller.Configure(title, body, autoAdvanceDelay);
         }

@@ -10,6 +10,9 @@ namespace FarmSimVR.MonoBehaviours
     public class TitleScreenManager : MonoBehaviour
     {
         public const string TutorialSliceLauncherRootName = "TutorialSliceLauncher";
+        public const string StoryPackageSampleLabel = "Story Package Sample";
+
+        private const string StoryPackageSampleSceneName = TutorialSceneCatalog.IntroSceneName;
 
         [FormerlySerializedAs("farmMainSceneName")]
         [SerializeField] private string targetSceneName = TutorialSceneCatalog.IntroSceneName;
@@ -110,7 +113,8 @@ namespace FarmSimVR.MonoBehaviours
             var rootImage = root.AddComponent<Image>();
             rootImage.color = new Color(0.05f, 0.06f, 0.05f, 0.86f);
 
-            var height = 72f + (SceneWorkCatalog.TitleScreenLaunchableScenes.Count * 46f);
+            var totalButtonCount = SceneWorkCatalog.TitleScreenLaunchableScenes.Count + 1;
+            var height = 72f + (totalButtonCount * 46f);
             rootRect.anchorMin = new Vector2(1f, 1f);
             rootRect.anchorMax = new Vector2(1f, 1f);
             rootRect.pivot = new Vector2(1f, 1f);
@@ -128,17 +132,42 @@ namespace FarmSimVR.MonoBehaviours
                 new Rect(16f, 12f, 288f, 28f),
                 Color.white);
 
+            CreateSliceButton(
+                root.transform,
+                font,
+                "TutorialSlice_StoryPackageSample",
+                StoryPackageSampleLabel,
+                StoryPackageSampleSceneName,
+                48f);
+
             for (int i = 0; i < SceneWorkCatalog.TitleScreenLaunchableScenes.Count; i++)
             {
                 var scene = SceneWorkCatalog.TitleScreenLaunchableScenes[i];
-                CreateSliceButton(root.transform, font, scene, 48f + (i * 46f));
+                CreateSliceButton(root.transform, font, scene, 94f + (i * 46f));
             }
 #endif
         }
 
         private void CreateSliceButton(Transform parent, Font font, SceneWorkDefinition scene, float topOffset)
         {
-            var buttonObject = new GameObject($"TutorialSlice_{scene.NumberLabel}_{scene.SceneName}");
+            CreateSliceButton(
+                parent,
+                font,
+                $"TutorialSlice_{scene.NumberLabel}_{scene.SceneName}",
+                $"{scene.NumberLabel} {scene.DisplayName}",
+                scene.SceneName,
+                topOffset);
+        }
+
+        private void CreateSliceButton(
+            Transform parent,
+            Font font,
+            string objectName,
+            string label,
+            string sceneName,
+            float topOffset)
+        {
+            var buttonObject = new GameObject(objectName);
             buttonObject.transform.SetParent(parent, false);
 
             var buttonRect = buttonObject.AddComponent<RectTransform>();
@@ -160,14 +189,13 @@ namespace FarmSimVR.MonoBehaviours
             colors.pressedColor = new Color(0.12f, 0.18f, 0.12f, 0.95f);
             button.colors = colors;
 
-            var sceneName = scene.SceneName;
             button.onClick.AddListener(() => StartScene(sceneName));
 
             CreateLabel(
                 "Label",
                 buttonObject.transform,
                 font,
-                $"{scene.NumberLabel} {scene.DisplayName}",
+                label,
                 15,
                 FontStyle.Bold,
                 TextAnchor.MiddleCenter,

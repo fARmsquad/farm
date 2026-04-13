@@ -59,10 +59,12 @@ namespace FarmSimVR.Tests.EditMode
                 TutorialSceneCatalog.PreFarmCutsceneSceneName,
                 TutorialSceneCatalog.FarmTutorialSceneName,
                 SceneWorkCatalog.HorseTrainingSceneName,
+                SceneWorkCatalog.TownSceneName,
                 SceneWorkCatalog.FarmVegetableStatesSceneName,
             }));
 
             Assert.That(TutorialSceneCatalog.SceneOrder, Does.Not.Contain(SceneWorkCatalog.HorseTrainingSceneName));
+            Assert.That(TutorialSceneCatalog.SceneOrder, Does.Not.Contain(SceneWorkCatalog.TownSceneName));
             Assert.That(TutorialSceneCatalog.SceneOrder, Does.Not.Contain(SceneWorkCatalog.FarmVegetableStatesSceneName));
         }
 
@@ -85,8 +87,14 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(horse.DisplayName, Is.EqualTo("Horse Training Grounds"));
             Assert.That(horse.ScenePath, Is.EqualTo(SceneWorkCatalog.HorseTrainingScenePath));
 
+            Assert.That(SceneWorkCatalog.TryGetBySceneName(SceneWorkCatalog.TownSceneName, out var town), Is.True);
+            Assert.That(town.Number, Is.EqualTo(10));
+            Assert.That(town.DisplayName, Is.EqualTo("Town Conversation"));
+            Assert.That(town.Kind, Is.EqualTo(SceneWorkKind.Gameplay));
+            Assert.That(town.ScenePath, Is.EqualTo(SceneWorkCatalog.TownScenePath));
+
             Assert.That(SceneWorkCatalog.TryGetBySceneName(SceneWorkCatalog.FarmVegetableStatesSceneName, out var vegetables), Is.True);
-            Assert.That(vegetables.Number, Is.EqualTo(10));
+            Assert.That(vegetables.Number, Is.EqualTo(11));
             Assert.That(vegetables.DisplayName, Is.EqualTo("Farm Vegetable States"));
             Assert.That(vegetables.Kind, Is.EqualTo(SceneWorkKind.Sandbox));
             Assert.That(vegetables.ScenePath, Is.EqualTo(SceneWorkCatalog.FarmVegetableStatesScenePath));

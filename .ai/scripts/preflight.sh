@@ -66,12 +66,14 @@ else
     ERRORS=$((ERRORS+1))
 fi
 
-echo -e "\n${YELLOW}[5/9] Feature Branch${NC}"
+echo -e "\n${YELLOW}[5/9] Branch Policy${NC}"
 BRANCH=$(git branch --show-current)
-if [[ "$BRANCH" != "main" && "$BRANCH" != "master" ]]; then
+if [[ "$BRANCH" = "main" || "$BRANCH" = "master" ]]; then
+    echo -e "  ${GREEN}✓ On integration branch: $BRANCH${NC}"
+elif [[ -n "$BRANCH" ]]; then
     echo -e "  ${GREEN}✓ On feature branch: $BRANCH${NC}"
 else
-    echo -e "  ${RED}✗ On $BRANCH — must be on feature branch${NC}"
+    echo -e "  ${RED}✗ Detached HEAD — checkout a tracked branch first${NC}"
     ERRORS=$((ERRORS+1))
 fi
 

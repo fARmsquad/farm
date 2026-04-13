@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using FarmSimVR.Core;
 using UnityEngine;
@@ -9,26 +10,25 @@ using UnityEngine.Networking;
 namespace FarmSimVR.MonoBehaviours
 {
     /// <summary>
-    /// Sends chat messages to the OpenAI Chat Completions API with streaming support.
-    /// Streams token-by-token via SSE and fires onChunk for each delta,
-    /// then onComplete with the full accumulated text when the stream ends.
+    /// Sends chat messages to the OpenAI Responses API with streaming support.
+    /// Streams text deltas via SSE and fires onChunk for each direct text delta,
+    /// then onComplete with the full accumulated response text when the stream ends.
     /// </summary>
     public class OpenAIClient : MonoBehaviour
     {
-        private const string API_URL = "https://api.openai.com/v1/chat/completions";
+        private const string API_URL = "https://api.openai.com/v1/responses";
         private const float REQUEST_TIMEOUT = 60f;
-        private const string SSE_DATA_PREFIX = "data: ";
-        private const string SSE_DONE_MARKER = "[DONE]";
+        private const string OpenAiApiKeyEnvironmentVariable = "OPENAI_API_KEY";
 
         [Header("OpenAI Configuration")]
         [SerializeField] private string apiKey;
         [SerializeField] private string model = "gpt-4o-mini";
         [SerializeField] [Range(0f, 2f)] private float temperature = 0.8f;
-        [SerializeField] private int maxTokens = 300;
+        [SerializeField] private int maxTokens = 140;
 
         /// <summary>
-        /// Streams a chat completion from the OpenAI API.
-        /// onChunk is called with each new token as it arrives.
+        /// Streams a text response from the OpenAI API.
+        /// onChunk is called with each new text delta as it arrives.
         /// onComplete is called with the full accumulated response text when done.
         /// onError is called if the request fails.
         /// </summary>
@@ -38,9 +38,11 @@ namespace FarmSimVR.MonoBehaviours
             Action<string> onComplete,
             Action<string> onError)
         {
-            if (string.IsNullOrWhiteSpace(apiKey))
+            string resolvedApiKey = ResolveApiKey();
+            if (string.IsNullOrWhiteSpace(resolvedApiKey))
             {
-                onError?.Invoke("OpenAI API key is not set. Assign it on the OpenAIClient component.");
+                onError?.Invoke(
+                    "OpenAI API key is not set. Provide OPENAI_API_KEY in the environment or assign a local override on OpenAIClient.");
                 yield break;
             }
 
@@ -52,14 +54,16 @@ namespace FarmSimVR.MonoBehaviours
             request.downloadHandler = new DownloadHandlerBuffer();
             request.timeout = (int)REQUEST_TIMEOUT;
             request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+            request.SetRequestHeader("Accept", "text/event-stream");
+            request.SetRequestHeader("Authorization", $"Bearer {resolvedApiKey}");
 
             var op = request.SendWebRequest();
 
             var accumulated = new StringBuilder(512);
+            var pendingEventBuffer = new StringBuilder(512);
             int bytesRead = 0;
-
-            // Poll the download buffer each frame to extract SSE chunks
+            string streamError = null;
+            // Poll the download buffer each frame to extract SSE events incrementally.
             while (!op.isDone)
             {
                 string raw = request.downloadHandler?.text;
@@ -67,17 +71,21 @@ namespace FarmSimVR.MonoBehaviours
                 {
                     string newData = raw.Substring(bytesRead);
                     bytesRead = raw.Length;
-                    ProcessSSEChunk(newData, accumulated, onChunk);
+                    ProcessStreamingText(newData, pendingEventBuffer, accumulated, onChunk, ref streamError);
                 }
+
+                if (streamError != null)
+                    break;
+
                 yield return null;
             }
 
-            // Process any remaining data after request completes
+            // Process any remaining data after the request completes.
             string finalRaw = request.downloadHandler?.text;
             if (finalRaw != null && finalRaw.Length > bytesRead)
             {
                 string remaining = finalRaw.Substring(bytesRead);
-                ProcessSSEChunk(remaining, accumulated, onChunk);
+                ProcessStreamingText(remaining, pendingEventBuffer, accumulated, onChunk, ref streamError);
             }
 
             if (request.result != UnityWebRequest.Result.Success)
@@ -87,42 +95,110 @@ namespace FarmSimVR.MonoBehaviours
                 yield break;
             }
 
+            if (streamError != null)
+            {
+                onError?.Invoke(streamError);
+                yield break;
+            }
+
             onComplete?.Invoke(accumulated.ToString());
         }
 
         /// <summary>
-        /// Parses SSE lines from a raw chunk and extracts delta content tokens.
+        /// Parses streamed SSE events and appends direct text deltas as they arrive.
         /// </summary>
-        private static void ProcessSSEChunk(string chunk, StringBuilder accumulated, Action<string> onChunk)
+        private static void ProcessStreamingText(
+            string chunk,
+            StringBuilder pendingEventBuffer,
+            StringBuilder accumulated,
+            Action<string> onChunk,
+            ref string streamError)
         {
-            string[] lines = chunk.Split('\n');
-            foreach (string line in lines)
+            if (string.IsNullOrEmpty(chunk))
+                return;
+
+            pendingEventBuffer.Append(chunk.Replace("\r", string.Empty));
+
+            while (TryPopNextEvent(pendingEventBuffer, out string rawEvent))
             {
-                string trimmed = line.Trim();
-                if (!trimmed.StartsWith(SSE_DATA_PREFIX)) continue;
+                string eventName = null;
+                var dataBuilder = new StringBuilder();
+                string[] lines = rawEvent.Split('\n');
+                foreach (string line in lines)
+                {
+                    if (line.StartsWith("event:", StringComparison.Ordinal))
+                    {
+                        eventName = line.Substring("event:".Length).Trim();
+                        continue;
+                    }
 
-                string payload = trimmed.Substring(SSE_DATA_PREFIX.Length).Trim();
-                if (payload == SSE_DONE_MARKER) continue;
+                    if (!line.StartsWith("data:", StringComparison.Ordinal))
+                        continue;
 
-                string token = ExtractDeltaContent(payload);
-                if (string.IsNullOrEmpty(token)) continue;
+                    if (dataBuilder.Length > 0)
+                        dataBuilder.Append('\n');
 
-                accumulated.Append(token);
-                onChunk?.Invoke(token);
+                    dataBuilder.Append(line.Substring("data:".Length).TrimStart());
+                }
+
+                if (dataBuilder.Length == 0)
+                    continue;
+
+                string payload = dataBuilder.ToString();
+                if (payload == "[DONE]")
+                    continue;
+
+                string eventType = string.IsNullOrEmpty(eventName)
+                    ? ExtractJsonStringValue(payload, "type")
+                    : eventName;
+
+                if (eventType == "response.output_text.delta")
+                {
+                    string delta = ExtractJsonStringValue(payload, "delta");
+                    if (string.IsNullOrEmpty(delta))
+                        continue;
+
+                    accumulated.Append(delta);
+                    onChunk?.Invoke(delta);
+                    continue;
+                }
+
+                if (eventType == "response.completed")
+                    continue;
+
+                if (eventType == "error")
+                {
+                    streamError = ExtractJsonStringValue(payload, "message")
+                        ?? "OpenAI streaming request failed.";
+                }
             }
         }
 
         /// <summary>
-        /// Extracts the content field from a streaming delta JSON chunk.
-        /// Format: {"choices":[{"delta":{"content":"token"}}]}
+        /// Extracts a string property from a JSON object without needing a full JSON dependency.
         /// </summary>
-        private static string ExtractDeltaContent(string json)
+        private static string ExtractJsonStringValue(string json, string key)
         {
-            const string key = "\"content\":\"";
-            int idx = json.IndexOf(key, StringComparison.Ordinal);
-            if (idx < 0) return null;
+            if (string.IsNullOrEmpty(json) || string.IsNullOrEmpty(key))
+                return null;
 
-            int valueStart = idx + key.Length;
+            string quotedKey = $"\"{key}\"";
+            int keyIndex = json.IndexOf(quotedKey, StringComparison.Ordinal);
+            if (keyIndex < 0)
+                return null;
+
+            int colonIndex = json.IndexOf(':', keyIndex + quotedKey.Length);
+            if (colonIndex < 0)
+                return null;
+
+            int valueStart = colonIndex + 1;
+            while (valueStart < json.Length && char.IsWhiteSpace(json[valueStart]))
+                valueStart++;
+
+            if (valueStart >= json.Length || json[valueStart] != '"')
+                return null;
+
+            valueStart++;
             var result = new StringBuilder();
 
             for (int i = valueStart; i < json.Length; i++)
@@ -155,26 +231,87 @@ namespace FarmSimVR.MonoBehaviours
         }
 
         /// <summary>
-        /// Builds the JSON payload for the Chat Completions endpoint.
+        /// Builds the JSON payload for the Responses endpoint.
         /// </summary>
         private string BuildRequestJson(List<ChatMessage> messages, bool stream = false)
         {
             var sb = new StringBuilder(512);
-            sb.Append("{\"model\":\"").Append(EscapeJson(model)).Append("\",");
-            sb.Append("\"temperature\":").Append(temperature.ToString("F2")).Append(",");
-            sb.Append("\"max_tokens\":").Append(maxTokens).Append(",");
-            if (stream) sb.Append("\"stream\":true,");
-            sb.Append("\"messages\":[");
-
-            for (int i = 0; i < messages.Count; i++)
+            string instructions = null;
+            var inputMessages = new List<ChatMessage>(messages.Count);
+            foreach (var message in messages)
             {
-                if (i > 0) sb.Append(",");
-                sb.Append("{\"role\":\"").Append(EscapeJson(messages[i].Role)).Append("\",");
-                sb.Append("\"content\":\"").Append(EscapeJson(messages[i].Content)).Append("\"}");
+                if (string.Equals(message.Role, "system", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (string.IsNullOrWhiteSpace(instructions))
+                        instructions = message.Content;
+                    else
+                        instructions = $"{instructions}\n\n{message.Content}";
+
+                    continue;
+                }
+
+                inputMessages.Add(message);
+            }
+
+            sb.Append("{\"model\":\"").Append(EscapeJson(model)).Append("\",");
+            sb.Append("\"text\":{\"format\":{\"type\":\"text\"}},");
+            sb.Append("\"temperature\":").Append(temperature.ToString("0.00", CultureInfo.InvariantCulture)).Append(",");
+            sb.Append("\"max_output_tokens\":").Append(maxTokens).Append(",");
+            sb.Append("\"store\":false,");
+            if (stream)
+                sb.Append("\"stream\":true,");
+
+            if (!string.IsNullOrWhiteSpace(instructions))
+                sb.Append("\"instructions\":\"").Append(EscapeJson(instructions)).Append("\",");
+
+            sb.Append("\"input\":[");
+            for (int i = 0; i < inputMessages.Count; i++)
+            {
+                if (i > 0)
+                    sb.Append(",");
+
+                sb.Append("{\"role\":\"").Append(EscapeJson(inputMessages[i].Role)).Append("\",");
+                sb.Append("\"content\":\"")
+                    .Append(EscapeJson(inputMessages[i].Content))
+                    .Append("\"}");
             }
 
             sb.Append("]}");
             return sb.ToString();
+        }
+
+        private static bool TryPopNextEvent(StringBuilder pendingEventBuffer, out string rawEvent)
+        {
+            int boundaryIndex = IndexOfEventBoundary(pendingEventBuffer);
+            if (boundaryIndex < 0)
+            {
+                rawEvent = null;
+                return false;
+            }
+
+            rawEvent = pendingEventBuffer.ToString(0, boundaryIndex);
+            pendingEventBuffer.Remove(0, boundaryIndex + 2);
+            return true;
+        }
+
+        private static int IndexOfEventBoundary(StringBuilder pendingEventBuffer)
+        {
+            for (int i = 0; i < pendingEventBuffer.Length - 1; i++)
+            {
+                if (pendingEventBuffer[i] == '\n' && pendingEventBuffer[i + 1] == '\n')
+                    return i;
+            }
+
+            return -1;
+        }
+
+        private string ResolveApiKey()
+        {
+            if (!string.IsNullOrWhiteSpace(apiKey))
+                return apiKey.Trim();
+
+            string envValue = Environment.GetEnvironmentVariable(OpenAiApiKeyEnvironmentVariable);
+            return string.IsNullOrWhiteSpace(envValue) ? null : envValue.Trim();
         }
 
         private static string EscapeJson(string s)

@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using FarmSimVR.Core;
 using FarmSimVR.MonoBehaviours.Cinematics;
 using UnityEngine;
@@ -139,7 +141,7 @@ namespace FarmSimVR.MonoBehaviours
                 yield break;
             }
 
-            // Parse the completed JSON to extract response text and options
+            // Parse structured output when present; otherwise fall back to the raw streamed text.
             var parsed = TryParseResponse(fullText);
             if (parsed == null)
             {
@@ -149,17 +151,19 @@ namespace FarmSimVR.MonoBehaviours
                 yield break;
             }
 
+            int turnIndex = CountAssistantMessages(_history);
             _history.Add(new ChatMessage("assistant", fullText));
+            string[] displayOptions = TownDialogueOptionComposer.BuildOptions(_activeNpc, turnIndex, parsed.response, parsed.options);
 
             Debug.Log($"{LOG_PREFIX} [{_activeNpc}] {parsed.response}");
-            if (parsed.options != null)
+            if (displayOptions != null)
             {
-                for (int i = 0; i < parsed.options.Length; i++)
-                    Debug.Log($"{LOG_PREFIX}   [{i + 1}] {parsed.options[i]}");
+                for (int i = 0; i < displayOptions.Length; i++)
+                    Debug.Log($"{LOG_PREFIX}   [{i + 1}] {displayOptions[i]}");
             }
 
             OnNPCResponse?.Invoke(_activeNpc, parsed.response);
-            OnOptionsReady?.Invoke(parsed.options ?? new[] { "Goodbye." });
+            OnOptionsReady?.Invoke(displayOptions);
         }
 
         // ── Helpers ───────────────────────────────────────────────────────────
@@ -168,7 +172,7 @@ namespace FarmSimVR.MonoBehaviours
         {
             if (string.IsNullOrEmpty(text)) return null;
 
-            // The model may wrap the JSON in markdown code fences — strip them
+            // Preserve compatibility with any older structured-output prompts.
             string cleaned = text.Trim();
             if (cleaned.StartsWith("```"))
             {
@@ -178,20 +182,197 @@ namespace FarmSimVR.MonoBehaviours
                     cleaned = cleaned.Substring(0, cleaned.Length - 3).Trim();
             }
 
+            if (!cleaned.StartsWith("{", StringComparison.Ordinal))
+                return BuildFallbackResponse(text);
+
+            if (TryParseLegacyJsonResponse(cleaned, out var legacyParsed))
+                return legacyParsed;
+
             try
             {
                 var parsed = JsonUtility.FromJson<LLMResponse>(cleaned);
                 if (parsed != null && !string.IsNullOrEmpty(parsed.response))
-                    return parsed;
+                    return new LLMResponse
+                    {
+                        response = parsed.response,
+                        options = NormalizeOptions(parsed.options)
+                    };
             }
             catch (Exception)
             {
                 // Fall through
             }
 
-            // Fallback: treat the entire text as the response with no options
-            return new LLMResponse { response = text, options = new[] { "Continue...", "Goodbye." } };
+            return BuildFallbackResponse(text);
         }
+
+        private static bool TryParseLegacyJsonResponse(string json, out LLMResponse parsed)
+        {
+            parsed = null;
+            if (!TryExtractJsonString(json, "response", out string responseText) || string.IsNullOrWhiteSpace(responseText))
+                return false;
+
+            string[] options = TryExtractJsonStringArray(json, "options", out string[] parsedOptions)
+                ? NormalizeOptions(parsedOptions)
+                : CreateFallbackOptions();
+
+            parsed = new LLMResponse
+            {
+                response = responseText,
+                options = options
+            };
+            return true;
+        }
+
+        private static bool TryExtractJsonString(string json, string key, out string value)
+        {
+            value = null;
+            if (!TryFindJsonValueIndex(json, key, out int valueIndex) || valueIndex >= json.Length || json[valueIndex] != '"')
+                return false;
+
+            return TryReadJsonString(json, valueIndex, out value, out _);
+        }
+
+        private static bool TryExtractJsonStringArray(string json, string key, out string[] values)
+        {
+            values = null;
+            if (!TryFindJsonValueIndex(json, key, out int valueIndex) || valueIndex >= json.Length || json[valueIndex] != '[')
+                return false;
+
+            var results = new List<string>();
+            int cursor = valueIndex + 1;
+            while (cursor < json.Length)
+            {
+                cursor = SkipWhitespace(json, cursor);
+                if (cursor >= json.Length) return false;
+                if (json[cursor] == ']')
+                {
+                    values = results.ToArray();
+                    return true;
+                }
+                if (json[cursor] == ',')
+                {
+                    cursor++;
+                    continue;
+                }
+                if (!TryReadJsonString(json, cursor, out string item, out cursor)) return false;
+                results.Add(item);
+            }
+
+            return false;
+        }
+
+        private static bool TryFindJsonValueIndex(string json, string key, out int valueIndex)
+        {
+            valueIndex = -1;
+            int keyIndex = json.IndexOf($"\"{key}\"", StringComparison.Ordinal);
+            if (keyIndex < 0) return false;
+
+            int colonIndex = json.IndexOf(':', keyIndex);
+            if (colonIndex < 0) return false;
+
+            valueIndex = SkipWhitespace(json, colonIndex + 1);
+            return valueIndex < json.Length;
+        }
+
+        private static bool TryReadJsonString(string json, int openingQuoteIndex, out string value, out int nextIndex)
+        {
+            value = null;
+            nextIndex = openingQuoteIndex;
+            if (openingQuoteIndex >= json.Length || json[openingQuoteIndex] != '"') return false;
+
+            var builder = new StringBuilder();
+            for (int i = openingQuoteIndex + 1; i < json.Length; i++)
+            {
+                char character = json[i];
+                if (character == '"')
+                {
+                    value = builder.ToString();
+                    nextIndex = i + 1;
+                    return true;
+                }
+                if (character != '\\')
+                {
+                    builder.Append(character);
+                    continue;
+                }
+                if (!TryAppendEscapedCharacter(json, ref i, builder)) return false;
+            }
+
+            return false;
+        }
+
+        private static bool TryAppendEscapedCharacter(string json, ref int index, StringBuilder builder)
+        {
+            int escapedIndex = index + 1;
+            if (escapedIndex >= json.Length) return false;
+
+            char escaped = json[escapedIndex];
+            switch (escaped)
+            {
+                case '"': builder.Append('"'); index = escapedIndex; return true;
+                case '\\': builder.Append('\\'); index = escapedIndex; return true;
+                case '/': builder.Append('/'); index = escapedIndex; return true;
+                case 'b': builder.Append('\b'); index = escapedIndex; return true;
+                case 'f': builder.Append('\f'); index = escapedIndex; return true;
+                case 'n': builder.Append('\n'); index = escapedIndex; return true;
+                case 'r': builder.Append('\r'); index = escapedIndex; return true;
+                case 't': builder.Append('\t'); index = escapedIndex; return true;
+                case 'u': return TryAppendUnicodeEscape(json, ref index, builder);
+                default: return false;
+            }
+        }
+
+        private static bool TryAppendUnicodeEscape(string json, ref int index, StringBuilder builder)
+        {
+            int hexStart = index + 2;
+            if (hexStart + 4 > json.Length) return false;
+
+            string hex = json.Substring(hexStart, 4);
+            if (!ushort.TryParse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out ushort codePoint))
+                return false;
+
+            builder.Append((char)codePoint);
+            index = hexStart + 3;
+            return true;
+        }
+
+        private static int SkipWhitespace(string text, int startIndex)
+        {
+            while (startIndex < text.Length && char.IsWhiteSpace(text[startIndex]))
+                startIndex++;
+
+            return startIndex;
+        }
+
+        private static LLMResponse BuildFallbackResponse(string text)
+        {
+            return new LLMResponse
+            {
+                response = text,
+                options = CreateFallbackOptions()
+            };
+        }
+
+        private static string[] NormalizeOptions(string[] options)
+        {
+            return options != null && options.Length > 0
+                ? options
+                : CreateFallbackOptions();
+        }
+
+        private static int CountAssistantMessages(List<ChatMessage> history)
+        {
+            int assistantMessages = 0;
+            for (int i = 0; i < history.Count; i++)
+            {
+                if (string.Equals(history[i].Role, "assistant", StringComparison.OrdinalIgnoreCase))
+                    assistantMessages++;
+            }
+            return assistantMessages;
+        }
+
+        private static string[] CreateFallbackOptions() => new[] { "Continue...", "Goodbye." };
 
         private static bool IsGoodbye(string option)
         {

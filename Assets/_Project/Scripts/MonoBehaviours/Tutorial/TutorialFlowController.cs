@@ -1,4 +1,5 @@
 using FarmSimVR.Core.Tutorial;
+using FarmSimVR.MonoBehaviours.Cinematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -60,6 +61,10 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             if (TutorialSceneCatalog.GetStepForScene(currentSceneName) == TutorialStep.None)
                 return requestedSceneName;
 
+            var packageNextScene = StoryPackageRuntimeCatalog.GetNextSceneOrNull(currentSceneName);
+            if (!string.IsNullOrWhiteSpace(packageNextScene))
+                return packageNextScene;
+
             var nextScene = Flow.GetNextScene();
             return string.IsNullOrWhiteSpace(nextScene) ? requestedSceneName : nextScene;
         }
@@ -72,7 +77,12 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 return;
             }
 
+            var currentSceneName = SceneManager.GetActiveScene().name;
+            var packageNextScene = StoryPackageRuntimeCatalog.GetNextSceneOrNull(currentSceneName);
             var nextScene = Flow.CompleteCurrentStep();
+            if (!string.IsNullOrWhiteSpace(packageNextScene))
+                nextScene = packageNextScene;
+
             if (string.IsNullOrWhiteSpace(nextScene))
             {
                 ShowCompletionBanner = true;

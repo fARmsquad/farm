@@ -1,0 +1,67 @@
+{
+  "PackageId": "storypkg_intro_chicken_sample",
+  "SchemaVersion": 1,
+  "PackageVersion": 1,
+  "DisplayName": "Intro Chicken Sample",
+  "Beats": [
+    {
+      "BeatId": "intro_opening",
+      "DisplayName": "Intro Opening",
+      "Kind": "Cutscene",
+      "SceneName": "Intro",
+      "NextSceneName": "ChickenGame",
+      "SequenceSteps": [
+        {
+          "StepType": "Fade",
+          "FloatParam": 0.0,
+          "Duration": 0.8,
+          "WaitForCompletion": true
+        },
+        {
+          "StepType": "ObjectivePopup",
+          "StringParam": "El Pollo Loco is loose in the pen."
+        },
+        {
+          "StepType": "MissionStart",
+          "StringParam": "POLLO LOCO|Catch El Pollo Loco"
+        },
+        {
+          "StepType": "Wait",
+          "Duration": 0.5,
+          "WaitForCompletion": true
+        }
+      ]
+    },
+    {
+      "BeatId": "chicken_chase",
+      "DisplayName": "Chicken Chase",
+      "Kind": "Minigame",
+      "SceneName": "ChickenGame",
+      "NextSceneName": "Tutorial_PostChickenCutscene",
+      "Minigame": {
+        "AdapterId": "tutorial.chicken_chase",
+        "ObjectiveText": "Catch El Pollo Loco before he escapes the pen.",
+        "RequiredCount": 1,
+        "TimeLimitSeconds": 300.0
+      }
+    },
+    {
+      "BeatId": "post_chicken_bridge",
+      "DisplayName": "Post Chicken Bridge",
+      "Kind": "Cutscene",
+      "SceneName": "Tutorial_PostChickenCutscene",
+      "NextSceneName": "",
+      "SequenceSteps": [
+        {
+          "StepType": "ObjectivePopup",
+          "StringParam": "Nice work. The farm still needs your hands."
+        },
+        {
+          "StepType": "Wait",
+          "Duration": 0.5,
+          "WaitForCompletion": true
+        }
+      ]
+    }
+  ]
+}

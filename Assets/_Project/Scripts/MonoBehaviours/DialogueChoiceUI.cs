@@ -8,13 +8,11 @@ namespace FarmSimVR.MonoBehaviours
 {
     /// <summary>
     /// Renders the LLM conversation UI with streaming support.
-    /// Shows the NPC's response text token-by-token as it streams in,
+    /// Shows the NPC's response text delta-by-delta as it streams in,
     /// then displays clickable choice buttons once the stream completes.
     /// </summary>
     public class DialogueChoiceUI : MonoBehaviour
     {
-        private const string RESPONSE_KEY = "\"response\":\"";
-
         [SerializeField] private LLMConversationController conversation;
         [SerializeField] private Canvas                    dialogueCanvas;
         [SerializeField] private GameObject                dialoguePanel;
@@ -24,10 +22,8 @@ namespace FarmSimVR.MonoBehaviours
         [SerializeField] private TextMeshProUGUI           loadingText;
 
         private readonly List<GameObject> _buttons = new();
-        private readonly StringBuilder _rawStream = new();
         private readonly StringBuilder _visibleText = new();
-        private bool _insideResponseValue;
-        private bool _isStreaming;
+        private string _lastPlayerPrompt;
 
         // ── Lifecycle ─────────────────────────────────────────────────────────
 
@@ -58,6 +54,7 @@ namespace FarmSimVR.MonoBehaviours
         private void Start()
         {
             if (dialoguePanel != null) dialoguePanel.SetActive(false);
+            _lastPlayerPrompt = null;
             ClearButtons();
         }
 
@@ -65,10 +62,7 @@ namespace FarmSimVR.MonoBehaviours
 
         private void HandleStreamStarted(string npcName)
         {
-            _rawStream.Clear();
             _visibleText.Clear();
-            _insideResponseValue = false;
-            _isStreaming = true;
 
             ShowCanvas(true);
             if (dialoguePanel   != null) dialoguePanel.SetActive(true);
@@ -76,7 +70,7 @@ namespace FarmSimVR.MonoBehaviours
             if (speakerNameText != null) speakerNameText.text = npcName;
             if (dialogueText    != null)
             {
-                dialogueText.text = "";
+                dialogueText.text = BuildDialogueBody(string.Empty);
                 dialogueText.maxVisibleCharacters = int.MaxValue;
             }
 
@@ -87,54 +81,17 @@ namespace FarmSimVR.MonoBehaviours
 
         private void HandleStreamChunk(string token)
         {
-            _rawStream.Append(token);
-
-            // Extract visible text from the "response" JSON value as it streams
-            string raw = _rawStream.ToString();
-
-            if (!_insideResponseValue)
-            {
-                int keyIdx = raw.IndexOf(RESPONSE_KEY);
-                if (keyIdx >= 0)
-                {
-                    _insideResponseValue = true;
-                    // Extract everything after the key so far
-                    string afterKey = raw.Substring(keyIdx + RESPONSE_KEY.Length);
-                    string extracted = ExtractUntilClose(afterKey);
-                    _visibleText.Clear();
-                    _visibleText.Append(extracted);
-                }
-            }
-            else
-            {
-                // We're already inside the response value — re-extract from the key
-                int keyIdx = raw.IndexOf(RESPONSE_KEY);
-                if (keyIdx >= 0)
-                {
-                    string afterKey = raw.Substring(keyIdx + RESPONSE_KEY.Length);
-                    string extracted = ExtractUntilClose(afterKey);
-                    _visibleText.Clear();
-                    _visibleText.Append(extracted);
-                }
-            }
-
-            if (dialogueText != null)
-                dialogueText.text = _visibleText.ToString();
+            _visibleText.Append(token);
+            SetDialogueText(_visibleText.ToString());
         }
 
         // ── Completion handlers ──────────────────────────────────────────────
 
         private void HandleResponse(string npcName, string responseText)
         {
-            _isStreaming = false;
-
-            // Show the final clean response text (parsed from complete JSON)
+            // Show the final clean response text once the streamed turn completes.
             if (speakerNameText != null) speakerNameText.text = npcName;
-            if (dialogueText != null)
-            {
-                dialogueText.text = responseText;
-                dialogueText.maxVisibleCharacters = int.MaxValue;
-            }
+            SetDialogueText(responseText);
         }
 
         private void HandleOptions(string[] options)
@@ -145,7 +102,11 @@ namespace FarmSimVR.MonoBehaviours
                 var captured = opt;
                 var btn = BuildButton(opt);
                 btn.GetComponent<Button>().onClick.AddListener(
-                    () => conversation.SelectOption(captured));
+                    () =>
+                    {
+                        _lastPlayerPrompt = captured;
+                        conversation.SelectOption(captured);
+                    });
                 _buttons.Add(btn);
             }
         }
@@ -160,14 +121,18 @@ namespace FarmSimVR.MonoBehaviours
                 loadingText.gameObject.SetActive(true);
                 loadingText.text = "...";
             }
+
+            if (!string.IsNullOrWhiteSpace(_lastPlayerPrompt))
+                SetDialogueText(string.Empty);
         }
 
         private void HandleEnded()
         {
-            _isStreaming = false;
             if (dialoguePanel != null) dialoguePanel.SetActive(false);
             ShowCanvas(false);
             ClearButtons();
+            _lastPlayerPrompt = null;
+            _visibleText.Clear();
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible   = false;
@@ -175,48 +140,8 @@ namespace FarmSimVR.MonoBehaviours
 
         private void HandleError(string _)
         {
-            _isStreaming = false;
-            if (dialogueText != null)
-                dialogueText.text = "(Something went wrong — try again later.)";
+            SetDialogueText("(Something went wrong — try again later.)");
             ClearButtons();
-        }
-
-        // ── JSON response value extraction ───────────────────────────────────
-
-        /// <summary>
-        /// Extracts text from the start of a string until an unescaped closing quote.
-        /// Handles escaped characters so \" doesn't terminate early.
-        /// If no closing quote is found, returns everything (stream still in progress).
-        /// </summary>
-        private static string ExtractUntilClose(string s)
-        {
-            var sb = new StringBuilder(s.Length);
-            for (int i = 0; i < s.Length; i++)
-            {
-                char c = s[i];
-                if (c == '\\' && i + 1 < s.Length)
-                {
-                    char next = s[i + 1];
-                    switch (next)
-                    {
-                        case '"':  sb.Append('"');  i++; break;
-                        case '\\': sb.Append('\\'); i++; break;
-                        case 'n':  sb.Append('\n'); i++; break;
-                        case 'r':  sb.Append('\r'); i++; break;
-                        case 't':  sb.Append('\t'); i++; break;
-                        default:   sb.Append(c);         break;
-                    }
-                }
-                else if (c == '"')
-                {
-                    break; // End of value
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-            return sb.ToString();
         }
 
         // ── Canvas visibility ────────────────────────────────────────────────
@@ -225,6 +150,26 @@ namespace FarmSimVR.MonoBehaviours
         {
             if (dialogueCanvas != null)
                 dialogueCanvas.enabled = visible;
+        }
+
+        private void SetDialogueText(string responseText)
+        {
+            if (dialogueText == null)
+                return;
+
+            dialogueText.text = BuildDialogueBody(responseText);
+            dialogueText.maxVisibleCharacters = int.MaxValue;
+        }
+
+        private string BuildDialogueBody(string responseText)
+        {
+            if (string.IsNullOrWhiteSpace(_lastPlayerPrompt))
+                return responseText ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(responseText))
+                return $"You: {_lastPlayerPrompt}";
+
+            return $"You: {_lastPlayerPrompt}\n\n{responseText}";
         }
 
         // ── Button factory ────────────────────────────────────────────────────

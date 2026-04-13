@@ -36,6 +36,70 @@
 
 ## Log
 
+### Town Early-Turn Choice Flow Fell Back To Continue/Goodbye Too Soon (2026-04-13)
+- Status: Addressed
+- Related story/task: Town direct text streaming and follow-up option flow
+- Original completion claim: The Town scene was handed off as streaming correctly with usable post-response dialogue options.
+- Reported issue: The developer reported that `Continue...` and `Goodbye.` still show up too early, and that `Goodbye.` should instead arrive as one of the four follow-up choices after a few steps.
+- Failing evidence: Developer report after using the updated Town flow: the opening turns still surface the generic fallback buttons instead of a staged four-choice conversation ladder.
+- Approach that produced the miss: The streaming fix focused on spoken-text rendering and payload parsing, but left the post-turn option source on the generic fallback path whenever the model returned plain text instead of structured options.
+- Why it was mistaken for done: Verification proved the text path and request shape, but did not treat the option cadence itself as a first-class player-facing behavior that needed dedicated regression coverage.
+- What should have been verified or stated differently: A Town dialogue handoff must explicitly verify the early-turn choice cadence, not just that some buttons appear after a line completes.
+- Prevention rules for future work:
+  - Add option-flow coverage that checks opening turns, mid turns, and the point where `Goodbye.` becomes available.
+  - When live model output is text-only, source interactive options from a deliberate conversation ladder instead of defaulting to generic fallback buttons.
+  - Treat response latency tuning and option cadence as separate UX concerns with their own checks.
+- Follow-up actions: Added `TownConversationFlowTests` to verify that the opening turns do not surface `Continue...` or `Goodbye.`, that later turns unlock `Goodbye.` inside a four-choice set, and that the Town scene uses the intended fast model budget. Reduced the Town scene output budget from 300 to 140 tokens and aligned the `OpenAIClient` default with that cap to tighten response time without changing the model. A later refinement replaced the temporary staged ladder with a response-aware composer so the option text itself now follows the streamed reply instead of a canned sequence.
+- Distilled rule added to project-memory.md: `Town dialogue tests must cover option cadence, not only streamed text (2026-04-13)`
+
+### Town Dialogue Choices Felt Scripted Against The Actual Reply (2026-04-13)
+- Status: Addressed
+- Related story/task: Town direct text streaming and follow-up option flow refinement
+- Original completion claim: The Town scene was handed off with early-turn `Continue...` and `Goodbye.` removed in favor of a staged four-choice ladder.
+- Reported issue: The developer reported that the flow still felt off and asked for choices that read naturally against whatever the NPC had just said.
+- Failing evidence: Developer follow-up after the cadence fix: the fallback flow still felt wrong even when the generic `Continue...` and early `Goodbye.` buttons were gone.
+- Approach that produced the miss: The first option-cadence fix replaced generic fallback buttons with a scripted turn ladder, but that ladder still ignored the content of the streamed reply and could surface prompts that felt disconnected from the current line.
+- Why it was mistaken for done: Verification proved the turn cadence and `Goodbye.` timing, but did not treat the option copy itself as a response-aware UX surface that needed content-sensitive coverage.
+- What should have been verified or stated differently: A Town dialogue handoff should not imply the follow-up flow feels natural unless the four choices are checked against the actual reply text, not just against the turn number.
+- Prevention rules for future work:
+  - Build Town follow-up options from the streamed reply text first, then layer cadence rules like late `Goodbye.` unlocks on top.
+  - Add regression coverage that proves keyword-heavy replies such as cooking, town-history, and gossip beats produce matching follow-up prompts.
+  - Treat "buttons appear in the right phase" and "buttons read naturally for this reply" as separate verification axes.
+- Follow-up actions: Added a pure C# `TownDialogueOptionComposer` in `Core/` and routed `LLMConversationController` through it so displayed choices now prefer meaningful model options, derive topic-aware follow-ups from the parsed reply text, rotate NPC-specific evergreen prompts, and only inject a natural goodbye line after later turns. Kept the existing Town conversation flow tests for goodbye cadence and used them to lock in Garrett cooking and history follow-ups against the new composer.
+- Distilled rule added to project-memory.md: `Town dialogue choices must be composed from the latest reply, not only the turn index (2026-04-13)`
+
+### Town Responses Request Used The Wrong Content Type For Assistant History (2026-04-13)
+- Status: Addressed
+- Related story/task: Town direct text streaming via the OpenAI Responses API
+- Original completion claim: The Town scene was handed off as streaming through the Responses API with local conversation history passed back into subsequent turns.
+- Reported issue: The developer hit a 400 from OpenAI: `Invalid value: 'input_text'. Supported values are: 'output_text' and 'refusal'.`
+- Failing evidence: Runtime log from `LLMConversationController` showing the request failed at `input[1].content[0]` when a prior assistant turn was included in the conversation history.
+- Approach that produced the miss: `OpenAIClient.BuildRequestJson()` encoded every non-system history item as a typed content array with `type: "input_text"`, including assistant messages.
+- Why it was mistaken for done: The request-shape verification only covered a system plus user turn and never exercised a multi-turn history that included an assistant reply, so the invalid assistant serialization path stayed invisible.
+- What should have been verified or stated differently: Any manual conversation-state implementation for the Responses API must verify both user and assistant history serialization against the documented multi-turn format before handoff.
+- Prevention rules for future work:
+  - Add request-builder coverage that includes at least one assistant history turn whenever conversation state is serialized manually.
+  - Prefer the documented string `content` message form for text-only history unless typed content items are required by the feature.
+  - Treat request-shape validation and stream parsing as separate guardrails; one passing does not imply the other is sound.
+- Follow-up actions: Updated `OpenAIClient.BuildRequestJson()` to serialize text-only history as plain message strings instead of typed `input_text` content arrays, which aligns with the official Responses API conversation-state examples for alternating user and assistant turns. Expanded the request-builder regression to include an assistant message and assert that no `input_text` item leaks into the serialized payload.
+- Distilled rule added to project-memory.md: `Responses API history tests must cover assistant turns (2026-04-13)`
+
+### Town Streaming Finalized With Raw JSON Still Visible (2026-04-13)
+- Status: Addressed
+- Related story/task: Town title-screen slice plus direct NPC text streaming in `Town.unity`
+- Original completion claim: The Town scene was handed off as having direct text streaming through the OpenAI Responses API, with the UI no longer scraping partial JSON from the raw stream.
+- Reported issue: The developer reported that the visible dialogue still showed the final JSON payload instead of only the NPC's spoken line.
+- Failing evidence: Town scene screenshot showing `Old Garrett` with the literal payload `{"response":"Oh, bless my soul!...","options":[...]}` rendered in the dialogue body while fallback buttons remained visible.
+- Approach that produced the miss: The transport and UI were moved onto direct text deltas, but the end-of-turn compatibility parser still fell back to the full raw payload when the model returned a legacy JSON object and the final parser path did not reliably extract `response` and `options`.
+- Why it was mistaken for done: Verification focused on the streaming path itself and did not include a regression that exercised the final payload parser with a JSON-shaped completion. The handoff overestimated end-to-end confidence from the delta path alone.
+- What should have been verified or stated differently: A "streaming works" claim for Town NPC dialogue must cover both the incremental delta display and the final payload normalization path, including legacy JSON completions and option extraction.
+- Prevention rules for future work:
+  - Add a parser regression test for any legacy JSON completion shape that can still arrive from the model or prompt drift.
+  - Add a golden-set eval that fails when outputs leak raw JSON, option arrays, code fences, or other non-spoken payload formatting.
+  - Treat stream rendering and final turn normalization as separate verification axes in the handoff.
+- Follow-up actions: Added an EditMode regression that invokes `LLMConversationController.TryParseResponse()` with the legacy JSON payload shape from the Town failure and asserts that only the spoken `response` plus structured `options` survive. Reworked the compatibility parser in `LLMConversationController` so it extracts `response` and `options` manually before falling back, which keeps direct streaming intact while preventing raw JSON from reaching the dialogue body. Added a repo-local Town golden-set eval under `docs/evals/` plus `tools/evals/town_llm_golden_eval.py` so prompt or model changes fail quickly if they leak payload formatting back into the scene.
+- Distilled rule added to project-memory.md: `Town streaming verification must cover both delta rendering and final payload normalization (2026-04-13)`
+
 ### Scene 7 Farming Tutorial Still Auto-Played After Completion Claim (2026-04-11)
 - Status: Addressed
 - Related story/task: FarmMain / Scene 7 farming tutorial completion pass
@@ -181,3 +245,82 @@
   - If prompt or mission code depends on scene bootstrap wiring, add an idempotent `Ensure...Configured()` path that can run before prompts are built.
 - Follow-up actions: Added `EnsureHeroPlotConfigured()` to `TutorialFarmSceneController`, retried hero-plot lifecycle wiring during update and before prompt/mission reads, updated `FarmPlotInteractionController` to force that configuration before building the prompt, and added an EditMode regression test that simulates late crop-state initialization.
 - Distilled rule added to project-memory.md: `Tutorial Scene Wiring Must Not Depend On Start Order (2026-04-11)`
+
+### FarmMain Scene Merge Left A Stale Tutorial Script On FarmController (2026-04-13)
+- Status: Addressed
+- Related story/task: Scene 7 tomato task-driven minigame lifecycle after teammate scene/tool merge
+- Original completion claim: The tomato stage-minigame flow was previously handed off as present in Scene 7, and later pull/integration work was summarized as keeping local farming changes intact while syncing teammate updates.
+- Reported issue: The developer reported that the farming-step minigames no longer show.
+- Failing evidence: Repo inspection of [`Assets/_Project/Scenes/FarmMain.unity`](/Users/youss/My%20project/Assets/_Project/Scenes/FarmMain.unity) found `FarmController` carrying a stale `MonoBehaviour` entry with missing script GUID `1cf442307b7db40ffa99802cf172a9bc` ahead of the live `TutorialFarmSceneController`.
+- Approach that produced the miss: Scene integration focused on code paths and stash contents, but did not perform a scene-level integrity check for missing scripts after the `FarmMain.unity` merge.
+- Why it was mistaken for done: The underlying minigame code still existed in `CropLifecycleProfile`, `CropPlotState`, and `FarmPlotInteractionController`, which made the feature look intact from a code diff alone while the scene root still contained stale merged wiring.
+- What should have been verified or stated differently: After merging or restoring Unity scenes, verification should include a missing-script sweep on the relevant controller roots, not just source-file inspection.
+- Prevention rules for future work:
+  - After any Unity scene merge, stash replay, or large scene pull, scan the touched scenes for stale script GUIDs and duplicate controller components.
+  - Treat controller-root missing scripts as P1 regressions for tutorial scenes because they can invalidate runtime behavior while leaving feature code apparently intact.
+  - Add scene-integrity tests for critical tutorial scenes so merged YAML regressions fail fast in EditMode.
+- Follow-up actions: Added a `FarmMainScene_FarmControllerHasNoMissingScripts` edit-mode regression test and removed the stale `FarmController` tutorial-script block from `FarmMain.unity`. Unity batch tests remained blocked because the editor already had the project open.
+- Distilled rule added to project-memory.md: `Unity Scene Merges Need Missing-Script Sweeps (2026-04-13)`
+
+### FarmMain Scene Integrity Test Missed FarmSimDriver Namespace Import (2026-04-13)
+- Status: Addressed
+- Related story/task: FarmMain scene-integrity regression test for missing scripts
+- Original completion claim: The stale `FarmController` script block was removed and a regression test was added to catch the issue going forward.
+- Reported issue: The developer hit `Assets/Tests/EditMode/TutorialSceneConfigurationTests.cs(242,53): error CS0246: The type or namespace name 'FarmSimDriver' could not be found`.
+- Failing evidence: The new test referenced `FarmSimDriver` without importing `FarmSimVR.MonoBehaviours.Farming`.
+- Approach that produced the miss: The scene fix added a new type assertion to an existing test file, but the final compile-oriented import sweep only focused on the scene YAML change and not the new test's namespace dependencies.
+- Why it was mistaken for done: The test logic itself was correct, so source review over-weighted the behavioral assertion and missed the missing namespace import while Unity compile execution was blocked by the open editor.
+- What should have been verified or stated differently: Any new test reference to a MonoBehaviour outside the current namespace set needs the same explicit `using` scan as production code when compile verification is unavailable.
+- Prevention rules for future work:
+  - Include test files in compile-oriented namespace/import sweeps after adding new typed assertions.
+  - When Unity compile is blocked, do not treat a new test as complete until every referenced project type is matched to an explicit `using` or fully qualified name.
+- Follow-up actions: Added the missing `using FarmSimVR.MonoBehaviours.Farming;` import to `TutorialSceneConfigurationTests.cs` and re-scanned the file header for the remaining referenced namespaces.
+- Distilled rule added to project-memory.md: `Namespace Imports After Cross-Assembly Wiring (2026-04-11)`
+
+### Tutorial Tomato Patch Was Present But Hidden From The Spawn Read (2026-04-13)
+- Status: Addressed
+- Related story/task: Scene 7 tomato minigame accessibility in `FarmMain`
+- Original completion claim: The minigame regression was summarized as fixed after scene-controller cleanup because the tutorial tomato hero plot still existed and remained wired to `TutorialFarmSceneController`.
+- Reported issue: The developer still could not see a tomato patch in the scene to try the minigames on.
+- Failing evidence: `FarmMain.unity` still placed the hero tomato plot prefab override at local position `(0, 0.01, 4)` under `FarmPlots` and named it `CropPlot_0`, which left it outside the obvious spawn read and indistinguishable from the generic plot row during inspection.
+- Approach that produced the miss: Verification focused on missing scripts and prompt wiring, but did not confirm that the dedicated tutorial plot was physically visible and uniquely identifiable from the starting play space.
+- Why it was mistaken for done: The scene contained a valid hero plot reference, so source-level checks suggested the feature existed even though the player-facing read of the space still failed.
+- What should have been verified or stated differently: The scene handoff needed an explicit "from spawn, can I immediately spot and reach the tutorial patch?" check, plus a unique scene name for the hero plot.
+- Prevention rules for future work:
+  - Critical tutorial interactables need unique scene names so merge review and tests can target them directly.
+  - Scene verification for playable loops must include physical visibility and reachability from the spawn area, not only serialized references.
+  - When a tutorial patch is special-purpose, prefer a dedicated lane position over leaving it mixed into ambiguous generic naming.
+- Follow-up actions: Renamed the hero plot to `CropPlot_TutorialTomato`, moved it into the front-right patch lane near `PlayerSpawn`, and added an EditMode regression test that asserts the tutorial controller still points at that visible plot.
+- Distilled rule added to project-memory.md: `Tutorial Plots Need Unique Names And Spawn-Visible Placement (2026-04-13)`
+
+### FarmMain Tool Props Used Wrapper Prefabs With Missing Second-Hop Sources (2026-04-13)
+- Status: Addressed
+- Related story/task: `FarmMain` scene-open failures after the tutorial tomato/minigame scene repairs
+- Original completion claim: The scene-level handoff focused on tutorial plot visibility and prompt/minigame wiring, with the expectation that `FarmMain` would remain openable after the scene edits.
+- Reported issue: Unity reported missing prefab assets while opening `Assets/_Project/Scenes/FarmMain.unity` for `SpadingFork`, `Bucket`, `Spade`, `Hoe`, and `Sickle`.
+- Failing evidence: The five prefabs under `Assets/ResilientLogicGames/ToolsLowPolyPackLite/Prefabs/` still existed by GUID, but each file was only a `PrefabInstance` wrapper whose `m_SourcePrefab` pointed at a missing inner source GUID (`6b58c11b87f85e144aeaa25c638a21f3`, `b78750eed6179e54f85d89fd770e6cc9`, `b83de2dc15ae7724d813d14ee94d8522`, `8e0274d0422891640b7ee8811ae16a5f`, `70dc12851c11b444aa5573d6ea1e3292`).
+- Approach that produced the miss: Verification stopped at scene YAML references and did not inspect whether the referenced decorative prefabs themselves still resolved to healthy imported assets.
+- Why it was mistaken for done: The outer prefab GUIDs were present in the repo, which made the scene references look valid in text search even though the actual asset import chain was broken one level deeper.
+- What should have been verified or stated differently: Scene-open validation needed an asset-health pass on referenced prefabs, especially third-party wrappers, instead of assuming that a present `.prefab` file implies a valid importable asset.
+- Prevention rules for future work:
+  - When a scene depends on wrapper prefabs, verify the wrapper is a standalone/importable asset or that every nested source GUID resolves locally.
+  - Treat scene-open editor errors as a separate verification axis from C# compile/test health.
+  - Add regression coverage for third-party decorative prefabs that the scene relies on so missing second-hop sources fail before manual scene-open.
+- Follow-up actions: Replaced the five broken wrapper prefab files with standalone prefab assets backed by in-repo prop meshes, preserving the existing wrapper GUIDs and root object IDs so `FarmMain` and demo scenes can keep their current references.
+- Distilled rule added to project-memory.md: `Wrapper Prefabs Must Not Depend On Missing Second-Hop Sources (2026-04-13)`
+
+### Run-Tests Harness Treated The Open Editor As A Terminal Failure (2026-04-13)
+- Status: Addressed
+- Related story/task: EditMode verification for the Scene 7 farming/minigame fixes
+- Original completion claim: Test verification was repeatedly reported as blocked because the Unity editor already had the project open.
+- Reported issue: The developer pointed out that the test runner design was faulty and should be redesigned to complete its intended use instead of just skipping.
+- Failing evidence: `.ai/scripts/run-tests.sh` returned `SKIPPED` with exit code `2` whenever batchmode hit `another Unity instance is running with this project open`, so `./run-tests.sh editmode` could not perform the requested verification while the editor was open.
+- Approach that produced the miss: The harness only attempted to run batchmode on the live project path and treated Unity's project lock as the end of the workflow instead of a condition the harness should work around.
+- Why it was mistaken for done: The prior handoff focused on accurately describing the lock, but that still left the command unable to do the one thing it exists to do: run tests.
+- What should have been verified or stated differently: The test runner itself needed a fallback execution path, not just a note that the primary path was blocked.
+- Prevention rules for future work:
+  - Verification harnesses should degrade into a workable alternative path when a common local constraint is predictable and automatable.
+  - Do not stop at "environment blocked" when the harness can safely run against a disposable copy of on-disk state.
+  - Add a regression around the fallback path so future harness refactors do not silently reintroduce skip-only behavior.
+- Follow-up actions: Added `.ai/tests/run-tests-lock-fallback.sh` as a regression, redesigned `.ai/scripts/run-tests.sh` to detect a live editor and run Unity against a disposable cloned project, and replaced the flaky CLI `-runTests` path with a repo-owned `BatchmodeTestRunner` execute-method that saves NUnit XML before exit. The harness now runs the real root command while the editor stays open and surfaces actual failing tests instead of skipping.
+- Distilled rule added to project-memory.md: `Unity Harnesses Need Editor-Lock Fallbacks (2026-04-13)`

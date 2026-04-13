@@ -2452,7 +2452,7 @@ MonoBehaviour:
   apiKey: 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
   model: gpt-4o-mini
   temperature: 0.8
-  maxTokens: 300
+  maxTokens: 140
 --- !u!4 &920750517
 Transform:
   m_ObjectHideFlags: 0

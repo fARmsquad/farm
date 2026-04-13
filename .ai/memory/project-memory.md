@@ -217,6 +217,67 @@ name and populate the slice after the most recent requested review subject
 (soil base, crop state, tomato stage, planter style, and so on), not whichever
 earlier asset family happened to be under discussion first.
 
+### Unity Scene Merges Need Missing-Script Sweeps (2026-04-13)
+After pulling, rebasing, or replaying stashed Unity scene changes, scan the
+touched scenes for stale script GUIDs and duplicate controller blocks before
+assuming runtime behavior is preserved. Scene YAML can keep a missing script on
+a controller root even when the live C# feature code still exists, and that
+kind of merge artifact is easy to miss in source-only review.
+
+### Tutorial Plots Need Unique Names And Spawn-Visible Placement (2026-04-13)
+For guided farm scenes, give the special tutorial plot a unique scene name and
+place it where it is immediately visible and reachable from the spawn read.
+Serialized references alone are not enough; the player must be able to spot the
+target patch without hunting through the field.
+
+### Wrapper Prefabs Must Not Depend On Missing Second-Hop Sources (2026-04-13)
+When a scene references third-party wrapper prefabs, verify that the wrapper is
+itself a healthy standalone asset or that every nested `m_SourcePrefab` target
+still exists locally. A `.prefab` file can be present while its import chain is
+broken, which will only surface when Unity tries to open the scene.
+
+### Unity Harnesses Need Editor-Lock Fallbacks (2026-04-13)
+If a local verification command is expected to run while the Unity editor is
+already open, the harness should provide a safe fallback path instead of
+stopping at the project lock. For batchmode test runs, a disposable copy of the
+current on-disk project state is preferable to a skip-only response.
+
+### Cloned Unity Batch Tests Should Own Result Writing (2026-04-13)
+When EditMode or PlayMode tests run against a disposable cloned project, do not
+assume Unity's built-in `-runTests` CLI path will emit the XML report
+reliably. Prefer a repo-owned `-executeMethod` runner that calls
+`TestRunnerApi`, saves the NUnit XML explicitly, and only then exits.
+
+### Town Streaming Needs Final-Payload Guardrails (2026-04-13)
+When Town NPC dialogue is described as "streaming correctly," verification must
+cover both layers of the turn: incremental text deltas during generation and
+final payload normalization after completion. A live delta path can still end
+with raw JSON on screen if the compatibility parser fails. Add a regression
+test for legacy JSON payloads and keep a golden-set eval that rejects raw JSON,
+option arrays, code fences, or other non-spoken output formats.
+
+### Responses API History Must Cover Assistant Turns (2026-04-13)
+When manually serializing conversation state for the Responses API, verify a
+history that includes at least one assistant turn. Text-only history can use
+plain string `content`, and that path is safer than hand-building typed content
+arrays unless the feature actually needs multimodal items. A request builder
+that only tests user messages can still fail at runtime once assistant history
+is appended on the second turn.
+
+### Town Dialogue Option Cadence Needs Its Own Guardrail (2026-04-13)
+For the Town slice, do not treat button presence as enough. Verify when the
+generic fallback buttons appear, when scripted four-choice ladders appear, and
+when `Goodbye.` becomes available. A streamed-text fix can still feel wrong if
+opening turns fall back to `Continue...`/`Goodbye.` before the intended
+conversation ladder takes over.
+
+### Town Dialogue Choices Must Follow The Latest Reply (2026-04-13)
+When Town NPC follow-up options are derived locally, do not drive them only
+from turn index or a canned ladder. Compose the visible prompts from the
+latest parsed reply first so cooking lines yield cooking follow-ups, town
+history lines yield story or town prompts, and cadence rules like late
+`Goodbye.` unlocks only shape the final set after that response-aware pass.
+
 ---
 
 ## Performance Budgets (Quest 2)

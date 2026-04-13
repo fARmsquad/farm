@@ -88,3 +88,13 @@ finalize.sh
 
 # Git worktrees
 .worktrees/
+
+# Local backend secrets
+backend/story-orchestrator/.env.local
+backend/story-orchestrator/.venv/
+backend/story-orchestrator/data/
+backend/story-orchestrator/**/__pycache__/
+
+# Python cache artifacts
+**/__pycache__/
+*.pyc

@@ -10,6 +10,8 @@ namespace FarmSimVR.Core.Tutorial
         public const string WorldSandboxScenePath = "Assets/_Project/Scenes/WorldMain.unity";
         public const string HorseTrainingSceneName = "HorseTrainingGame";
         public const string HorseTrainingScenePath = "Assets/_Project/Scenes/HorseTrainingGame.unity";
+        public const string TownSceneName = "Town";
+        public const string TownScenePath = "Assets/_Project/Scenes/Town.unity";
         public const string FarmVegetableStatesSceneName = "FarmVegetableStates";
         public const string FarmVegetableStatesScenePath = "Assets/_Project/Scenes/FarmVegetableStates.unity";
 
@@ -78,7 +80,7 @@ namespace FarmSimVR.Core.Tutorial
 
         private static IReadOnlyList<SceneWorkDefinition> BuildTitleScreenLaunchableScenes(IReadOnlyList<SceneWorkDefinition> tutorialScenes)
         {
-            var launchableScenes = new List<SceneWorkDefinition>(tutorialScenes.Count + 2);
+            var launchableScenes = new List<SceneWorkDefinition>(tutorialScenes.Count + 3);
             foreach (var scene in tutorialScenes)
                 launchableScenes.Add(scene);
 
@@ -93,6 +95,15 @@ namespace FarmSimVR.Core.Tutorial
 
             launchableScenes.Add(Define(
                 10,
+                TownSceneName,
+                TownScenePath,
+                "Town Conversation",
+                "Own the standalone town interaction slice with NPC conversation, autoplay approach, and free-roam follow-up.",
+                SceneWorkKind.Gameplay,
+                null));
+
+            launchableScenes.Add(Define(
+                11,
                 FarmVegetableStatesSceneName,
                 FarmVegetableStatesScenePath,
                 "Farm Vegetable States",
