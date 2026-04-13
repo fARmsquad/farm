@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     gemini_project_number: str = ""
     gemini_project_id: str = ""
     gemini_image_model: str = "gemini-3.1-flash-image-preview"
+    gemini_image_fallback_model: str = "gemini-2.5-flash-image"
     elevenlabs_api_key: str = ""
     elevenlabs_voice_id: str = ""
     elevenlabs_model_id: str = "eleven_multilingual_v2"

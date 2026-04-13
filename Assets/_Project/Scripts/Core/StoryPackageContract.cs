@@ -99,16 +99,64 @@ namespace FarmSimVR.Core.Story
 
         private static void ValidateCutsceneBeat(StoryBeatSnapshot beat, int index, List<string> errors)
         {
-            if (beat.SequenceSteps == null || beat.SequenceSteps.Length == 0)
+            var hasSequenceSteps = beat.SequenceSteps != null && beat.SequenceSteps.Length > 0;
+            var hasStoryboard = beat.Storyboard != null;
+            if (!hasSequenceSteps && !hasStoryboard)
             {
-                errors.Add($"Beat {index} cutscene requires at least one SequenceStep.");
+                errors.Add($"Beat {index} cutscene requires SequenceSteps or Storyboard.");
                 return;
             }
 
+            if (hasSequenceSteps)
+                ValidateSequenceSteps(beat, index, errors);
+
+            if (hasStoryboard)
+                ValidateStoryboard(beat.Storyboard, index, errors);
+        }
+
+        private static void ValidateSequenceSteps(StoryBeatSnapshot beat, int index, List<string> errors)
+        {
             for (int i = 0; i < beat.SequenceSteps.Length; i++)
             {
                 if (beat.SequenceSteps[i] == null || string.IsNullOrWhiteSpace(beat.SequenceSteps[i].StepType))
                     errors.Add($"Beat {index} cutscene step {i} is missing StepType.");
+            }
+        }
+
+        private static void ValidateStoryboard(
+            StoryStoryboardSnapshot storyboard,
+            int index,
+            List<string> errors)
+        {
+            if (storyboard.Shots == null || storyboard.Shots.Length == 0)
+            {
+                errors.Add($"Beat {index} storyboard requires at least one shot.");
+                return;
+            }
+
+            for (int i = 0; i < storyboard.Shots.Length; i++)
+            {
+                var shot = storyboard.Shots[i];
+                if (shot == null)
+                {
+                    errors.Add($"Beat {index} storyboard shot {i} is null.");
+                    continue;
+                }
+
+                if (string.IsNullOrWhiteSpace(shot.ShotId))
+                    errors.Add($"Beat {index} storyboard shot {i} requires ShotId.");
+
+                if (string.IsNullOrWhiteSpace(shot.SubtitleText))
+                    errors.Add($"Beat {index} storyboard shot {i} requires SubtitleText.");
+
+                if (string.IsNullOrWhiteSpace(shot.ImageResourcePath))
+                    errors.Add($"Beat {index} storyboard shot {i} requires ImageResourcePath.");
+
+                if (string.IsNullOrWhiteSpace(shot.AudioResourcePath))
+                    errors.Add($"Beat {index} storyboard shot {i} requires AudioResourcePath.");
+
+                if (shot.DurationSeconds <= 0f)
+                    errors.Add($"Beat {index} storyboard shot {i} requires DurationSeconds greater than 0.");
             }
         }
 

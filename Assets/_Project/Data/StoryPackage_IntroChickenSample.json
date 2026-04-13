@@ -50,7 +50,7 @@
       "DisplayName": "Post Chicken Bridge",
       "Kind": "Cutscene",
       "SceneName": "Tutorial_PostChickenCutscene",
-      "NextSceneName": "",
+      "NextSceneName": "MidpointPlaceholder",
       "SequenceSteps": [
         {
           "StepType": "ObjectivePopup",
@@ -61,7 +61,36 @@
           "Duration": 0.5,
           "WaitForCompletion": true
         }
-      ]
+      ],
+      "Storyboard": {
+        "StylePresetId": "farm_storybook_v1",
+        "Shots": [
+          {
+            "ShotId": "shot_01",
+            "SubtitleText": "Nice work. The carrot beds are finally ready for you.",
+            "NarrationText": "Nice work. The carrot beds are finally ready for you.",
+            "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/post_chicken_bridge/shot_01",
+            "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/post_chicken_bridge/shot_01",
+            "DurationSeconds": 3.2
+          },
+          {
+            "ShotId": "shot_02",
+            "SubtitleText": "Plant 3 carrots in 5 minutes, and keep the rows tidy.",
+            "NarrationText": "Plant 3 carrots in 5 minutes, and keep the rows tidy.",
+            "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/post_chicken_bridge/shot_02",
+            "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/post_chicken_bridge/shot_02",
+            "DurationSeconds": 3.6
+          },
+          {
+            "ShotId": "shot_03",
+            "SubtitleText": "Head to the plots. The farm is waiting on your hands.",
+            "NarrationText": "Head to the plots. The farm is waiting on your hands.",
+            "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/post_chicken_bridge/shot_03",
+            "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/post_chicken_bridge/shot_03",
+            "DurationSeconds": 3.0
+          }
+        ]
+      }
     }
   ]
 }

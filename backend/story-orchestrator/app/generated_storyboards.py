@@ -149,9 +149,9 @@ class TemplateStoryboardPlanner:
 
 
 class GeminiImageGenerator:
-    def __init__(self, api_key: str, model: str) -> None:
+    def __init__(self, api_key: str, models: list[str]) -> None:
         self._api_key = api_key
-        self._model = model
+        self._models = [model for model in models if model]
 
     def generate_image(
         self,
@@ -178,32 +178,63 @@ class GeminiImageGenerator:
                 }
             )
 
-        payload = {
+        last_error: Exception | None = None
+        for model in self._models:
+            try:
+                payload = self._build_payload(
+                    model=model,
+                    parts=parts,
+                    aspect_ratio=aspect_ratio,
+                    image_size=image_size,
+                )
+                response = httpx.post(
+                    f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+                    headers={
+                        "Content-Type": "application/json",
+                        "x-goog-api-key": self._api_key,
+                    },
+                    json=payload,
+                    timeout=120,
+                )
+                response.raise_for_status()
+
+                data = response.json()
+                inline_data = self._extract_inline_image(data)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                output_path.write_bytes(base64.b64decode(inline_data["data"]))
+                return GeneratedImageAsset(output_path=output_path, mime_type=inline_data.get("mimeType", "image/png"))
+            except httpx.HTTPStatusError as error:
+                last_error = error
+                if error.response.status_code not in (403, 404, 429):
+                    raise
+            except Exception as error:
+                last_error = error
+                raise
+
+        if last_error is not None:
+            raise last_error
+
+        raise RuntimeError("No Gemini image model is configured.")
+
+    @staticmethod
+    def _build_payload(
+        *,
+        model: str,
+        parts: list[dict[str, Any]],
+        aspect_ratio: str,
+        image_size: str,
+    ) -> dict[str, Any]:
+        image_config: dict[str, Any] = {"aspectRatio": aspect_ratio}
+        if image_size and "gemini-2.5" not in model:
+            image_config["imageSize"] = image_size
+
+        return {
             "contents": [{"parts": parts}],
             "generationConfig": {
                 "responseModalities": ["TEXT", "IMAGE"],
-                "imageConfig": {
-                    "aspectRatio": aspect_ratio,
-                    "imageSize": image_size,
-                },
+                "imageConfig": image_config,
             },
         }
-        response = httpx.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/{self._model}:generateContent",
-            headers={
-                "Content-Type": "application/json",
-                "x-goog-api-key": self._api_key,
-            },
-            json=payload,
-            timeout=120,
-        )
-        response.raise_for_status()
-
-        data = response.json()
-        inline_data = self._extract_inline_image(data)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_bytes(base64.b64decode(inline_data["data"]))
-        return GeneratedImageAsset(output_path=output_path, mime_type=inline_data.get("mimeType", "image/png"))
 
     @staticmethod
     def _extract_inline_image(response_json: dict[str, Any]) -> dict[str, Any]:
@@ -300,7 +331,10 @@ class GeneratedStoryboardService:
             planner=TemplateStoryboardPlanner(),
             image_generator=GeminiImageGenerator(
                 api_key=settings.gemini_api_key,
-                model=settings.gemini_image_model,
+                models=[
+                    settings.gemini_image_model,
+                    settings.gemini_image_fallback_model,
+                ],
             ),
             speech_generator=ElevenLabsSpeechGenerator(
                 api_key=settings.elevenlabs_api_key,
@@ -347,31 +381,40 @@ class GeneratedStoryboardService:
                 }
             )
 
-        unity_package = {
-            "PackageId": request.package_id,
-            "SchemaVersion": 1,
-            "PackageVersion": 1,
-            "DisplayName": request.package_display_name,
-            "Beats": [
+        unity_package = self._load_existing_package(request)
+        unity_package["PackageId"] = request.package_id
+        unity_package["SchemaVersion"] = unity_package.get("SchemaVersion", 1)
+        unity_package["PackageVersion"] = unity_package.get("PackageVersion", 1)
+        unity_package["DisplayName"] = request.package_display_name
+        beats = unity_package.setdefault("Beats", [])
+
+        updated_beat = {
+            "BeatId": plan.beat_id,
+            "DisplayName": plan.display_name,
+            "Kind": "Cutscene",
+            "SceneName": plan.scene_name,
+            "NextSceneName": plan.next_scene_name,
+            "SequenceSteps": [
                 {
-                    "BeatId": plan.beat_id,
-                    "DisplayName": plan.display_name,
-                    "Kind": "Cutscene",
-                    "SceneName": plan.scene_name,
-                    "NextSceneName": plan.next_scene_name,
-                    "SequenceSteps": [
-                        {
-                            "StepType": "ObjectivePopup",
-                            "StringParam": shots[0]["SubtitleText"],
-                        }
-                    ],
-                    "Storyboard": {
-                        "StylePresetId": plan.style_preset_id,
-                        "Shots": shots,
-                    },
+                    "StepType": "ObjectivePopup",
+                    "StringParam": shots[0]["SubtitleText"],
                 }
             ],
+            "Storyboard": {
+                "StylePresetId": plan.style_preset_id,
+                "Shots": shots,
+            },
         }
+
+        beat_replaced = False
+        for index, beat in enumerate(beats):
+            if beat.get("BeatId") == plan.beat_id or beat.get("SceneName") == plan.scene_name:
+                beats[index] = updated_beat
+                beat_replaced = True
+                break
+
+        if not beat_replaced:
+            beats.append(updated_beat)
 
         self._package_output_path.parent.mkdir(parents=True, exist_ok=True)
         self._package_output_path.write_text(
@@ -402,6 +445,21 @@ class GeneratedStoryboardService:
     def _to_resource_path(self, asset_path: Path) -> str:
         relative_path = asset_path.relative_to(self._output_root)
         return str(relative_path.with_suffix("")).replace("\\", "/")
+
+    def _load_existing_package(self, request: GeneratedStoryboardCutsceneRequest) -> dict[str, Any]:
+        if not self._package_output_path.exists():
+            return {
+                "PackageId": request.package_id,
+                "SchemaVersion": 1,
+                "PackageVersion": 1,
+                "DisplayName": request.package_display_name,
+                "Beats": [],
+            }
+
+        try:
+            return json.loads(self._package_output_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as error:
+            raise RuntimeError(f"Existing story package is invalid JSON: {error}") from error
 
 
 def _build_style_prompt(style_preset_id: str) -> str:

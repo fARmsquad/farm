@@ -9,6 +9,7 @@ namespace FarmSimVR.Core.Story
         public string SceneName;
         public string NextSceneName;
         public StorySequenceStepSnapshot[] SequenceSteps = System.Array.Empty<StorySequenceStepSnapshot>();
+        public StoryStoryboardSnapshot Storyboard;
         public StoryMinigameConfigSnapshot Minigame;
     }
 }

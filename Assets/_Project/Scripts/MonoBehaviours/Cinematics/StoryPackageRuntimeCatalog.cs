@@ -46,7 +46,34 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
             title = beat.DisplayName ?? string.Empty;
             body = ExtractBodyText(beat);
+            if (string.IsNullOrWhiteSpace(body) &&
+                beat.Storyboard != null &&
+                beat.Storyboard.Shots != null &&
+                beat.Storyboard.Shots.Length > 0)
+            {
+                body = beat.Storyboard.Shots[0]?.SubtitleText ?? string.Empty;
+            }
+
             return !string.IsNullOrWhiteSpace(title) || !string.IsNullOrWhiteSpace(body);
+        }
+
+        public static bool TryGetStoryboard(string sceneName, out string title, out StoryStoryboardSnapshot storyboard)
+        {
+            title = string.Empty;
+            storyboard = null;
+
+            if (!TryGetBeat(sceneName, out var beat))
+                return false;
+
+            if (!StoryBeatKindParser.TryParse(beat.Kind, out var kind) || kind != StoryBeatKind.Cutscene)
+                return false;
+
+            if (beat.Storyboard == null || beat.Storyboard.Shots == null || beat.Storyboard.Shots.Length == 0)
+                return false;
+
+            title = beat.DisplayName ?? string.Empty;
+            storyboard = beat.Storyboard;
+            return true;
         }
 
         public static void ResetCacheForTests()

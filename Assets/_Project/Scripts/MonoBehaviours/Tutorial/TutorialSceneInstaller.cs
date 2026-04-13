@@ -55,6 +55,16 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         private static void EnsureCutscene(string objectName, string title, string body, float autoAdvanceDelay)
         {
+            if (StoryPackageRuntimeCatalog.TryGetStoryboard(objectName, out var storyboardTitle, out var storyboard))
+            {
+                if (!string.IsNullOrWhiteSpace(storyboardTitle))
+                    title = storyboardTitle;
+
+                var storyboardController = EnsureComponent<TutorialCutsceneSceneController>(objectName);
+                storyboardController.ConfigureStoryboard(title, storyboard.Shots, autoAdvanceDelay);
+                return;
+            }
+
             if (StoryPackageRuntimeCatalog.TryGetCutsceneDisplayText(objectName, out var packageTitle, out var packageBody))
             {
                 if (!string.IsNullOrWhiteSpace(packageTitle))
