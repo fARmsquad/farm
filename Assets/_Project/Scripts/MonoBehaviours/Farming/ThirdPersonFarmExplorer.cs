@@ -21,6 +21,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
         private CharacterController _controller;
         private Transform _cameraTransform;
+        private FarmPlotInteractionController _interactionController;
         private float _pitch;
         private float _yVelocity;
 
@@ -34,6 +35,10 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private void Update()
         {
             TryResolveReferences();
+
+            if (_interactionController != null && _interactionController.IsMinigameActive)
+                return;
+
             HandleLook();
             HandleMove();
         }
@@ -126,6 +131,9 @@ namespace FarmSimVR.MonoBehaviours.Farming
                 if (cam != null)
                     _cameraTransform = cam.transform;
             }
+
+            if (_interactionController == null)
+                _interactionController = Object.FindAnyObjectByType<FarmPlotInteractionController>();
         }
     }
 }

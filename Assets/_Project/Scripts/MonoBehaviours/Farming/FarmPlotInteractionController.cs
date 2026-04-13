@@ -24,6 +24,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
         private Camera _camera;
         private TutorialFarmSceneController _mission;
+        private Transform _playerTransform;
         private string _focusedPlotName;
         private FarmPlotActionPrompt _currentPrompt;
         private CropPlotController _focusedController;
@@ -34,6 +35,13 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private Renderer _highlightRenderer;
         private Material _highlightMat;
         private FarmStageMinigameSession _activeMinigame;
+        private float _minigameClosedTime = -1f;
+        private const float MinigameInputCooldown = 0.15f;
+
+        /// <summary>True when a stage minigame overlay is open and consuming input.</summary>
+        public bool IsMinigameActive => _activeMinigame != null
+            || (_minigameClosedTime >= 0f && Time.unscaledTime - _minigameClosedTime < MinigameInputCooldown);
+
         private string _minigamePlotName;
         private CropPlotController _minigameController;
         private GUIStyle _missionStyle;
@@ -97,14 +105,16 @@ namespace FarmSimVR.MonoBehaviours.Farming
                 AddFocusCandidate(hitController, -1f, candidates, promptsByController, seen);
             }
 
-            var nearby = Physics.OverlapSphere(_camera.transform.position, _proximityRadius);
+            // Use player position for proximity in third-person; camera position otherwise.
+            var proximityCenter = ResolveProximityCenter();
+            var nearby = Physics.OverlapSphere(proximityCenter, _proximityRadius);
             foreach (var col in nearby)
             {
                 var controller = col.GetComponent<CropPlotController>() ?? col.GetComponentInParent<CropPlotController>();
                 if (controller == null)
                     continue;
 
-                var distance = Vector3.Distance(_camera.transform.position, controller.transform.position);
+                var distance = Vector3.Distance(proximityCenter, controller.transform.position);
                 AddFocusCandidate(controller, distance, candidates, promptsByController, seen);
             }
 
@@ -114,6 +124,24 @@ namespace FarmSimVR.MonoBehaviours.Farming
                 promptsByController.TryGetValue(bestController, out var prompt);
                 AcceptFocus(bestController, prompt);
             }
+        }
+
+        private Vector3 ResolveProximityCenter()
+        {
+            if (_driver != null && _driver.UseThirdPersonRig)
+            {
+                if (_playerTransform == null)
+                {
+                    var player = GameObject.FindWithTag("Player");
+                    if (player != null)
+                        _playerTransform = player.transform;
+                }
+
+                if (_playerTransform != null)
+                    return _playerTransform.position;
+            }
+
+            return _camera.transform.position;
         }
 
         private void AcceptFocus(CropPlotController controller, FarmPlotActionPrompt prompt)
@@ -182,11 +210,22 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
         private void HandlePromptInput()
         {
+            var keyboard = Keyboard.current;
+            if (keyboard == null)
+                return;
+
+            // Seed selection via number keys (always active, not gated by prompt)
+            if (keyboard.digit1Key.wasPressedThisFrame)
+                _driver.SetSelectedSeed(0);
+            else if (keyboard.digit2Key.wasPressedThisFrame)
+                _driver.SetSelectedSeed(1);
+            else if (keyboard.digit3Key.wasPressedThisFrame)
+                _driver.SetSelectedSeed(2);
+
             if (_currentPrompt == null)
                 return;
 
-            var keyboard = Keyboard.current;
-            if (keyboard == null || keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed)
+            if (keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed)
                 return;
 
             foreach (var option in _currentPrompt.Actions)
@@ -255,7 +294,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
                 return false;
 
             var soilStatus = controller.SoilState?.Status ?? PlotStatus.Empty;
-            if (soilStatus == PlotStatus.Empty && controller.State.Phase == PlotPhase.Empty)
+            if ((soilStatus == PlotStatus.Empty || soilStatus == PlotStatus.Untilled) && controller.State.Phase == PlotPhase.Empty)
                 return false;
 
             var minigame = controller.State.CurrentMinigame;
@@ -273,18 +312,22 @@ namespace FarmSimVR.MonoBehaviours.Farming
             _activeMinigame = null;
             _minigamePlotName = null;
             _minigameController = null;
+            _minigameClosedTime = Time.unscaledTime;
         }
 
         private static bool WasPressed(FarmPlotAction action, Keyboard keyboard)
         {
+            var mouse = Mouse.current;
             return action switch
             {
                 FarmPlotAction.PrimaryInteract => keyboard.eKey.wasPressedThisFrame,
+                FarmPlotAction.Till => mouse != null && mouse.leftButton.wasPressedThisFrame,
+                FarmPlotAction.PlantSelected => mouse != null && mouse.leftButton.wasPressedThisFrame,
                 FarmPlotAction.PlantTomato => keyboard.tKey.wasPressedThisFrame,
                 FarmPlotAction.PlantCarrot => keyboard.cKey.wasPressedThisFrame,
                 FarmPlotAction.PlantLettuce => keyboard.lKey.wasPressedThisFrame,
-                FarmPlotAction.Water => keyboard.pKey.wasPressedThisFrame,
-                FarmPlotAction.Harvest => keyboard.hKey.wasPressedThisFrame,
+                FarmPlotAction.Water => mouse != null && mouse.leftButton.wasPressedThisFrame,
+                FarmPlotAction.Harvest => keyboard.eKey.wasPressedThisFrame,
                 FarmPlotAction.Compost => keyboard.mKey.wasPressedThisFrame,
                 FarmPlotAction.ClearDead => keyboard.xKey.wasPressedThisFrame,
                 _ => false,
@@ -326,7 +369,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
         {
             var missionAction = _mission?.GetPrimaryAction(_focusedController);
             const float panelWidth = 540f;
-            const float panelHeight = 100f;
+            const float panelHeight = 140f;
             var panelX = (Screen.width - panelWidth) * 0.5f;
             var panelY = Screen.height - panelHeight - 44f;
 
@@ -354,6 +397,17 @@ namespace FarmSimVR.MonoBehaviours.Farming
             {
                 var isPrimary = missionAction.HasValue && option.Action == missionAction.Value;
                 chipX = DrawActionChip(chipX, rowY, option.KeyLabel, option.Label, isPrimary) + 12f;
+            }
+
+            // Seed selection indicator
+            rowY += 34f;
+            var seedNames = new[] { "Tomato", "Carrot", "Lettuce" };
+            var selectedIdx = _driver != null ? _driver.SelectedSeedIndex : 0;
+            var seedChipX = panelX + 16f;
+            for (var i = 0; i < seedNames.Length; i++)
+            {
+                var isSelected = i == selectedIdx;
+                seedChipX = DrawActionChip(seedChipX, rowY, (i + 1).ToString(), seedNames[i], isSelected) + 8f;
             }
         }
 

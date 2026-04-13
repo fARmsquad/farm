@@ -19,6 +19,7 @@ namespace FarmSimVR.Core.Tutorial
     public sealed class FarmTutorialMissionService
     {
         private const string TomatoSeedId = "seed_tomato";
+        private const string TillObjective = "Till the soil (LMB).";
         private const string PlantObjective = "Plant the tomato seed.";
 
         private CropTaskId _lastObservedTaskId = CropTaskId.None;
@@ -37,7 +38,7 @@ namespace FarmSimVR.Core.Tutorial
         public void Reset()
         {
             CurrentStep = FarmTutorialMissionStep.AwaitPlant;
-            CurrentObjective = PlantObjective;
+            CurrentObjective = TillObjective;
             _lastObservedTaskId = CropTaskId.None;
         }
 
@@ -49,7 +50,7 @@ namespace FarmSimVR.Core.Tutorial
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(cropId) || soilStatus == PlotStatus.Empty)
+            if (string.IsNullOrWhiteSpace(cropId) && (soilStatus == PlotStatus.Empty || soilStatus == PlotStatus.Untilled))
             {
                 if (_lastObservedTaskId == CropTaskId.TwistHarvest)
                 {
@@ -59,7 +60,9 @@ namespace FarmSimVR.Core.Tutorial
                 else
                 {
                     CurrentStep = FarmTutorialMissionStep.AwaitPlant;
-                    CurrentObjective = PlantObjective;
+                    CurrentObjective = soilStatus == PlotStatus.Untilled
+                        ? TillObjective
+                        : PlantObjective;
                 }
 
                 _lastObservedTaskId = currentTaskId;
@@ -89,6 +92,10 @@ namespace FarmSimVR.Core.Tutorial
             if (IsComplete)
                 return true;
 
+            // Allow tilling untilled plots during tutorial
+            if (soilStatus == PlotStatus.Untilled)
+                return action == FarmPlotAction.Till;
+
             if (action != FarmPlotAction.PrimaryInteract)
                 return false;
 
@@ -102,6 +109,9 @@ namespace FarmSimVR.Core.Tutorial
         {
             if (IsComplete)
                 return null;
+
+            if (soilStatus == PlotStatus.Untilled)
+                return FarmPlotAction.Till;
 
             if (string.IsNullOrWhiteSpace(cropId))
                 return soilStatus == PlotStatus.Empty ? FarmPlotAction.PrimaryInteract : null;

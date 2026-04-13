@@ -37,14 +37,15 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private static readonly string[] SeedLabels = { "Tomato", "Carrot", "Lettuce" };
         private static readonly CropData[] Crops =
         {
-            // baseGrowthRate: 0.04/s → each 0.2-unit phase gate takes 5 seconds at standard conditions
-            new CropData(baseGrowthRate: 0.04f, maxGrowth: 1f),
-            new CropData(baseGrowthRate: 0.04f, maxGrowth: 1f),
-            new CropData(baseGrowthRate: 0.04f, maxGrowth: 1f),
+            // baseGrowthRate: 0.022/s → full growth in ~45 seconds at standard conditions
+            new CropData(baseGrowthRate: 0.022f, maxGrowth: 1f),
+            new CropData(baseGrowthRate: 0.022f, maxGrowth: 1f),
+            new CropData(baseGrowthRate: 0.022f, maxGrowth: 1f),
         };
 
         private int _plot;
         private int _seed;
+        private int _selectedSeedIndex;
         private string _log = "Walk to a plot and look at it to farm.";
 
         private void Start()
@@ -98,6 +99,18 @@ namespace FarmSimVR.MonoBehaviours.Farming
             TickSimulation(Time.deltaTime);
         }
 
+        /// <summary>
+        /// Sets the currently selected seed index for context-sensitive planting.
+        /// </summary>
+        public void SetSelectedSeed(int index)
+        {
+            if (index >= 0 && index < SeedIds.Length)
+                _selectedSeedIndex = index;
+        }
+
+        /// <summary>Current selected seed index (0 = Tomato, 1 = Carrot, 2 = Lettuce).</summary>
+        public int SelectedSeedIndex => _selectedSeedIndex;
+
         public FarmPlotActionPrompt BuildPrompt(string plotName)
         {
             if (!TryGetPlotIndex(plotName, out var index))
@@ -108,7 +121,8 @@ namespace FarmSimVR.MonoBehaviours.Farming
                 _sim.Plots[index],
                 _inv.GetCount(SeedIds[0]),
                 _inv.GetCount(SeedIds[1]),
-                _inv.GetCount(SeedIds[2]));
+                _inv.GetCount(SeedIds[2]),
+                _selectedSeedIndex);
         }
 
         public bool TryExecuteAction(string plotName, FarmPlotAction action, out string message)
@@ -122,9 +136,11 @@ namespace FarmSimVR.MonoBehaviours.Farming
             bool success = action switch
             {
                 FarmPlotAction.PrimaryInteract => TryPrimaryInteract(index, out message),
+                FarmPlotAction.Till => TryTill(index, out message),
                 FarmPlotAction.PlantTomato => TryPlant(index, 0, out message),
                 FarmPlotAction.PlantCarrot => TryPlant(index, 1, out message),
                 FarmPlotAction.PlantLettuce => TryPlant(index, 2, out message),
+                FarmPlotAction.PlantSelected => TryPlant(index, _selectedSeedIndex, out message),
                 FarmPlotAction.Water => TryWater(index, out message),
                 FarmPlotAction.Harvest => TryHarvest(index, out message),
                 FarmPlotAction.Compost => TryCompost(index, out message),
@@ -279,6 +295,19 @@ namespace FarmSimVR.MonoBehaviours.Farming
             }
         }
 
+        private bool TryTill(int plotIndex, out string message)
+        {
+            var soil = _soil.AllPlots[plotIndex];
+            if (soil.Status != PlotStatus.Untilled)
+                return Fail($"Can't till — {soil.Status}", out message);
+
+            if (!_soil.Till(soil.PlotId))
+                return Fail("Tilling failed.", out message);
+
+            message = $"Tilled {soil.PlotId} — ready to plant.";
+            return true;
+        }
+
         private bool TryPlant(int plotIndex, int seedIndex, out string message)
         {
             var soil = _soil.AllPlots[plotIndex];
@@ -309,8 +338,11 @@ namespace FarmSimVR.MonoBehaviours.Farming
             var soil = _soil.AllPlots[plotIndex];
             var cropPlot = _sim.Plots[plotIndex];
 
+            if (soil.Status == PlotStatus.Untilled)
+                return TryTill(plotIndex, out message);
+
             if (soil.Status == PlotStatus.Empty && cropPlot.Phase == PlotPhase.Empty)
-                return TryPlant(plotIndex, 0, out message);
+                return TryPlant(plotIndex, _selectedSeedIndex, out message);
 
             if (cropPlot.IsTutorialTaskMode)
                 return Fail("Open the stage minigame to complete that task.", out message);
