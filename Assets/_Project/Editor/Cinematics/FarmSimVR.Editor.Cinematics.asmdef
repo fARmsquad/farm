@@ -7,7 +7,8 @@
         "Unity.Cinemachine",
         "Unity.Cinemachine.Editor",
         "Unity.Timeline",
-        "Unity.Timeline.Editor"
+        "Unity.Timeline.Editor",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [
         "Editor"
