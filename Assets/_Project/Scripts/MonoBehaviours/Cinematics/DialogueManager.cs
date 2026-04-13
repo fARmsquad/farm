@@ -93,21 +93,23 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         #region Show / Hide
 
         /// <summary>
-        /// Shows the dialogue canvas.
+        /// Shows the dialogue canvas by enabling the Canvas component.
+        /// The GameObject stays active so sibling components (e.g. DialogueChoiceUI) keep running.
         /// </summary>
         public void Show()
         {
             if (dialogueCanvas != null)
-                dialogueCanvas.gameObject.SetActive(true);
+                dialogueCanvas.enabled = true;
         }
 
         /// <summary>
-        /// Hides the dialogue canvas.
+        /// Hides the dialogue canvas by disabling the Canvas component.
+        /// The GameObject stays active so sibling components (e.g. DialogueChoiceUI) keep running.
         /// </summary>
         public void Hide()
         {
             if (dialogueCanvas != null)
-                dialogueCanvas.gameObject.SetActive(false);
+                dialogueCanvas.enabled = false;
         }
 
         #endregion

@@ -9,13 +9,16 @@ using UnityEngine.Networking;
 namespace FarmSimVR.MonoBehaviours
 {
     /// <summary>
-    /// Sends chat messages to the OpenAI Chat Completions API and returns the
-    /// assistant's reply. Set the API key and model in the Inspector.
+    /// Sends chat messages to the OpenAI Chat Completions API with streaming support.
+    /// Streams token-by-token via SSE and fires onChunk for each delta,
+    /// then onComplete with the full accumulated text when the stream ends.
     /// </summary>
     public class OpenAIClient : MonoBehaviour
     {
         private const string API_URL = "https://api.openai.com/v1/chat/completions";
-        private const float REQUEST_TIMEOUT = 30f;
+        private const float REQUEST_TIMEOUT = 60f;
+        private const string SSE_DATA_PREFIX = "data: ";
+        private const string SSE_DONE_MARKER = "[DONE]";
 
         [Header("OpenAI Configuration")]
         [SerializeField] private string apiKey;
@@ -24,12 +27,15 @@ namespace FarmSimVR.MonoBehaviours
         [SerializeField] private int maxTokens = 300;
 
         /// <summary>
-        /// Sends the conversation history to the OpenAI API.
-        /// Invokes onSuccess with the raw content string, or onError on failure.
+        /// Streams a chat completion from the OpenAI API.
+        /// onChunk is called with each new token as it arrives.
+        /// onComplete is called with the full accumulated response text when done.
+        /// onError is called if the request fails.
         /// </summary>
-        public IEnumerator Chat(
+        public IEnumerator ChatStream(
             List<ChatMessage> messages,
-            Action<string> onSuccess,
+            Action<string> onChunk,
+            Action<string> onComplete,
             Action<string> onError)
         {
             if (string.IsNullOrWhiteSpace(apiKey))
@@ -38,46 +44,126 @@ namespace FarmSimVR.MonoBehaviours
                 yield break;
             }
 
-            string requestBody = BuildRequestJson(messages);
+            string requestBody = BuildRequestJson(messages, stream: true);
+            byte[] bodyBytes = Encoding.UTF8.GetBytes(requestBody);
 
             using var request = new UnityWebRequest(API_URL, UnityWebRequest.kHttpVerbPOST);
-            byte[] bodyBytes = Encoding.UTF8.GetBytes(requestBody);
             request.uploadHandler = new UploadHandlerRaw(bodyBytes);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.timeout = (int)REQUEST_TIMEOUT;
             request.SetRequestHeader("Content-Type", "application/json");
             request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
 
-            yield return request.SendWebRequest();
+            var op = request.SendWebRequest();
+
+            var accumulated = new StringBuilder(512);
+            int bytesRead = 0;
+
+            // Poll the download buffer each frame to extract SSE chunks
+            while (!op.isDone)
+            {
+                string raw = request.downloadHandler?.text;
+                if (raw != null && raw.Length > bytesRead)
+                {
+                    string newData = raw.Substring(bytesRead);
+                    bytesRead = raw.Length;
+                    ProcessSSEChunk(newData, accumulated, onChunk);
+                }
+                yield return null;
+            }
+
+            // Process any remaining data after request completes
+            string finalRaw = request.downloadHandler?.text;
+            if (finalRaw != null && finalRaw.Length > bytesRead)
+            {
+                string remaining = finalRaw.Substring(bytesRead);
+                ProcessSSEChunk(remaining, accumulated, onChunk);
+            }
 
             if (request.result != UnityWebRequest.Result.Success)
             {
                 string errorDetail = request.downloadHandler?.text ?? request.error;
-                onError?.Invoke($"OpenAI request failed ({request.responseCode}): {errorDetail}");
+                onError?.Invoke($"OpenAI stream failed ({request.responseCode}): {errorDetail}");
                 yield break;
             }
 
-            string responseBody = request.downloadHandler.text;
-            string content = ExtractContent(responseBody);
+            onComplete?.Invoke(accumulated.ToString());
+        }
 
-            if (content == null)
+        /// <summary>
+        /// Parses SSE lines from a raw chunk and extracts delta content tokens.
+        /// </summary>
+        private static void ProcessSSEChunk(string chunk, StringBuilder accumulated, Action<string> onChunk)
+        {
+            string[] lines = chunk.Split('\n');
+            foreach (string line in lines)
             {
-                onError?.Invoke($"Failed to parse OpenAI response: {responseBody}");
-                yield break;
+                string trimmed = line.Trim();
+                if (!trimmed.StartsWith(SSE_DATA_PREFIX)) continue;
+
+                string payload = trimmed.Substring(SSE_DATA_PREFIX.Length).Trim();
+                if (payload == SSE_DONE_MARKER) continue;
+
+                string token = ExtractDeltaContent(payload);
+                if (string.IsNullOrEmpty(token)) continue;
+
+                accumulated.Append(token);
+                onChunk?.Invoke(token);
+            }
+        }
+
+        /// <summary>
+        /// Extracts the content field from a streaming delta JSON chunk.
+        /// Format: {"choices":[{"delta":{"content":"token"}}]}
+        /// </summary>
+        private static string ExtractDeltaContent(string json)
+        {
+            const string key = "\"content\":\"";
+            int idx = json.IndexOf(key, StringComparison.Ordinal);
+            if (idx < 0) return null;
+
+            int valueStart = idx + key.Length;
+            var result = new StringBuilder();
+
+            for (int i = valueStart; i < json.Length; i++)
+            {
+                char c = json[i];
+                if (c == '\\' && i + 1 < json.Length)
+                {
+                    char next = json[i + 1];
+                    switch (next)
+                    {
+                        case '"':  result.Append('"');  i++; break;
+                        case '\\': result.Append('\\'); i++; break;
+                        case 'n':  result.Append('\n'); i++; break;
+                        case 'r':  result.Append('\r'); i++; break;
+                        case 't':  result.Append('\t'); i++; break;
+                        default:   result.Append('\\'); result.Append(next); i++; break;
+                    }
+                }
+                else if (c == '"')
+                {
+                    break;
+                }
+                else
+                {
+                    result.Append(c);
+                }
             }
 
-            onSuccess?.Invoke(content);
+            return result.Length > 0 ? result.ToString() : null;
         }
 
         /// <summary>
         /// Builds the JSON payload for the Chat Completions endpoint.
         /// </summary>
-        private string BuildRequestJson(List<ChatMessage> messages)
+        private string BuildRequestJson(List<ChatMessage> messages, bool stream = false)
         {
             var sb = new StringBuilder(512);
             sb.Append("{\"model\":\"").Append(EscapeJson(model)).Append("\",");
             sb.Append("\"temperature\":").Append(temperature.ToString("F2")).Append(",");
             sb.Append("\"max_tokens\":").Append(maxTokens).Append(",");
+            if (stream) sb.Append("\"stream\":true,");
             sb.Append("\"messages\":[");
 
             for (int i = 0; i < messages.Count; i++)
@@ -89,34 +175,6 @@ namespace FarmSimVR.MonoBehaviours
 
             sb.Append("]}");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Extracts the assistant message content from the API response JSON.
-        /// </summary>
-        private static string ExtractContent(string json)
-        {
-            var response = JsonUtility.FromJson<OpenAIResponse>(json);
-            if (response?.choices == null || response.choices.Length == 0) return null;
-            return response.choices[0]?.message?.content;
-        }
-
-        [Serializable]
-        private class OpenAIResponse
-        {
-            public Choice[] choices;
-        }
-
-        [Serializable]
-        private class Choice
-        {
-            public Message message;
-        }
-
-        [Serializable]
-        private class Message
-        {
-            public string content;
         }
 
         private static string EscapeJson(string s)
