@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using FarmSimVR.MonoBehaviours.Cinematics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,49 +11,82 @@ namespace FarmSimVR.MonoBehaviours
     /// Starts disabled and is activated by TownInteractionAutoplay.OnDemoComplete.
     ///
     /// Controls:
-    ///   Mouse X  → turns the character (yaw), steering movement direction.
-    ///   Mouse Y  → pushes forward / pulls back (velocity along facing direction).
-    ///   WASD     → camera-relative movement; W always = "into the screen".
+    ///   Mouse X  → turns the character (yaw).
+    ///   WASD     → camera-relative movement.
     ///   Shift    → run.
-    ///   E        → interact with nearby NPC.
+    ///   E        → interact with nearest NPC in range.
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
     public class TownPlayerController : MonoBehaviour
     {
-        private const float MoveSpeed      = 4f;
-        private const float RunSpeed       = 7f;
-        private const float Gravity        = -18f;
-        private const float MouseTurnSensX = 120f;  // degrees/sec per unit of normalised mouse delta
-        private const float MouseVelSensY  = 6f;    // forward speed added per unit of mouse Y delta
-        private const float MouseVelDecay  = 8f;    // how fast mouse-driven velocity bleeds to zero
-        private const float MaxMouseVel    = RunSpeed;
+        private const float MOVE_SPEED      = 4f;
+        private const float RUN_SPEED       = 7f;
+        private const float GRAVITY         = -18f;
+        private const float MOUSE_TURN_SENS = 120f;
 
         [Header("References")]
         [SerializeField] private Transform cameraRig;
+        [SerializeField] private LLMConversationController conversationController;
 
         [Header("Interaction UI")]
         [SerializeField] private TextMeshProUGUI interactPromptLabel;
 
         private CharacterController _cc;
         private float _verticalVelocity;
-        private float _mouseForwardVel;
         private bool _controlEnabled;
+        private bool _wasInConversation;
+
+        private List<NPCController> _npcs = new();
 
         // ── Lifecycle ─────────────────────────────────────────────────────────
 
         private void Awake()
         {
             _cc = GetComponent<CharacterController>();
+            _npcs.AddRange(FindObjectsByType<NPCController>(FindObjectsSortMode.None));
 
             if (interactPromptLabel != null)
                 interactPromptLabel.gameObject.SetActive(false);
         }
 
+        private void Start()
+        {
+            _npcs.Clear();
+            _npcs.AddRange(FindObjectsByType<NPCController>(FindObjectsSortMode.None));
+        }
+
         private void Update()
         {
+            if (!_controlEnabled
+                && Keyboard.current != null
+                && Keyboard.current.tabKey.wasPressedThisFrame)
+            {
+                EnableControl();
+            }
+
             if (!_controlEnabled) return;
 
-            HandleMouseSteering();
+            bool inConversation = conversationController != null && conversationController.IsInConversation;
+
+            if (inConversation != _wasInConversation)
+            {
+                _wasInConversation = inConversation;
+                if (inConversation)
+                {
+                    Cursor.lockState = CursorLockMode.None;
+                    Cursor.visible   = true;
+                }
+                else
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible   = false;
+                }
+            }
+
+            if (inConversation) return;
+
+            UpdateInteractPrompt();
+            HandleMouseLook();
             HandleMovement();
         }
 
@@ -66,43 +101,77 @@ namespace FarmSimVR.MonoBehaviours
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible   = false;
 
-            ShowHint("WASD to walk  |  Mouse to steer & accelerate  |  E to talk to vendors");
+            ShowHint("WASD to move  |  Mouse to look  |  E to talk");
         }
 
-        // ── Mouse steering ────────────────────────────────────────────────────
+        // ── Interaction prompt ────────────────────────────────────────────────
 
-        private void HandleMouseSteering()
+        /// <summary>
+        /// Shows "Press E to talk" when the player is within range of any NPC.
+        /// </summary>
+        private void UpdateInteractPrompt()
+        {
+            if (interactPromptLabel == null) return;
+
+            NPCController nearest = GetNearestNPCInRange();
+            bool inRange = nearest != null;
+
+            if (inRange)
+            {
+                interactPromptLabel.text = $"Press E to talk to {nearest.NpcName}";
+                interactPromptLabel.gameObject.SetActive(true);
+
+                if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+                    nearest.TriggerInteraction();
+            }
+            else if (interactPromptLabel.gameObject.activeSelf)
+            {
+                interactPromptLabel.gameObject.SetActive(false);
+            }
+        }
+
+        private NPCController GetNearestNPCInRange()
+        {
+            NPCController nearest  = null;
+            float nearestSqDist    = float.MaxValue;
+
+            foreach (var npc in _npcs)
+            {
+                if (npc == null || !npc.gameObject.activeInHierarchy) continue;
+                if (!npc.IsPlayerInRange) continue;
+
+                float sqDist = (npc.transform.position - transform.position).sqrMagnitude;
+                if (sqDist < nearestSqDist)
+                {
+                    nearestSqDist = sqDist;
+                    nearest       = npc;
+                }
+            }
+
+            return nearest;
+        }
+
+        // ── Mouse look (yaw only) ─────────────────────────────────────────────
+
+        private void HandleMouseLook()
         {
             var mouse = Mouse.current;
             if (mouse == null) return;
 
-            Vector2 delta = mouse.delta.ReadValue();
-
-            // Mouse X → yaw the character so it turns left/right
-            float yawDelta = delta.x * MouseTurnSensX * Time.deltaTime;
+            float deltaX = mouse.delta.x.ReadValue();
+            float yawDelta = deltaX * MOUSE_TURN_SENS * Time.deltaTime;
             transform.Rotate(0f, yawDelta, 0f, Space.Self);
-
-            // Mouse Y → accelerate forward (up) or backward (down)
-            // Screen Y is inverted relative to world forward, hence the negation
-            _mouseForwardVel += -delta.y * MouseVelSensY * Time.deltaTime;
-            _mouseForwardVel  = Mathf.Clamp(_mouseForwardVel, -MaxMouseVel, MaxMouseVel);
         }
 
-        // ── WASD + mouse velocity movement ────────────────────────────────────
+        // ── WASD movement ─────────────────────────────────────────────────────
 
         private void HandleMovement()
         {
             var kb = Keyboard.current;
             if (kb == null) return;
 
-            // Bleed off mouse-driven velocity while the mouse is idle
-            _mouseForwardVel = Mathf.MoveTowards(_mouseForwardVel, 0f, MouseVelDecay * Time.deltaTime);
+            float speed = kb.leftShiftKey.isPressed ? RUN_SPEED : MOVE_SPEED;
 
-            float speed = kb.leftShiftKey.isPressed ? RunSpeed : MoveSpeed;
-
-            // Project the camera's axes onto XZ so W always means
-            // "toward what the camera is looking at", regardless of how
-            // the player prefab root is oriented in the asset.
             Transform reference = cameraRig != null ? cameraRig : transform;
             Vector3 camForward  = Vector3.ProjectOnPlane(reference.forward, Vector3.up).normalized;
             Vector3 camRight    = Vector3.ProjectOnPlane(reference.right,   Vector3.up).normalized;
@@ -114,32 +183,29 @@ namespace FarmSimVR.MonoBehaviours
             if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) wasd.x += 1f;
             wasd = Vector2.ClampMagnitude(wasd, 1f);
 
-            Vector3 wasdMove  = (camForward * wasd.y + camRight * wasd.x) * speed;
-            Vector3 mouseMove = transform.forward * _mouseForwardVel;
+            Vector3 move = (camForward * wasd.y + camRight * wasd.x) * speed;
 
-            // WASD takes full priority when a key is held; mouse velocity fills in when idle
-            Vector3 horizontal = wasd.magnitude > 0.01f ? wasdMove : mouseMove;
-            horizontal.y = 0f;
-
-            // Gravity
             if (_cc.isGrounded && _verticalVelocity < 0f)
+            {
                 _verticalVelocity = -2f;
+            }
             else
-                _verticalVelocity += Gravity * Time.deltaTime;
+            {
+                _verticalVelocity += GRAVITY * Time.deltaTime;
+            }
 
-            horizontal.y = _verticalVelocity;
-            _cc.Move(horizontal * Time.deltaTime);
+            move.y = _verticalVelocity;
+            _cc.Move(move * Time.deltaTime);
         }
 
-        // ── Interaction hint ──────────────────────────────────────────────────
+        // ── Hint (one-shot startup message) ──────────────────────────────────
 
         private void ShowHint(string message)
         {
             if (interactPromptLabel == null) return;
-
             interactPromptLabel.text = message;
             interactPromptLabel.gameObject.SetActive(true);
-            Invoke(nameof(HideHint), 5f);
+            Invoke(nameof(HideHint), 4f);
         }
 
         private void HideHint()
