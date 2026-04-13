@@ -70,6 +70,45 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(result.IsValid, Is.False);
             Assert.That(result.Errors, Does.Contain("Beat 0 minigame requires AdapterId."));
         }
+
+        [Test]
+        public void Validate_StoryboardCutsceneWithoutAudioPath_ReturnsReadableError()
+        {
+            var package = new StoryPackageSnapshot
+            {
+                PackageId = "storypkg_storyboard_missing_audio",
+                SchemaVersion = 1,
+                PackageVersion = 1,
+                Beats = new[]
+                {
+                    new StoryBeatSnapshot
+                    {
+                        BeatId = "post_chicken_bridge",
+                        Kind = "Cutscene",
+                        SceneName = "PostChickenCutscene",
+                        Storyboard = new StoryStoryboardSnapshot
+                        {
+                            StylePresetId = "farm_storybook_v1",
+                            Shots = new[]
+                            {
+                                new StoryStoryboardShotSnapshot
+                                {
+                                    ShotId = "shot_01",
+                                    SubtitleText = "Old Garrett points toward the carrot beds.",
+                                    ImageResourcePath = "GeneratedStoryboards/storypkg_intro_chicken_sample/post_chicken_bridge/shot_01",
+                                    DurationSeconds = 3f
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = StoryPackageContract.Validate(package);
+
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(result.Errors, Does.Contain("Beat 0 storyboard shot 0 requires AudioResourcePath."));
+        }
     }
 
     [TestFixture]
