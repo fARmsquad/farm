@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using FarmSimVR.Core.Farming;
 using FarmSimVR.MonoBehaviours;
 using FarmSimVR.MonoBehaviours.Tutorial;
+using FarmSimVR.MonoBehaviours.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -25,6 +26,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private Camera _camera;
         private TutorialFarmSceneController _mission;
         private Transform _playerTransform;
+        private InventoryUIController _inventoryUI;
         private string _focusedPlotName;
         private FarmPlotActionPrompt _currentPrompt;
         private CropPlotController _focusedController;
@@ -72,6 +74,12 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
             if (_camera == null)
                 _camera = Camera.main;
+
+            // Skip all gameplay input while the backpack inventory is open
+            if (_inventoryUI == null)
+                _inventoryUI = FindAnyObjectByType<InventoryUIController>();
+            if (_inventoryUI != null && _inventoryUI.IsOpen)
+                return;
 
             if (_activeMinigame != null)
             {
@@ -214,13 +222,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
             if (keyboard == null)
                 return;
 
-            // Seed selection via number keys (always active, not gated by prompt)
-            if (keyboard.digit1Key.wasPressedThisFrame)
-                _driver.SetSelectedSeed(0);
-            else if (keyboard.digit2Key.wasPressedThisFrame)
-                _driver.SetSelectedSeed(1);
-            else if (keyboard.digit3Key.wasPressedThisFrame)
-                _driver.SetSelectedSeed(2);
+            // Seed selection via digit keys removed — now handled by HotbarUIController
 
             if (_currentPrompt == null)
                 return;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using FarmSimVR.Core.Farming;
 using FarmSimVR.Core.Inventory;
+using FarmSimVR.MonoBehaviours.UI;
 
 namespace FarmSimVR.MonoBehaviours.Farming
 {
@@ -21,6 +22,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
         [Header("Inventory")]
         [SerializeField] private int starterSeeds = 5;
+        [SerializeField] private ItemIconDatabase iconDatabase;
 
         [Header("Simulation")]
         [SerializeField] private float fastForwardSeconds = 30f;
@@ -31,6 +33,14 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private FarmSimulation _sim;
         private WorldFarmProgressionController _progression;
         private readonly List<GameObject> _plots = new();
+
+        private ToolEquipState _toolEquip;
+
+        /// <summary>Current tool equip state for UI and enforcement.</summary>
+        public ToolEquipState ToolEquip => _toolEquip;
+
+        /// <summary>Inventory accessor for UI controllers.</summary>
+        public IInventorySystem Inventory => _inv;
 
         private static readonly string[] SeedIds = { "seed_tomato", "seed_carrot", "seed_lettuce" };
         private static readonly string[] CropIds = { "crop_tomato", "crop_carrot", "crop_lettuce" };
@@ -56,6 +66,15 @@ namespace FarmSimVR.MonoBehaviours.Farming
             foreach (var id in SeedIds)
                 _inv.AddItem(id, starterSeeds);
 
+            // Add starter tools to inventory
+            _inv.AddItem("tool_watering_can", 1);
+            _inv.AddItem("tool_basket", 1);
+            _inv.AddItem("tool_hoe", 1);
+            _inv.AddItem("tool_seed_pouch", 1);
+
+            // Initialize tool equip state
+            _toolEquip = new ToolEquipState();
+
             var found = GameObject.FindGameObjectsWithTag("CropPlot");
             System.Array.Sort(found, (a, b) =>
                 string.Compare(a.name, b.name, System.StringComparison.Ordinal));
@@ -79,6 +98,20 @@ namespace FarmSimVR.MonoBehaviours.Farming
             }
 
             EnsureInteractionController();
+
+            // Initialize UI controllers
+            var inventoryUI = FindAnyObjectByType<InventoryUIController>();
+            if (inventoryUI != null)
+                inventoryUI.Initialize(_inv, _db, _toolEquip, iconDatabase);
+
+            var hotbarUI = FindAnyObjectByType<HotbarUIController>();
+            if (hotbarUI != null)
+                hotbarUI.Initialize(_inv, _db, _toolEquip, iconDatabase);
+
+            // Initialize tool visual controller
+            var toolVisual = FindAnyObjectByType<ToolVisualController>();
+            if (toolVisual != null)
+                toolVisual.Initialize(_toolEquip);
 
             _log = $"Ready — {_plots.Count} plots found.";
             Debug.Log($"[FarmSimDriver] Ready — {_plots.Count} plots.");
@@ -132,6 +165,11 @@ namespace FarmSimVR.MonoBehaviours.Farming
                 message = $"Unknown plot '{plotName}'.";
                 return false;
             }
+
+            // Tool enforcement: check that the correct tool is equipped before executing
+            var requiredTool = FarmToolMap.RequiredToolFor(action);
+            if (requiredTool != FarmToolId.None && _toolEquip != null && _toolEquip.EquippedTool != requiredTool)
+                return Fail($"Equip {requiredTool} first.", out message);
 
             bool success = action switch
             {

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using FarmSimVR.MonoBehaviours.UI;
 
 namespace FarmSimVR.MonoBehaviours.Farming
 {
@@ -22,6 +23,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private CharacterController _controller;
         private Transform _cameraTransform;
         private FarmPlotInteractionController _interactionController;
+        private InventoryUIController _inventoryUI;
         private float _pitch;
         private float _yVelocity;
 
@@ -37,6 +39,12 @@ namespace FarmSimVR.MonoBehaviours.Farming
             TryResolveReferences();
 
             if (_interactionController != null && _interactionController.IsMinigameActive)
+                return;
+
+            // Skip look/move input when the backpack inventory is open
+            if (_inventoryUI == null)
+                _inventoryUI = FindAnyObjectByType<InventoryUIController>();
+            if (_inventoryUI != null && _inventoryUI.IsOpen)
                 return;
 
             HandleLook();
