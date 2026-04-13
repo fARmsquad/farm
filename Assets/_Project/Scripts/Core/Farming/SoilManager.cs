@@ -49,6 +49,20 @@ namespace FarmSimVR.Core.Farming
             return state;
         }
 
+        // ── Till ──────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Transitions a plot from Untilled to Empty (tilled).
+        /// Returns false if the plot is not Untilled or not found.
+        /// </summary>
+        public bool Till(string plotId)
+        {
+            if (!_plotsById.TryGetValue(plotId, out var state))
+                return false;
+
+            return state.Till();
+        }
+
         // ── Plant ─────────────────────────────────────────────────────────────
 
         public bool Plant(string plotId, string cropId)

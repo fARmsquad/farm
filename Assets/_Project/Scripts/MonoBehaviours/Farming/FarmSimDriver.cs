@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using FarmSimVR.Core.Farming;
 using FarmSimVR.Core.Inventory;
+using FarmSimVR.MonoBehaviours.UI;
 
 namespace FarmSimVR.MonoBehaviours.Farming
 {
@@ -21,6 +22,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
         [Header("Inventory")]
         [SerializeField] private int starterSeeds = 5;
+        [SerializeField] private ItemIconDatabase iconDatabase;
 
         [Header("Simulation")]
         [SerializeField] private float fastForwardSeconds = 30f;
@@ -32,19 +34,28 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private WorldFarmProgressionController _progression;
         private readonly List<GameObject> _plots = new();
 
+        private ToolEquipState _toolEquip;
+
+        /// <summary>Current tool equip state for UI and enforcement.</summary>
+        public ToolEquipState ToolEquip => _toolEquip;
+
+        /// <summary>Inventory accessor for UI controllers.</summary>
+        public IInventorySystem Inventory => _inv;
+
         private static readonly string[] SeedIds = { "seed_tomato", "seed_carrot", "seed_lettuce" };
         private static readonly string[] CropIds = { "crop_tomato", "crop_carrot", "crop_lettuce" };
         private static readonly string[] SeedLabels = { "Tomato", "Carrot", "Lettuce" };
         private static readonly CropData[] Crops =
         {
-            // baseGrowthRate: 0.04/s → each 0.2-unit phase gate takes 5 seconds at standard conditions
-            new CropData(baseGrowthRate: 0.04f, maxGrowth: 1f),
-            new CropData(baseGrowthRate: 0.04f, maxGrowth: 1f),
-            new CropData(baseGrowthRate: 0.04f, maxGrowth: 1f),
+            // baseGrowthRate: 0.022/s → full growth in ~45 seconds at standard conditions
+            new CropData(baseGrowthRate: 0.022f, maxGrowth: 1f),
+            new CropData(baseGrowthRate: 0.022f, maxGrowth: 1f),
+            new CropData(baseGrowthRate: 0.022f, maxGrowth: 1f),
         };
 
         private int _plot;
         private int _seed;
+        private int _selectedSeedIndex;
         private string _log = "Walk to a plot and look at it to farm.";
 
         private void Start()
@@ -54,6 +65,15 @@ namespace FarmSimVR.MonoBehaviours.Farming
             _progression = GetComponent<WorldFarmProgressionController>();
             foreach (var id in SeedIds)
                 _inv.AddItem(id, starterSeeds);
+
+            // Add starter tools to inventory
+            _inv.AddItem("tool_watering_can", 1);
+            _inv.AddItem("tool_basket", 1);
+            _inv.AddItem("tool_hoe", 1);
+            _inv.AddItem("tool_seed_pouch", 1);
+
+            // Initialize tool equip state
+            _toolEquip = new ToolEquipState();
 
             var found = GameObject.FindGameObjectsWithTag("CropPlot");
             System.Array.Sort(found, (a, b) =>
@@ -79,6 +99,20 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
             EnsureInteractionController();
 
+            // Initialize UI controllers
+            var inventoryUI = FindAnyObjectByType<InventoryUIController>();
+            if (inventoryUI != null)
+                inventoryUI.Initialize(_inv, _db, _toolEquip, iconDatabase);
+
+            var hotbarUI = FindAnyObjectByType<HotbarUIController>();
+            if (hotbarUI != null)
+                hotbarUI.Initialize(_inv, _db, _toolEquip, iconDatabase);
+
+            // Initialize tool visual controller
+            var toolVisual = FindAnyObjectByType<ToolVisualController>();
+            if (toolVisual != null)
+                toolVisual.Initialize(_toolEquip);
+
             _log = $"Ready — {_plots.Count} plots found.";
             Debug.Log($"[FarmSimDriver] Ready — {_plots.Count} plots.");
 
@@ -98,6 +132,18 @@ namespace FarmSimVR.MonoBehaviours.Farming
             TickSimulation(Time.deltaTime);
         }
 
+        /// <summary>
+        /// Sets the currently selected seed index for context-sensitive planting.
+        /// </summary>
+        public void SetSelectedSeed(int index)
+        {
+            if (index >= 0 && index < SeedIds.Length)
+                _selectedSeedIndex = index;
+        }
+
+        /// <summary>Current selected seed index (0 = Tomato, 1 = Carrot, 2 = Lettuce).</summary>
+        public int SelectedSeedIndex => _selectedSeedIndex;
+
         public FarmPlotActionPrompt BuildPrompt(string plotName)
         {
             if (!TryGetPlotIndex(plotName, out var index))
@@ -108,7 +154,8 @@ namespace FarmSimVR.MonoBehaviours.Farming
                 _sim.Plots[index],
                 _inv.GetCount(SeedIds[0]),
                 _inv.GetCount(SeedIds[1]),
-                _inv.GetCount(SeedIds[2]));
+                _inv.GetCount(SeedIds[2]),
+                _selectedSeedIndex);
         }
 
         public bool TryExecuteAction(string plotName, FarmPlotAction action, out string message)
@@ -119,12 +166,19 @@ namespace FarmSimVR.MonoBehaviours.Farming
                 return false;
             }
 
+            // Tool enforcement: check that the correct tool is equipped before executing
+            var requiredTool = FarmToolMap.RequiredToolFor(action);
+            if (requiredTool != FarmToolId.None && _toolEquip != null && _toolEquip.EquippedTool != requiredTool)
+                return Fail($"Equip {requiredTool} first.", out message);
+
             bool success = action switch
             {
                 FarmPlotAction.PrimaryInteract => TryPrimaryInteract(index, out message),
+                FarmPlotAction.Till => TryTill(index, out message),
                 FarmPlotAction.PlantTomato => TryPlant(index, 0, out message),
                 FarmPlotAction.PlantCarrot => TryPlant(index, 1, out message),
                 FarmPlotAction.PlantLettuce => TryPlant(index, 2, out message),
+                FarmPlotAction.PlantSelected => TryPlant(index, _selectedSeedIndex, out message),
                 FarmPlotAction.Water => TryWater(index, out message),
                 FarmPlotAction.Harvest => TryHarvest(index, out message),
                 FarmPlotAction.Compost => TryCompost(index, out message),
@@ -279,6 +333,19 @@ namespace FarmSimVR.MonoBehaviours.Farming
             }
         }
 
+        private bool TryTill(int plotIndex, out string message)
+        {
+            var soil = _soil.AllPlots[plotIndex];
+            if (soil.Status != PlotStatus.Untilled)
+                return Fail($"Can't till — {soil.Status}", out message);
+
+            if (!_soil.Till(soil.PlotId))
+                return Fail("Tilling failed.", out message);
+
+            message = $"Tilled {soil.PlotId} — ready to plant.";
+            return true;
+        }
+
         private bool TryPlant(int plotIndex, int seedIndex, out string message)
         {
             var soil = _soil.AllPlots[plotIndex];
@@ -309,8 +376,11 @@ namespace FarmSimVR.MonoBehaviours.Farming
             var soil = _soil.AllPlots[plotIndex];
             var cropPlot = _sim.Plots[plotIndex];
 
+            if (soil.Status == PlotStatus.Untilled)
+                return TryTill(plotIndex, out message);
+
             if (soil.Status == PlotStatus.Empty && cropPlot.Phase == PlotPhase.Empty)
-                return TryPlant(plotIndex, 0, out message);
+                return TryPlant(plotIndex, _selectedSeedIndex, out message);
 
             if (cropPlot.IsTutorialTaskMode)
                 return Fail("Open the stage minigame to complete that task.", out message);

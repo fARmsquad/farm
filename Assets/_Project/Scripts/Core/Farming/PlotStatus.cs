@@ -2,12 +2,15 @@ namespace FarmSimVR.Core.Farming
 {
     /// <summary>
     /// Life-cycle status of a single crop plot.
-    /// Transitions: Empty → Planted → Growing → Harvestable → Empty (or Depleted).
+    /// Transitions: Untilled → Empty (tilled) → Planted → Growing → Harvestable → Empty (or Depleted).
     /// Drought path: Growing → Dead → Empty (after ClearDead).
     /// </summary>
     public enum PlotStatus
     {
-        /// <summary>No crop present. Ready to receive a seed.</summary>
+        /// <summary>Raw ground, not yet tilled. Must be tilled before planting.</summary>
+        Untilled,
+
+        /// <summary>Tilled soil, no crop present. Ready to receive a seed.</summary>
         Empty,
 
         /// <summary>Seed placed but not yet actively growing (transient — advances on first Tick).</summary>

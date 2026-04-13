@@ -9,10 +9,12 @@ namespace FarmSimVR.Core.Farming
         PlantTomato,
         PlantCarrot,
         PlantLettuce,
+        PlantSelected,
         Water,
         Harvest,
         Compost,
-        ClearDead
+        ClearDead,
+        Till
     }
 
     public readonly struct FarmPlotActionOption
@@ -50,7 +52,8 @@ namespace FarmSimVR.Core.Farming
             CropPlotState crop,
             int tomatoSeeds,
             int carrotSeeds,
-            int lettuceSeeds)
+            int lettuceSeeds,
+            int selectedSeedIndex = 0)
         {
             if (soil == null) throw new ArgumentNullException(nameof(soil));
             if (crop == null) throw new ArgumentNullException(nameof(crop));
@@ -62,13 +65,17 @@ namespace FarmSimVR.Core.Farming
 
             switch (soil.Status)
             {
+                case PlotStatus.Untilled:
+                    actions.Add(new FarmPlotActionOption(FarmPlotAction.Till, "LMB", "Till Soil"));
+                    break;
+
                 case PlotStatus.Empty:
-                    if (tomatoSeeds > 0)
-                        actions.Add(new FarmPlotActionOption(FarmPlotAction.PlantTomato, "T", $"Plant Tomato ({tomatoSeeds})"));
-                    if (carrotSeeds > 0)
-                        actions.Add(new FarmPlotActionOption(FarmPlotAction.PlantCarrot, "C", $"Plant Carrot ({carrotSeeds})"));
-                    if (lettuceSeeds > 0)
-                        actions.Add(new FarmPlotActionOption(FarmPlotAction.PlantLettuce, "L", $"Plant Lettuce ({lettuceSeeds})"));
+                    var seedCounts = new[] { tomatoSeeds, carrotSeeds, lettuceSeeds };
+                    var seedNames = new[] { "Tomato", "Carrot", "Lettuce" };
+                    var idx = selectedSeedIndex >= 0 && selectedSeedIndex < seedCounts.Length
+                        ? selectedSeedIndex : 0;
+                    if (seedCounts[idx] > 0)
+                        actions.Add(new FarmPlotActionOption(FarmPlotAction.PlantSelected, "LMB", $"Plant {seedNames[idx]} ({seedCounts[idx]})"));
                     actions.Add(new FarmPlotActionOption(FarmPlotAction.Compost, "M", "Compost Soil"));
                     break;
 
@@ -76,14 +83,14 @@ namespace FarmSimVR.Core.Farming
                 case PlotStatus.Growing:
                     actions.Add(new FarmPlotActionOption(
                         FarmPlotAction.Water,
-                        "P",
+                        "LMB",
                         crop.Phase == PlotPhase.Wilting ? "Water Urgently" : "Pour Water"));
                     actions.Add(new FarmPlotActionOption(FarmPlotAction.Compost, "M", "Compost Soil"));
                     break;
 
                 case PlotStatus.Harvestable:
-                    actions.Add(new FarmPlotActionOption(FarmPlotAction.Harvest, "H", "Harvest"));
-                    actions.Add(new FarmPlotActionOption(FarmPlotAction.Water, "P", "Pour Water"));
+                    actions.Add(new FarmPlotActionOption(FarmPlotAction.Harvest, "E", "Harvest"));
+                    actions.Add(new FarmPlotActionOption(FarmPlotAction.Water, "LMB", "Pour Water"));
                     actions.Add(new FarmPlotActionOption(FarmPlotAction.Compost, "M", "Compost Soil"));
                     break;
 
@@ -107,7 +114,12 @@ namespace FarmSimVR.Core.Farming
             var actions = new List<FarmPlotActionOption>(1);
             string detail;
 
-            if (soil.Status == PlotStatus.Empty && crop.Phase == PlotPhase.Empty)
+            if (soil.Status == PlotStatus.Untilled)
+            {
+                actions.Add(new FarmPlotActionOption(FarmPlotAction.Till, "LMB", "Till Soil"));
+                detail = "Till the ground to prepare the soil for planting.";
+            }
+            else if (soil.Status == PlotStatus.Empty && crop.Phase == PlotPhase.Empty)
             {
                 var label = tomatoSeeds > 0 ? $"Plant Tomato Seed ({tomatoSeeds})" : "Need Tomato Seed";
                 if (tomatoSeeds > 0)

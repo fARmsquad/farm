@@ -116,6 +116,23 @@ namespace FarmSimVR.Core.Inventory
             return total;
         }
 
+        // ── Swap ─────────────────────────────────────────────────────
+
+        public void SwapSlots(int indexA, int indexB)
+        {
+            if (indexA < 0 || indexA >= _slots.Count)
+                throw new ArgumentOutOfRangeException(nameof(indexA));
+            if (indexB < 0 || indexB >= _slots.Count)
+                throw new ArgumentOutOfRangeException(nameof(indexB));
+            if (indexA == indexB)
+                return;
+
+            var temp = new InventorySlot();
+            temp.CopyFrom(_slots[indexA]);
+            _slots[indexA].CopyFrom(_slots[indexB]);
+            _slots[indexB].CopyFrom(temp);
+        }
+
         // ── Helpers ──────────────────────────────────────────────────
 
         private static void ValidateItemId(string itemId)

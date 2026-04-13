@@ -1,13 +1,9 @@
 {
-    "name": "FarmSimVR.MonoBehaviours",
-    "rootNamespace": "FarmSimVR.MonoBehaviours",
+    "name": "FarmSimVR.ScriptableObjects",
+    "rootNamespace": "FarmSimVR.ScriptableObjects",
     "references": [
         "FarmSimVR.Core",
-        "FarmSimVR.ScriptableObjects",
-        "glTFast",
-        "Unity.InputSystem",
-        "Unity.TextMeshPro",
-        "Unity.Postprocessing.Runtime"
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

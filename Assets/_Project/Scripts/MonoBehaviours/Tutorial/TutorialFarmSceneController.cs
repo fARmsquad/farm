@@ -81,7 +81,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 return false;
 
             var soilState = plotController.SoilState;
-            var soilStatus = soilState?.Status ?? PlotStatus.Empty;
+            var soilStatus = soilState?.Status ?? PlotStatus.Untilled;
             var cropId = soilState?.CurrentCropId;
             var taskId = plotController.State?.CurrentTaskId ?? CropTaskId.None;
             return _missionService.IsActionAllowed(action, cropId, soilStatus, taskId);
@@ -98,7 +98,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 return null;
 
             var soilState = plotController.SoilState;
-            var soilStatus = soilState?.Status ?? PlotStatus.Empty;
+            var soilStatus = soilState?.Status ?? PlotStatus.Untilled;
             var cropId = soilState?.CurrentCropId;
             var taskId = plotController.State?.CurrentTaskId ?? CropTaskId.None;
             return _missionService.GetPrimaryAction(cropId, soilStatus, taskId);
@@ -164,7 +164,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 return;
 
             var soilState = _heroCropController.SoilState;
-            var soilStatus = soilState?.Status ?? PlotStatus.Empty;
+            var soilStatus = soilState?.Status ?? PlotStatus.Untilled;
             var cropId = soilState?.CurrentCropId;
             var taskId = _heroCropController.State.CurrentTaskId;
 

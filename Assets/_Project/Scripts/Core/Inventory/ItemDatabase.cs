@@ -65,6 +65,8 @@ namespace FarmSimVR.Core.Inventory
                 // Tools (stack of 1 each)
                 new ItemData("tool_watering_can", "Watering Can", ItemCategory.Tool, 1, 0, "Waters crop plots to boost growth."),
                 new ItemData("tool_basket",        "Harvest Basket", ItemCategory.Tool, 1, 0, "Used to collect harvested crops."),
+                new ItemData("tool_hoe",           "Hoe",            ItemCategory.Tool, 1, 0, "Tills untilled soil plots."),
+                new ItemData("tool_seed_pouch",    "Seed Pouch",     ItemCategory.Tool, 1, 0, "Holds seeds for planting."),
             };
 
             return new ItemDatabase(items);

@@ -63,5 +63,15 @@ namespace FarmSimVR.Core.Inventory
             Quantity = 0;
             MaxStack = 0;
         }
+
+        /// <summary>
+        /// Copies all data from another slot into this one, overwriting current contents.
+        /// </summary>
+        public void CopyFrom(InventorySlot other)
+        {
+            ItemId = other.ItemId;
+            Quantity = other.Quantity;
+            MaxStack = other.MaxStack;
+        }
     }
 }

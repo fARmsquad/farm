@@ -12,6 +12,9 @@ namespace FarmSimVR.MonoBehaviours
     {
         private const string FallbackVisualName = "FallbackVisual";
         private const string ImportedSourceRootName = "_ImportedCropSource";
+        private const string SeedVisualName = "SeedVisual";
+        private const string UntilledMarkerPrefix = "UntilledMarker_";
+        private const int UntilledMarkerCount = 4;
         private const float CropYOffset = 0.01f;
         private const float SoilYOffset = 0.005f;
         private static readonly Quaternion ImportedModelCorrection = Quaternion.Euler(90f, 0f, 0f);
@@ -20,6 +23,8 @@ namespace FarmSimVR.MonoBehaviours
         private static readonly Color PlantedColor = new(0.48f, 0.66f, 0.24f);
         private static readonly Color SeedlingColor = new(0.28f, 0.78f, 0.24f);
         private static readonly Color MatureColor = new(0.92f, 0.2f, 0.15f);
+        private static readonly Color SeedColor = new(0.45f, 0.3f, 0.12f);
+        private static readonly Color StakeColor = new(0.55f, 0.42f, 0.22f);
 
         [SerializeField] private GameObject soilPrefab;
 
@@ -56,6 +61,8 @@ namespace FarmSimVR.MonoBehaviours
         private readonly Dictionary<string, Transform[]> _stageVariants = new(StringComparer.Ordinal);
         private readonly List<Transform> _soilVariants = new();
         private GameObject[] _tutorialStageRoots = Array.Empty<GameObject>();
+        private GameObject _seedVisualRoot;
+        private readonly GameObject[] _untilledMarkers = new GameObject[UntilledMarkerCount];
 
         private void Awake()
         {
@@ -88,6 +95,8 @@ namespace FarmSimVR.MonoBehaviours
                 return;
 
             ApplySoilVariant();
+            ApplyUntilledMarkers();
+            ApplySeedVisual();
 
             var phase = _controller.State.Phase;
 
@@ -406,6 +415,19 @@ namespace FarmSimVR.MonoBehaviours
         {
             if (_soilVariants.Count == 0)
                 return;
+
+            // Hide soil mesh when plot is untilled — raw ground only
+            var isUntilled = _controller?.SoilState?.Status == PlotStatus.Untilled;
+            if (isUntilled)
+            {
+                foreach (var soil in _soilVariants)
+                {
+                    if (soil != null)
+                        soil.gameObject.SetActive(false);
+                }
+                return;
+            }
+
             var activeIndex = ResolveSoilVariantIndex();
             for (var i = 0; i < _soilVariants.Count; i++)
             {
@@ -439,11 +461,109 @@ namespace FarmSimVR.MonoBehaviours
                 renderer.SetPropertyBlock(_propBlock);
             }
         }
+        /// <summary>
+        /// Shows small brown spheres on the soil during the Planted phase to represent seeds.
+        /// </summary>
+        private void ApplySeedVisual()
+        {
+            var showSeeds = _controller?.State?.Phase == PlotPhase.Planted;
+
+            if (showSeeds && _seedVisualRoot == null)
+            {
+                _seedVisualRoot = new GameObject(SeedVisualName);
+                _seedVisualRoot.transform.SetParent(transform, false);
+                _seedVisualRoot.layer = gameObject.layer;
+
+                var offsets = new[]
+                {
+                    new Vector3(-0.12f, CropYOffset + 0.02f, 0.08f),
+                    new Vector3(0.10f, CropYOffset + 0.02f, -0.06f),
+                    new Vector3(-0.02f, CropYOffset + 0.02f, -0.12f),
+                };
+
+                foreach (var offset in offsets)
+                {
+                    var seed = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    seed.name = "Seed";
+                    seed.transform.SetParent(_seedVisualRoot.transform, false);
+                    seed.transform.localPosition = offset;
+                    seed.transform.localScale = new Vector3(0.04f, 0.03f, 0.04f);
+                    seed.layer = gameObject.layer;
+
+                    var col = seed.GetComponent<Collider>();
+                    if (col != null) DestroyRuntimeObject(col);
+
+                    var rend = seed.GetComponent<Renderer>();
+                    if (rend != null)
+                    {
+                        rend.GetPropertyBlock(_propBlock);
+                        _propBlock.SetColor(ColorId, SeedColor);
+                        _propBlock.SetColor(BaseColorId, SeedColor);
+                        rend.SetPropertyBlock(_propBlock);
+                    }
+                }
+            }
+
+            if (_seedVisualRoot != null)
+                _seedVisualRoot.SetActive(showSeeds);
+        }
+
+        /// <summary>
+        /// Shows subtle corner stake markers when the plot is untilled so players can find plots in the grass.
+        /// </summary>
+        private void ApplyUntilledMarkers()
+        {
+            var isUntilled = _controller?.SoilState?.Status == PlotStatus.Untilled;
+
+            if (isUntilled && _untilledMarkers[0] == null)
+            {
+                var halfSize = 0.45f;
+                var corners = new[]
+                {
+                    new Vector3(-halfSize, 0f, -halfSize),
+                    new Vector3(halfSize, 0f, -halfSize),
+                    new Vector3(halfSize, 0f, halfSize),
+                    new Vector3(-halfSize, 0f, halfSize),
+                };
+
+                for (var i = 0; i < UntilledMarkerCount; i++)
+                {
+                    var stake = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    stake.name = UntilledMarkerPrefix + i;
+                    stake.transform.SetParent(transform, false);
+                    stake.transform.localPosition = corners[i] + new Vector3(0f, 0.06f, 0f);
+                    stake.transform.localScale = new Vector3(0.03f, 0.06f, 0.03f);
+                    stake.layer = gameObject.layer;
+
+                    var col = stake.GetComponent<Collider>();
+                    if (col != null) DestroyRuntimeObject(col);
+
+                    var rend = stake.GetComponent<Renderer>();
+                    if (rend != null)
+                    {
+                        rend.GetPropertyBlock(_propBlock);
+                        _propBlock.SetColor(ColorId, StakeColor);
+                        _propBlock.SetColor(BaseColorId, StakeColor);
+                        rend.SetPropertyBlock(_propBlock);
+                    }
+
+                    _untilledMarkers[i] = stake;
+                }
+            }
+
+            for (var i = 0; i < UntilledMarkerCount; i++)
+            {
+                if (_untilledMarkers[i] != null)
+                    _untilledMarkers[i].SetActive(isUntilled);
+            }
+        }
+
         private void ApplyFallbackVisual(PlotPhase phase, float growthPercent)
         {
             if (_fallbackRenderer == null || _fallbackTransform == null)
                 return;
-            var visible = phase != PlotPhase.Empty;
+            // Hide fallback when in Planted phase (seed visual is shown instead)
+            var visible = phase != PlotPhase.Empty && phase != PlotPhase.Planted;
             if (_fallbackRenderer.enabled != visible)
                 _fallbackRenderer.enabled = visible;
             if (!visible)

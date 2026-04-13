@@ -53,10 +53,12 @@ namespace FarmSimVR.Core.Farming
             }
         }
 
+        private const int RequiredWaterEventsToGrow = 2;
+
         public bool NeedsWaterToAdvance =>
             !IsTutorialTaskMode &&
             (Phase == PlotPhase.Planted
-                ? _waterEventCount <= _growthGateWaterEventCount
+                ? _waterEventCount < _growthGateWaterEventCount + RequiredWaterEventsToGrow
                 : RequireWateringPerPhase &&
                   Phase != PlotPhase.Empty &&
                   Phase != PlotPhase.Ready &&

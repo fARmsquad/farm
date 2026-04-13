@@ -16,6 +16,9 @@ namespace FarmSimVR.Core.Inventory
         /// <summary>Total count of itemId across all slots.</summary>
         int GetCount(string itemId);
 
+        /// <summary>Swaps the contents of two inventory slots by index.</summary>
+        void SwapSlots(int indexA, int indexB);
+
         IReadOnlyList<InventorySlot> Slots { get; }
     }
 }

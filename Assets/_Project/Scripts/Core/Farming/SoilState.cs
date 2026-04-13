@@ -61,10 +61,22 @@ namespace FarmSimVR.Core.Farming
 
             Moisture = _defaults.InitialMoisture;
             Nutrients = _defaults.InitialNutrients;
-            Status = PlotStatus.Empty;
+            Status = PlotStatus.Untilled;
         }
 
         // ── Mutations — intended for SoilManager use only ──────────────────────
+
+        /// <summary>
+        /// Transitions from Untilled to Empty (tilled). No-op if already tilled.
+        /// </summary>
+        public bool Till()
+        {
+            if (Status != PlotStatus.Untilled)
+                return false;
+
+            Status = PlotStatus.Empty;
+            return true;
+        }
 
         public void SetStatus(PlotStatus status) => Status = status;
 
