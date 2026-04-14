@@ -162,7 +162,10 @@ namespace FarmSimVR.MonoBehaviours.Portal
             }
 
             if (playerController != null)
+            {
                 playerController.enabled = true;
+                playerController.RefreshInteractables();
+            }
 
             // Brief hold while screen is black
             yield return new WaitForSeconds(holdBlackDuration);
