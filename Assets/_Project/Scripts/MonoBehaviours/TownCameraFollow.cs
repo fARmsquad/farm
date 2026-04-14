@@ -20,6 +20,7 @@ namespace FarmSimVR.MonoBehaviours
         [SerializeField] private float smoothSpeed = DEFAULT_SMOOTH_SPEED;
 
         private float _pitch;
+        private bool _snapNextFrame;
 
         /// <summary>
         /// Sets the camera pitch angle (vertical look). Clamped by the caller.
@@ -27,6 +28,16 @@ namespace FarmSimVR.MonoBehaviours
         public void SetPitch(float pitch)
         {
             _pitch = pitch;
+        }
+
+        /// <summary>
+        /// Schedules an instant snap on the next LateUpdate, skipping all smoothing.
+        /// Call after teleporting the player to avoid the camera lerping from the old position.
+        /// </summary>
+        public void SnapToTarget()
+        {
+            _pitch = 0f;
+            _snapNextFrame = true;
         }
 
         private void LateUpdate()
@@ -38,7 +49,16 @@ namespace FarmSimVR.MonoBehaviours
             Vector3 back = rotation * new Vector3(0f, 0f, -distance);
 
             Vector3 desiredPos = target.position + Vector3.up * shoulderHeight + back;
-            transform.position = Vector3.Lerp(transform.position, desiredPos, smoothSpeed * Time.deltaTime);
+
+            if (_snapNextFrame)
+            {
+                transform.position = desiredPos;
+                _snapNextFrame = false;
+            }
+            else
+            {
+                transform.position = Vector3.Lerp(transform.position, desiredPos, smoothSpeed * Time.deltaTime);
+            }
 
             Vector3 focusPoint = target.position + Vector3.up * lookAtHeight;
             transform.LookAt(focusPoint);
