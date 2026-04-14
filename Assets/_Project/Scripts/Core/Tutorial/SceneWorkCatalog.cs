@@ -15,6 +15,8 @@ namespace FarmSimVR.Core.Tutorial
         public const string TownScenePath = "Assets/_Project/Scenes/Town.unity";
         public const string FarmVegetableStatesSceneName = "FarmVegetableStates";
         public const string FarmVegetableStatesScenePath = "Assets/_Project/Scenes/FarmVegetableStates.unity";
+        public const string PlayerGettingSeedsSceneName = "PlayerGettingSeeds";
+        public const string PlayerGettingSeedsScenePath = "Assets/_Project/Scenes/PlayerGettingSeeds.unity";
 
         private static readonly Dictionary<string, SceneWorkDefinition> BySceneName = new(StringComparer.Ordinal);
 
@@ -27,6 +29,12 @@ namespace FarmSimVR.Core.Tutorial
 
             RegisterScenes(OrderedScenes);
             RegisterScenes(TitleScreenLaunchableScenes);
+
+            // Bridge cutscene driven by story package; not a formal tutorial step.
+            BySceneName[PlayerGettingSeedsSceneName] = Define(
+                0, PlayerGettingSeedsSceneName, PlayerGettingSeedsScenePath,
+                "Tool Recovery Cutscene", "Bridge cutscene after tool collection.",
+                SceneWorkKind.Cutscene, TutorialSceneCatalog.PreFarmCutsceneSceneName);
         }
 
         public static IReadOnlyList<SceneWorkDefinition> OrderedScenes { get; }
@@ -62,11 +70,11 @@ namespace FarmSimVR.Core.Tutorial
             {
                 Define(1, TutorialSceneCatalog.IntroSceneName, "Assets/_Project/Scenes/Intro.unity", "Intro Cutscene", "Own the opening image sequence, timing, and handoff into the chicken chase.", SceneWorkKind.Cutscene, TutorialSceneCatalog.ChickenGameSceneName),
                 Define(2, TutorialSceneCatalog.ChickenGameSceneName, "Assets/_Project/Scenes/ChickenGame.unity", "Chicken Chase Game", "Own the first playable beat: catch the chicken and complete into the next bridge scene.", SceneWorkKind.Gameplay, TutorialSceneCatalog.PostChickenCutsceneSceneName),
-                Define(3, TutorialSceneCatalog.PostChickenCutsceneSceneName, "Assets/_Project/Scenes/CaughtChickenCutscene.unity", "Caught chicken cutscene", "Own the short bridge after the chase and tee up the tools arc.", SceneWorkKind.Cutscene, TutorialSceneCatalog.CoreSceneSceneName),
-                Define(4, TutorialSceneCatalog.CoreSceneSceneName, "Assets/_Project/Scenes/CoreScene.unity", "Core Hub", "Own the persistent hub scene and portal handoff into the find-tools beat.", SceneWorkKind.Gameplay, TutorialSceneCatalog.FindToolsSceneName),
-                Define(5, TutorialSceneCatalog.FindToolsSceneName, "Assets/_Project/Scenes/FindToolsGame.unity", "Find Tools Game", "Own the isolated tool-recovery beat and its transition into the final farm setup cutscene.", SceneWorkKind.Gameplay, TutorialSceneCatalog.PreFarmCutsceneSceneName),
-                Define(6, TutorialSceneCatalog.PreFarmCutsceneSceneName, "Assets/_Project/Scenes/Tutorial_PreFarmCutscene.unity", "Pre-Farm Cutscene", "Own the final short bridge that frames the first farm loop.", SceneWorkKind.Cutscene, TutorialSceneCatalog.FarmTutorialSceneName),
-                Define(7, TutorialSceneCatalog.FarmTutorialSceneName, "Assets/_Project/Scenes/FarmMain.unity", "Farm Tutorial Game", "Own the first complete plant-water-harvest loop and any onboarding polish in FarmMain.", SceneWorkKind.Gameplay, null),
+                Define(3, TutorialSceneCatalog.PostChickenCutsceneSceneName, "Assets/_Project/Scenes/CaughtChickenCutscene.unity", "Caught chicken cutscene", "Own the short bridge after the chase and tee up the tools arc.", SceneWorkKind.Cutscene, TutorialSceneCatalog.FindToolsSceneName),
+                Define(4, TutorialSceneCatalog.FindToolsSceneName, "Assets/_Project/Scenes/PlayerCollectTools.unity", "Find Tools Game", "Own the isolated tool-recovery beat and its transition into the final farm setup cutscene.", SceneWorkKind.Gameplay, PlayerGettingSeedsSceneName),
+                Define(5, TutorialSceneCatalog.PreFarmCutsceneSceneName, "Assets/_Project/Scenes/Tutorial_PreFarmCutscene.unity", "Pre-Farm Cutscene", "Own the final short bridge that frames the first farm loop.", SceneWorkKind.Cutscene, TutorialSceneCatalog.FarmTutorialSceneName),
+                Define(6, TutorialSceneCatalog.FarmTutorialSceneName, "Assets/_Project/Scenes/FarmMain.unity", "Farm Tutorial Game", "Own the first complete plant-water-harvest loop and any onboarding polish in FarmMain.", SceneWorkKind.Gameplay, TutorialSceneCatalog.CoreSceneSceneName),
+                Define(7, TutorialSceneCatalog.CoreSceneSceneName, "Assets/_Project/Scenes/CoreScene.unity", "Core Hub", "Own the persistent hub scene and portal handoff into the find-tools beat.", SceneWorkKind.Gameplay, null),
                 Define(8, WorldSandboxSceneName, WorldSandboxScenePath, "World Sandbox", "Own the open-world integration slice used for farming, pen-game, and sandbox iteration outside the tutorial chain.", SceneWorkKind.Sandbox, null),
             };
 
@@ -133,6 +141,7 @@ namespace FarmSimVR.Core.Tutorial
             foreach (var scene in launchableScenes)
                 paths.Add(scene.ScenePath);
 
+            paths.Add(PlayerGettingSeedsScenePath);
             paths.Add(WorldSandboxScenePath);
             return paths;
         }

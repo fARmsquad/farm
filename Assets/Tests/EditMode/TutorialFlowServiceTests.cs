@@ -15,10 +15,10 @@ namespace FarmSimVR.Tests.EditMode
                     TutorialSceneCatalog.IntroSceneName,
                     TutorialSceneCatalog.ChickenGameSceneName,
                     TutorialSceneCatalog.PostChickenCutsceneSceneName,
-                    TutorialSceneCatalog.CoreSceneSceneName,
                     TutorialSceneCatalog.FindToolsSceneName,
                     TutorialSceneCatalog.PreFarmCutsceneSceneName,
                     TutorialSceneCatalog.FarmTutorialSceneName,
+                    TutorialSceneCatalog.CoreSceneSceneName,
                 },
                 TutorialSceneCatalog.SceneOrder);
         }
@@ -37,12 +37,8 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(service.State.ChickenHuntComplete, Is.True);
 
             service.EnterScene(TutorialSceneCatalog.PostChickenCutsceneSceneName);
-            Assert.That(service.CompleteCurrentStep(), Is.EqualTo(TutorialSceneCatalog.CoreSceneSceneName));
-            Assert.That(service.State.PostChickenCutsceneComplete, Is.True);
-
-            service.EnterScene(TutorialSceneCatalog.CoreSceneSceneName);
-            Assert.That(service.State.PlaceholderCutsceneVisited, Is.True);
             Assert.That(service.CompleteCurrentStep(), Is.EqualTo(TutorialSceneCatalog.FindToolsSceneName));
+            Assert.That(service.State.PostChickenCutsceneComplete, Is.True);
 
             service.EnterScene(TutorialSceneCatalog.FindToolsSceneName);
             Assert.That(service.CompleteCurrentStep(), Is.EqualTo(TutorialSceneCatalog.PreFarmCutsceneSceneName));
@@ -53,8 +49,12 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(service.State.PreFarmCutsceneComplete, Is.True);
 
             service.EnterScene(TutorialSceneCatalog.FarmTutorialSceneName);
-            Assert.That(service.CompleteCurrentStep(), Is.Null);
+            Assert.That(service.CompleteCurrentStep(), Is.EqualTo(TutorialSceneCatalog.CoreSceneSceneName));
             Assert.That(service.State.FarmTutorialComplete, Is.True);
+
+            service.EnterScene(TutorialSceneCatalog.CoreSceneSceneName);
+            Assert.That(service.State.PlaceholderCutsceneVisited, Is.True);
+            Assert.That(service.CompleteCurrentStep(), Is.Null);
             Assert.That(service.State.IsTutorialComplete, Is.True);
         }
 
@@ -67,7 +67,7 @@ namespace FarmSimVR.Tests.EditMode
 
             Assert.That(
                 service.GetPreviousScene(),
-                Is.EqualTo(TutorialSceneCatalog.CoreSceneSceneName));
+                Is.EqualTo(TutorialSceneCatalog.PostChickenCutsceneSceneName));
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace FarmSimVR.Tests.EditMode
                 Is.EqualTo(TutorialStep.FindTools));
             Assert.That(
                 TutorialSceneCatalog.GetNextStep(TutorialStep.PostChickenCutscene),
-                Is.EqualTo(TutorialStep.MidpointPlaceholder));
+                Is.EqualTo(TutorialStep.FindTools));
             Assert.That(
                 TutorialSceneCatalog.GetPreviousStep(TutorialStep.PreFarmCutscene),
                 Is.EqualTo(TutorialStep.FindTools));

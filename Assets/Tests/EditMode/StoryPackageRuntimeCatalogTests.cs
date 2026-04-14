@@ -81,14 +81,14 @@ namespace FarmSimVR.Tests.EditMode
         }
 
         [Test]
-        public void RuntimeCatalog_TryGetNextScene_FindsTerminalPackageBeat()
+        public void RuntimeCatalog_TryGetNextScene_FindsPreFarmPackageBeat()
         {
             var found = StoryPackageRuntimeCatalog.TryGetNextScene(
                 TutorialSceneCatalog.PreFarmCutsceneSceneName,
                 out var nextScene);
 
             Assert.That(found, Is.True);
-            Assert.That(nextScene, Is.Empty);
+            Assert.That(nextScene, Is.EqualTo(TutorialSceneCatalog.FarmTutorialSceneName));
         }
 
         [Test]
@@ -113,7 +113,7 @@ namespace FarmSimVR.Tests.EditMode
         public void RuntimeCatalog_ProvidesFindToolsMinigameConfig_FromResourcePackage()
         {
             var found = StoryPackageRuntimeCatalog.TryGetMinigameConfig(
-                "FindToolsGame",
+                TutorialSceneCatalog.FindToolsSceneName,
                 out var title,
                 out var minigame);
 
@@ -121,8 +121,8 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(title, Is.EqualTo("Find Tools Intro"));
             Assert.That(minigame, Is.Not.Null);
             Assert.That(minigame.AdapterId, Is.EqualTo("tutorial.find_tools"));
-            Assert.That(minigame.RequiredCount, Is.EqualTo(2));
-            Assert.That(minigame.TimeLimitSeconds, Is.EqualTo(240f));
+            Assert.That(minigame.RequiredCount, Is.EqualTo(3));
+            Assert.That(minigame.TimeLimitSeconds, Is.EqualTo(0f));
             Assert.That(minigame.TryGetStringParameter("targetToolSet", out var targetToolSet), Is.True);
             Assert.That(targetToolSet, Is.EqualTo("starter"));
         }
@@ -144,7 +144,7 @@ namespace FarmSimVR.Tests.EditMode
         {
             var nextScene = StoryPackageRuntimeCatalog.GetNextSceneOrNull(TutorialSceneCatalog.PostChickenCutsceneSceneName);
 
-            Assert.That(nextScene, Is.EqualTo(TutorialSceneCatalog.CoreSceneSceneName));
+            Assert.That(nextScene, Is.EqualTo(TutorialSceneCatalog.FindToolsSceneName));
         }
 
         [Test]

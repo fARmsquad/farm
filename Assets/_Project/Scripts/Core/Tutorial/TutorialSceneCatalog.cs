@@ -9,7 +9,7 @@ namespace FarmSimVR.Core.Tutorial
         public const string ChickenGameSceneName = "ChickenGame";
         public const string PostChickenCutsceneSceneName = "PostChickenCutscene";
         public const string CoreSceneSceneName = "CoreScene";
-        public const string FindToolsSceneName = "PlayerGettingSeeds";
+        public const string FindToolsSceneName = "PlayerCollectTools";
         /// <summary>Legacy catalog key; runtime Unity scene is <see cref="CoreSceneSceneName"/>.</summary>
         public const string MidpointPlaceholderSceneName = "MidpointPlaceholder";
         public const string PreFarmCutsceneSceneName = "PreFarmCutscene";
@@ -26,10 +26,10 @@ namespace FarmSimVR.Core.Tutorial
             IntroSceneName,
             ChickenGameSceneName,
             PostChickenCutsceneSceneName,
-            CoreSceneSceneName,
             FindToolsSceneName,
             PreFarmCutsceneSceneName,
             FarmTutorialSceneName,
+            CoreSceneSceneName,
         };
 
         public static string NormalizeRuntimeSceneName(string sceneName)
@@ -105,14 +105,14 @@ namespace FarmSimVR.Core.Tutorial
                 case TutorialStep.ChickenHunt:
                     return TutorialStep.PostChickenCutscene;
                 case TutorialStep.PostChickenCutscene:
-                    return TutorialStep.MidpointPlaceholder;
-                case TutorialStep.MidpointPlaceholder:
                     return TutorialStep.FindTools;
                 case TutorialStep.FindTools:
                     return TutorialStep.PreFarmCutscene;
                 case TutorialStep.PreFarmCutscene:
                     return TutorialStep.FarmTutorial;
                 case TutorialStep.FarmTutorial:
+                    return TutorialStep.MidpointPlaceholder;
+                case TutorialStep.MidpointPlaceholder:
                     return TutorialStep.None;
                 default:
                     return TutorialStep.None;
@@ -127,14 +127,14 @@ namespace FarmSimVR.Core.Tutorial
                     return TutorialStep.Intro;
                 case TutorialStep.PostChickenCutscene:
                     return TutorialStep.ChickenHunt;
-                case TutorialStep.MidpointPlaceholder:
-                    return TutorialStep.PostChickenCutscene;
                 case TutorialStep.FindTools:
-                    return TutorialStep.MidpointPlaceholder;
+                    return TutorialStep.PostChickenCutscene;
                 case TutorialStep.PreFarmCutscene:
                     return TutorialStep.FindTools;
                 case TutorialStep.FarmTutorial:
                     return TutorialStep.PreFarmCutscene;
+                case TutorialStep.MidpointPlaceholder:
+                    return TutorialStep.FarmTutorial;
                 default:
                     return TutorialStep.None;
             }

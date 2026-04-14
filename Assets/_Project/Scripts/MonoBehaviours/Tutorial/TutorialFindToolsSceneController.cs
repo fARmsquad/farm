@@ -24,6 +24,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         private bool _goalReached;
         private bool _usePackageMode;
         private bool _failureAcknowledged;
+        private bool _sceneHasEnvironment;
         private string _currentObjective = string.Empty;
         private TutorialToolPickup[] _packagePickups = System.Array.Empty<TutorialToolPickup>();
 
@@ -36,7 +37,12 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         private void Start()
         {
             _usePackageMode = TryConfigurePackageMode();
-            BuildEnvironment(includeGoalSquare: !_usePackageMode);
+
+            // Only build procedural environment when the scene lacks its own.
+            _sceneHasEnvironment = GameObject.Find("Environment") != null;
+            if (!_sceneHasEnvironment)
+                BuildEnvironment(includeGoalSquare: !_usePackageMode);
+
             if (_usePackageMode)
             {
                 BuildPackagePickups();
@@ -150,21 +156,24 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             var pickup = root.AddComponent<TutorialToolPickup>();
             pickup.Configure(toolName);
 
-            var visual = GameObject.CreatePrimitive(ResolvePrimitive(toolName));
-            visual.name = "PickupVisual";
-            visual.transform.SetParent(root.transform, false);
-            visual.transform.localPosition = Vector3.zero;
-            visual.transform.localScale = ResolveScale(toolName);
-            DestroyUnityObject(visual.GetComponent<Collider>());
-            SetRendererColor(visual.GetComponent<Renderer>(), ResolveToolColor(toolName));
-
-            if (_packageMission.HintStrength != "light")
+            if (!_sceneHasEnvironment)
             {
-                var markerColor = _packageMission.HintStrength == "strong"
-                    ? new Color(1f, 0.9f, 0.32f)
-                    : new Color(0.72f, 0.92f, 1f);
-                var height = _packageMission.HintStrength == "strong" ? 1.6f : 1.2f;
-                EnsureMarkerPost(root.transform, new Vector3(0f, height, 0f), "PickupMarker", markerColor);
+                var visual = GameObject.CreatePrimitive(ResolvePrimitive(toolName));
+                visual.name = "PickupVisual";
+                visual.transform.SetParent(root.transform, false);
+                visual.transform.localPosition = Vector3.zero;
+                visual.transform.localScale = ResolveScale(toolName);
+                DestroyUnityObject(visual.GetComponent<Collider>());
+                SetRendererColor(visual.GetComponent<Renderer>(), ResolveToolColor(toolName));
+
+                if (_packageMission.HintStrength != "light")
+                {
+                    var markerColor = _packageMission.HintStrength == "strong"
+                        ? new Color(1f, 0.9f, 0.32f)
+                        : new Color(0.72f, 0.92f, 1f);
+                    var height = _packageMission.HintStrength == "strong" ? 1.6f : 1.2f;
+                    EnsureMarkerPost(root.transform, new Vector3(0f, height, 0f), "PickupMarker", markerColor);
+                }
             }
 
             return pickup;

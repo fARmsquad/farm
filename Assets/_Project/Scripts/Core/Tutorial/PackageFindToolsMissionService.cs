@@ -32,7 +32,7 @@ namespace FarmSimVR.Core.Tutorial
             SearchZone = NormalizeOrDefault(searchZone, "yard");
             HintStrength = NormalizeOrDefault(hintStrength, "strong");
             ToolDisplayNames = ResolveTools(TargetToolSet, RequiredCount);
-            TimeRemainingSeconds = timeLimitSeconds <= 0f ? 240f : timeLimitSeconds;
+            TimeRemainingSeconds = timeLimitSeconds <= 0f ? -1f : timeLimitSeconds;
             CurrentCount = 0;
             IsComplete = false;
             IsFailed = false;
@@ -55,13 +55,16 @@ namespace FarmSimVR.Core.Tutorial
                 return;
             }
 
-            TimeRemainingSeconds -= deltaTime;
-            if (TimeRemainingSeconds <= 0f)
+            if (TimeRemainingSeconds > 0f)
             {
-                TimeRemainingSeconds = 0f;
-                IsFailed = true;
-                CurrentObjective = "Time ran out. Reload the slice and try again.";
-                return;
+                TimeRemainingSeconds -= deltaTime;
+                if (TimeRemainingSeconds <= 0f)
+                {
+                    TimeRemainingSeconds = 0f;
+                    IsFailed = true;
+                    CurrentObjective = "Time ran out. Reload the slice and try again.";
+                    return;
+                }
             }
 
             CurrentObjective = BuildObjective(_baseObjective, CurrentCount, RequiredCount, TimeRemainingSeconds);
@@ -87,10 +90,16 @@ namespace FarmSimVR.Core.Tutorial
             var safeBase = string.IsNullOrWhiteSpace(baseObjective)
                 ? "Recover the tools."
                 : baseObjective.Trim();
-            var wholeSeconds = timeRemainingSeconds < 0f ? 0 : (int)timeRemainingSeconds;
-            var minutes = wholeSeconds / 60;
-            var seconds = wholeSeconds % 60;
-            return $"{safeBase}  {collectedCount}/{requiredCount} found.  {minutes:00}:{seconds:00} remaining.";
+
+            if (timeRemainingSeconds > 0f)
+            {
+                var wholeSeconds = (int)timeRemainingSeconds;
+                var minutes = wholeSeconds / 60;
+                var seconds = wholeSeconds % 60;
+                return $"{safeBase}  {collectedCount}/{requiredCount} found.  {minutes:00}:{seconds:00} remaining.";
+            }
+
+            return $"{safeBase}";
         }
 
         private static string NormalizeOrDefault(string value, string fallback)

@@ -14,6 +14,6 @@ namespace FarmSimVR.Core.Tutorial
         public bool FarmTutorialComplete { get; internal set; }
         public bool FarmTutorialStarted { get; internal set; }
 
-        public bool IsTutorialComplete => FarmTutorialComplete;
+        public bool IsTutorialComplete => PlaceholderCutsceneVisited && FarmTutorialComplete;
     }
 }

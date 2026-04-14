@@ -6,9 +6,9 @@ namespace FarmSimVR.Core.Tutorial
         Intro,
         ChickenHunt,
         PostChickenCutscene,
-        MidpointPlaceholder,
         FindTools,
         PreFarmCutscene,
         FarmTutorial,
+        MidpointPlaceholder,
     }
 }
