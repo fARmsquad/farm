@@ -10,9 +10,9 @@ namespace FarmSimVR.MonoBehaviours
     public class TitleScreenManager : MonoBehaviour
     {
         public const string TutorialSliceLauncherRootName = "TutorialSliceLauncher";
-        public const string StoryPackageSampleLabel = "Story Package Sample";
+        public const string StoryPackageSampleLabel = "Generative Story Slice";
 
-        private const string StoryPackageSampleSceneName = TutorialSceneCatalog.IntroSceneName;
+        private const string StoryPackageSampleSceneName = TutorialSceneCatalog.PostChickenCutsceneSceneName;
 
         [FormerlySerializedAs("farmMainSceneName")]
         [SerializeField] private string targetSceneName = TutorialSceneCatalog.IntroSceneName;
@@ -64,7 +64,7 @@ namespace FarmSimVR.MonoBehaviours
                 musicSource.Stop();
 
             var sceneName = ResolveTargetSceneName(targetSceneName);
-            SceneManager.LoadScene(sceneName);
+            SceneManager.LoadScene(SceneWorkCatalog.GetLoadableSceneName(sceneName));
         }
 
         private void CreateFadeOverlay()
@@ -135,7 +135,7 @@ namespace FarmSimVR.MonoBehaviours
             CreateSliceButton(
                 root.transform,
                 font,
-                "TutorialSlice_StoryPackageSample",
+                "TutorialSlice_GenerativeStorySlice",
                 StoryPackageSampleLabel,
                 StoryPackageSampleSceneName,
                 48f);

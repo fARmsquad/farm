@@ -100,7 +100,7 @@ namespace FarmSimVR.Core.Story
         private static void ValidateCutsceneBeat(StoryBeatSnapshot beat, int index, List<string> errors)
         {
             var hasSequenceSteps = beat.SequenceSteps != null && beat.SequenceSteps.Length > 0;
-            var hasStoryboard = beat.Storyboard != null;
+            var hasStoryboard = IsStoryboardConfigured(beat.Storyboard);
             if (!hasSequenceSteps && !hasStoryboard)
             {
                 errors.Add($"Beat {index} cutscene requires SequenceSteps or Storyboard.");
@@ -112,6 +112,17 @@ namespace FarmSimVR.Core.Story
 
             if (hasStoryboard)
                 ValidateStoryboard(beat.Storyboard, index, errors);
+        }
+
+        private static bool IsStoryboardConfigured(StoryStoryboardSnapshot storyboard)
+        {
+            if (storyboard == null)
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(storyboard.StylePresetId))
+                return true;
+
+            return storyboard.Shots != null && storyboard.Shots.Length > 0;
         }
 
         private static void ValidateSequenceSteps(StoryBeatSnapshot beat, int index, List<string> errors)

@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using FarmSimVR.Core;
+using FarmSimVR.Core.Farming;
 using FarmSimVR.Core.Tutorial;
 using FarmSimVR.Editor;
 using FarmSimVR.MonoBehaviours;
@@ -64,6 +65,27 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(GameObject.Find("GoalSquare"), Is.Not.Null);
             Assert.That(Object.FindObjectsByType<TutorialToolPickup>(FindObjectsInactive.Include, FindObjectsSortMode.None), Is.Empty);
             Assert.That(Object.FindFirstObjectByType<FirstPersonExplorer>(), Is.Not.Null);
+        }
+
+        [Test]
+        public void FindToolsGameScene_StartUsesPackageDrivenToolRecoveryBeat_WhenStoryBeatExists()
+        {
+            var scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/FindToolsGame.unity", OpenSceneMode.Single);
+
+            Assert.That(scene.IsValid(), Is.True);
+
+            StoryPackageRuntimeCatalog.ResetCacheForTests();
+
+            var gameObject = new GameObject("TutorialFindToolsSceneController");
+            var controller = gameObject.AddComponent<TutorialFindToolsSceneController>();
+
+            InvokePrivateInstance(controller, "Start");
+
+            Assert.That(controller.CurrentObjectiveText, Does.Contain("Find 2 starter tools around the yard in 4 minutes."));
+
+            var pickups = Object.FindObjectsByType<TutorialToolPickup>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            Assert.That(pickups.Length, Is.EqualTo(2));
+            Assert.That(pickups.All(pickup => !string.IsNullOrWhiteSpace(pickup.ToolName)), Is.True);
         }
 
         [Test]
@@ -175,6 +197,13 @@ namespace FarmSimVR.Tests.EditMode
         [Test]
         public void TitleScreenManager_StartBuildsTutorialSliceLauncherFromSharedSceneCatalogAndStoryPackageSampleEntry()
         {
+            Assert.That(TitleScreenManager.StoryPackageSampleLabel, Is.EqualTo("Generative Story Slice"));
+            Assert.That(
+                typeof(TitleScreenManager)
+                    .GetField("StoryPackageSampleSceneName", BindingFlags.NonPublic | BindingFlags.Static)?
+                    .GetRawConstantValue(),
+                Is.EqualTo(TutorialSceneCatalog.PostChickenCutsceneSceneName));
+
             var canvasObject = new GameObject("Canvas");
             canvasObject.AddComponent<Canvas>();
             canvasObject.AddComponent<GraphicRaycaster>();
@@ -202,6 +231,58 @@ namespace FarmSimVR.Tests.EditMode
                     SceneWorkCatalog.TitleScreenLaunchableScenes
                         .Select(scene => $"{scene.NumberLabel} {scene.DisplayName}"))
                     .ToArray()));
+        }
+
+        [TestCase(TutorialSceneCatalog.IntroSceneName, "Intro")]
+        [TestCase(TutorialSceneCatalog.PostChickenCutsceneSceneName, "Tutorial_PostChickenCutscene")]
+        [TestCase(TutorialSceneCatalog.MidpointPlaceholderSceneName, "Tutorial_MidpointPlaceholder")]
+        [TestCase(TutorialSceneCatalog.PreFarmCutsceneSceneName, "Tutorial_PreFarmCutscene")]
+        public void SceneWorkCatalog_GetLoadableSceneName_ResolvesBuildProfileSceneNames(
+            string sceneName,
+            string expectedLoadableSceneName)
+        {
+            Assert.That(
+                SceneWorkCatalog.GetLoadableSceneName(sceneName),
+                Is.EqualTo(expectedLoadableSceneName));
+        }
+
+        [Test]
+        public void TutorialFlowController_ResolveLoadableSceneRequest_UsesBuildProfileNameForStoryPackageNextScene()
+        {
+            var scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/Tutorial_PostChickenCutscene.unity", OpenSceneMode.Single);
+
+            Assert.That(scene.IsValid(), Is.True);
+
+            StoryPackageRuntimeCatalog.ResetCacheForTests();
+
+            var runtime = new GameObject("TutorialRuntime");
+            var controller = runtime.AddComponent<TutorialFlowController>();
+
+            Assert.That(
+                controller.ResolveLoadableSceneRequest(TutorialSceneCatalog.MidpointPlaceholderSceneName),
+                Is.EqualTo("FarmMain"));
+        }
+
+        [Test]
+        public void TutorialFlowController_CompleteCurrentSceneAndLoadNext_ShowsCompletionBanner_ForTerminalStoryPackageBeat()
+        {
+            var scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/Tutorial_PreFarmCutscene.unity", OpenSceneMode.Single);
+
+            Assert.That(scene.IsValid(), Is.True);
+
+            StoryPackageRuntimeCatalog.ResetCacheForTests();
+
+            var runtime = new GameObject("TutorialRuntime");
+            var controller = runtime.AddComponent<TutorialFlowController>();
+            var flow = new TutorialFlowService();
+            flow.EnterScene(TutorialSceneCatalog.PreFarmCutsceneSceneName);
+            SetPrivateField(controller, "<Flow>k__BackingField", flow);
+            SetPrivateField(controller, "<ToolRecovery>k__BackingField", new ToolRecoveryService());
+
+            controller.CompleteCurrentSceneAndLoadNext();
+
+            Assert.That(controller.ShowCompletionBanner, Is.True);
+            Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo("Tutorial_PreFarmCutscene"));
         }
 
         [Test]
@@ -388,6 +469,32 @@ namespace FarmSimVR.Tests.EditMode
 
             Assert.That(heroCropPlot, Is.Not.Null);
             Assert.That(heroCropPlot.objectReferenceValue, Is.EqualTo(heroPatch));
+        }
+
+        [Test]
+        public void FarmMainScene_StartUsesPackageDrivenPlantRowsObjective_WhenStoryBeatExists()
+        {
+            var scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/FarmMain.unity", OpenSceneMode.Single);
+
+            Assert.That(scene.IsValid(), Is.True);
+
+            StoryPackageRuntimeCatalog.ResetCacheForTests();
+
+            var tutorialController = Object.FindFirstObjectByType<TutorialFarmSceneController>();
+            Assert.That(tutorialController, Is.Not.Null);
+
+            InvokePrivateInstance(tutorialController, "Start");
+
+            Assert.That(tutorialController.CurrentObjectiveText, Does.Contain("Plant 3 carrots in 5 minutes."));
+
+            var plots = Object.FindObjectsByType<CropPlotController>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            Assert.That(plots.Length, Is.EqualTo(6));
+            Assert.That(
+                plots.Select(plot => plot.gameObject.name).Distinct().Count(),
+                Is.EqualTo(6));
+            Assert.That(
+                plots.Count(plot => tutorialController.IsActionAllowed(FarmPlotAction.Till, plot)),
+                Is.EqualTo(6));
         }
 
         private static void InvokePrivateInstance(object target, string methodName, params object[] args)

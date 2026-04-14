@@ -194,7 +194,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 624b17f1b9f8744678ef3dc45e3191b6, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.Cinematics.NPCController
   npcName: Young Pip
   capsuleColor: {r: 0, g: 1, b: 1, a: 1}
@@ -1226,7 +1226,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 963866fd3f0944048a66be8440460e52, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.DialogueChoiceUI
   conversation: {fileID: 920750515}
   dialogueCanvas: {fileID: 556897493}
@@ -1245,7 +1245,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ab3324a6b9dff441994e88248784486c, type: 3}
-  m_Name: 
+  m_Name: ""
   m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.Cinematics.DialogueManager
   dialogueCanvas: {fileID: 556897493}
   speakerNameText: {fileID: 912536703}
@@ -1265,7 +1265,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
+  m_Name: TownNpcVoiceStreamController
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
   m_IgnoreReversedGraphics: 1
   m_BlockingObjects: 0
@@ -2417,6 +2417,7 @@ GameObject:
   - component: {fileID: 920750517}
   - component: {fileID: 920750516}
   - component: {fileID: 920750515}
+  - component: {fileID: 920750518}
   m_Layer: 0
   m_Name: LLMSystem
   m_TagString: Untagged
@@ -2449,10 +2450,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b21e8e39b3ab409080d4f12ab74454a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.OpenAIClient
-  apiKey: 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
+  apiKey:
   model: gpt-4o-mini
   temperature: 0.8
   maxTokens: 140
+--- !u!114 &920750518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920750514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c44624bc931c4b00bfb5653b0c94200f, type: 3}
+  m_Name: TownNpcVoiceStreamController
+  m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.TownNpcVoiceStreamController
+  conversation: {fileID: 920750515}
+  tokenServiceBaseUrl: http://127.0.0.1:8000
+  voiceEnabled: 1
+  pcmPlayer: {fileID: 0}
 --- !u!4 &920750517
 Transform:
   m_ObjectHideFlags: 0

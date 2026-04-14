@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     gemini_image_fallback_model: str = "gemini-2.5-flash-image"
     elevenlabs_api_key: str = ""
     elevenlabs_voice_id: str = ""
-    elevenlabs_model_id: str = "eleven_multilingual_v2"
+    elevenlabs_model_id: str = "eleven_flash_v2_5"
     database_path: str = "data/story_orchestrator.db"
     generated_storyboard_output_root: str = "../../Assets/_Project/Resources"
     generated_storyboard_package_path: str = "../../Assets/_Project/Resources/StoryPackages/StoryPackage_IntroChickenSample.json"

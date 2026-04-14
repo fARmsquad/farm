@@ -54,7 +54,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         {
             if (HasStoryboard())
             {
-                EnsureAudioSource();
+                ResolveAudioSource();
                 BeginStoryboardShot(0);
                 return;
             }
@@ -207,19 +207,34 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             _stylesReady = true;
         }
 
-        private void EnsureAudioSource()
+        private AudioSource ResolveAudioSource()
         {
-            if (_audioSource == null)
-                _audioSource = gameObject.GetComponent<AudioSource>() ?? gameObject.AddComponent<AudioSource>();
+            if (_audioSource != null)
+                return _audioSource;
+
+            var existingSource = gameObject.GetComponent<AudioSource>();
+            if (existingSource != null)
+            {
+                _audioSource = existingSource;
+                return _audioSource;
+            }
+
+            _audioSource = gameObject.AddComponent<AudioSource>();
+            _audioSource.playOnAwake = false;
+            _audioSource.loop = false;
+            return _audioSource;
         }
 
         private void PlayAudio(AudioClip clip)
         {
-            EnsureAudioSource();
-            _audioSource.Stop();
-            _audioSource.clip = clip;
+            var audioSource = ResolveAudioSource();
+            if (audioSource == null)
+                return;
+
+            audioSource.Stop();
+            audioSource.clip = clip;
             if (clip != null)
-                _audioSource.Play();
+                audioSource.Play();
         }
 
         private static T LoadResource<T>(string resourcePath) where T : Object

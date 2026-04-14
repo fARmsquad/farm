@@ -59,6 +59,42 @@ class StoryOrchestratorAppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json()["detail"], "Story job not found.")
 
+    def test_create_elevenlabs_tts_websocket_token_returns_single_use_token(self) -> None:
+        captured: dict[str, str] = {}
+
+        def fake_provider(api_key: str) -> str:
+            captured["api_key"] = api_key
+            return "sutkn_demo"
+
+        self.client.app.state.elevenlabs_token_provider = fake_provider
+
+        response = self.client.post("/api/v1/elevenlabs/tts-websocket-token")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {"token": "sutkn_demo", "token_type": "tts_websocket"},
+        )
+        self.assertEqual(captured["api_key"], "test-eleven")
+
+    def test_create_elevenlabs_tts_websocket_token_requires_api_key(self) -> None:
+        database_path = Path(self._temp_dir.name) / "story_orchestrator_missing_voice.db"
+        settings = Settings(
+            gemini_api_key="test-gemini",
+            elevenlabs_api_key="",
+            database_path=str(database_path),
+        )
+        client = TestClient(create_app(settings))
+        self.addCleanup(client.close)
+
+        response = client.post("/api/v1/elevenlabs/tts-websocket-token")
+
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(
+            response.json()["detail"],
+            "ElevenLabs is not configured for the local story orchestrator.",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

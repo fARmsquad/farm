@@ -11,11 +11,21 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         [SerializeField] private string toolName;
 
         public string ToolName => toolName;
+        public bool IsCollected { get; private set; }
 
-        public void Collect()
+        public void Configure(string displayName)
         {
-            Debug.Log($"[TutorialToolPickup] Collected tool: {toolName}");
+            toolName = string.IsNullOrWhiteSpace(displayName) ? "Tool" : displayName.Trim();
+        }
+
+        public bool Collect()
+        {
+            if (IsCollected)
+                return false;
+
+            IsCollected = true;
             gameObject.SetActive(false);
+            return true;
         }
     }
 }

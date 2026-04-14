@@ -1,142 +1,36 @@
 import base64
 import json
 import mimetypes
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
 import httpx
-from pydantic import BaseModel, Field
 
 from .config import Settings
-
-
-class GeneratedStoryboardContext(BaseModel):
-    character_name: str = Field(min_length=1)
-    crop_name: str = Field(min_length=1)
-    minigame_goal: str = Field(min_length=1)
-
-
-class GeneratedStoryboardCutsceneRequest(BaseModel):
-    package_id: str = Field(min_length=1)
-    package_display_name: str = Field(min_length=1)
-    beat_id: str = Field(min_length=1)
-    display_name: str = Field(min_length=1)
-    scene_name: str = Field(min_length=1)
-    next_scene_name: str | None = None
-    story_brief: str = Field(min_length=1)
-    style_preset_id: str = Field(default="farm_storybook_v1", min_length=1)
-    voice_id: str | None = None
-    reference_image_paths: list[str] = Field(default_factory=list)
-    aspect_ratio: str = Field(default="16:9", min_length=1)
-    image_size: str = Field(default="2K", min_length=1)
-    context: GeneratedStoryboardContext
-
-
-class GeneratedStoryboardPackageResult(BaseModel):
-    package_output_path: str
-    unity_package: dict[str, Any]
-
-
-@dataclass(frozen=True)
-class GeneratedStoryboardPlanShot:
-    shot_id: str
-    subtitle_text: str
-    narration_text: str
-    image_prompt: str
-    duration_seconds: float
-
-
-@dataclass(frozen=True)
-class GeneratedStoryboardPlan:
-    beat_id: str
-    display_name: str
-    scene_name: str
-    next_scene_name: str
-    style_preset_id: str
-    shots: list[GeneratedStoryboardPlanShot]
-
-
-@dataclass(frozen=True)
-class GeneratedImageAsset:
-    output_path: Path
-    mime_type: str
-
-
-@dataclass(frozen=True)
-class GeneratedSpeechAsset:
-    output_path: Path
-    alignment_path: Path
-    duration_seconds: float
-    mime_type: str
-
-
-class StoryboardPlanner(Protocol):
-    def plan(self, request: GeneratedStoryboardCutsceneRequest) -> GeneratedStoryboardPlan:
-        ...
-
-
-class ImageGenerator(Protocol):
-    def generate_image(
-        self,
-        *,
-        prompt: str,
-        reference_image_paths: list[str],
-        output_path: Path,
-        aspect_ratio: str,
-        image_size: str,
-    ) -> GeneratedImageAsset:
-        ...
-
-
-class SpeechGenerator(Protocol):
-    def generate_speech(
-        self,
-        *,
-        text: str,
-        voice_id: str,
-        output_path: Path,
-        previous_text: str,
-        next_text: str,
-    ) -> GeneratedSpeechAsset:
-        ...
+from .generated_storyboard_models import (
+    GeneratedImageAsset,
+    GeneratedSpeechAsset,
+    GeneratedStoryboardContext,
+    GeneratedStoryboardCutsceneRequest,
+    GeneratedStoryboardPackageResult,
+    GeneratedStoryboardPlan,
+    GeneratedStoryboardPlanShot,
+    ImageGenerator,
+    SpeechGenerator,
+    StoryboardPlanner,
+)
+from .storyboard_media import (
+    ChainImageGenerator,
+    ChainSpeechGenerator,
+    PlaceholderImageGenerator,
+    PlaceholderSpeechGenerator,
+)
 
 
 class TemplateStoryboardPlanner:
     def plan(self, request: GeneratedStoryboardCutsceneRequest) -> GeneratedStoryboardPlan:
         context = request.context
-        shots = [
-            GeneratedStoryboardPlanShot(
-                shot_id="shot_01",
-                subtitle_text=f"Nice work. The {context.crop_name} beds are finally ready for you.",
-                narration_text=f"Nice work. The {context.crop_name} beds are finally ready for you.",
-                image_prompt=(
-                    f"{context.character_name} stands at the farm edge after the chicken chase, "
-                    f"revealing freshly prepared {context.crop_name} rows at sunrise."
-                ),
-                duration_seconds=3.2,
-            ),
-            GeneratedStoryboardPlanShot(
-                shot_id="shot_02",
-                subtitle_text=f"{context.minigame_goal}, and keep the rows tidy.",
-                narration_text=f"{context.minigame_goal}, and keep the rows tidy.",
-                image_prompt=(
-                    f"{context.character_name} gestures toward the {context.crop_name} rows and the tools "
-                    "needed for the next farm task."
-                ),
-                duration_seconds=3.6,
-            ),
-            GeneratedStoryboardPlanShot(
-                shot_id="shot_03",
-                subtitle_text="Head to the plots. The farm is waiting on your hands.",
-                narration_text="Head to the plots. The farm is waiting on your hands.",
-                image_prompt=(
-                    f"A forward-looking shot from the pen toward the {context.crop_name} plots, "
-                    "inviting the player into the next minigame."
-                ),
-                duration_seconds=3.0,
-            ),
-        ]
+        shots = _build_plan_shots(context)
 
         return GeneratedStoryboardPlan(
             beat_id=request.beat_id,
@@ -329,16 +223,26 @@ class GeneratedStoryboardService:
             output_root=output_root,
             package_output_path=package_output_path,
             planner=TemplateStoryboardPlanner(),
-            image_generator=GeminiImageGenerator(
-                api_key=settings.gemini_api_key,
-                models=[
-                    settings.gemini_image_model,
-                    settings.gemini_image_fallback_model,
-                ],
+            image_generator=ChainImageGenerator(
+                [
+                    GeminiImageGenerator(
+                        api_key=settings.gemini_api_key,
+                        models=[
+                            settings.gemini_image_model,
+                            settings.gemini_image_fallback_model,
+                        ],
+                    ),
+                    PlaceholderImageGenerator(),
+                ]
             ),
-            speech_generator=ElevenLabsSpeechGenerator(
-                api_key=settings.elevenlabs_api_key,
-                model_id=settings.elevenlabs_model_id,
+            speech_generator=ChainSpeechGenerator(
+                [
+                    ElevenLabsSpeechGenerator(
+                        api_key=settings.elevenlabs_api_key,
+                        model_id=settings.elevenlabs_model_id,
+                    ),
+                    PlaceholderSpeechGenerator(),
+                ]
             ),
             default_voice_id=settings.elevenlabs_voice_id,
         )
@@ -347,21 +251,22 @@ class GeneratedStoryboardService:
         self,
         request: GeneratedStoryboardCutsceneRequest,
     ) -> GeneratedStoryboardPackageResult:
-        plan = self._planner.plan(request)
+        resolved_request = self._resolve_request_context(request)
+        plan = self._planner.plan(resolved_request)
         voice_id = request.voice_id or self._default_voice_id
         if not voice_id:
             raise RuntimeError("A voice_id is required to generate narration audio.")
 
-        base_asset_dir = self._output_root / "GeneratedStoryboards" / request.package_id / request.beat_id
+        base_asset_dir = self._output_root / "GeneratedStoryboards" / resolved_request.package_id / resolved_request.beat_id
         shots = []
         for index, shot in enumerate(plan.shots):
             stem = base_asset_dir / shot.shot_id
             image_asset = self._image_generator.generate_image(
-                prompt=self._build_image_prompt(request, shot),
-                reference_image_paths=request.reference_image_paths,
+                prompt=self._build_image_prompt(resolved_request, shot),
+                reference_image_paths=resolved_request.reference_image_paths,
                 output_path=stem.with_suffix(".png"),
-                aspect_ratio=request.aspect_ratio,
-                image_size=request.image_size,
+                aspect_ratio=resolved_request.aspect_ratio,
+                image_size=resolved_request.image_size,
             )
             speech_asset = self._speech_generator.generate_speech(
                 text=shot.narration_text,
@@ -381,11 +286,11 @@ class GeneratedStoryboardService:
                 }
             )
 
-        unity_package = self._load_existing_package(request)
-        unity_package["PackageId"] = request.package_id
+        unity_package = self._load_existing_package(resolved_request)
+        unity_package["PackageId"] = resolved_request.package_id
         unity_package["SchemaVersion"] = unity_package.get("SchemaVersion", 1)
         unity_package["PackageVersion"] = unity_package.get("PackageVersion", 1)
-        unity_package["DisplayName"] = request.package_display_name
+        unity_package["DisplayName"] = resolved_request.package_display_name
         beats = unity_package.setdefault("Beats", [])
 
         updated_beat = {
@@ -427,6 +332,40 @@ class GeneratedStoryboardService:
             unity_package=unity_package,
         )
 
+    def _resolve_request_context(
+        self,
+        request: GeneratedStoryboardCutsceneRequest,
+    ) -> GeneratedStoryboardCutsceneRequest:
+        crop_name = request.context.crop_name
+        focus_label = request.context.focus_label
+        minigame_goal = request.context.minigame_goal
+        if request.linked_minigame_beat_id:
+            package = self._load_existing_package(request)
+            linked_beat = self._find_linked_minigame_beat(package, request.linked_minigame_beat_id)
+            minigame_payload = linked_beat.get("Minigame") or {}
+            if not minigame_goal:
+                minigame_goal = minigame_payload.get("ObjectiveText") or ""
+            if not crop_name:
+                crop_name = self._extract_crop_name(minigame_payload)
+            if not focus_label:
+                focus_label = self._extract_focus_label(minigame_payload)
+
+        if not minigame_goal:
+            raise RuntimeError("Storyboard context requires minigame_goal or linked_minigame_beat_id.")
+        if not crop_name and not focus_label:
+            raise RuntimeError("Storyboard context requires crop_name, focus_label, or a linked minigame beat that can derive one.")
+
+        return request.model_copy(
+            update={
+                "context": GeneratedStoryboardContext(
+                    character_name=request.context.character_name,
+                    crop_name=crop_name,
+                    focus_label=focus_label,
+                    minigame_goal=minigame_goal,
+                )
+            }
+        )
+
     def _build_image_prompt(
         self,
         request: GeneratedStoryboardCutsceneRequest,
@@ -434,9 +373,10 @@ class GeneratedStoryboardService:
     ) -> str:
         context = request.context
         style_prompt = _build_style_prompt(request.style_preset_id)
+        subject_label = _resolve_subject_label(context)
         return (
             f"{style_prompt} Story brief: {request.story_brief}. "
-            f"Character: {context.character_name}. Crop: {context.crop_name}. "
+            f"Character: {context.character_name}. Focus: {subject_label}. "
             f"Gameplay goal: {context.minigame_goal}. "
             f"Frame direction: {shot.image_prompt}. "
             "Keep the framing readable for subtitles and preserve character identity across shots."
@@ -461,6 +401,46 @@ class GeneratedStoryboardService:
         except json.JSONDecodeError as error:
             raise RuntimeError(f"Existing story package is invalid JSON: {error}") from error
 
+    @staticmethod
+    def _find_linked_minigame_beat(package: dict[str, Any], beat_id: str) -> dict[str, Any]:
+        for beat in package.get("Beats", []):
+            if beat.get("BeatId") != beat_id:
+                continue
+            if beat.get("Kind") != "Minigame" or not isinstance(beat.get("Minigame"), dict):
+                raise RuntimeError(f"Linked beat '{beat_id}' is not a valid minigame beat.")
+            return beat
+
+        raise RuntimeError(f"Linked minigame beat '{beat_id}' was not found in the story package.")
+
+    @staticmethod
+    def _extract_crop_name(minigame_payload: dict[str, Any]) -> str:
+        resolved_parameters = _extract_resolved_parameters(minigame_payload)
+        if not resolved_parameters:
+            return ""
+
+        crop_type = resolved_parameters.get("cropType")
+        if not isinstance(crop_type, str) or not crop_type:
+            return ""
+
+        return _pluralize_crop(crop_type)
+
+    @staticmethod
+    def _extract_focus_label(minigame_payload: dict[str, Any]) -> str:
+        resolved_parameters = _extract_resolved_parameters(minigame_payload)
+        if not resolved_parameters:
+            return ""
+
+        minigame_id = minigame_payload.get("MinigameId")
+        if minigame_id == "find_tools":
+            tool_set = resolved_parameters.get("targetToolSet")
+            if isinstance(tool_set, str) and tool_set:
+                return f"{tool_set} tools"
+
+        if minigame_id == "chicken_chase":
+            return "chickens"
+
+        return ""
+
 
 def _build_style_prompt(style_preset_id: str) -> str:
     if style_preset_id == "farm_storybook_v1":
@@ -475,9 +455,139 @@ def _build_style_prompt(style_preset_id: str) -> str:
     )
 
 
+def _build_plan_shots(context: GeneratedStoryboardContext) -> list[GeneratedStoryboardPlanShot]:
+    if context.crop_name:
+        crop_label = _singularize_crop(context.crop_name)
+        minigame_prompt = _append_goal_clause(context.minigame_goal or "", "and keep the rows tidy.")
+        return [
+            GeneratedStoryboardPlanShot(
+                shot_id="shot_01",
+                subtitle_text=f"Nice work. The {crop_label} beds are finally ready for you.",
+                narration_text=f"Nice work. The {crop_label} beds are finally ready for you.",
+                image_prompt=(
+                    f"{context.character_name} stands at the farm edge after the chicken chase, "
+                    f"revealing freshly prepared {crop_label} rows at sunrise."
+                ),
+                duration_seconds=3.2,
+            ),
+            GeneratedStoryboardPlanShot(
+                shot_id="shot_02",
+                subtitle_text=minigame_prompt,
+                narration_text=minigame_prompt,
+                image_prompt=(
+                    f"{context.character_name} gestures toward the {crop_label} rows and the tools "
+                    "needed for the next farm task."
+                ),
+                duration_seconds=3.6,
+            ),
+            GeneratedStoryboardPlanShot(
+                shot_id="shot_03",
+                subtitle_text="Head to the plots. The farm is waiting on your hands.",
+                narration_text="Head to the plots. The farm is waiting on your hands.",
+                image_prompt=(
+                    f"A forward-looking shot from the pen toward the {crop_label} plots, "
+                    "inviting the player into the next minigame."
+                ),
+                duration_seconds=3.0,
+            ),
+        ]
+
+    focus_label = context.focus_label or "tools"
+    return [
+        GeneratedStoryboardPlanShot(
+            shot_id="shot_01",
+            subtitle_text=f"Nice work. The {focus_label} are back where they belong.",
+            narration_text=f"Nice work. The {focus_label} are back where they belong.",
+            image_prompt=(
+                f"{context.character_name} stands beside the farm path at sunrise with the recovered {focus_label}, "
+                "framing the homestead as the next phase begins."
+            ),
+            duration_seconds=3.2,
+        ),
+        GeneratedStoryboardPlanShot(
+            shot_id="shot_02",
+            subtitle_text=f"The {focus_label} are back in your hands. Head to the plots and get ready to plant.",
+            narration_text=f"The {focus_label} are back in your hands. Head to the plots and get ready to plant.",
+            image_prompt=(
+                f"{context.character_name} gestures from the recovered {focus_label} toward the prepared farm plots, "
+                "turning the recovered gear into a clear call toward planting."
+            ),
+            duration_seconds=3.4,
+        ),
+        GeneratedStoryboardPlanShot(
+            shot_id="shot_03",
+            subtitle_text="The fields are waiting. Let's start the first real farm loop.",
+            narration_text="The fields are waiting. Let's start the first real farm loop.",
+            image_prompt=(
+                "A forward-looking sunrise view from the tool path toward the ready plots, "
+                "inviting the player into the first full farming loop."
+            ),
+            duration_seconds=3.0,
+        ),
+    ]
+
+
 def _extract_alignment_duration(alignment: dict[str, Any]) -> float:
     end_times = alignment.get("character_end_times_seconds") or []
     if not end_times:
         return 0.0
 
     return float(end_times[-1])
+
+
+def _pluralize_crop(crop_type: str) -> str:
+    irregular = {"tomato": "tomatoes"}
+    return irregular.get(crop_type, f"{crop_type}s")
+
+
+def _append_goal_clause(goal: str, suffix: str) -> str:
+    normalized_goal = goal.rstrip(" .!?")
+    return f"{normalized_goal}, {suffix}"
+
+
+def _singularize_crop(crop_name: str) -> str:
+    irregular = {"tomatoes": "tomato"}
+    if crop_name in irregular:
+        return irregular[crop_name]
+    if crop_name.endswith("s") and len(crop_name) > 1:
+        return crop_name[:-1]
+    return crop_name
+
+
+def _resolve_subject_label(context: GeneratedStoryboardContext) -> str:
+    if context.crop_name:
+        return _singularize_crop(context.crop_name)
+    if context.focus_label:
+        return context.focus_label
+    return "farm task"
+
+
+def _extract_resolved_parameters(minigame_payload: dict[str, Any]) -> dict[str, Any]:
+    resolved_parameters = minigame_payload.get("ResolvedParameters")
+    if isinstance(resolved_parameters, dict) and resolved_parameters:
+        return resolved_parameters
+
+    entries = minigame_payload.get("ResolvedParameterEntries")
+    if not isinstance(entries, list):
+        return {}
+
+    extracted: dict[str, Any] = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+
+        name = entry.get("Name")
+        value_type = entry.get("ValueType")
+        if not isinstance(name, str) or not name:
+            continue
+
+        if value_type == "Bool":
+            extracted[name] = bool(entry.get("BoolValue"))
+        elif value_type == "Int":
+            extracted[name] = int(entry.get("IntValue", 0))
+        elif value_type == "Float":
+            extracted[name] = float(entry.get("FloatValue", 0.0))
+        else:
+            extracted[name] = str(entry.get("StringValue", ""))
+
+    return extracted
