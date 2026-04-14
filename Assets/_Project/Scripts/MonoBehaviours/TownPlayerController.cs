@@ -22,7 +22,9 @@ namespace FarmSimVR.MonoBehaviours
         private const float MOVE_SPEED      = 4f;
         private const float RUN_SPEED       = 7f;
         private const float GRAVITY         = -18f;
-        private const float MOUSE_TURN_SENS = 120f;
+        private const float LOOK_SPEED      = 2f;
+        private const float MIN_PITCH       = -35f;
+        private const float MAX_PITCH       = 55f;
 
         [Header("References")]
         [SerializeField] private Transform cameraRig;
@@ -32,7 +34,9 @@ namespace FarmSimVR.MonoBehaviours
         [SerializeField] private TextMeshProUGUI interactPromptLabel;
 
         private CharacterController _cc;
+        private TownCameraFollow _cameraFollow;
         private float _verticalVelocity;
+        private float _pitch;
         private bool _controlEnabled;
         private bool _wasInConversation;
 
@@ -44,6 +48,9 @@ namespace FarmSimVR.MonoBehaviours
         {
             _cc = GetComponent<CharacterController>();
             _npcs.AddRange(FindObjectsByType<NPCController>(FindObjectsSortMode.None));
+
+            if (cameraRig != null)
+                _cameraFollow = cameraRig.GetComponent<TownCameraFollow>();
 
             if (interactPromptLabel != null)
                 interactPromptLabel.gameObject.SetActive(false);
@@ -151,19 +158,27 @@ namespace FarmSimVR.MonoBehaviours
             return nearest;
         }
 
-        // ── Mouse look (yaw only) ─────────────────────────────────────────────
+        // ── Mouse look (yaw + pitch) ──────────────────────────────────────────
 
         private void HandleMouseLook()
         {
             var mouse = Mouse.current;
             if (mouse == null) return;
 
-            float deltaX = mouse.delta.x.ReadValue();
-            float yawDelta = deltaX * MOUSE_TURN_SENS * Time.deltaTime;
-            transform.Rotate(0f, yawDelta, 0f, Space.Self);
+            Vector2 delta = mouse.delta.ReadValue();
+            float mouseX = delta.x * LOOK_SPEED * 0.1f;
+            float mouseY = delta.y * LOOK_SPEED * 0.1f;
+
+            transform.Rotate(Vector3.up * mouseX);
+
+            _pitch -= mouseY;
+            _pitch = Mathf.Clamp(_pitch, MIN_PITCH, MAX_PITCH);
+
+            if (_cameraFollow != null)
+                _cameraFollow.SetPitch(_pitch);
         }
 
-        // ── WASD movement ─────────────────────────────────────────────────────
+        // ── WASD movement (player-relative) ───────────────────────────────────
 
         private void HandleMovement()
         {
@@ -172,10 +187,6 @@ namespace FarmSimVR.MonoBehaviours
 
             float speed = kb.leftShiftKey.isPressed ? RUN_SPEED : MOVE_SPEED;
 
-            Transform reference = cameraRig != null ? cameraRig : transform;
-            Vector3 camForward  = Vector3.ProjectOnPlane(reference.forward, Vector3.up).normalized;
-            Vector3 camRight    = Vector3.ProjectOnPlane(reference.right,   Vector3.up).normalized;
-
             Vector2 wasd = Vector2.zero;
             if (kb.wKey.isPressed || kb.upArrowKey.isPressed)    wasd.y += 1f;
             if (kb.sKey.isPressed || kb.downArrowKey.isPressed)  wasd.y -= 1f;
@@ -183,7 +194,7 @@ namespace FarmSimVR.MonoBehaviours
             if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) wasd.x += 1f;
             wasd = Vector2.ClampMagnitude(wasd, 1f);
 
-            Vector3 move = (camForward * wasd.y + camRight * wasd.x) * speed;
+            Vector3 move = (transform.forward * wasd.y + transform.right * wasd.x) * speed;
 
             if (_cc.isGrounded && _verticalVelocity < 0f)
             {
