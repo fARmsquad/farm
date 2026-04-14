@@ -7,76 +7,102 @@ using UnityEngine.UI;
 namespace FarmSimVR.MonoBehaviours
 {
     /// <summary>
-    /// Renders the LLM conversation UI with streaming support.
-    /// Shows the NPC's response text delta-by-delta as it streams in,
-    /// then displays clickable choice buttons once the stream completes.
+    /// Renders the Town dialogue HUD and adapts it to streaming, voice-input, and choice states.
     /// </summary>
     public class DialogueChoiceUI : MonoBehaviour
     {
+        private static readonly Color WaitingColor = new(0.76f, 0.87f, 1f, 0.92f);
+        private static readonly Color RecordingColor = new(1f, 0.72f, 0.54f, 1f);
+        private static readonly Color TranscribingColor = new(0.73f, 0.96f, 1f, 1f);
+        private static readonly Color WarningColor = new(1f, 0.86f, 0.64f, 1f);
+
         [SerializeField] private LLMConversationController conversation;
-        [SerializeField] private Canvas                    dialogueCanvas;
-        [SerializeField] private GameObject                dialoguePanel;
-        [SerializeField] private TextMeshProUGUI           speakerNameText;
-        [SerializeField] private TextMeshProUGUI           dialogueText;
-        [SerializeField] private Transform                 choiceContainer;
-        [SerializeField] private TextMeshProUGUI           loadingText;
+        [SerializeField] private Canvas dialogueCanvas;
+        [SerializeField] private GameObject dialoguePanel;
+        [SerializeField] private TextMeshProUGUI speakerNameText;
+        [SerializeField] private TextMeshProUGUI dialogueText;
+        [SerializeField] private Transform choiceContainer;
+        [SerializeField] private TextMeshProUGUI loadingText;
+        [SerializeField] private TextMeshProUGUI hintText;
 
         private readonly List<GameObject> _buttons = new();
         private readonly StringBuilder _visibleText = new();
+        private string _defaultHintText;
         private string _lastPlayerPrompt;
-
-        // ── Lifecycle ─────────────────────────────────────────────────────────
+        private bool _choicesVisible;
+        private bool _layoutInitialized;
+        private TownVoiceInputController _voiceInputController;
+        private RectTransform _dialoguePanelRect;
+        private RectTransform _choiceContainerRect;
 
         private void OnEnable()
         {
-            if (conversation == null) return;
-            conversation.OnStreamStarted     += HandleStreamStarted;
-            conversation.OnStreamChunk       += HandleStreamChunk;
-            conversation.OnNPCResponse       += HandleResponse;
-            conversation.OnOptionsReady      += HandleOptions;
-            conversation.OnWaiting           += HandleWaiting;
+            InitializeAdaptiveHud();
+            if (conversation == null)
+                return;
+
+            ResolveVoiceInputController();
+            conversation.OnStreamStarted += HandleStreamStarted;
+            conversation.OnStreamChunk += HandleStreamChunk;
+            conversation.OnNPCResponse += HandleResponse;
+            conversation.OnOptionsReady += HandleOptions;
+            conversation.OnWaiting += HandleWaiting;
             conversation.OnConversationEnded += HandleEnded;
-            conversation.OnError             += HandleError;
+            conversation.OnError += HandleError;
+            conversation.OnPlayerPromptSubmitted += HandlePlayerPromptSubmitted;
+            conversation.OnExitBlocked += HandleExitBlocked;
+            SubscribeVoiceInputStatus();
         }
 
         private void OnDisable()
         {
-            if (conversation == null) return;
-            conversation.OnStreamStarted     -= HandleStreamStarted;
-            conversation.OnStreamChunk       -= HandleStreamChunk;
-            conversation.OnNPCResponse       -= HandleResponse;
-            conversation.OnOptionsReady      -= HandleOptions;
-            conversation.OnWaiting           -= HandleWaiting;
+            UnsubscribeVoiceInputStatus();
+            if (conversation == null)
+                return;
+
+            conversation.OnStreamStarted -= HandleStreamStarted;
+            conversation.OnStreamChunk -= HandleStreamChunk;
+            conversation.OnNPCResponse -= HandleResponse;
+            conversation.OnOptionsReady -= HandleOptions;
+            conversation.OnWaiting -= HandleWaiting;
             conversation.OnConversationEnded -= HandleEnded;
-            conversation.OnError             -= HandleError;
+            conversation.OnError -= HandleError;
+            conversation.OnPlayerPromptSubmitted -= HandlePlayerPromptSubmitted;
+            conversation.OnExitBlocked -= HandleExitBlocked;
         }
 
         private void Start()
         {
-            if (dialoguePanel != null) dialoguePanel.SetActive(false);
-            _lastPlayerPrompt = null;
-            ClearButtons();
-        }
+            InitializeAdaptiveHud();
+            ResolveVoiceInputController();
+            if (dialoguePanel != null)
+                dialoguePanel.SetActive(false);
 
-        // ── Streaming handlers ───────────────────────────────────────────────
+            _lastPlayerPrompt = null;
+            _choicesVisible = false;
+            ClearButtons();
+            HideStatusBadge();
+            RestoreDefaultHint();
+        }
 
         private void HandleStreamStarted(string npcName)
         {
+            InitializeAdaptiveHud();
             _visibleText.Clear();
+            _choicesVisible = false;
 
             ShowCanvas(true);
-            if (dialoguePanel   != null) dialoguePanel.SetActive(true);
-            if (loadingText     != null) loadingText.gameObject.SetActive(false);
-            if (speakerNameText != null) speakerNameText.text = npcName;
-            if (dialogueText    != null)
-            {
-                dialogueText.text = BuildDialogueBody(string.Empty);
-                dialogueText.maxVisibleCharacters = int.MaxValue;
-            }
+            if (dialoguePanel != null)
+                dialoguePanel.SetActive(true);
+
+            if (speakerNameText != null)
+                speakerNameText.text = npcName;
 
             ClearButtons();
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible   = true;
+            HideStatusBadge();
+            SetHintText(string.Empty);
+            SetDialogueText(string.Empty);
+            UnlockCursor();
         }
 
         private void HandleStreamChunk(string token)
@@ -85,42 +111,36 @@ namespace FarmSimVR.MonoBehaviours
             SetDialogueText(_visibleText.ToString());
         }
 
-        // ── Completion handlers ──────────────────────────────────────────────
-
         private void HandleResponse(string npcName, string responseText)
         {
-            // Show the final clean response text once the streamed turn completes.
-            if (speakerNameText != null) speakerNameText.text = npcName;
+            if (speakerNameText != null)
+                speakerNameText.text = npcName;
+
             SetDialogueText(responseText);
         }
 
         private void HandleOptions(string[] options)
         {
+            InitializeAdaptiveHud();
+            ResolveVoiceInputController();
             ClearButtons();
-            foreach (string opt in options)
-            {
-                var captured = opt;
-                var btn = BuildButton(opt);
-                btn.GetComponent<Button>().onClick.AddListener(
-                    () =>
-                    {
-                        _lastPlayerPrompt = captured;
-                        conversation.SelectOption(captured);
-                    });
-                _buttons.Add(btn);
-            }
+            BuildOptionButtons(options);
+            _choicesVisible = true;
+            RefreshVoiceInputStatus();
+            RefreshAdaptiveLayout();
         }
 
         private void HandleWaiting()
         {
+            InitializeAdaptiveHud();
             ShowCanvas(true);
-            if (dialoguePanel != null) dialoguePanel.SetActive(true);
+            if (dialoguePanel != null)
+                dialoguePanel.SetActive(true);
+
             ClearButtons();
-            if (loadingText != null)
-            {
-                loadingText.gameObject.SetActive(true);
-                loadingText.text = "...";
-            }
+            _choicesVisible = false;
+            ShowStatusBadge("Thinking...", WaitingColor);
+            SetHintText(string.Empty);
 
             if (!string.IsNullOrWhiteSpace(_lastPlayerPrompt))
                 SetDialogueText(string.Empty);
@@ -128,23 +148,45 @@ namespace FarmSimVR.MonoBehaviours
 
         private void HandleEnded()
         {
-            if (dialoguePanel != null) dialoguePanel.SetActive(false);
+            InitializeAdaptiveHud();
+            if (dialoguePanel != null)
+                dialoguePanel.SetActive(false);
+
             ShowCanvas(false);
             ClearButtons();
             _lastPlayerPrompt = null;
             _visibleText.Clear();
-
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible   = false;
+            _choicesVisible = false;
+            HideStatusBadge();
+            RestoreDefaultHint();
+            LockCursor();
         }
 
         private void HandleError(string _)
         {
+            InitializeAdaptiveHud();
             SetDialogueText("(Something went wrong — try again later.)");
             ClearButtons();
+            _choicesVisible = false;
+            ShowStatusBadge("Conversation unavailable.", WarningColor);
+            SetHintText(string.Empty);
         }
 
-        // ── Canvas visibility ────────────────────────────────────────────────
+        private void HandlePlayerPromptSubmitted(string prompt)
+        {
+            _lastPlayerPrompt = prompt;
+        }
+
+        private void HandleExitBlocked(string message)
+        {
+            InitializeAdaptiveHud();
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            ShowStatusBadge(message, WarningColor);
+            if (_choicesVisible)
+                RefreshVoiceInputStatus();
+        }
 
         private void ShowCanvas(bool visible)
         {
@@ -154,11 +196,13 @@ namespace FarmSimVR.MonoBehaviours
 
         private void SetDialogueText(string responseText)
         {
+            InitializeAdaptiveHud();
             if (dialogueText == null)
                 return;
 
             dialogueText.text = BuildDialogueBody(responseText);
             dialogueText.maxVisibleCharacters = int.MaxValue;
+            RefreshAdaptiveLayout();
         }
 
         private string BuildDialogueBody(string responseText)
@@ -172,48 +216,216 @@ namespace FarmSimVR.MonoBehaviours
             return $"You: {_lastPlayerPrompt}\n\n{responseText}";
         }
 
-        // ── Button factory ────────────────────────────────────────────────────
+        private void BuildOptionButtons(string[] options)
+        {
+            if (options == null)
+                return;
+
+            foreach (string option in options)
+            {
+                string captured = option;
+                GameObject button = BuildButton(option);
+                button.GetComponent<Button>().onClick.AddListener(() => conversation.SelectOption(captured));
+                _buttons.Add(button);
+            }
+        }
 
         private GameObject BuildButton(string label)
         {
             var go = new GameObject("ChoiceBtn");
             go.transform.SetParent(choiceContainer, false);
-
-            var rect       = go.AddComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(0f, 48f);
-
-            var img   = go.AddComponent<Image>();
-            img.color = new Color(0.1f, 0.16f, 0.26f, 0.92f);
-
-            var btn    = go.AddComponent<Button>();
-            var colors = btn.colors;
-            colors.highlightedColor = new Color(0.18f, 0.28f, 0.45f, 1f);
-            colors.pressedColor     = new Color(0.08f, 0.12f, 0.20f, 1f);
-            btn.colors = colors;
-
-            var textGo = new GameObject("Label");
-            textGo.transform.SetParent(go.transform, false);
-
-            var textRect       = textGo.AddComponent<RectTransform>();
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = new Vector2(20f,  4f);
-            textRect.offsetMax = new Vector2(-20f, -4f);
-
-            var tmp       = textGo.AddComponent<TextMeshProUGUI>();
-            tmp.text      = label;
-            tmp.fontSize  = 18f;
-            tmp.color     = Color.white;
-            tmp.alignment = TextAlignmentOptions.MidlineLeft;
-            tmp.enableWordWrapping = false;
-
+            TownDialogueHudLayout.ConfigureChoiceButton(go, label);
             return go;
         }
 
         private void ClearButtons()
         {
-            foreach (var btn in _buttons) Destroy(btn);
+            foreach (GameObject button in _buttons)
+                Destroy(button);
+
             _buttons.Clear();
+        }
+
+        private void InitializeAdaptiveHud()
+        {
+            bool hasResolvedLayout = _layoutInitialized
+                && _dialoguePanelRect != null
+                && _choiceContainerRect != null;
+            if (hasResolvedLayout)
+                return;
+
+            ResolveHintText();
+            _dialoguePanelRect = dialoguePanel != null ? dialoguePanel.GetComponent<RectTransform>() : null;
+            _choiceContainerRect = choiceContainer as RectTransform;
+            _defaultHintText = hintText != null ? hintText.text : string.Empty;
+
+            TownDialogueHudLayout.ConfigureStatusText(loadingText);
+            TownDialogueHudLayout.ConfigureHintText(hintText);
+            TownDialogueHudLayout.ConfigureChoiceContainer(choiceContainer);
+            _layoutInitialized = true;
+            RefreshAdaptiveLayout();
+        }
+
+        private void ResolveHintText()
+        {
+            if (hintText != null || dialoguePanel == null)
+                return;
+
+            foreach (TextMeshProUGUI candidate in dialoguePanel.GetComponentsInChildren<TextMeshProUGUI>(true))
+            {
+                if (candidate.name != "HintLabel")
+                    continue;
+
+                hintText = candidate;
+                break;
+            }
+        }
+
+        private void ResolveVoiceInputController()
+        {
+            if (_voiceInputController != null || conversation == null)
+                return;
+
+            _voiceInputController = conversation.GetComponent<TownVoiceInputController>();
+            SubscribeVoiceInputStatus();
+        }
+
+        private void SubscribeVoiceInputStatus()
+        {
+            if (_voiceInputController == null)
+                return;
+
+            _voiceInputController.OnStatusChanged -= HandleVoiceInputStatusChanged;
+            _voiceInputController.OnStatusChanged += HandleVoiceInputStatusChanged;
+        }
+
+        private void UnsubscribeVoiceInputStatus()
+        {
+            if (_voiceInputController == null)
+                return;
+
+            _voiceInputController.OnStatusChanged -= HandleVoiceInputStatusChanged;
+        }
+
+        private void HandleVoiceInputStatusChanged(string status)
+        {
+            InitializeAdaptiveHud();
+            if (!_choicesVisible)
+                return;
+
+            ApplyVoiceHudPresentation(_voiceInputController?.CurrentStatusPhase ?? TownVoiceInputStatusPhase.Hidden, status);
+        }
+
+        private void RefreshVoiceInputStatus()
+        {
+            InitializeAdaptiveHud();
+            if (!_choicesVisible)
+            {
+                HideStatusBadge();
+                return;
+            }
+
+            TownVoiceInputStatusPhase phase = _voiceInputController?.CurrentStatusPhase ?? TownVoiceInputStatusPhase.Hidden;
+            string status = _voiceInputController?.CurrentStatus;
+            ApplyVoiceHudPresentation(phase, status);
+        }
+
+        private void ApplyVoiceHudPresentation(TownVoiceInputStatusPhase phase, string status)
+        {
+            switch (phase)
+            {
+                case TownVoiceInputStatusPhase.Idle:
+                    HideStatusBadge();
+                    SetHintText("Hold V to speak or choose a reply");
+                    break;
+
+                case TownVoiceInputStatusPhase.Recording:
+                    ShowStatusBadge(status, RecordingColor);
+                    SetHintText("Release V to send");
+                    break;
+
+                case TownVoiceInputStatusPhase.Transcribing:
+                    ShowStatusBadge(status, TranscribingColor);
+                    SetHintText("Preparing your reply...");
+                    break;
+
+                case TownVoiceInputStatusPhase.Warning:
+                    ShowStatusBadge(status, WarningColor);
+                    SetHintText("Choose a reply below");
+                    break;
+
+                default:
+                    HideStatusBadge();
+                    SetHintText("Choose a reply below");
+                    break;
+            }
+        }
+
+        private void ShowStatusBadge(string message, Color color)
+        {
+            if (loadingText == null)
+                return;
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                HideStatusBadge();
+                return;
+            }
+
+            loadingText.gameObject.SetActive(true);
+            loadingText.color = color;
+            loadingText.text = message;
+            RefreshAdaptiveLayout();
+        }
+
+        private void HideStatusBadge()
+        {
+            if (loadingText == null)
+                return;
+
+            loadingText.text = string.Empty;
+            loadingText.gameObject.SetActive(false);
+            RefreshAdaptiveLayout();
+        }
+
+        private void SetHintText(string text)
+        {
+            if (hintText == null)
+                return;
+
+            hintText.text = text ?? string.Empty;
+            RefreshAdaptiveLayout();
+        }
+
+        private void RestoreDefaultHint()
+        {
+            SetHintText(_defaultHintText);
+        }
+
+        private void RefreshAdaptiveLayout()
+        {
+            if (!_layoutInitialized)
+                return;
+
+            TownDialogueHudLayout.RefreshLayout(
+                _dialoguePanelRect,
+                _choiceContainerRect,
+                speakerNameText,
+                dialogueText,
+                loadingText,
+                hintText);
+        }
+
+        private static void UnlockCursor()
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+
+        private static void LockCursor()
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
     }
 }

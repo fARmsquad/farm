@@ -31,6 +31,7 @@ namespace FarmSimVR.MonoBehaviours
         private CancellationTokenSource _sessionCts;
         private ClientWebSocket _socket;
         private TownVoiceTextChunker _chunker;
+        private string _resolvedTokenServiceBaseUrl;
         private string _pendingWarning;
         private bool _responseCompleted;
         private bool _sessionReady;
@@ -140,33 +141,23 @@ namespace FarmSimVR.MonoBehaviours
             TownNpcVoiceProfile profile,
             CancellationToken cancellationToken)
         {
-            string url = $"{tokenServiceBaseUrl.TrimEnd('/')}/api/v1/elevenlabs/tts-websocket-token";
-            using var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
-            request.uploadHandler = new UploadHandlerRaw(Array.Empty<byte>());
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.timeout = 10;
-
-            yield return request.SendWebRequest();
+            TownVoiceTokenRequestResult tokenResult = null;
+            yield return TownVoiceTokenServiceClient.RequestToken(
+                _resolvedTokenServiceBaseUrl ?? tokenServiceBaseUrl,
+                result => tokenResult = result);
 
             if (!IsCurrentSession(version) || cancellationToken.IsCancellationRequested)
                 yield break;
 
-            if (request.result != UnityWebRequest.Result.Success)
+            if (tokenResult == null || !tokenResult.Success)
             {
-                SetPendingWarning("Voice streaming is unavailable; continuing with text only.");
+                SetPendingWarning(tokenResult?.ErrorMessage ?? "Voice streaming is unavailable; continuing with text only.");
                 StopVoiceSession(clearPlayer: true);
                 yield break;
             }
 
-            TokenResponse payload = JsonUtility.FromJson<TokenResponse>(request.downloadHandler.text);
-            if (payload == null || string.IsNullOrWhiteSpace(payload.token))
-            {
-                SetPendingWarning("Voice token response was empty; continuing with text only.");
-                StopVoiceSession(clearPlayer: true);
-                yield break;
-            }
-
-            _ = ConnectAndReceiveAsync(version, profile, payload.token, cancellationToken);
+            _resolvedTokenServiceBaseUrl = tokenResult.BaseUrl;
+            _ = ConnectAndReceiveAsync(version, profile, tokenResult.Token, cancellationToken);
         }
 
         private async Task ConnectAndReceiveAsync(
@@ -474,12 +465,6 @@ namespace FarmSimVR.MonoBehaviours
         private static string FormatFloat(float value)
         {
             return value.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
-        }
-
-        [Serializable]
-        private sealed class TokenResponse
-        {
-            public string token;
         }
     }
 }

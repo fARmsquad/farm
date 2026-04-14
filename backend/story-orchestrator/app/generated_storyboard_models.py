@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, Field
 
@@ -26,14 +26,31 @@ class GeneratedStoryboardCutsceneRequest(BaseModel):
     style_preset_id: str = Field(default="farm_storybook_v1", min_length=1)
     voice_id: str | None = None
     reference_image_paths: list[str] = Field(default_factory=list)
+    continuity_reference_mode: Literal["auto", "explicit_only"] = "auto"
+    max_reference_images: int = Field(default=4, ge=0, le=8)
     aspect_ratio: str = Field(default="16:9", min_length=1)
     image_size: str = Field(default="2K", min_length=1)
     context: GeneratedStoryboardContext
 
 
+class GeneratedStoryboardAssetRecord(BaseModel):
+    asset_id: str
+    beat_id: str
+    shot_id: str
+    asset_type: Literal["image", "audio"]
+    provider_name: str = ""
+    provider_model: str = ""
+    fallback_used: bool = False
+    mime_type: str
+    output_path: str
+    resource_path: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 class GeneratedStoryboardPackageResult(BaseModel):
     package_output_path: str
     unity_package: dict[str, Any]
+    generated_assets: list[GeneratedStoryboardAssetRecord] = Field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -59,6 +76,10 @@ class GeneratedStoryboardPlan:
 class GeneratedImageAsset:
     output_path: Path
     mime_type: str
+    provider_name: str = ""
+    provider_model: str = ""
+    fallback_used: bool = False
+    source_metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -67,6 +88,10 @@ class GeneratedSpeechAsset:
     alignment_path: Path
     duration_seconds: float
     mime_type: str
+    provider_name: str = ""
+    provider_model: str = ""
+    fallback_used: bool = False
+    source_metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class StoryboardPlanner(Protocol):

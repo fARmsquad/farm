@@ -354,7 +354,19 @@ class CountingImageGenerator:
     ) -> GeneratedImageAsset:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_bytes(b"fake-png")
-        return GeneratedImageAsset(output_path=output_path, mime_type="image/png")
+        return GeneratedImageAsset(
+            output_path=output_path,
+            mime_type="image/png",
+            provider_name="fake-image",
+            provider_model="fake-image-v1",
+            fallback_used=False,
+            source_metadata={
+                "prompt": prompt,
+                "reference_image_paths": list(reference_image_paths),
+                "aspect_ratio": aspect_ratio,
+                "image_size": image_size,
+            },
+        )
 
 
 class CountingSpeechGenerator:
@@ -376,6 +388,15 @@ class CountingSpeechGenerator:
             alignment_path=alignment_path,
             duration_seconds=3.0,
             mime_type="audio/mpeg",
+            provider_name="fake-speech",
+            provider_model="fake-speech-v1",
+            fallback_used=False,
+            source_metadata={
+                "text": text,
+                "voice_id": voice_id,
+                "previous_text": previous_text,
+                "next_text": next_text,
+            },
         )
 
 

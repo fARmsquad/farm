@@ -1,12 +1,7 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/_Project/Art/Cutscenes/CaughtChickenCutscene.meta
-guid: 3d5cf0df838e4c969cb12e84d023300d
+guid: c6f51f0e309674c138103a3da72b3651
 folderAsset: yes
 DefaultImporter:
-========
-guid: bae3c2415d524a3dbd947dc244ef01da
-TextScriptImporter:
->>>>>>>> 504e757e ([feature] checkpoint generative story package work):Assets/Specs/Features/GSO-005-minigame-generator-definition-foundation.md.meta
   externalObjects: {}
   userData: 
   assetBundleName: 

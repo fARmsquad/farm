@@ -54,6 +54,17 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             ? _currentObjective
             : $"{_objectivePrefix}{_currentObjective}";
 
+        public void FastCompleteForDev()
+        {
+            if (_usePackagePlantRowsMode)
+            {
+                _packagePlantRowsService.Observe(_packagePlantRowsService.RequiredCount, 0f);
+                _currentObjective = _packagePlantRowsService.CurrentObjective;
+            }
+
+            CompleteScene();
+        }
+
         private void Start()
         {
             if (_driver == null)

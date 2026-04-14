@@ -9,8 +9,6 @@ namespace FarmSimVR.Core
     public static class TownDialogueOptionComposer
     {
         private const int DisplayOptionCount = 4;
-        private const int GoodbyeUnlockTurn = 2;
-        private const string ScriptedGoodbye = "I should get going. Goodbye.";
         private const int RecentQuestionWindow = 4;
 
         private static readonly string[] CookingKeywords = { "recipe", "pie", "cook", "cooking", "oven", "chowder", "bake", "baking" };
@@ -87,7 +85,7 @@ namespace FarmSimVR.Core
             IReadOnlyList<ChatMessage> history,
             TownConversationContextWindow contextWindow)
         {
-            bool allowGoodbye = turnIndex >= GoodbyeUnlockTurn;
+            bool allowGoodbye = turnIndex >= TownConversationExitGate.GoodbyeUnlockTurn;
             var options = new List<string>(DisplayOptionCount);
             HashSet<string> recentQuestions = GetRecentUserQuestions(history);
             int rotationSeed = GetRotationSeed(turnIndex, history);
@@ -270,11 +268,11 @@ namespace FarmSimVR.Core
 
             if (options.Count >= DisplayOptionCount)
             {
-                options[DisplayOptionCount - 1] = ScriptedGoodbye;
+                options[DisplayOptionCount - 1] = TownConversationExitGate.ExitOptionLabel;
                 return;
             }
 
-            options.Add(ScriptedGoodbye);
+            options.Add(TownConversationExitGate.ExitOptionLabel);
         }
 
         private static bool TryAddOption(
@@ -287,7 +285,7 @@ namespace FarmSimVR.Core
             if (string.IsNullOrEmpty(trimmed) || IsContinueOption(trimmed) || IsGenericGoodbye(trimmed))
                 return false;
 
-            if (!allowGoodbye && IsGoodbye(trimmed))
+            if (!allowGoodbye && TownConversationExitGate.IsExitPrompt(trimmed))
                 return false;
 
             if (recentQuestions != null && recentQuestions.Contains(NormalizeForComparison(trimmed)))
@@ -373,7 +371,7 @@ namespace FarmSimVR.Core
             if (content.StartsWith("Opening cue:", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            return !IsGoodbye(content);
+            return !TownConversationExitGate.IsExitPrompt(content);
         }
 
         private static string NormalizeForComparison(string text)
@@ -415,7 +413,7 @@ namespace FarmSimVR.Core
         {
             for (int i = 0; i < options.Count; i++)
             {
-                if (IsGoodbye(options[i]))
+                if (TownConversationExitGate.IsExitPrompt(options[i]))
                     return true;
             }
 
@@ -444,15 +442,5 @@ namespace FarmSimVR.Core
                 || string.Equals(option, "Goodbye", StringComparison.OrdinalIgnoreCase);
         }
 
-        private static bool IsGoodbye(string option)
-        {
-            if (string.IsNullOrWhiteSpace(option))
-                return false;
-
-            return option.IndexOf("goodbye", StringComparison.OrdinalIgnoreCase) >= 0
-                || option.IndexOf("farewell", StringComparison.OrdinalIgnoreCase) >= 0
-                || option.IndexOf("see you", StringComparison.OrdinalIgnoreCase) >= 0
-                || option.IndexOf("take care", StringComparison.OrdinalIgnoreCase) >= 0;
-        }
     }
 }

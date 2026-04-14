@@ -17,6 +17,19 @@ namespace FarmSimVR.Core.Story
                 if (candidate == null)
                     continue;
 
+                if (string.Equals(candidate.SceneName?.Trim(), sceneName.Trim(), System.StringComparison.Ordinal))
+                {
+                    beat = candidate;
+                    return true;
+                }
+            }
+
+            for (int i = 0; i < package.Beats.Length; i++)
+            {
+                var candidate = package.Beats[i];
+                if (candidate == null)
+                    continue;
+
                 if (SceneNamesMatch(candidate.SceneName, sceneName))
                 {
                     beat = candidate;

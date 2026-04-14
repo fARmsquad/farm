@@ -3,3 +3,4 @@ uvicorn>=0.32,<1.0
 pydantic-settings>=2.6,<3.0
 httpx>=0.28,<1.0
 pillow>=10.0,<11.0
+python-multipart>=0.0.9,<1.0

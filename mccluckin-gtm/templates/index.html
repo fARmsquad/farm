@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>McCluckin GTM Review</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #12161c;
+        --panel: #1b2129;
+        --muted: #91a0b2;
+        --text: #f5f7fb;
+        --border: #2c3643;
+        --accent: #6ad2a1;
+        --warn: #ffb85c;
+        --danger: #ff7c7c;
+        --info: #7fd0ff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(18, 22, 28, 0.96);
+        border-bottom: 1px solid var(--border);
+        padding: 16px 20px;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      main {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 24px 16px 40px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 1.15fr 0.95fr;
+        gap: 16px;
+        align-items: start;
+      }
+      .column {
+        min-width: 0;
+      }
+      .stack {
+        display: grid;
+        gap: 16px;
+      }
+      .section-title {
+        margin: 0 0 10px;
+        font-size: 15px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .stats {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 18px;
+        margin-bottom: 16px;
+      }
+      .card h2 {
+        margin: 0 0 12px;
+        font-size: 18px;
+      }
+      .meta, .body {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .meta-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .body {
+        white-space: pre-wrap;
+        margin: 10px 0;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 4px 8px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .chip.status-new { color: #a7b5c6; }
+      .chip.status-drafted { color: #6ad2a1; }
+      .chip.status-skipped { color: #ffb85c; }
+      .chip.status-approved { color: var(--info); }
+      .chip.status-published { color: #a3e26a; }
+      .chip.status-error { color: #ff7c7c; }
+      .decision {
+        border-left: 3px solid var(--border);
+        padding-left: 10px;
+        margin-top: 10px;
+      }
+      .small {
+        font-size: 13px;
+      }
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: #141920;
+        color: var(--text);
+        padding: 12px;
+        font: inherit;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+      button, a.button {
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: #202833;
+        color: var(--text);
+        padding: 10px 14px;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      button.primary { background: var(--accent); color: #08120d; border-color: var(--accent); }
+      button.info { background: var(--info); color: #07131d; border-color: var(--info); }
+      button.warn { background: var(--warn); color: #241100; border-color: var(--warn); }
+      button.danger { background: var(--danger); color: #2c0606; border-color: var(--danger); }
+      .empty {
+        border: 1px dashed var(--border);
+        border-radius: 8px;
+        padding: 24px;
+        text-align: center;
+        color: var(--muted);
+      }
+      @media (max-width: 980px) {
+        .layout { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <strong>McCluckin GTM Review</strong>
+        <div id="queue-count" class="meta">Loading queue...</div>
+      </div>
+      <div id="stats" class="stats"></div>
+    </header>
+    <main>
+      <div class="layout">
+        <div class="column stack">
+          <section>
+            <h2 class="section-title">Pending Review</h2>
+            <div id="queue"></div>
+          </section>
+          <section>
+            <h2 class="section-title">Ready To Publish</h2>
+            <div id="ready"></div>
+          </section>
+          <section>
+            <h2 class="section-title">Recent Decisions</h2>
+            <div id="history"></div>
+          </section>
+        </div>
+        <div class="column stack">
+          <section>
+            <h2 class="section-title">Recent Errors</h2>
+            <div id="errors"></div>
+          </section>
+          <section>
+            <h2 class="section-title">Recent Activity</h2>
+            <div id="activity"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <script>
+      const queueNode = document.getElementById("queue");
+      const readyNode = document.getElementById("ready");
+      const historyNode = document.getElementById("history");
+      const errorsNode = document.getElementById("errors");
+      const activityNode = document.getElementById("activity");
+      const queueCountNode = document.getElementById("queue-count");
+      const statsNode = document.getElementById("stats");
+
+      function bodyText(item) {
+        if (item.lead) return item.lead.body || item.lead.title || "";
+        if (item.content_item) return `${item.content_item.content_type}: ${item.content_item.topic}`;
+        return "";
+      }
+
+      function sourceLabel(item) {
+        if (item.lead && item.lead.platform === "reddit") return `Reddit - r/${item.lead.subreddit} - ${item.lead.author}`;
+        if (item.lead && item.lead.platform === "twitter") return `X - @${item.lead.author}`;
+        if (item.content_item) return `Calendar - ${item.content_item.platform} - ${item.content_item.content_type}`;
+        return "Unknown";
+      }
+
+      function leadLabel(item) {
+        if (item.platform === "reddit") return `Reddit - r/${item.subreddit} - ${item.author}`;
+        if (item.platform === "twitter") return `X - @${item.author}`;
+        return item.platform;
+      }
+
+      function statusChip(status, label) {
+        return `<span class="chip status-${status}">${label || status}</span>`;
+      }
+
+      async function apiPost(path, payload) {
+        const response = await fetch(path, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload ? JSON.stringify(payload) : undefined,
+        });
+        return response.json();
+      }
+
+      function maybeNotifyPublish(result) {
+        const publishResult = result.publish_result || result;
+        if (!publishResult || publishResult.published !== false) return;
+        if (publishResult.error) {
+          window.alert(`Publish failed: ${publishResult.error}`);
+          return;
+        }
+        if (publishResult.reason && publishResult.reason !== "guardrail") {
+          window.alert(`Publish is still pending: ${publishResult.reason}`);
+        }
+      }
+
+      async function act(path, payload) {
+        const result = await apiPost(path, payload);
+        await loadDashboard();
+        maybeNotifyPublish(result);
+        return result;
+      }
+
+      function renderCard(item) {
+        const card = document.createElement("section");
+        card.className = "card";
+        const sourceUrl = item.lead ? item.lead.url : "#";
+        card.innerHTML = `
+          <h2>${sourceLabel(item)}</h2>
+          <div class="meta-row">
+            ${item.lead ? statusChip(item.lead.status, item.lead.status) : ""}
+            ${(item.lead?.matched_keywords || []).map((keyword) => `<span class="chip">${keyword}</span>`).join("")}
+          </div>
+          <div class="body">${bodyText(item)}</div>
+          <div><strong>Draft</strong></div>
+          <div class="body">${item.final_text}</div>
+          <textarea hidden>${item.final_text}</textarea>
+          <div class="actions">
+            <button class="primary">Approve + Publish</button>
+            <button class="warn">Edit</button>
+            <button class="danger">Reject</button>
+            ${item.lead ? `<a class="button" href="${sourceUrl}" target="_blank" rel="noreferrer">Open source</a>` : ""}
+          </div>
+        `;
+        const [approveButton, editButton, rejectButton] = card.querySelectorAll("button");
+        const editor = card.querySelector("textarea");
+        approveButton.onclick = () => act(`/api/queue/${item.id}/approve?publish=true`);
+        rejectButton.onclick = () => act(`/api/queue/${item.id}/reject`);
+        editButton.onclick = async () => {
+          if (editor.hidden) {
+            editor.hidden = false;
+            editButton.textContent = "Save Edit + Publish";
+            return;
+          }
+          await act(`/api/queue/${item.id}/edit?publish=true`, { text: editor.value });
+        };
+        return card;
+      }
+
+      function renderReadyItem(item) {
+        const card = document.createElement("section");
+        card.className = "card";
+        const sourceUrl = item.lead ? item.lead.url : "#";
+        card.innerHTML = `
+          <h2>${sourceLabel(item)}</h2>
+          <div class="meta-row">
+            ${statusChip("approved", item.reviewer_action || "approved")}
+            ${(item.lead?.matched_keywords || []).map((keyword) => `<span class="chip">${keyword}</span>`).join("")}
+          </div>
+          <div class="body">${bodyText(item)}</div>
+          <div><strong>Ready text</strong></div>
+          <div class="body">${item.final_text}</div>
+          <div class="actions">
+            <button class="info">Publish now</button>
+            ${item.lead ? `<a class="button" href="${sourceUrl}" target="_blank" rel="noreferrer">Open source</a>` : ""}
+          </div>
+        `;
+        const [publishButton] = card.querySelectorAll("button");
+        publishButton.onclick = () => act(`/api/ready/${item.id}/publish`);
+        return card;
+      }
+
+      function renderHistoryItem(item) {
+        const card = document.createElement("section");
+        card.className = "card";
+        const publication = item.draft?.publication;
+        card.innerHTML = `
+          <h2>${leadLabel(item)}</h2>
+          <div class="meta-row">
+            ${statusChip(item.status, item.status)}
+            ${item.matched_keywords.map((keyword) => `<span class="chip">${keyword}</span>`).join("")}
+            ${publication ? statusChip("published", `published ${new Date(publication.published_at).toLocaleString()}`) : ""}
+          </div>
+          <div class="body">${item.body || item.title || ""}</div>
+          ${item.decision_note ? `<div class="decision small"><strong>Decision</strong><div class="body">${item.decision_note}</div></div>` : ""}
+          ${item.draft ? `<div class="decision small"><strong>Draft</strong><div class="body">${item.draft.final_text}</div></div>` : ""}
+          <div class="actions">
+            <a class="button" href="${item.url}" target="_blank" rel="noreferrer">Open source</a>
+          </div>
+        `;
+        return card;
+      }
+
+      function renderActivityItem(item) {
+        const card = document.createElement("section");
+        card.className = "card";
+        card.innerHTML = `
+          <h2>${item.provider} - ${item.action}</h2>
+          <div class="meta-row">
+            ${statusChip(item.succeeded ? "published" : "error", item.succeeded ? "ok" : "error")}
+            <span class="chip">${new Date(item.created_at).toLocaleString()}</span>
+          </div>
+          <div class="body">${JSON.stringify(item.payload, null, 2)}</div>
+        `;
+        return card;
+      }
+
+      function renderEmpty(node, message) {
+        node.innerHTML = `<div class="empty">${message}</div>`;
+      }
+
+      async function loadDashboard() {
+        const [queueResponse, readyResponse, historyResponse, activityResponse, statsResponse] = await Promise.all([
+          fetch("/api/queue"),
+          fetch("/api/ready"),
+          fetch("/api/history"),
+          fetch("/api/activity"),
+          fetch("/api/stats"),
+        ]);
+
+        const queuePayload = await queueResponse.json();
+        const readyPayload = await readyResponse.json();
+        const historyPayload = await historyResponse.json();
+        const activityPayload = await activityResponse.json();
+        const stats = await statsResponse.json();
+
+        queueCountNode.textContent = `${queuePayload.count} pending review - ${readyPayload.count} ready to publish`;
+
+        queueNode.innerHTML = "";
+        if (!queuePayload.items.length) {
+          renderEmpty(queueNode, "Queue is clear for now.");
+        } else {
+          queuePayload.items.forEach((item) => queueNode.appendChild(renderCard(item)));
+        }
+
+        readyNode.innerHTML = "";
+        if (!readyPayload.items.length) {
+          renderEmpty(readyNode, "Nothing approved is waiting on the publish step.");
+        } else {
+          readyPayload.items.forEach((item) => readyNode.appendChild(renderReadyItem(item)));
+        }
+
+        historyNode.innerHTML = "";
+        if (!historyPayload.items.length) {
+          renderEmpty(historyNode, "No decision history yet.");
+        } else {
+          historyPayload.items.forEach((item) => historyNode.appendChild(renderHistoryItem(item)));
+        }
+
+        errorsNode.innerHTML = "";
+        if (!activityPayload.errors.length) {
+          renderEmpty(errorsNode, "No recent errors.");
+        } else {
+          activityPayload.errors.forEach((item) => errorsNode.appendChild(renderActivityItem(item)));
+        }
+
+        activityNode.innerHTML = "";
+        if (!activityPayload.recent.length) {
+          renderEmpty(activityNode, "No recent activity.");
+        } else {
+          activityPayload.recent.forEach((item) => activityNode.appendChild(renderActivityItem(item)));
+        }
+
+        statsNode.innerHTML = `
+          <span>Total leads: ${stats.total_leads}</span>
+          <span>Drafted: ${stats.drafted}</span>
+          <span>Approved: ${stats.approved}</span>
+          <span>Ready: ${stats.ready}</span>
+          <span>Published: ${stats.published}</span>
+          <span>Skip rate: ${stats.skip_rate}%</span>
+        `;
+      }
+
+      loadDashboard();
+      setInterval(loadDashboard, 30000);
+    </script>
+  </body>
+</html>

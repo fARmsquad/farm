@@ -50,6 +50,14 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             _completionHandled = false;
         }
 
+        public void FastCompleteForDev()
+        {
+            if (_audioSource != null)
+                _audioSource.Stop();
+
+            CompleteScene();
+        }
+
         private void Start()
         {
             if (HasStoryboard())

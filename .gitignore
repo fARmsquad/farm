@@ -94,6 +94,14 @@ backend/story-orchestrator/.env.local
 backend/story-orchestrator/.venv/
 backend/story-orchestrator/data/
 backend/story-orchestrator/**/__pycache__/
+backend/story-orchestrator/story_orchestrator.db
+mccluckin-gtm/.env
+mccluckin-gtm/.venv/
+mccluckin-gtm/.pytest_cache/
+mccluckin-gtm/gtm.db
+mccluckin-gtm/gtm.log
+mccluckin-gtm/*.egg-info/
+mccluckin-gtm/**/__pycache__/
 
 # Python cache artifacts
 **/__pycache__/

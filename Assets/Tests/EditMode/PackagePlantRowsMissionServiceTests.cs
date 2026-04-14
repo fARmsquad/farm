@@ -47,13 +47,13 @@ namespace FarmSimVR.Tests.EditMode
         }
 
         [Test]
-        public void Configure_RowCountGreaterThanOne_ExpandsDesiredPlotCount()
+        public void Configure_RowCountGreaterThanOne_RoundsDesiredPlotCountUpToFullRows()
         {
             var service = new PackagePlantRowsMissionService();
             service.Configure(
-                objectiveText: "Plant 3 carrots in 5 minutes.",
+                objectiveText: "Plant 5 carrots in 5 minutes.",
                 cropType: "carrot",
-                requiredCount: 3,
+                requiredCount: 5,
                 rowCount: 2,
                 timeLimitSeconds: 300f);
 

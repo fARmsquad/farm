@@ -19,7 +19,8 @@ namespace FarmSimVR.Core.Tutorial
         {
             RequiredCount = requiredCount < 1 ? 1 : requiredCount;
             var safeRowCount = rowCount < 1 ? 1 : rowCount;
-            DesiredPlotCount = RequiredCount * safeRowCount;
+            var columnCount = (RequiredCount + safeRowCount - 1) / safeRowCount;
+            DesiredPlotCount = columnCount * safeRowCount;
             TimeRemainingSeconds = timeLimitSeconds <= 0f ? 300f : timeLimitSeconds;
             TargetSeedId = ToSeedId(cropType);
             CurrentCount = 0;

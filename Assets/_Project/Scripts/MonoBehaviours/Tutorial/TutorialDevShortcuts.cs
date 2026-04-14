@@ -7,8 +7,11 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 {
     public sealed class TutorialDevShortcuts : MonoBehaviour
     {
+        public const string CompleteShortcutLabel = "Shift+Enter";
+        public const string NextShortcutLabel = "Shift+.";
         public const string ShortcutSummary =
-            "Shift+. Next  Shift+, Back  Shift+/ Reload  Shift+1-7 Scene 01-07  Shift+0 Reset";
+            CompleteShortcutLabel + " Complete  " +
+            NextShortcutLabel + " Next  Shift+, Back  Shift+/ Reload  Shift+1-7 Scene 01-07  Shift+0 Reset";
 
         [SerializeField] private bool showOverlay = TutorialDevTuning.ShowTutorialShortcutOverlayByDefault;
 
@@ -24,6 +27,12 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             var keyboard = Keyboard.current;
             if (keyboard == null || !IsShiftHeld(keyboard))
                 return;
+
+            if (IsFastCompletePressed(keyboard))
+            {
+                controller.TryFastCompleteCurrentScene();
+                return;
+            }
 
             if (keyboard.periodKey.wasPressedThisFrame)
             {
@@ -93,6 +102,11 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 new Rect((Screen.width - 360f) * 0.5f, 46f, 360f, 28f),
                 "Tutorial complete. Shift+/ to replay the final scene.",
                 _labelStyle);
+        }
+
+        private static bool IsFastCompletePressed(Keyboard keyboard)
+        {
+            return keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame;
         }
 
         private static bool IsShiftHeld(Keyboard keyboard)

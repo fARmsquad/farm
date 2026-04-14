@@ -12,6 +12,7 @@ from .generated_minigames import (
 from .generated_storyboard_models import GeneratedStoryboardContext
 from .generated_storyboards import (
     GeneratedStoryboardCutsceneRequest,
+    GeneratedStoryboardPackageResult,
     GeneratedStoryboardService,
 )
 from .minigame_generator_models import MinigameGenerationContext
@@ -54,6 +55,8 @@ class GeneratedPackageAssemblyCutsceneInput(BaseModel):
     style_preset_id: str = Field(default="farm_storybook_v1", min_length=1)
     voice_id: str | None = None
     reference_image_paths: list[str] = Field(default_factory=list)
+    continuity_reference_mode: str = Field(default="auto", min_length=1)
+    max_reference_images: int = Field(default=4, ge=0, le=8)
     aspect_ratio: str = Field(default="16:9", min_length=1)
     image_size: str = Field(default="2K", min_length=1)
     context: GeneratedStoryboardContext
@@ -77,6 +80,8 @@ class GeneratedPackageAssemblyCutsceneInput(BaseModel):
             style_preset_id=self.style_preset_id,
             voice_id=self.voice_id,
             reference_image_paths=self.reference_image_paths,
+            continuity_reference_mode=self.continuity_reference_mode,
+            max_reference_images=self.max_reference_images,
             aspect_ratio=self.aspect_ratio,
             image_size=self.image_size,
             context=self.context,
@@ -95,6 +100,7 @@ class GeneratedPackageAssemblyResult(BaseModel):
     package_output_path: str = ""
     unity_package: dict[str, Any] = Field(default_factory=dict)
     minigame_result: GeneratedMinigameBeatResult | None = None
+    cutscene_result: GeneratedStoryboardPackageResult | None = None
     errors: list[str] = Field(default_factory=list)
     fallback_generator_ids: list[str] = Field(default_factory=list)
 
@@ -140,5 +146,6 @@ class GeneratedPackageAssemblyService:
             package_output_path=cutscene_result.package_output_path,
             unity_package=cutscene_result.unity_package,
             minigame_result=minigame_result,
+            cutscene_result=cutscene_result,
             fallback_generator_ids=minigame_result.fallback_generator_ids,
         )

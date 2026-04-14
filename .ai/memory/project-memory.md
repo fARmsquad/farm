@@ -108,6 +108,8 @@
 - DON'T say work is fully done without stating what was directly verified vs what was assumed
 - DON'T treat a developer-reported post-"done" issue as routine feedback — log it as a completion learning and update the guardrail
 - DON'T assume backend consumers will receive the raw `ResolvedParameters` dictionary. Unity-facing story packages may only carry `ResolvedParameterEntries`, so cross-runtime readers need to support that contract shape too.
+- DON'T set a Unity-side timeout for a local proxy call lower than the backend's own upstream provider timeout when Town voice depends on that proxy.
+- DON'T present approval in an outbound-content UI as effectively published unless the publish step is actually triggered and visibly tracked.
 
 ---
 
@@ -157,6 +159,14 @@ entry must explain the original claim, the failing behavior, the approach that
 produced it, why verification missed it, and what future work must verify or
 phrase differently. Completion summaries must also separate verified facts from
 unverified assumptions so "done" has a clear boundary.
+
+### Town Voice Token Proxy Budgets (2026-04-14)
+When Unity asks the local story-orchestrator to mint a Town voice token, the
+client timeout and retry policy must account for the backend still needing to
+call ElevenLabs. A Unity timeout shorter than the backend provider timeout will
+create intermittent text-only fallback even when the happy path works. Keep the
+runtime proxy budget at or above the backend's upstream budget, or retry
+transient transport/5xx failures explicitly.
 
 ### Global Codex Unity Skills (2026-04-11)
 When this repo wires external Codex Unity skills into `.ai` workflows, keep
@@ -305,6 +315,21 @@ through `SceneWorkCatalog.GetLoadableSceneName()` before calling
 flow controllers, autoplay bridges, and generic loaders all need the same
 mapping or aliased bridge scenes will fail at runtime.
 
+### Town Local Backend Integrations Must Not Depend On One Hardcoded Localhost Port (2026-04-14)
+When a Unity scene depends on a local backend such as the story-orchestrator,
+do not assume a single serialized localhost port will always own that service.
+Support an explicit override plus a bounded local fallback path so features like
+Town voice token minting still resolve when the backend is moved off the
+default dev port.
+
+### Generated Minigame Variants Should Tune Existing Scenes Before Forking Them (2026-04-14)
+When the story package asks for a minigame variation, prefer bounded runtime
+parameter consumption inside the existing scene controller and manager before
+creating a new scene variant. Use safe preset IDs and pure mission services to
+carry generated state, and make the config application resilient to Unity
+`Start` ordering so the standing `Generative Story Slice` can keep evolving on
+one stable test surface.
+
 ---
 
 ## Performance Budgets (Quest 2)
@@ -314,3 +339,11 @@ mapping or aliased bridge scenes will fail at runtime.
 - Texture memory: < 256MB
 - Frame time: < 11ms (90 FPS target)
 - See `.ai/docs/quest-perf-budget.md` for full budget
+
+
+### Approval State Must Expose Publish State (2026-04-14)
+For outbound content systems, approval, queued-for-publish, and published are
+separate operator states. The UI, automation, and handoff must make those
+states explicit, and live verification must confirm that the intended approval
+path actually reaches platform publication instead of only changing local DB
+status.

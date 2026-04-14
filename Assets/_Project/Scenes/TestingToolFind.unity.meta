@@ -1,10 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/_Project/Scenes/TestingToolFind.unity.meta
-guid: 4a136b1d741984b329f2f60eed095dfd
-========
-guid: 68dcde21954b84ee48bf789b696621cb
-folderAsset: yes
->>>>>>>> 504e757e ([feature] checkpoint generative story package work):Assets/_Project/Resources/GeneratedStoryboards/storypkg_intro_chicken_sample/post_chicken_bridge.meta
+guid: 03a6fe29ac56e44a49d6b03b03d1b549
 DefaultImporter:
   externalObjects: {}
   userData: 

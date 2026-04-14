@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Standing Slice Review</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 24px;
+      background: #0f1512;
+      color: #edf1ea;
+    }
+    h1, h2 { margin-bottom: 8px; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .panel {
+      background: #18211c;
+      border: 1px solid #314236;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    textarea, input {
+      width: 100%;
+      box-sizing: border-box;
+      background: #0d120f;
+      color: #edf1ea;
+      border: 1px solid #314236;
+      border-radius: 6px;
+      padding: 10px;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+    }
+    textarea { min-height: 120px; }
+    #requestJson { min-height: 320px; }
+    button {
+      background: #2f7044;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 14px;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+    .status { font-weight: bold; }
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .asset-card {
+      border: 1px solid #314236;
+      border-radius: 8px;
+      padding: 12px;
+      background: #111813;
+    }
+    img, audio { width: 100%; margin-top: 8px; }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #0d120f;
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .muted { color: #b8c3b5; }
+  </style>
+</head>
+<body>
+  <h1>Standing Slice Review</h1>
+  <div class="panel">
+    <h2>Submit Job</h2>
+    <p class="muted">Edit the standing-slice request, submit it, or fetch an existing job.</p>
+    <textarea id="requestJson"></textarea>
+    <div style="margin-top: 12px;">
+      <button id="submitButton">Submit Standing Slice Job</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Fetch Job</h2>
+    <div class="row">
+      <div style="flex: 1 1 320px;">
+        <input id="jobIdInput" placeholder="Paste a job id">
+      </div>
+      <div>
+        <button id="fetchButton">Fetch Job</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Reference Library</h2>
+    <p class="muted">Upload character, style, or environment references here. Auto continuity uses uploaded references when the cutscene <code>character_name</code> matches.</p>
+    <div class="row">
+      <div style="flex: 1 1 320px;">
+        <input id="referenceFileInput" type="file" accept="image/*">
+      </div>
+      <div style="flex: 1 1 180px;">
+        <input id="referenceLabelInput" placeholder="Label">
+      </div>
+      <div style="flex: 1 1 180px;">
+        <input id="referenceCharacterInput" placeholder="Character name">
+      </div>
+      <div style="flex: 1 1 160px;">
+        <input id="referenceTagsInput" placeholder="tags,comma,separated">
+      </div>
+      <div style="flex: 0 1 160px;">
+        <input id="referenceRoleInput" placeholder="character | style | environment | prop" value="character">
+      </div>
+    </div>
+    <div style="margin-top: 12px;">
+      <button id="referenceUploadButton">Upload Reference</button>
+      <button id="referenceRefreshButton">Refresh References</button>
+    </div>
+  </div>
+
+  <div id="statusPanel" class="panel" style="display:none;"></div>
+  <div id="reviewPanel" class="panel" style="display:none;">
+    <h2>Review</h2>
+    <p class="muted">Persist review notes and the current operator decision.</p>
+    <textarea id="reviewNotes" placeholder="Add review notes for this job"></textarea>
+    <div style="margin-top: 12px;">
+      <button id="pendingReviewButton">Mark Pending Review</button>
+      <button id="approveButton">Approve Job</button>
+      <button id="rejectButton">Reject Job</button>
+      <button id="publishButton">Publish Approved Job</button>
+    </div>
+  </div>
+  <div id="stepsPanel" class="panel" style="display:none;"></div>
+  <div id="assetsPanel" class="panel" style="display:none;"></div>
+  <div id="referencesPanel" class="panel" style="display:none;"></div>
+
+  <script>
+    const defaultRequest = {
+      package_id: "storypkg_intro_chicken_sample",
+      package_display_name: "Generative Story Slice",
+      post_chicken_to_farm: {
+        minigame: {
+          beat_id: "plant_rows_intro",
+          display_name: "Plant Rows Intro",
+          scene_name: "FarmMain",
+          next_scene_name: "FindToolsGame",
+          generator_id: "plant_rows_v1",
+          parameters: {
+            cropType: "carrot",
+            targetCount: 6,
+            timeLimitSeconds: 300,
+            rowCount: 2,
+            assistLevel: "high"
+          },
+          context: {
+            fit_tags: ["intro"],
+            world_state: ["farm_plots_unlocked"],
+            difficulty_band: "tutorial"
+          }
+        },
+        cutscene: {
+          beat_id: "post_chicken_bridge",
+          display_name: "Post Chicken Bridge",
+          scene_name: "Tutorial_PostChickenCutscene",
+          next_scene_name: "FarmMain",
+          story_brief: "Bridge the chicken chase into the first planting task.",
+          style_preset_id: "farm_storybook_v1",
+          voice_id: "voice-test",
+          context: {
+            character_name: "Old Garrett",
+            crop_name: "",
+            minigame_goal: ""
+          }
+        }
+      },
+      find_tools_to_pre_farm: {
+        minigame: {
+          beat_id: "find_tools_intro",
+          display_name: "Find Tools Intro",
+          scene_name: "FindToolsGame",
+          next_scene_name: "Tutorial_PreFarmCutscene",
+          generator_id: "find_tools_cluster_v1",
+          parameters: {
+            targetToolSet: "starter",
+            toolCount: 2,
+            searchZone: "yard",
+            hintStrength: "strong",
+            timeLimitSeconds: 240
+          },
+          context: {
+            fit_tags: ["bridge"],
+            world_state: ["tool_search_enabled"],
+            difficulty_band: "tutorial"
+          }
+        },
+        cutscene: {
+          beat_id: "pre_farm_bridge",
+          display_name: "Pre Farm Bridge",
+          scene_name: "Tutorial_PreFarmCutscene",
+          next_scene_name: "",
+          story_brief: "Bridge tool recovery into the first real farm loop.",
+          style_preset_id: "farm_storybook_v1",
+          voice_id: "voice-test",
+          context: {
+            character_name: "Old Garrett",
+            crop_name: "",
+            focus_label: "",
+            minigame_goal: ""
+          }
+        }
+      }
+    };
+
+    const requestJson = document.getElementById("requestJson");
+    const jobIdInput = document.getElementById("jobIdInput");
+    const submitButton = document.getElementById("submitButton");
+    const fetchButton = document.getElementById("fetchButton");
+    const statusPanel = document.getElementById("statusPanel");
+    const reviewPanel = document.getElementById("reviewPanel");
+    const reviewNotes = document.getElementById("reviewNotes");
+    const referenceFileInput = document.getElementById("referenceFileInput");
+    const referenceLabelInput = document.getElementById("referenceLabelInput");
+    const referenceCharacterInput = document.getElementById("referenceCharacterInput");
+    const referenceTagsInput = document.getElementById("referenceTagsInput");
+    const referenceRoleInput = document.getElementById("referenceRoleInput");
+    const referenceUploadButton = document.getElementById("referenceUploadButton");
+    const referenceRefreshButton = document.getElementById("referenceRefreshButton");
+    const pendingReviewButton = document.getElementById("pendingReviewButton");
+    const approveButton = document.getElementById("approveButton");
+    const rejectButton = document.getElementById("rejectButton");
+    const publishButton = document.getElementById("publishButton");
+    const stepsPanel = document.getElementById("stepsPanel");
+    const assetsPanel = document.getElementById("assetsPanel");
+    const referencesPanel = document.getElementById("referencesPanel");
+    let currentJobId = "";
+
+    requestJson.value = JSON.stringify(defaultRequest, null, 2);
+
+    submitButton.addEventListener("click", async () => {
+      try {
+        const payload = JSON.parse(requestJson.value);
+        const response = await fetch("/api/v1/generated-standing-slice-jobs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || JSON.stringify(data));
+        }
+        jobIdInput.value = data.job_id;
+        renderJob(data);
+      } catch (error) {
+        renderError(`Submit failed: ${error.message}`);
+      }
+    });
+
+    fetchButton.addEventListener("click", async () => {
+      const jobId = jobIdInput.value.trim();
+      if (!jobId) {
+        renderError("Enter a job id first.");
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/v1/generated-standing-slice-jobs/${jobId}`);
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || JSON.stringify(data));
+        }
+        renderJob(data);
+      } catch (error) {
+        renderError(`Fetch failed: ${error.message}`);
+      }
+    });
+
+    pendingReviewButton.addEventListener("click", () => updateReview("pending_review"));
+    approveButton.addEventListener("click", () => updateReview("approved"));
+    rejectButton.addEventListener("click", () => updateReview("rejected"));
+    publishButton.addEventListener("click", publishApprovedJob);
+    referenceUploadButton.addEventListener("click", uploadReferenceAsset);
+    referenceRefreshButton.addEventListener("click", loadReferenceAssets);
+
+    function renderError(message) {
+      statusPanel.style.display = "block";
+      reviewPanel.style.display = "none";
+      stepsPanel.style.display = "none";
+      assetsPanel.style.display = "none";
+      statusPanel.innerHTML = `<h2>Status</h2><p>${message}</p>`;
+    }
+
+    async function uploadReferenceAsset() {
+      const file = referenceFileInput.files[0];
+      if (!file) {
+        renderError("Choose a reference file before uploading.");
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("reference_role", referenceRoleInput.value.trim() || "character");
+        formData.append("label", referenceLabelInput.value.trim() || file.name.replace(/\.[^.]+$/, ""));
+        formData.append("character_name", referenceCharacterInput.value.trim());
+        formData.append("tags", referenceTagsInput.value.trim());
+
+        const response = await fetch("/api/v1/storyboard-reference-assets", {
+          method: "POST",
+          body: formData
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || JSON.stringify(data));
+        }
+
+        referenceFileInput.value = "";
+        await loadReferenceAssets();
+      } catch (error) {
+        renderError(`Reference upload failed: ${error.message}`);
+      }
+    }
+
+    async function loadReferenceAssets() {
+      try {
+        const response = await fetch("/api/v1/storyboard-reference-assets");
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || JSON.stringify(data));
+        }
+        renderReferenceAssets(data);
+      } catch (error) {
+        renderError(`Reference listing failed: ${error.message}`);
+      }
+    }
+
+    async function updateReview(approvalStatus) {
+      if (!currentJobId) {
+        renderError("Submit or fetch a job before updating review state.");
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/v1/generated-standing-slice-jobs/${currentJobId}/review`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            approval_status: approvalStatus,
+            review_notes: reviewNotes.value
+          })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || JSON.stringify(data));
+        }
+        renderJob(data);
+      } catch (error) {
+        renderError(`Review update failed: ${error.message}`);
+      }
+    }
+
+    async function publishApprovedJob() {
+      if (!currentJobId) {
+        renderError("Submit or fetch a job before publishing.");
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/v1/generated-standing-slice-jobs/${currentJobId}/publish`, {
+          method: "POST"
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || JSON.stringify(data));
+        }
+        renderJob(data);
+      } catch (error) {
+        renderError(`Publish failed: ${error.message}`);
+      }
+    }
+
+    function renderReferenceAssets(references) {
+      referencesPanel.style.display = "block";
+      if (!references.length) {
+        referencesPanel.innerHTML = `<h2>Reference Library</h2><p class="muted">No reference assets uploaded yet.</p>`;
+        return;
+      }
+
+      const cards = references.map(reference => {
+        const contentUrl = `/api/v1/storyboard-reference-assets/${reference.reference_id}/content`;
+        const preview = reference.mime_type.startsWith("image/")
+          ? `<img src="${contentUrl}" alt="${reference.label}">`
+          : `<p><a href="${contentUrl}">Open reference</a></p>`;
+        const tags = reference.tags.length ? reference.tags.join(", ") : "none";
+        return `
+          <div class="asset-card">
+            <div><span class="status">${reference.label}</span></div>
+            <div>Role: ${reference.reference_role}</div>
+            <div>Character: ${reference.character_name || "(none)"}</div>
+            <div>Tags: ${tags}</div>
+            <div>Source: ${reference.source_filename}</div>
+            ${preview}
+          </div>
+        `;
+      }).join("");
+
+      referencesPanel.innerHTML = `
+        <h2>Reference Library</h2>
+        <div class="asset-grid">${cards}</div>
+      `;
+    }
+
+    function renderJob(job) {
+      currentJobId = job.job_id;
+      statusPanel.style.display = "block";
+      reviewPanel.style.display = "block";
+      stepsPanel.style.display = "block";
+      assetsPanel.style.display = "block";
+      reviewNotes.value = job.review_notes || "";
+
+      statusPanel.innerHTML = `
+        <h2>Status</h2>
+        <p><span class="status">Job:</span> ${job.job_id}</p>
+        <p><span class="status">Status:</span> ${job.status}</p>
+        <p><span class="status">Approval:</span> ${job.approval_status}</p>
+        <p><span class="status">Review Notes:</span> ${job.review_notes || "none"}</p>
+        <p><span class="status">Publish:</span> ${job.publish_status || "not_published"}</p>
+        <p><span class="status">Published At:</span> ${job.published_at || "not published"}</p>
+        <p><span class="status">Package Snapshot:</span> ${job.result?.package_output_path || "none"}</p>
+        <p><span class="status">Assets:</span> ${job.assets.length}</p>
+      `;
+
+      stepsPanel.innerHTML = `
+        <h2>Steps</h2>
+        ${job.steps.map(step => `
+          <div class="asset-card">
+            <div><span class="status">${step.step_id}</span></div>
+            <div>Status: ${step.status}</div>
+            <div>Errors: ${step.errors.length ? step.errors.join("; ") : "none"}</div>
+          </div>
+        `).join("")}
+      `;
+
+      assetsPanel.innerHTML = `
+        <h2>Assets</h2>
+        <div class="asset-grid">
+          ${job.assets.map(asset => {
+            const contentUrl = `/api/v1/generated-standing-slice-jobs/${job.job_id}/assets/${asset.asset_id}/content`;
+            const media = asset.asset_type === "image"
+              ? `<img src="${contentUrl}" alt="${asset.asset_id}">`
+              : `<audio controls src="${contentUrl}"></audio>`;
+            return `
+              <div class="asset-card">
+                <div><span class="status">${asset.asset_id}</span></div>
+                <div>Step: ${asset.step_id}</div>
+                <div>Type: ${asset.asset_type}</div>
+                <div>Provider: ${asset.provider_name || "unknown"} (${asset.provider_model || "n/a"})</div>
+                <div>Fallback: ${asset.fallback_used}</div>
+                <div>Shot: ${asset.shot_id}</div>
+                <div>Path: ${asset.output_path}</div>
+                <pre>${JSON.stringify(asset.metadata, null, 2)}</pre>
+                ${media}
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    loadReferenceAssets();
+  </script>
+</body>
+</html>

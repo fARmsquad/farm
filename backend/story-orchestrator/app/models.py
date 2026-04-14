@@ -6,6 +6,10 @@ from pydantic import BaseModel, Field
 
 from .generated_package_assembly import GeneratedPackageAssemblyResult
 from .generated_standing_slice import GeneratedStandingSliceRequest, GeneratedStandingSliceResult
+from .generated_storyboard_models import GeneratedStoryboardAssetRecord
+
+GeneratedStandingSliceApprovalStatus = Literal["not_requested", "pending_review", "approved", "rejected"]
+GeneratedStandingSlicePublishStatus = Literal["not_published", "published"]
 
 
 class StoryJobCreateRequest(BaseModel):
@@ -52,13 +56,26 @@ class GeneratedStandingSliceJobStepRecord(BaseModel):
     errors: list[str] = Field(default_factory=list)
 
 
+class GeneratedStandingSliceJobAssetRecord(GeneratedStoryboardAssetRecord):
+    step_id: Literal["post_chicken_to_farm", "find_tools_to_pre_farm"]
+
+
+class GeneratedStandingSliceJobReviewRequest(BaseModel):
+    approval_status: GeneratedStandingSliceApprovalStatus
+    review_notes: str = ""
+
+
 class GeneratedStandingSliceJobRecord(BaseModel):
     job_id: str
     status: Literal["pending", "running", "failed", "completed"]
-    approval_status: Literal["not_requested", "pending_review", "approved", "rejected"] = "not_requested"
+    approval_status: GeneratedStandingSliceApprovalStatus = "not_requested"
+    review_notes: str = ""
+    publish_status: GeneratedStandingSlicePublishStatus = "not_published"
+    published_at: str = ""
     request: GeneratedStandingSliceRequest
     result: GeneratedStandingSliceResult | None = None
     steps: list[GeneratedStandingSliceJobStepRecord] = Field(default_factory=list)
+    assets: list[GeneratedStandingSliceJobAssetRecord] = Field(default_factory=list)
     created_at: str
     updated_at: str
 
@@ -69,6 +86,9 @@ class GeneratedStandingSliceJobRecord(BaseModel):
             job_id=str(uuid4()),
             status="pending",
             approval_status="not_requested",
+            review_notes="",
+            publish_status="not_published",
+            published_at="",
             request=request,
             result=None,
             steps=[
@@ -81,6 +101,7 @@ class GeneratedStandingSliceJobRecord(BaseModel):
                     status="pending",
                 ),
             ],
+            assets=[],
             created_at=now,
             updated_at=now,
         )

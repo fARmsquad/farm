@@ -33,9 +33,22 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         private GUIStyle _bodyStyle;
         private GUIStyle _feedbackStyle;
         private bool _stylesReady;
-
         public string CurrentObjectiveText => _currentObjective;
 
+        public void FastCompleteForDev()
+        {
+            if (_usePackageMode)
+            {
+                foreach (var pickup in _packagePickups)
+                    if (pickup != null && !pickup.IsCollected && pickup.Collect())
+                        MarkRecoveredTool(pickup.ToolName);
+                _packageMission.Observe(_packageMission.RequiredCount, 0f);
+                _currentObjective = _packageMission.CurrentObjective;
+            }
+            else _goalReached = true;
+            _completionAt = Time.time + 0.05f;
+            SetFeedback("Developer fast-complete triggered.");
+        }
         private void Start()
         {
             _usePackageMode = TryConfigurePackageMode();

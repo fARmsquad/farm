@@ -59,6 +59,15 @@ class StoryOrchestratorAppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json()["detail"], "Story job not found.")
 
+
+    def test_standing_slice_review_page_includes_reference_library_surface(self) -> None:
+        response = self.client.get("/review/standing-slice")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Reference Library", response.text)
+        self.assertIn("referenceUploadButton", response.text)
+        self.assertIn("referencesPanel", response.text)
+
     def test_create_elevenlabs_tts_websocket_token_returns_single_use_token(self) -> None:
         captured: dict[str, str] = {}
 

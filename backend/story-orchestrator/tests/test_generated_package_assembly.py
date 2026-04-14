@@ -54,6 +54,8 @@ class GeneratedPackageAssemblyServiceTests(unittest.TestCase):
 
         self.assertTrue(result.is_valid, result.errors)
         self.assertEqual(result.minigame_result.materialized_minigame["AdapterId"], "tutorial.plant_rows")
+        self.assertIsNotNone(result.cutscene_result)
+        self.assertEqual(len(result.cutscene_result.generated_assets), 6)
         self.assertTrue(self.package_output_path.exists())
 
         beats = {beat["BeatId"]: beat for beat in result.unity_package["Beats"]}
@@ -140,6 +142,7 @@ class GeneratedPackageAssemblyEndpointTests(unittest.TestCase):
         payload = response.json()
         self.assertTrue(payload["is_valid"])
         self.assertEqual(payload["minigame_result"]["materialized_minigame"]["AdapterId"], "tutorial.plant_rows")
+        self.assertEqual(len(payload["cutscene_result"]["generated_assets"]), 6)
         self.assertEqual(
             payload["unity_package"]["Beats"][1]["Storyboard"]["Shots"][1]["ShotId"],
             "shot_02",
@@ -204,7 +207,19 @@ class CountingImageGenerator:
         self.calls += 1
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_bytes(b"fake-png")
-        return GeneratedImageAsset(output_path=output_path, mime_type="image/png")
+        return GeneratedImageAsset(
+            output_path=output_path,
+            mime_type="image/png",
+            provider_name="fake-image",
+            provider_model="fake-image-v1",
+            fallback_used=False,
+            source_metadata={
+                "prompt": prompt,
+                "reference_image_paths": list(reference_image_paths),
+                "aspect_ratio": aspect_ratio,
+                "image_size": image_size,
+            },
+        )
 
 
 class CountingSpeechGenerator:
@@ -230,6 +245,15 @@ class CountingSpeechGenerator:
             alignment_path=alignment_path,
             duration_seconds=3.0,
             mime_type="audio/mpeg",
+            provider_name="fake-speech",
+            provider_model="fake-speech-v1",
+            fallback_used=False,
+            source_metadata={
+                "text": text,
+                "voice_id": voice_id,
+                "previous_text": previous_text,
+                "next_text": next_text,
+            },
         )
 
 

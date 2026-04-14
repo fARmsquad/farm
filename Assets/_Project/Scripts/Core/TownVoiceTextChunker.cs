@@ -9,6 +9,7 @@ namespace FarmSimVR.Core
     public sealed class TownVoiceTextChunker
     {
         private const int SoftChunkLength = 48;
+        private const int MinimumClauseChunkLength = 24;
         private readonly StringBuilder _buffer = new();
 
         public IReadOnlyList<string> Append(string delta)
@@ -40,6 +41,9 @@ namespace FarmSimVR.Core
             chunk = null;
             int boundary = FindSentenceBoundary();
             if (boundary < 0)
+                boundary = FindClauseBoundary();
+
+            if (boundary < 0)
                 boundary = FindSoftBoundary();
 
             if (boundary < 0)
@@ -57,6 +61,23 @@ namespace FarmSimVR.Core
             {
                 char current = _buffer[i];
                 if (!IsSentenceTerminator(current))
+                    continue;
+
+                if (i == _buffer.Length - 1 || char.IsWhiteSpace(_buffer[i + 1]))
+                    return i;
+            }
+
+            return -1;
+        }
+
+        private int FindClauseBoundary()
+        {
+            if (_buffer.Length < MinimumClauseChunkLength)
+                return -1;
+
+            for (int i = _buffer.Length - 1; i >= MinimumClauseChunkLength - 1; i--)
+            {
+                if (_buffer[i] != ',')
                     continue;
 
                 if (i == _buffer.Length - 1 || char.IsWhiteSpace(_buffer[i + 1]))

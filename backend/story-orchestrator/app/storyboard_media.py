@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import textwrap
 import wave
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -15,9 +16,12 @@ class ChainImageGenerator:
 
     def generate_image(self, **kwargs: Any) -> Any:
         last_error: Exception | None = None
-        for generator in self._generators:
+        for index, generator in enumerate(self._generators):
             try:
-                return generator.generate_image(**kwargs)
+                asset = generator.generate_image(**kwargs)
+                if index > 0 and hasattr(asset, "fallback_used"):
+                    return replace(asset, fallback_used=True)
+                return asset
             except Exception as error:  # pragma: no cover - fallback path is integration-led
                 last_error = error
 
@@ -73,7 +77,19 @@ class PlaceholderImageGenerator:
 
         from .generated_storyboards import GeneratedImageAsset
 
-        return GeneratedImageAsset(output_path=output_path, mime_type="image/png")
+        return GeneratedImageAsset(
+            output_path=output_path,
+            mime_type="image/png",
+            provider_name="placeholder-image",
+            provider_model="placeholder-image-v1",
+            fallback_used=True,
+            source_metadata={
+                "prompt": prompt,
+                "reference_image_paths": list(reference_image_paths),
+                "aspect_ratio": aspect_ratio,
+                "image_size": image_size,
+            },
+        )
 
 
 class ChainSpeechGenerator:
@@ -82,9 +98,12 @@ class ChainSpeechGenerator:
 
     def generate_speech(self, **kwargs: Any) -> Any:
         last_error: Exception | None = None
-        for generator in self._generators:
+        for index, generator in enumerate(self._generators):
             try:
-                return generator.generate_speech(**kwargs)
+                asset = generator.generate_speech(**kwargs)
+                if index > 0 and hasattr(asset, "fallback_used"):
+                    return replace(asset, fallback_used=True)
+                return asset
             except Exception as error:  # pragma: no cover - fallback path is integration-led
                 last_error = error
 
@@ -121,6 +140,15 @@ class PlaceholderSpeechGenerator:
             alignment_path=alignment_path,
             duration_seconds=duration_seconds,
             mime_type="audio/wav",
+            provider_name="placeholder-speech",
+            provider_model="placeholder-speech-v1",
+            fallback_used=True,
+            source_metadata={
+                "text": text,
+                "voice_id": voice_id,
+                "previous_text": previous_text,
+                "next_text": next_text,
+            },
         )
 
 

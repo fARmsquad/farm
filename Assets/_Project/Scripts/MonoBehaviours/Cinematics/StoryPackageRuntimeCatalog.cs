@@ -10,15 +10,51 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         private static StoryPackageSnapshot _cachedPackage;
         private static string _cachedError;
         private static bool _loadAttempted;
+        private static StoryPackageSnapshot _runtimeOverridePackage;
+        private static string _runtimeOverrideError;
 
         public static bool TryGetPackage(out StoryPackageSnapshot package, out string error)
         {
+            if (_runtimeOverridePackage != null)
+            {
+                package = _runtimeOverridePackage;
+                error = _runtimeOverrideError ?? string.Empty;
+                return true;
+            }
+
             if (!_loadAttempted)
                 LoadPackage();
 
             package = _cachedPackage;
             error = _cachedError ?? string.Empty;
             return package != null;
+        }
+
+        public static bool TrySetRuntimeOverrideJson(string json, out string error)
+        {
+            if (!StoryPackageImporter.TryImportJson(json, out var package, out error))
+                return false;
+
+            _runtimeOverridePackage = package;
+            _runtimeOverrideError = string.Empty;
+            return true;
+        }
+
+        public static bool TrySetRuntimeOverride(StoryPackageSnapshot package, out string error)
+        {
+            if (package == null)
+            {
+                error = "Story package override is null.";
+                return false;
+            }
+
+            return TrySetRuntimeOverrideJson(JsonUtility.ToJson(package), out error);
+        }
+
+        public static void ClearRuntimeOverride()
+        {
+            _runtimeOverridePackage = null;
+            _runtimeOverrideError = string.Empty;
         }
 
         public static bool TryGetBeat(string sceneName, out StoryBeatSnapshot beat)
@@ -110,6 +146,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             _cachedPackage = null;
             _cachedError = string.Empty;
             _loadAttempted = false;
+            ClearRuntimeOverride();
         }
 
         private static void LoadPackage()

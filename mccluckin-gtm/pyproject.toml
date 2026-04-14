@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mccluckin-gtm"
+version = "0.1.0"
+description = "Automated go-to-market pipeline for McCluckin Farm community engagement."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "alembic>=1.16,<2.0",
+  "anthropic>=0.51,<1.0",
+  "asyncpraw>=7.8,<8.0",
+  "fastapi>=0.115,<1.0",
+  "httpx>=0.28,<1.0",
+  "jinja2>=3.1,<4.0",
+  "pydantic-settings>=2.8,<3.0",
+  "python-dotenv>=1.1,<2.0",
+  "sqlalchemy>=2.0,<3.0",
+  "tweepy>=4.15,<5.0",
+  "typer>=0.16,<1.0",
+  "uvicorn>=0.34,<1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3,<9.0",
+  "pytest-asyncio>=0.25,<1.0",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.setuptools]
+py-modules = ["cli", "config", "logging_utils"]
+
+[tool.setuptools.packages.find]
+include = ["db*", "monitor*", "drafter*", "publisher*", "review*", "scheduler*"]

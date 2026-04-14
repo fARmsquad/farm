@@ -1,4 +1,5 @@
 using System.Collections;
+using FarmSimVR.MonoBehaviours.Cinematics;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.SceneManagement;
@@ -22,6 +23,7 @@ namespace FarmSimVR.MonoBehaviours
         private Canvas fadeCanvas;
         private Image fadeImage;
         private bool isTransitioning;
+        private bool launchGeneratedStorySlice;
 
         private void Start()
         {
@@ -40,7 +42,19 @@ namespace FarmSimVR.MonoBehaviours
         public void StartScene(string sceneName)
         {
             if (isTransitioning) return;
+            StorySequenceRuntimeController.Instance?.ClearSequenceState();
+            launchGeneratedStorySlice = false;
             targetSceneName = ResolveTargetSceneName(sceneName);
+            isTransitioning = true;
+            StartCoroutine(TransitionToGame());
+        }
+
+        public void StartGeneratedStorySlice()
+        {
+            if (isTransitioning) return;
+
+            targetSceneName = StoryPackageSampleSceneName;
+            launchGeneratedStorySlice = true;
             isTransitioning = true;
             StartCoroutine(TransitionToGame());
         }
@@ -64,6 +78,13 @@ namespace FarmSimVR.MonoBehaviours
                 musicSource.Stop();
 
             var sceneName = ResolveTargetSceneName(targetSceneName);
+            if (launchGeneratedStorySlice)
+            {
+                launchGeneratedStorySlice = false;
+                StorySequenceRuntimeController.GetOrCreate().BeginSequenceAndLoad(sceneName);
+                yield break;
+            }
+
             SceneManager.LoadScene(SceneWorkCatalog.GetLoadableSceneName(sceneName));
         }
 
@@ -138,7 +159,8 @@ namespace FarmSimVR.MonoBehaviours
                 "TutorialSlice_GenerativeStorySlice",
                 StoryPackageSampleLabel,
                 StoryPackageSampleSceneName,
-                48f);
+                48f,
+                isGeneratedStorySlice: true);
 
             for (int i = 0; i < SceneWorkCatalog.TitleScreenLaunchableScenes.Count; i++)
             {
@@ -165,7 +187,8 @@ namespace FarmSimVR.MonoBehaviours
             string objectName,
             string label,
             string sceneName,
-            float topOffset)
+            float topOffset,
+            bool isGeneratedStorySlice = false)
         {
             var buttonObject = new GameObject(objectName);
             buttonObject.transform.SetParent(parent, false);
@@ -189,7 +212,10 @@ namespace FarmSimVR.MonoBehaviours
             colors.pressedColor = new Color(0.12f, 0.18f, 0.12f, 0.95f);
             button.colors = colors;
 
-            button.onClick.AddListener(() => StartScene(sceneName));
+            if (isGeneratedStorySlice)
+                button.onClick.AddListener(StartGeneratedStorySlice);
+            else
+                button.onClick.AddListener(() => StartScene(sceneName));
 
             CreateLabel(
                 "Label",

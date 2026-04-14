@@ -73,6 +73,15 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             return SceneWorkCatalog.GetLoadableSceneName(ResolveSceneRequest(requestedSceneName));
         }
 
+        public void TryFastCompleteCurrentScene()
+        {
+            var step = TutorialSceneCatalog.GetStepForScene(SceneManager.GetActiveScene().name);
+            if (TryFastCompleteSceneController(step))
+                return;
+
+            CompleteCurrentSceneAndLoadNext();
+        }
+
         public void CompleteCurrentSceneAndLoadNext()
         {
             if (SceneManager.GetActiveScene().name == TutorialSceneCatalog.TitleScreenSceneName)
@@ -88,6 +97,10 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             if (string.IsNullOrWhiteSpace(nextScene))
             {
+                var sequenceRuntime = StorySequenceRuntimeController.Instance;
+                if (sequenceRuntime != null && sequenceRuntime.TryContinueGeneratedSequence(this, currentSceneName))
+                    return;
+
                 ShowCompletionBanner = true;
                 return;
             }
@@ -124,15 +137,60 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         public void ResetTutorial()
         {
+            StorySequenceRuntimeController.Instance?.ClearSequenceState();
             Flow.Reset();
             ToolRecovery = new ToolRecoveryService();
             ShowCompletionBanner = false;
             LoadSceneByCatalogName(TutorialSceneCatalog.IntroSceneName);
         }
 
+        public void NotifyGeneratedSequenceContinuationUnavailable()
+        {
+            ShowCompletionBanner = true;
+        }
+
         public bool MarkToolRecovered(TutorialToolId toolId)
         {
             return ToolRecovery.Recover(toolId);
+        }
+
+        private static bool TryFastCompleteSceneController(TutorialStep step)
+        {
+            switch (step)
+            {
+                case TutorialStep.ChickenHunt:
+                    var chicken = FindAnyObjectByType<TutorialChickenSceneController>();
+                    if (chicken == null)
+                        return false;
+
+                    chicken.FastCompleteForDev();
+                    return true;
+                case TutorialStep.FindTools:
+                    var findTools = FindAnyObjectByType<TutorialFindToolsSceneController>();
+                    if (findTools == null)
+                        return false;
+
+                    findTools.FastCompleteForDev();
+                    return true;
+                case TutorialStep.FarmTutorial:
+                    var farm = FindAnyObjectByType<TutorialFarmSceneController>();
+                    if (farm == null)
+                        return false;
+
+                    farm.FastCompleteForDev();
+                    return true;
+                case TutorialStep.PostChickenCutscene:
+                case TutorialStep.MidpointPlaceholder:
+                case TutorialStep.PreFarmCutscene:
+                    var cutscene = FindAnyObjectByType<TutorialCutsceneSceneController>();
+                    if (cutscene == null)
+                        return false;
+
+                    cutscene.FastCompleteForDev();
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -141,6 +199,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             if (scene.name == TutorialSceneCatalog.TitleScreenSceneName)
             {
+                StorySequenceRuntimeController.Instance?.ClearSequenceState();
                 Flow.Reset();
                 return;
             }

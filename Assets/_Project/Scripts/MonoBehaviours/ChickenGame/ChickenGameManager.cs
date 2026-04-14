@@ -1,4 +1,6 @@
 using System.Collections;
+using FarmSimVR.Core.Story;
+using FarmSimVR.Core.Tutorial;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,6 +14,10 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
     /// </summary>
     public class ChickenGameManager : MonoBehaviour
     {
+        private const string DefaultChickenObjective = "Catch the chicken and drop it in the coop.";
+        private const string DefaultArenaPresetId = "tutorial_pen_small";
+        private const string DefaultGuidanceLevel = "high";
+
         [Header("References")]
         [SerializeField] public ChickenAI chicken;
         [SerializeField] public Transform player;
@@ -36,14 +42,22 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         [SerializeField] private float winHoldAfterSwoop   = 0.4f;
         [SerializeField] private AnimationCurve winSwoopEase = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
+        private readonly PackageChickenChaseMissionService _packageMission = new();
+
         private ChickenPlayerController _playerController;
         private float _timeRemaining;
         private bool  _gameOver;
         private bool  _isHoldingChicken;
+        private bool  _usePackageMode;
+        private bool  _chickenDefaultsCaptured;
         private float _gripMeter;
         private Vector3    _playerStartPos;
         private Quaternion _playerStartRot;
         private Vector3    _chickenStartPos;
+        private Quaternion _chickenStartRot;
+        private float _defaultChickenArenaRadius;
+        private float _defaultChickenFleeRadius;
+        private float _defaultChickenPanicRadius;
         private Keyboard _keyboard;
         private Mouse    _mouse;
 
@@ -58,6 +72,8 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             TryGetComponent(out _sceneAudio);
             if (winSwoopEase == null || winSwoopEase.length == 0)
                 winSwoopEase = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+            CaptureChickenDefaults();
         }
 
         private void Start()
@@ -73,7 +89,10 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             }
 
             if (chicken != null)
+            {
                 _chickenStartPos = chicken.transform.position;
+                _chickenStartRot = chicken.transform.rotation;
+            }
 
             _timeRemaining = timeLimit;
         }
@@ -123,11 +142,47 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
         /// <summary>True while the player is holding the chicken.</summary>
         public bool IsHoldingChicken => _isHoldingChicken;
 
+        public string CurrentObjectiveText => _usePackageMode
+            ? _packageMission.CurrentObjective
+            : DefaultChickenObjective;
+        public int RequiredCaptureCount => _usePackageMode ? _packageMission.RequiredCaptureCount : 1;
+        public int CapturedCount => _usePackageMode ? _packageMission.CapturedCount : (IsWon ? 1 : 0);
+        public int ConfiguredChickenCount => _usePackageMode ? _packageMission.ConfiguredChickenCount : 1;
+        public string GuidanceLevel => _usePackageMode ? _packageMission.GuidanceLevel : DefaultGuidanceLevel;
+        public string ArenaPresetId => _usePackageMode ? _packageMission.ArenaPresetId : DefaultArenaPresetId;
+
         /// <summary>Current grip level, 0–1. Drains without clicking, refills on click.</summary>
         public float GripFraction => _gripMeter;
 
         /// <summary>True when the chicken is currently stunned.</summary>
         public bool IsChickenStunned => chicken != null && chicken.IsStunned;
+
+        public void ApplyPackageConfig(StoryMinigameConfigSnapshot minigame)
+        {
+            if (minigame == null || !string.Equals(minigame.AdapterId, "tutorial.chicken_chase", System.StringComparison.Ordinal))
+                return;
+
+            CaptureChickenDefaults();
+
+            var requiredCaptureCount = ResolveRequiredCaptureCount(minigame);
+            var chickenCount = ResolveChickenCount(minigame, requiredCaptureCount);
+            var arenaPresetId = ResolveStringParameter(minigame, "arenaPresetId", DefaultArenaPresetId);
+            var guidanceLevel = ResolveStringParameter(minigame, "guidanceLevel", DefaultGuidanceLevel);
+
+            _packageMission.Configure(
+                minigame.ObjectiveText,
+                requiredCaptureCount,
+                chickenCount,
+                arenaPresetId,
+                guidanceLevel);
+            _usePackageMode = true;
+
+            if (minigame.TimeLimitSeconds > 0f)
+                timeLimit = minigame.TimeLimitSeconds;
+
+            _timeRemaining = timeLimit;
+            ApplyArenaPreset(_packageMission.ArenaPresetId);
+        }
 
         /// <summary>True if the player is currently within catch range of the chicken.</summary>
         public bool IsInCatchRange()
@@ -245,7 +300,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             RestoreCelebrationCamera();
             _winCelebrationActive = false;
 
-            EndGame(won: true);
+            ResolveSuccessfulCaptureOutcome();
         }
 
         private void RestoreCelebrationCamera()
@@ -316,6 +371,12 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             RestoreCelebrationCamera();
             _winCelebrationActive = false;
 
+            if (_usePackageMode)
+            {
+                _packageMission.ResetProgress();
+                ApplyArenaPreset(_packageMission.ArenaPresetId);
+            }
+
             _gameOver         = false;
             IsWon             = false;
             _isHoldingChicken = false;
@@ -332,6 +393,7 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
             {
                 chicken.gameObject.SetActive(true);
                 chicken.transform.position = _chickenStartPos;
+                chicken.transform.rotation = _chickenStartRot;
                 chicken.enabled            = true;
                 chicken.ResetState();
             }
@@ -341,6 +403,96 @@ namespace FarmSimVR.MonoBehaviours.ChickenGame
 
             if (_ui != null)
                 _ui.ResetUI();
+        }
+
+        private void ResolveSuccessfulCaptureOutcome()
+        {
+            if (_usePackageMode && !_packageMission.RegisterSuccessfulCapture())
+            {
+                RearmConfiguredCaptureLoop();
+                return;
+            }
+
+            EndGame(won: true);
+        }
+
+        private void RearmConfiguredCaptureLoop()
+        {
+            if (player != null)
+            {
+                player.position = _playerStartPos;
+                player.rotation = _playerStartRot;
+            }
+
+            if (chicken != null)
+            {
+                chicken.gameObject.SetActive(true);
+                chicken.transform.position = _chickenStartPos;
+                chicken.transform.rotation = _chickenStartRot;
+                chicken.enabled = true;
+                chicken.ResetState();
+            }
+
+            if (_playerController != null)
+            {
+                _playerController.SetCelebrationFrozen(false);
+                _playerController.ResetState();
+                _playerController.SetCursorLocked(true);
+            }
+        }
+
+        private void CaptureChickenDefaults()
+        {
+            if (_chickenDefaultsCaptured || chicken == null)
+                return;
+
+            _defaultChickenArenaRadius = chicken.arenaRadius;
+            _defaultChickenFleeRadius = chicken.fleeRadius;
+            _defaultChickenPanicRadius = chicken.panicRadius;
+            _chickenDefaultsCaptured = true;
+        }
+
+        private void ApplyArenaPreset(string arenaPresetId)
+        {
+            if (chicken == null)
+                return;
+
+            CaptureChickenDefaults();
+            if (string.Equals(arenaPresetId, "tutorial_pen_medium", System.StringComparison.Ordinal))
+            {
+                chicken.arenaRadius = _defaultChickenArenaRadius + 3f;
+                chicken.fleeRadius = _defaultChickenFleeRadius + 1f;
+                chicken.panicRadius = _defaultChickenPanicRadius + 0.5f;
+                return;
+            }
+
+            chicken.arenaRadius = _defaultChickenArenaRadius;
+            chicken.fleeRadius = _defaultChickenFleeRadius;
+            chicken.panicRadius = _defaultChickenPanicRadius;
+        }
+
+        private static int ResolveRequiredCaptureCount(StoryMinigameConfigSnapshot minigame)
+        {
+            var requiredCaptureCount = minigame.RequiredCount < 1 ? 1 : minigame.RequiredCount;
+            if (minigame.TryGetIntParameter("targetCaptureCount", out var configuredCaptureCount) && configuredCaptureCount > 0)
+                requiredCaptureCount = configuredCaptureCount;
+
+            return requiredCaptureCount;
+        }
+
+        private static int ResolveChickenCount(StoryMinigameConfigSnapshot minigame, int requiredCaptureCount)
+        {
+            if (!minigame.TryGetIntParameter("chickenCount", out var chickenCount))
+                return requiredCaptureCount;
+
+            return chickenCount < requiredCaptureCount ? requiredCaptureCount : chickenCount;
+        }
+
+        private static string ResolveStringParameter(StoryMinigameConfigSnapshot minigame, string parameterName, string fallback)
+        {
+            return minigame.TryGetStringParameter(parameterName, out var value)
+                ? value
+                : fallback;
         }
     }
 }

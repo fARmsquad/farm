@@ -36,6 +36,46 @@
 
 ## Log
 
+### GTM Approval Flow Did Not Publish Approved X Replies (2026-04-14)
+- Status: Open
+- Related story/task: McCluckin Farm GTM X-only monitor + review dashboard
+- Original completion claim: The X-only pipeline was described as working end to end for discovery and drafting, with the dashboard acting as the operator console for live monitoring and review.
+- Reported issue: The developer approved multiple X drafts in the dashboard and none of them were actually posted on X.
+- Failing evidence: The live GTM database contained 10 drafts with `reviewer_action in ('approved','edited')` and no matching row in `published`, while the active `gtm-x-monitor` automation only ran monitor + draft work and never invoked the publish path.
+- Approach that produced the miss: The implementation treated approval as a state transition only, left publishing to a separate CLI path, and created monitoring automations that summarized queue activity without actually driving approved replies through the publisher.
+- Why it was mistaken for done: Verification proved the mechanical pieces independently, but it did not verify the operator workflow the developer would actually use: approve in the dashboard, then expect the post to appear on X or at least become visibly ready or pending publication.
+- What should have been verified or stated differently: The handoff should have explicitly said that approval alone does not publish and that a separate publish run or automation was still required. The dashboard should also have exposed approved-but-unpublished items as a first-class operator state.
+- Prevention rules for future work:
+  - When a review UI includes an approval action for outbound content, verify whether approval publishes immediately, schedules publication, or only marks readiness, and state that behavior explicitly in the handoff.
+  - For automation-backed publishing systems, verify the live automation prompts against the intended operator workflow instead of assuming a separate command will be run later.
+  - Make approved-but-unpublished content visible in the operator surface so queue state cannot masquerade as published state.
+- Follow-up actions:
+  - Add focused tests for approved-but-unpublished dashboard visibility and publish actions.
+  - Wire the dashboard and/or automation flow so approved X replies can actually publish through the intended operator path.
+  - Add clearer publish logging so operator history distinguishes review approval from platform publication.
+- Distilled rule added to project-memory.md: `Approval flows for outbound content must make publish state explicit and verifiable (2026-04-14)`
+
+
+### Town Voice Streaming Fell Back To Text On Intermittent Token Mint Delays (2026-04-14)
+- Status: Addressed
+- Related story/task: TOWN-002 Town NPC voice streaming
+- Original completion claim: The Town scene was handed off as speaking reliably through ElevenLabs while text streamed.
+- Reported issue: The developer reported that Town voice sometimes streamed and sometimes fell back to text-only with `[TownVoice] Voice streaming is unavailable; continuing with text only.`
+- Failing evidence: Runtime warning emitted from `TownNpcVoiceStreamController.Update()` after `TownVoiceTokenServiceClient.RequestToken()` returned an unsuccessful result.
+- Approach that produced the miss: The Unity runtime treated local token minting as a very short-lived request with a 3-second timeout and no retry, even though the local backend still had to call ElevenLabs before returning the single-use token.
+- Why it was mistaken for done: Earlier verification proved the happy path when the local backend and ElevenLabs answered quickly, but it did not treat token-mint latency variance as part of the real Town voice-stream reliability surface.
+- What should have been verified or stated differently: The handoff should have called out that the Unity-side token timeout was much shorter than the backend provider timeout and therefore vulnerable to intermittent fallback under normal network jitter.
+- Prevention rules for future work:
+  - Any Unity client calling a local proxy for third-party tokens must allow at least as much time as the proxy's upstream provider timeout, or explicitly retry transient failures.
+  - Treat "token mint succeeds once" and "voice path is resilient to startup latency" as separate verification axes.
+  - When a local backend proxies an external provider, the runtime warning should preserve enough endpoint/error context to distinguish misconfiguration from transient latency.
+- Follow-up actions:
+  - Increase the Unity token request budget and add a focused retry path for transport and upstream 5xx failures.
+  - Add regression coverage that locks the Unity-side timeout above the old 3-second budget.
+- Actual root cause after fix: `TownVoiceTokenServiceClient` only allowed 3 seconds for `/api/v1/elevenlabs/tts-websocket-token`, but the backend's own ElevenLabs token mint call uses a much longer timeout. Under intermittent provider or network latency, Unity gave up first and dropped the voice session into text-only fallback.
+- Guardrail added: Unity token requests now use a longer timeout plus transient retries, and EditMode coverage locks the timeout above the old fragile threshold.
+- Distilled rule added to project-memory.md: `Unity proxy timeouts must not undercut the backend provider timeout for Town voice token minting (2026-04-14)`
+
 ### Scene Loader Alias Fix Missed The Core Tutorial Namespace Import (2026-04-13)
 - Status: Addressed
 - Related story/task: Tutorial alias-resolution fix for post-chicken -> midpoint runtime transitions
@@ -444,3 +484,23 @@
   - Add a regression around the fallback path so future harness refactors do not silently reintroduce skip-only behavior.
 - Follow-up actions: Added `.ai/tests/run-tests-lock-fallback.sh` as a regression, redesigned `.ai/scripts/run-tests.sh` to detect a live editor and run Unity against a disposable cloned project, and replaced the flaky CLI `-runTests` path with a repo-owned `BatchmodeTestRunner` execute-method that saves NUnit XML before exit. The harness now runs the real root command while the editor stays open and surfaces actual failing tests instead of skipping.
 - Distilled rule added to project-memory.md: `Unity Harnesses Need Editor-Lock Fallbacks (2026-04-13)`
+
+### Town Voice Streaming Was Wired But Still Pointed At A Dead Local Port (2026-04-14)
+- Status: Addressed
+- Related story/task: `TOWN-002` Town NPC voice streaming
+- Original completion claim: The Town slice already had the ElevenLabs voice path wired through Unity, the story-orchestrator token broker, and per-character voice profiles.
+- Reported issue: The live Town scene still could not mint a token because `TownNpcVoiceStreamController` was serialized to `http://127.0.0.1:8000` while the actual local story-orchestrator was running on `http://127.0.0.1:8011`.
+- Failing evidence: `curl http://127.0.0.1:8000/health` returned no listener, `curl http://127.0.0.1:8011/health` returned `200`, and `Assets/_Project/Scenes/Town.unity` still had `tokenServiceBaseUrl: http://127.0.0.1:8000`.
+- Approach that produced the miss: Verification focused on the existence of the text stream, the backend token route, and the scene-side voice controller, but it did not exercise the actual runtime token endpoint resolution path against the active local backend.
+- Why it was mistaken for done: The architecture was present in source, so the feature looked complete on inspection even though the player-facing token fetch was pinned to a stale local port.
+- What should have been verified or stated differently: A voice-streaming completion claim needed one end-to-end check that the Town scene could actually reach the active local token broker, not just that the broker and client components both existed.
+- Prevention rules for future work:
+  - Local backend integrations in Unity must support an override or fallback path instead of assuming one hardcoded localhost port.
+  - When a feature depends on a local service, verify the scene/client hits the currently running endpoint before calling the workflow complete.
+  - Distinguish "integration pieces exist" from "the live endpoint resolves successfully" in the handoff.
+- Follow-up actions:
+  - Add a tested token-service endpoint resolver for Town voice streaming.
+  - Update the runtime to try the active local story-orchestrator endpoint instead of trusting one stale serialized port.
+- Actual root cause after fix: `TownNpcVoiceStreamController` trusted one serialized `tokenServiceBaseUrl` value from `Town.unity` and never tried an environment override or the alternate local orchestrator port. On this machine the backend was healthy on `127.0.0.1:8011`, so the scene-side token fetch failed before voice streaming could start.
+- Guardrail added: `TownVoiceTokenServiceEndpointResolver` now builds ordered candidate base URLs from an explicit environment override, the serialized scene value, and bounded local fallbacks (`8000`, `8011`). `TownVoiceTokenServiceClient` probes those candidates before giving up, and `TownVoiceStreamingTests` locks the override ordering plus local fallback behavior.
+- Distilled rule added to project-memory.md: `Town local backend integrations must not depend on one hardcoded localhost port (2026-04-14)`

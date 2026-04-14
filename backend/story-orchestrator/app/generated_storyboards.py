@@ -1,15 +1,12 @@
-import base64
 import json
-import mimetypes
 from pathlib import Path
 from typing import Any
-
-import httpx
 
 from .config import Settings
 from .generated_storyboard_models import (
     GeneratedImageAsset,
     GeneratedSpeechAsset,
+    GeneratedStoryboardAssetRecord,
     GeneratedStoryboardContext,
     GeneratedStoryboardCutsceneRequest,
     GeneratedStoryboardPackageResult,
@@ -25,6 +22,8 @@ from .storyboard_media import (
     PlaceholderImageGenerator,
     PlaceholderSpeechGenerator,
 )
+from .storyboard_provider_clients import ElevenLabsSpeechGenerator, GeminiImageGenerator
+from .storyboard_reference_library import StoryboardReferenceLibrary, StoryboardReferencePathResolver
 
 
 class TemplateStoryboardPlanner:
@@ -42,161 +41,6 @@ class TemplateStoryboardPlanner:
         )
 
 
-class GeminiImageGenerator:
-    def __init__(self, api_key: str, models: list[str]) -> None:
-        self._api_key = api_key
-        self._models = [model for model in models if model]
-
-    def generate_image(
-        self,
-        *,
-        prompt: str,
-        reference_image_paths: list[str],
-        output_path: Path,
-        aspect_ratio: str,
-        image_size: str,
-    ) -> GeneratedImageAsset:
-        parts = [{"text": prompt}]
-        for path in reference_image_paths:
-            if not path:
-                continue
-
-            reference_path = Path(path)
-            mime_type = mimetypes.guess_type(reference_path.name)[0] or "image/png"
-            parts.append(
-                {
-                    "inlineData": {
-                        "mimeType": mime_type,
-                        "data": base64.b64encode(reference_path.read_bytes()).decode("ascii"),
-                    }
-                }
-            )
-
-        last_error: Exception | None = None
-        for model in self._models:
-            try:
-                payload = self._build_payload(
-                    model=model,
-                    parts=parts,
-                    aspect_ratio=aspect_ratio,
-                    image_size=image_size,
-                )
-                response = httpx.post(
-                    f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-                    headers={
-                        "Content-Type": "application/json",
-                        "x-goog-api-key": self._api_key,
-                    },
-                    json=payload,
-                    timeout=120,
-                )
-                response.raise_for_status()
-
-                data = response.json()
-                inline_data = self._extract_inline_image(data)
-                output_path.parent.mkdir(parents=True, exist_ok=True)
-                output_path.write_bytes(base64.b64decode(inline_data["data"]))
-                return GeneratedImageAsset(output_path=output_path, mime_type=inline_data.get("mimeType", "image/png"))
-            except httpx.HTTPStatusError as error:
-                last_error = error
-                if error.response.status_code not in (403, 404, 429):
-                    raise
-            except Exception as error:
-                last_error = error
-                raise
-
-        if last_error is not None:
-            raise last_error
-
-        raise RuntimeError("No Gemini image model is configured.")
-
-    @staticmethod
-    def _build_payload(
-        *,
-        model: str,
-        parts: list[dict[str, Any]],
-        aspect_ratio: str,
-        image_size: str,
-    ) -> dict[str, Any]:
-        image_config: dict[str, Any] = {"aspectRatio": aspect_ratio}
-        if image_size and "gemini-2.5" not in model:
-            image_config["imageSize"] = image_size
-
-        return {
-            "contents": [{"parts": parts}],
-            "generationConfig": {
-                "responseModalities": ["TEXT", "IMAGE"],
-                "imageConfig": image_config,
-            },
-        }
-
-    @staticmethod
-    def _extract_inline_image(response_json: dict[str, Any]) -> dict[str, Any]:
-        for candidate in response_json.get("candidates", []):
-            content = candidate.get("content", {})
-            for part in content.get("parts", []):
-                inline_data = part.get("inlineData")
-                if inline_data and inline_data.get("data"):
-                    return inline_data
-
-        raise RuntimeError("Gemini did not return an inline image payload.")
-
-
-class ElevenLabsSpeechGenerator:
-    def __init__(self, api_key: str, model_id: str) -> None:
-        self._api_key = api_key
-        self._model_id = model_id
-
-    def generate_speech(
-        self,
-        *,
-        text: str,
-        voice_id: str,
-        output_path: Path,
-        previous_text: str,
-        next_text: str,
-    ) -> GeneratedSpeechAsset:
-        payload: dict[str, Any] = {
-            "text": text,
-            "model_id": self._model_id,
-        }
-        if previous_text:
-            payload["previous_text"] = previous_text
-        if next_text:
-            payload["next_text"] = next_text
-
-        response = httpx.post(
-            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/with-timestamps",
-            headers={
-                "Content-Type": "application/json",
-                "xi-api-key": self._api_key,
-            },
-            json=payload,
-            timeout=120,
-        )
-        response.raise_for_status()
-
-        data = response.json()
-        audio_base64 = data.get("audio_base64")
-        if not audio_base64:
-            raise RuntimeError("ElevenLabs did not return audio data.")
-
-        alignment = data.get("normalized_alignment") or data.get("alignment") or {}
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_bytes(base64.b64decode(audio_base64))
-
-        alignment_path = output_path.with_suffix(".alignment.json")
-        alignment_path.write_text(json.dumps(alignment, indent=2), encoding="utf-8")
-
-        duration_seconds = _extract_alignment_duration(alignment)
-        return GeneratedSpeechAsset(
-            output_path=output_path,
-            alignment_path=alignment_path,
-            duration_seconds=duration_seconds,
-            mime_type="audio/mpeg",
-        )
-
-
 class GeneratedStoryboardService:
     def __init__(
         self,
@@ -206,6 +50,7 @@ class GeneratedStoryboardService:
         planner: StoryboardPlanner,
         image_generator: ImageGenerator,
         speech_generator: SpeechGenerator,
+        reference_library: StoryboardReferenceLibrary | None = None,
         default_voice_id: str = "",
     ) -> None:
         self._output_root = output_root
@@ -213,12 +58,15 @@ class GeneratedStoryboardService:
         self._planner = planner
         self._image_generator = image_generator
         self._speech_generator = speech_generator
+        self._reference_library = reference_library
+        self._reference_path_resolver = StoryboardReferencePathResolver(output_root, reference_library)
         self._default_voice_id = default_voice_id
 
     @classmethod
     def from_settings(cls, settings: Settings, base_dir: Path) -> "GeneratedStoryboardService":
         output_root = settings.resolve_path(base_dir, settings.generated_storyboard_output_root)
         package_output_path = settings.resolve_path(base_dir, settings.generated_storyboard_package_path)
+        reference_library = StoryboardReferenceLibrary(output_root)
         return cls(
             output_root=output_root,
             package_output_path=package_output_path,
@@ -244,6 +92,7 @@ class GeneratedStoryboardService:
                     PlaceholderSpeechGenerator(),
                 ]
             ),
+            reference_library=reference_library,
             default_voice_id=settings.elevenlabs_voice_id,
         )
 
@@ -258,12 +107,17 @@ class GeneratedStoryboardService:
             raise RuntimeError("A voice_id is required to generate narration audio.")
 
         base_asset_dir = self._output_root / "GeneratedStoryboards" / resolved_request.package_id / resolved_request.beat_id
+        reference_image_paths = self._reference_path_resolver.resolve_paths(resolved_request)
         shots = []
+        generated_assets: list[GeneratedStoryboardAssetRecord] = []
         for index, shot in enumerate(plan.shots):
             stem = base_asset_dir / shot.shot_id
+            image_prompt = self._build_image_prompt(resolved_request, shot)
+            previous_text = plan.shots[index - 1].narration_text if index > 0 else ""
+            next_text = plan.shots[index + 1].narration_text if index + 1 < len(plan.shots) else ""
             image_asset = self._image_generator.generate_image(
-                prompt=self._build_image_prompt(resolved_request, shot),
-                reference_image_paths=resolved_request.reference_image_paths,
+                prompt=image_prompt,
+                reference_image_paths=reference_image_paths,
                 output_path=stem.with_suffix(".png"),
                 aspect_ratio=resolved_request.aspect_ratio,
                 image_size=resolved_request.image_size,
@@ -272,18 +126,53 @@ class GeneratedStoryboardService:
                 text=shot.narration_text,
                 voice_id=voice_id,
                 output_path=stem.with_suffix(".mp3"),
-                previous_text=plan.shots[index - 1].narration_text if index > 0 else "",
-                next_text=plan.shots[index + 1].narration_text if index + 1 < len(plan.shots) else "",
+                previous_text=previous_text,
+                next_text=next_text,
             )
+            image_resource_path = self._to_resource_path(image_asset.output_path)
+            audio_resource_path = self._to_resource_path(speech_asset.output_path)
             shots.append(
                 {
                     "ShotId": shot.shot_id,
                     "SubtitleText": shot.subtitle_text,
                     "NarrationText": shot.narration_text,
-                    "ImageResourcePath": self._to_resource_path(image_asset.output_path),
-                    "AudioResourcePath": self._to_resource_path(speech_asset.output_path),
+                    "ImageResourcePath": image_resource_path,
+                    "AudioResourcePath": audio_resource_path,
                     "DurationSeconds": max(shot.duration_seconds, speech_asset.duration_seconds),
                 }
+            )
+            generated_assets.append(
+                GeneratedStoryboardAssetRecord(
+                    asset_id=f"{plan.beat_id}_{shot.shot_id}_image",
+                    beat_id=plan.beat_id,
+                    shot_id=shot.shot_id,
+                    asset_type="image",
+                    provider_name=image_asset.provider_name,
+                    provider_model=image_asset.provider_model,
+                    fallback_used=image_asset.fallback_used,
+                    mime_type=image_asset.mime_type,
+                    output_path=str(image_asset.output_path),
+                    resource_path=image_resource_path,
+                    metadata=dict(image_asset.source_metadata),
+                )
+            )
+            audio_metadata = dict(speech_asset.source_metadata)
+            audio_metadata["alignment_path"] = str(speech_asset.alignment_path)
+            audio_metadata["duration_seconds"] = speech_asset.duration_seconds
+            generated_assets.append(
+                GeneratedStoryboardAssetRecord(
+                    asset_id=f"{plan.beat_id}_{shot.shot_id}_audio",
+                    beat_id=plan.beat_id,
+                    shot_id=shot.shot_id,
+                    asset_type="audio",
+                    provider_name=speech_asset.provider_name,
+                    provider_model=speech_asset.provider_model,
+                    fallback_used=speech_asset.fallback_used,
+                    mime_type=speech_asset.mime_type,
+                    output_path=str(speech_asset.output_path),
+                    resource_path=audio_resource_path,
+                    metadata=audio_metadata,
+                )
             )
 
         unity_package = self._load_existing_package(resolved_request)
@@ -330,6 +219,7 @@ class GeneratedStoryboardService:
         return GeneratedStoryboardPackageResult(
             package_output_path=str(self._package_output_path),
             unity_package=unity_package,
+            generated_assets=generated_assets,
         )
 
     def _resolve_request_context(
@@ -525,14 +415,6 @@ def _build_plan_shots(context: GeneratedStoryboardContext) -> list[GeneratedStor
             duration_seconds=3.0,
         ),
     ]
-
-
-def _extract_alignment_duration(alignment: dict[str, Any]) -> float:
-    end_times = alignment.get("character_end_times_seconds") or []
-    if not end_times:
-        return 0.0
-
-    return float(end_times[-1])
 
 
 def _pluralize_crop(crop_type: str) -> str:

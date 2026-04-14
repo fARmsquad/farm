@@ -19,6 +19,7 @@ namespace FarmSimVR.MonoBehaviours
         private const string LOG_PREFIX = "[Chat]";
 
         [SerializeField] private OpenAIClient openAIClient;
+        [SerializeField] private bool enableVoiceInput = true;
 
         /// <summary>Fired once when the NPC name is known and streaming begins.</summary>
         public event Action<string> OnStreamStarted;       // (npcName)
@@ -32,6 +33,8 @@ namespace FarmSimVR.MonoBehaviours
         public event Action                 OnWaiting;
         public event Action                 OnConversationEnded;
         public event Action<string>         OnError;
+        public event Action<string>         OnPlayerPromptSubmitted;
+        public event Action<string>         OnExitBlocked;
 
         public bool IsInConversation { get; private set; }
 
@@ -40,6 +43,14 @@ namespace FarmSimVR.MonoBehaviours
         private readonly TownConversationMemoryStore _conversationMemory = new();
 
         // ── Lifecycle ─────────────────────────────────────────────────────────
+
+        private void Awake()
+        {
+            if (!enableVoiceInput || GetComponent<TownVoiceInputController>() != null)
+                return;
+
+            gameObject.AddComponent<TownVoiceInputController>();
+        }
 
         private void Start()
         {
@@ -83,19 +94,38 @@ namespace FarmSimVR.MonoBehaviours
         /// <summary>Called by DialogueChoiceUI when the player picks a reply.</summary>
         public void SelectOption(string option)
         {
-            if (!IsInConversation) return;
+            SubmitPlayerPrompt(option);
+        }
 
-            Debug.Log($"{LOG_PREFIX} [Player] {option}");
+        public bool SubmitPlayerPrompt(string prompt)
+        {
+            if (!IsInConversation)
+                return false;
 
-            if (IsGoodbye(option))
+            string trimmedPrompt = prompt?.Trim();
+            if (string.IsNullOrWhiteSpace(trimmedPrompt))
+                return false;
+
+            Debug.Log($"{LOG_PREFIX} [Player] {trimmedPrompt}");
+
+            var exitDecision = TownConversationExitGate.Evaluate(trimmedPrompt, CountAssistantMessages(_history));
+            if (!string.IsNullOrWhiteSpace(exitDecision.BlockedMessage))
             {
-                EndConversation();
-                return;
+                OnExitBlocked?.Invoke(exitDecision.BlockedMessage);
+                return false;
             }
 
-            _conversationMemory.RecordPlayerPrompt(_activeNpc, option);
-            _history.Add(new ChatMessage("user", option));
+            if (exitDecision.ShouldEndConversation)
+            {
+                EndConversation();
+                return true;
+            }
+
+            _conversationMemory.RecordPlayerPrompt(_activeNpc, trimmedPrompt);
+            _history.Add(new ChatMessage("user", trimmedPrompt));
+            OnPlayerPromptSubmitted?.Invoke(trimmedPrompt);
             StartCoroutine(StreamAndUpdate());
+            return true;
         }
 
         /// <summary>
@@ -402,14 +432,6 @@ namespace FarmSimVR.MonoBehaviours
         }
 
         private static string[] CreateFallbackOptions() => new[] { "Continue...", "Goodbye." };
-
-        private static bool IsGoodbye(string option)
-        {
-            if (string.IsNullOrEmpty(option)) return false;
-            string lower = option.ToLowerInvariant();
-            return lower.Contains("goodbye") || lower.Contains("farewell")
-                || lower.Contains("see you") || lower.Contains("take care");
-        }
 
         [Serializable]
         private class LLMResponse

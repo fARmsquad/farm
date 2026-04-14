@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Text;
 using FarmSimVR.Core;
 using UnityEngine;
@@ -19,17 +18,6 @@ namespace FarmSimVR.MonoBehaviours
     {
         private const string API_URL = "https://api.openai.com/v1/responses";
         private const float REQUEST_TIMEOUT = 60f;
-        private const string OpenAiApiKeyEnvironmentVariable = "OPENAI_API_KEY";
-        private const string GauntletDirectoryPath = "Development/gauntlet";
-        private static readonly string[] PreferredGauntletEnvRelativePaths =
-        {
-            "collab-board/.env.vercel.production",
-            "collab-board/.env",
-            "chatbox-fork-pr-target-guard/.env.local",
-            "chatbox-fork-pr-target-guard/.env",
-            "chatbox/.env.local",
-            "chatbox/.env"
-        };
 
         [Header("OpenAI Configuration")]
         [SerializeField] private string apiKey;
@@ -322,119 +310,11 @@ namespace FarmSimVR.MonoBehaviours
 
         private string ResolveApiKey()
         {
-            string envValue = Environment.GetEnvironmentVariable(OpenAiApiKeyEnvironmentVariable);
-            if (!string.IsNullOrWhiteSpace(envValue))
-                return envValue.Trim();
-
-            string gauntletValue = ResolveGauntletApiKey();
-            if (!string.IsNullOrWhiteSpace(gauntletValue))
-                return gauntletValue;
-
-            if (!string.IsNullOrWhiteSpace(apiKey))
-                return apiKey.Trim();
-
-            return null;
-        }
-
-        private string ResolveGauntletApiKey()
-        {
-            if (_gauntletApiKeyCached)
-                return _cachedGauntletApiKey;
-
-            _gauntletApiKeyCached = true;
-            string searchRoot = ResolveGauntletSearchRoot();
-            if (string.IsNullOrWhiteSpace(searchRoot) || !Directory.Exists(searchRoot))
-                return null;
-
-            try
-            {
-                for (int i = 0; i < PreferredGauntletEnvRelativePaths.Length; i++)
-                {
-                    string preferredPath = Path.Combine(searchRoot, PreferredGauntletEnvRelativePaths[i]);
-                    if (!File.Exists(preferredPath))
-                        continue;
-
-                    if (!TryReadApiKeyFromEnvFile(preferredPath, out string preferredKey))
-                        continue;
-
-                    _cachedGauntletApiKey = preferredKey;
-                    return preferredKey;
-                }
-
-                foreach (string envFile in Directory.EnumerateFiles(searchRoot, ".env*", SearchOption.AllDirectories))
-                {
-                    if (ShouldSkipEnvFile(envFile))
-                        continue;
-
-                    if (!TryReadApiKeyFromEnvFile(envFile, out string key))
-                        continue;
-
-                    _cachedGauntletApiKey = key;
-                    return key;
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
-            return null;
-        }
-
-        private string ResolveGauntletSearchRoot()
-        {
-            if (!string.IsNullOrWhiteSpace(_gauntletEnvSearchRootOverride))
-                return _gauntletEnvSearchRootOverride;
-
-            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            if (string.IsNullOrWhiteSpace(home))
-                return null;
-
-            return Path.Combine(home, GauntletDirectoryPath);
-        }
-
-        private static bool TryReadApiKeyFromEnvFile(string path, out string apiKeyValue)
-        {
-            apiKeyValue = null;
-            foreach (string line in File.ReadLines(path))
-            {
-                if (!line.StartsWith("OPENAI_API_KEY=", StringComparison.Ordinal))
-                    continue;
-
-                string rawValue = line.Substring("OPENAI_API_KEY=".Length).Trim();
-                apiKeyValue = TrimOptionalQuotes(rawValue);
-                return !string.IsNullOrWhiteSpace(apiKeyValue);
-            }
-
-            return false;
-        }
-
-        private static bool ShouldSkipEnvFile(string path)
-        {
-            string fileName = Path.GetFileName(path);
-            if (fileName.EndsWith(".example", StringComparison.OrdinalIgnoreCase))
-                return true;
-
-            if (fileName.EndsWith(".sample", StringComparison.OrdinalIgnoreCase))
-                return true;
-
-            return false;
-        }
-
-        private static string TrimOptionalQuotes(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return null;
-
-            if (value.Length >= 2)
-            {
-                bool quotedWithDouble = value[0] == '"' && value[^1] == '"';
-                bool quotedWithSingle = value[0] == '\'' && value[^1] == '\'';
-                if (quotedWithDouble || quotedWithSingle)
-                    value = value.Substring(1, value.Length - 2);
-            }
-
-            return value.Trim();
+            return OpenAIConfigurationResolver.ResolveApiKey(
+                apiKey,
+                ref _gauntletApiKeyCached,
+                ref _cachedGauntletApiKey,
+                _gauntletEnvSearchRootOverride);
         }
 
         private static string EscapeJson(string s)

@@ -6,7 +6,7 @@ Last updated: 2026-04-13
 
 - **Current story**: none
 - **Story phase**: idle
-- **Recent fix**: The EditMode harness now clones a disposable project copy, runs tests through a repo-owned `BatchmodeTestRunner`, and emits NUnit XML even while the main Unity editor keeps the live project locked; Town dialogue follow-up choices now compose from the streamed reply text instead of a generic fallback ladder; `Intro.unity` now uses `InputSystemUIInputModule` so the scene no longer hits `UnityEngine.Input` through `StandaloneInputModule`
+- **Recent fix**: The EditMode harness now clones a disposable project copy, runs tests through a repo-owned `BatchmodeTestRunner`, and emits NUnit XML even while the main Unity editor keeps the live project locked; Town dialogue follow-up choices now compose from the streamed reply text instead of a generic fallback ladder; `Intro.unity` now uses `InputSystemUIInputModule` so the scene no longer hits `UnityEngine.Input` through `StandaloneInputModule`; Town voice token minting now waits longer and retries transient failures so ElevenLabs startup latency does not drop NPC speech into text-only fallback; the Town dialogue HUD now separates control hints from transient voice status, wraps long choice labels, and grows the panel / choice stack for longer content
 - **Scene work map**: `.ai/docs/scene-work-map.md`
 - **Tests**: 0 EditMode passing, 0 PlayMode passing
 - **Main status**: green

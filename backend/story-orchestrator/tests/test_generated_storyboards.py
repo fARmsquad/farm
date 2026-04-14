@@ -41,12 +41,19 @@ class GeneratedStoryboardServiceTests(unittest.TestCase):
         beat = result.unity_package["Beats"][0]
         storyboard = beat["Storyboard"]
         first_shot = storyboard["Shots"][0]
+        first_asset = result.generated_assets[0]
 
         self.assertEqual(result.package_output_path, str(self.package_output_path))
         self.assertEqual(result.unity_package["PackageId"], "storypkg_intro_chicken_sample")
         self.assertEqual(beat["SceneName"], "PostChickenCutscene")
         self.assertEqual(storyboard["StylePresetId"], "farm_storybook_v1")
         self.assertEqual(first_shot["SubtitleText"], "Nice work. The carrot beds are finally ready for you.")
+        self.assertEqual(len(result.generated_assets), 6)
+        self.assertEqual(first_asset.asset_type, "image")
+        self.assertEqual(first_asset.provider_name, "fake-image")
+        self.assertFalse(first_asset.fallback_used)
+        self.assertEqual(first_asset.shot_id, "shot_01")
+        self.assertEqual(first_asset.metadata["aspect_ratio"], "16:9")
         self.assertTrue((self.output_root / "GeneratedStoryboards" / "storypkg_intro_chicken_sample" / "post_chicken_bridge" / "shot_01.png").exists())
         self.assertTrue((self.output_root / "GeneratedStoryboards" / "storypkg_intro_chicken_sample" / "post_chicken_bridge" / "shot_01.mp3").exists())
         self.assertTrue(self.package_output_path.exists())
@@ -202,6 +209,8 @@ class GeneratedStoryboardEndpointTests(unittest.TestCase):
         payload = response.json()
         self.assertEqual(payload["unity_package"]["Beats"][0]["Storyboard"]["Shots"][1]["ShotId"], "shot_02")
         self.assertEqual(payload["unity_package"]["Beats"][0]["Storyboard"]["Shots"][1]["ImageResourcePath"], "GeneratedStoryboards/storypkg_intro_chicken_sample/post_chicken_bridge/shot_02")
+        self.assertEqual(len(payload["generated_assets"]), 6)
+        self.assertEqual(payload["generated_assets"][1]["asset_type"], "audio")
 
 
 class PlaceholderSpeechGeneratorTests(unittest.TestCase):
@@ -269,7 +278,19 @@ class FakeImageGenerator:
     ) -> "GeneratedImageAsset":
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_bytes(b"fake-png")
-        return GeneratedImageAsset(output_path=output_path, mime_type="image/png")
+        return GeneratedImageAsset(
+            output_path=output_path,
+            mime_type="image/png",
+            provider_name="fake-image",
+            provider_model="fake-image-v1",
+            fallback_used=False,
+            source_metadata={
+                "prompt": prompt,
+                "reference_image_paths": list(reference_image_paths),
+                "aspect_ratio": aspect_ratio,
+                "image_size": image_size,
+            },
+        )
 
 
 class FakeSpeechGenerator:
@@ -291,4 +312,13 @@ class FakeSpeechGenerator:
             alignment_path=alignment_path,
             duration_seconds=3.0,
             mime_type="audio/mpeg",
+            provider_name="fake-speech",
+            provider_model="fake-speech-v1",
+            fallback_used=False,
+            source_metadata={
+                "text": text,
+                "voice_id": voice_id,
+                "previous_text": previous_text,
+                "next_text": next_text,
+            },
         )
