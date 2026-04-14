@@ -10,6 +10,7 @@ namespace FarmSimVR.Core.Tutorial
             bool postChickenCutsceneComplete,
             bool placeholderCutsceneVisited,
             bool findToolsComplete,
+            bool gettingSeedsComplete,
             bool preFarmCutsceneComplete,
             bool farmTutorialStarted,
             bool farmTutorialComplete)
@@ -21,6 +22,7 @@ namespace FarmSimVR.Core.Tutorial
             PostChickenCutsceneComplete = postChickenCutsceneComplete;
             PlaceholderCutsceneVisited = placeholderCutsceneVisited;
             FindToolsComplete = findToolsComplete;
+            GettingSeedsComplete = gettingSeedsComplete;
             PreFarmCutsceneComplete = preFarmCutsceneComplete;
             FarmTutorialStarted = farmTutorialStarted;
             FarmTutorialComplete = farmTutorialComplete;
@@ -33,6 +35,7 @@ namespace FarmSimVR.Core.Tutorial
         public bool PostChickenCutsceneComplete { get; }
         public bool PlaceholderCutsceneVisited { get; }
         public bool FindToolsComplete { get; }
+        public bool GettingSeedsComplete { get; }
         public bool PreFarmCutsceneComplete { get; }
         public bool FarmTutorialStarted { get; }
         public bool FarmTutorialComplete { get; }

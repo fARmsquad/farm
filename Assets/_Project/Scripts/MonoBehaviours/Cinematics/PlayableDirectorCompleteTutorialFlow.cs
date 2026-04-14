@@ -126,6 +126,10 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                     TutorialSceneCatalog.GetNextStep(
                         TutorialSceneCatalog.GetStepForScene(SceneManager.GetActiveScene().name)));
 
+            if (string.IsNullOrWhiteSpace(next) &&
+                SceneWorkCatalog.TryGetBySceneName(SceneManager.GetActiveScene().name, out var def))
+                next = def.NextSceneName;
+
             _sceneLoader.LoadScene(next);
         }
     }

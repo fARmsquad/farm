@@ -16,8 +16,7 @@ namespace FarmSimVR.Tests.EditMode
                     TutorialSceneCatalog.ChickenGameSceneName,
                     TutorialSceneCatalog.PostChickenCutsceneSceneName,
                     TutorialSceneCatalog.FindToolsSceneName,
-                    TutorialSceneCatalog.PreFarmCutsceneSceneName,
-                    TutorialSceneCatalog.FarmTutorialSceneName,
+                    SceneWorkCatalog.PlayerGettingSeedsSceneName,
                     TutorialSceneCatalog.CoreSceneSceneName,
                 },
                 TutorialSceneCatalog.SceneOrder);
@@ -41,16 +40,12 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(service.State.PostChickenCutsceneComplete, Is.True);
 
             service.EnterScene(TutorialSceneCatalog.FindToolsSceneName);
-            Assert.That(service.CompleteCurrentStep(), Is.EqualTo(TutorialSceneCatalog.PreFarmCutsceneSceneName));
+            Assert.That(service.CompleteCurrentStep(), Is.EqualTo(SceneWorkCatalog.PlayerGettingSeedsSceneName));
             Assert.That(service.State.FindToolsComplete, Is.True);
 
-            service.EnterScene(TutorialSceneCatalog.PreFarmCutsceneSceneName);
-            Assert.That(service.CompleteCurrentStep(), Is.EqualTo(TutorialSceneCatalog.FarmTutorialSceneName));
-            Assert.That(service.State.PreFarmCutsceneComplete, Is.True);
-
-            service.EnterScene(TutorialSceneCatalog.FarmTutorialSceneName);
+            service.EnterScene(SceneWorkCatalog.PlayerGettingSeedsSceneName);
             Assert.That(service.CompleteCurrentStep(), Is.EqualTo(TutorialSceneCatalog.CoreSceneSceneName));
-            Assert.That(service.State.FarmTutorialComplete, Is.True);
+            Assert.That(service.State.GettingSeedsComplete, Is.True);
 
             service.EnterScene(TutorialSceneCatalog.CoreSceneSceneName);
             Assert.That(service.State.PlaceholderCutsceneVisited, Is.True);
@@ -83,8 +78,8 @@ namespace FarmSimVR.Tests.EditMode
                 TutorialSceneCatalog.GetNextStep(TutorialStep.PostChickenCutscene),
                 Is.EqualTo(TutorialStep.FindTools));
             Assert.That(
-                TutorialSceneCatalog.GetPreviousStep(TutorialStep.PreFarmCutscene),
-                Is.EqualTo(TutorialStep.FindTools));
+                TutorialSceneCatalog.GetPreviousStep(TutorialStep.MidpointPlaceholder),
+                Is.EqualTo(TutorialStep.GettingSeeds));
         }
 
         [Test]

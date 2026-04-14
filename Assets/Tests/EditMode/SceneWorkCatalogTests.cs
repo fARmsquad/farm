@@ -12,16 +12,17 @@ namespace FarmSimVR.Tests.EditMode
         {
             var ordered = SceneWorkCatalog.OrderedScenes.ToArray();
 
-            Assert.That(ordered.Select(scene => scene.Number), Is.EqualTo(new[] { 1, 2, 3, 4, 5, 6, 7, 8 }));
+            Assert.That(ordered.Select(scene => scene.Number), Is.EqualTo(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }));
             Assert.That(ordered.Select(scene => scene.SceneName), Is.EqualTo(new[]
             {
                 TutorialSceneCatalog.IntroSceneName,
                 TutorialSceneCatalog.ChickenGameSceneName,
                 TutorialSceneCatalog.PostChickenCutsceneSceneName,
                 TutorialSceneCatalog.FindToolsSceneName,
+                SceneWorkCatalog.PlayerGettingSeedsSceneName,
+                TutorialSceneCatalog.CoreSceneSceneName,
                 TutorialSceneCatalog.PreFarmCutsceneSceneName,
                 TutorialSceneCatalog.FarmTutorialSceneName,
-                TutorialSceneCatalog.CoreSceneSceneName,
                 SceneWorkCatalog.WorldSandboxSceneName,
             }));
         }
@@ -38,8 +39,7 @@ namespace FarmSimVR.Tests.EditMode
                 "Assets/_Project/Scenes/ChickenGame.unity",
                 "Assets/_Project/Scenes/CaughtChickenCutscene.unity",
                 "Assets/_Project/Scenes/PlayerCollectTools.unity",
-                "Assets/_Project/Scenes/Tutorial_PreFarmCutscene.unity",
-                "Assets/_Project/Scenes/FarmMain.unity",
+                "Assets/_Project/Scenes/PlayerGettingSeeds.unity",
                 "Assets/_Project/Scenes/CoreScene.unity",
             }));
         }
@@ -55,8 +55,7 @@ namespace FarmSimVR.Tests.EditMode
                 TutorialSceneCatalog.ChickenGameSceneName,
                 TutorialSceneCatalog.PostChickenCutsceneSceneName,
                 TutorialSceneCatalog.FindToolsSceneName,
-                TutorialSceneCatalog.PreFarmCutsceneSceneName,
-                TutorialSceneCatalog.FarmTutorialSceneName,
+                SceneWorkCatalog.PlayerGettingSeedsSceneName,
                 TutorialSceneCatalog.CoreSceneSceneName,
                 SceneWorkCatalog.HorseTrainingSceneName,
                 SceneWorkCatalog.TownSceneName,
@@ -78,23 +77,23 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(intro.ScenePath, Is.EqualTo("Assets/_Project/Scenes/Intro.unity"));
 
             Assert.That(SceneWorkCatalog.TryGetBySceneName(SceneWorkCatalog.WorldSandboxSceneName, out var world), Is.True);
-            Assert.That(world.Number, Is.EqualTo(8));
+            Assert.That(world.Number, Is.EqualTo(9));
             Assert.That(world.Kind, Is.EqualTo(SceneWorkKind.Sandbox));
             Assert.That(world.ScenePath, Is.EqualTo("Assets/_Project/Scenes/WorldMain.unity"));
 
             Assert.That(SceneWorkCatalog.TryGetBySceneName(SceneWorkCatalog.HorseTrainingSceneName, out var horse), Is.True);
-            Assert.That(horse.Number, Is.EqualTo(9));
+            Assert.That(horse.Number, Is.EqualTo(10));
             Assert.That(horse.DisplayName, Is.EqualTo("Horse Training Grounds"));
             Assert.That(horse.ScenePath, Is.EqualTo(SceneWorkCatalog.HorseTrainingScenePath));
 
             Assert.That(SceneWorkCatalog.TryGetBySceneName(SceneWorkCatalog.TownSceneName, out var town), Is.True);
-            Assert.That(town.Number, Is.EqualTo(10));
+            Assert.That(town.Number, Is.EqualTo(11));
             Assert.That(town.DisplayName, Is.EqualTo("Town Conversation"));
             Assert.That(town.Kind, Is.EqualTo(SceneWorkKind.Gameplay));
             Assert.That(town.ScenePath, Is.EqualTo(SceneWorkCatalog.TownScenePath));
 
             Assert.That(SceneWorkCatalog.TryGetBySceneName(SceneWorkCatalog.FarmVegetableStatesSceneName, out var vegetables), Is.True);
-            Assert.That(vegetables.Number, Is.EqualTo(11));
+            Assert.That(vegetables.Number, Is.EqualTo(12));
             Assert.That(vegetables.DisplayName, Is.EqualTo("Farm Vegetable States"));
             Assert.That(vegetables.Kind, Is.EqualTo(SceneWorkKind.Sandbox));
             Assert.That(vegetables.ScenePath, Is.EqualTo(SceneWorkCatalog.FarmVegetableStatesScenePath));

@@ -81,10 +81,10 @@ namespace FarmSimVR.Tests.EditMode
 
             InvokePrivateInstance(controller, "Start");
 
-            Assert.That(controller.CurrentObjectiveText, Does.Contain("Find 2 starter tools around the yard in 4 minutes."));
+            Assert.That(controller.CurrentObjectiveText, Does.Contain("Find the 3 hidden tools."));
 
             var pickups = Object.FindObjectsByType<TutorialToolPickup>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            Assert.That(pickups.Length, Is.EqualTo(2));
+            Assert.That(pickups.Length, Is.EqualTo(3));
             Assert.That(pickups.All(pickup => !string.IsNullOrWhiteSpace(pickup.ToolName)), Is.True);
         }
 
@@ -109,13 +109,13 @@ namespace FarmSimVR.Tests.EditMode
                     "Assets/_Project/Scenes/ChickenGame.unity",
                     "Assets/_Project/Scenes/CaughtChickenCutscene.unity",
                     "Assets/_Project/Scenes/PlayerCollectTools.unity",
-                    "Assets/_Project/Scenes/Tutorial_PreFarmCutscene.unity",
-                    "Assets/_Project/Scenes/FarmMain.unity",
+                    "Assets/_Project/Scenes/PlayerGettingSeeds.unity",
                     "Assets/_Project/Scenes/CoreScene.unity",
                     "Assets/_Project/Scenes/HorseTrainingGame.unity",
                     "Assets/_Project/Scenes/Town.unity",
                     "Assets/_Project/Scenes/FarmVegetableStates.unity",
-                    "Assets/_Project/Scenes/PlayerGettingSeeds.unity",
+                    "Assets/_Project/Scenes/Tutorial_PreFarmCutscene.unity",
+                    "Assets/_Project/Scenes/FarmMain.unity",
                     "Assets/_Project/Scenes/WorldMain.unity",
                 }));
         }
