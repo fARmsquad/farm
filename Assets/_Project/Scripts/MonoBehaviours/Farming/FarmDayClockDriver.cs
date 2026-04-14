@@ -29,23 +29,20 @@ namespace FarmSimVR.MonoBehaviours.Farming
             Clock    = new FarmDayClock(realSecondsPerDay, startTime);
 
             Clock.OnPhaseChanged += (_, next) =>
-            {
                 Debug.Log($"[FarmDayClock] Phase → {next}  (Day {Clock.DayCount + 1})");
-                lighting?.ApplyPhase(next, Clock.SunAngleDegrees());
-            };
 
             Clock.OnNewDay += day =>
                 Debug.Log($"[FarmDayClock] New day — Day {day + 1}");
 
-            // Apply starting phase immediately
-            lighting?.ApplyPhase(Clock.Phase, Clock.SunAngleDegrees());
+            // Apply starting time immediately
+            lighting?.ApplyTime(Clock.NormalisedTime);
         }
 
         private void Update()
         {
             TryResolveLighting();
             Clock.Tick(Time.deltaTime);
-            lighting?.ApplyPhase(Clock.Phase, Clock.SunAngleDegrees());
+            lighting?.ApplyTime(Clock.NormalisedTime);
         }
 
         private void OnDestroy()

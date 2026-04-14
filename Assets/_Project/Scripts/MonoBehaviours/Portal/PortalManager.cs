@@ -257,13 +257,22 @@ namespace FarmSimVR.MonoBehaviours.Portal
         }
 
         /// <summary>
-        /// Sets the newly loaded area scene as the active scene for proper lighting.
+        /// Sets the newly loaded area scene as the active scene for proper
+        /// object creation, then forces the lighting controller to snap
+        /// its values so the area scene's baked lighting doesn't bleed through.
         /// </summary>
         private void SetActiveAreaScene(string scenePath)
         {
             Scene scene = SceneManager.GetSceneByPath(scenePath);
             if (scene.IsValid() && scene.isLoaded)
                 SceneManager.SetActiveScene(scene);
+
+            // SetActiveScene stomps RenderSettings with the destination scene's
+            // baked ambient/fog/skybox. Force the day-night controller to snap
+            // all values back to the current time-of-day targets immediately.
+            var lighting = FindAnyObjectByType<FarmLightingController>();
+            if (lighting != null && FarmDayClockDriver.Instance != null)
+                lighting.ForceApply(FarmDayClockDriver.Instance.Clock.NormalisedTime);
         }
     }
 }

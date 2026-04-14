@@ -66,6 +66,34 @@ namespace FarmSimVR.Core.Farming
             }
         }
 
+        // ── Time Skip ───────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Jumps the clock to a target normalised time.
+        /// If the target is at or before the current time, a new day is triggered first.
+        /// Fires <see cref="OnNewDay"/> and <see cref="OnPhaseChanged"/> as appropriate.
+        /// </summary>
+        public void SkipTo(float targetNormalisedTime)
+        {
+            targetNormalisedTime = Math.Clamp(targetNormalisedTime, 0f, 1f);
+
+            if (targetNormalisedTime <= NormalisedTime)
+            {
+                DayCount++;
+                OnNewDay?.Invoke(DayCount);
+            }
+
+            NormalisedTime = targetNormalisedTime;
+
+            var newPhase = PhaseFor(NormalisedTime);
+            if (newPhase != Phase)
+            {
+                var old = Phase;
+                Phase = newPhase;
+                OnPhaseChanged?.Invoke(old, newPhase);
+            }
+        }
+
         // ── Helpers ─────────────────────────────────────────────────────────
 
         /// <summary>
