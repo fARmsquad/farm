@@ -16,6 +16,10 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private static readonly int ExposureId           = Shader.PropertyToID("_Exposure");
         private static readonly int AtmosphereThicknessId = Shader.PropertyToID("_AtmosphereThickness");
         private static readonly int GroundColorId        = Shader.PropertyToID("_GroundColor");
+        private static readonly int SunSizeId            = Shader.PropertyToID("_SunSize");
+
+        private const float DAY_SUN_SIZE  = 0.04f;
+        private const float NIGHT_MOON_SIZE = 0.025f;
 
         private static readonly Color WEATHER_OVERCAST_TINT = new Color(0.55f, 0.60f, 0.70f);
 
@@ -145,6 +149,10 @@ namespace FarmSimVR.MonoBehaviours.Farming
                 }
             }
 
+            // ── Swap skybox sun source: sun during day, moon at night ──────
+            bool useMoon = moonLight != null && moonLight.enabled && (sunLight == null || !sunLight.enabled);
+            RenderSettings.sun = useMoon ? moonLight : sunLight;
+
             // ── Write stars ────────────────────────────────────────────────
             if (_starsCached)
             {
@@ -174,6 +182,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
                 skyboxMaterial.SetFloat(ExposureId, baseSkyExp);
                 skyboxMaterial.SetFloat(AtmosphereThicknessId, baseAtmoThick);
                 skyboxMaterial.SetColor(GroundColorId, baseGroundCol);
+                skyboxMaterial.SetFloat(SunSizeId, useMoon ? NIGHT_MOON_SIZE : DAY_SUN_SIZE);
             }
         }
 
