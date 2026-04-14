@@ -186,9 +186,21 @@ namespace FarmSimVR.Editor.Cinematics
                 Debug.Log("[CaughtChickenCutsceneSlideshow] PlayableDirector created on 'SlideshowDirector'.");
             }
 
+            if (director.GetComponent<PlayableDirectorCompleteTutorialFlow>() == null)
+            {
+                director.gameObject.AddComponent<PlayableDirectorCompleteTutorialFlow>();
+                Debug.Log("[CaughtChickenCutsceneSlideshow] Added PlayableDirectorCompleteTutorialFlow (skip + scene handoff).");
+            }
+
             director.playableAsset = timeline;
-            director.playOnAwake = true;
+            director.playOnAwake = false;
             director.extrapolationMode = DirectorWrapMode.None;
+            var serializedDirector = new SerializedObject(director);
+            var initialStateProp = serializedDirector.FindProperty("m_InitialState");
+            if (initialStateProp != null)
+                initialStateProp.intValue = 0;
+            serializedDirector.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(director);
 
             ComputeSlideSchedule(out var starts, out var durations);
 

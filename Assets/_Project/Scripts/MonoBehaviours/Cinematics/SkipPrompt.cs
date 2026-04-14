@@ -22,6 +22,12 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         private float holdProgress;
         private bool skipFired;
 
+        private void Awake()
+        {
+            if (OnSkipRequested == null)
+                OnSkipRequested = new UnityEvent();
+        }
+
         public void Activate()
         {
             IsActive = true;

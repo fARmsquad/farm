@@ -1,0 +1,33 @@
+Unity Editor version:    6000.4.1f1 (8535861f39e1)
+Branch:                  6000.4/staging
+Build type:              Release
+Batch mode:              YES
+macOS version:           Version 15.7.4 (Build 24G517)
+Darwin version:          24.6.0
+Architecture:            arm64
+Running under Rosetta:   NO
+Available memory:        16384 MB
+Date:                    2026-04-14T17:33:33Z
+[Licensing::Module] Trying to connect to existing licensing client channel...
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-jack" at "2026-04-14T17:33:33.255537Z"
+Launching external process: /Applications/Unity/Hub/Editor/6000.4.1f1/Unity.app/Contents/Helpers/PackageManager/Server/UnityPackageManager
+
+COMMAND LINE ARGUMENTS:
+/Applications/Unity/Hub/Editor/6000.4.1f1/Unity.app/Contents/MacOS/Unity
+-batchmode
+-nographics
+-quit
+-projectPath
+/Users/jack/Desktop/work/gauntlet/farm
+-runTests
+-testPlatform
+EditMode
+-assemblyNames
+FarmSimVR.Tests.EditMode
+-testResults
+/Users/jack/Desktop/work/gauntlet/farm/TestResults-EditMode.xml
+-logFile
+/Users/jack/Desktop/work/gauntlet/farm/unity-test.log
+Successfully changed project path to: /Users/jack/Desktop/work/gauntlet/farm
+/Users/jack/Desktop/work/gauntlet/farm
+[Package Manager] Server process was shutdown

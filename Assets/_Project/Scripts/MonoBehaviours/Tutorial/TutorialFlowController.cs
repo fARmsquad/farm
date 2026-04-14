@@ -88,8 +88,14 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             if (string.IsNullOrWhiteSpace(nextScene))
             {
-                ShowCompletionBanner = true;
-                return;
+                if (TutorialSceneCatalog.NormalizeRuntimeSceneName(currentSceneName) ==
+                    TutorialSceneCatalog.PostChickenCutsceneSceneName)
+                    nextScene = TutorialSceneCatalog.CoreSceneSceneName;
+                else
+                {
+                    ShowCompletionBanner = true;
+                    return;
+                }
             }
 
             LoadSceneByCatalogName(nextScene);

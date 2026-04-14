@@ -98,3 +98,6 @@ backend/story-orchestrator/**/__pycache__/
 # Python cache artifacts
 **/__pycache__/
 *.pyc
+
+# Node (e.g. MCP Unity Server~)
+**/node_modules/
