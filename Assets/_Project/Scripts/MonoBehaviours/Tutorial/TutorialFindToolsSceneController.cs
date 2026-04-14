@@ -14,9 +14,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         private static readonly Vector3 GoalSquarePosition = new(0f, 0.05f, 6f);
         private static readonly int ColorId = Shader.PropertyToID("_Color");
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
-
         private readonly PackageFindToolsMissionService _packageMission = new();
-
         private Transform _player;
         private string _feedbackMessage;
         private float _feedbackUntil;
@@ -29,12 +27,10 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         private string _currentObjective = string.Empty;
         private TutorialToolPickup[] _packagePickups = System.Array.Empty<TutorialToolPickup>();
         private ToolSpawnManager _toolSpawnManager;
-
         private GUIStyle _bodyStyle;
         private GUIStyle _feedbackStyle;
         private bool _stylesReady;
         public string CurrentObjectiveText => _currentObjective;
-
         public void FastCompleteForDev()
         {
             if (_usePackageMode)
@@ -86,7 +82,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             var rig = FarmFirstPersonRigUtility.EnsureRig();
             _player = rig != null ? rig.transform : null;
         }
-
         private void Update()
         {
             if (_player == null)
@@ -117,20 +112,17 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             HandleCompletion();
         }
-
         private void OnDestroy()
         {
             if (_toolSpawnManager != null)
                 _toolSpawnManager.OnAllToolsCollected -= HandleSceneToolsCollected;
         }
-
         private void OnGUI()
         {
             BuildStyles();
             DrawObjectivePanel();
             DrawFeedback();
         }
-
         private bool TryConfigurePackageMode()
         {
             if (!StoryPackageRuntimeCatalog.TryGetMinigameConfig(SceneManager.GetActiveScene().name, out _, out var minigame))
@@ -155,7 +147,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 minigame.TimeLimitSeconds);
             return true;
         }
-
         private void BuildEnvironment(bool includeGoalSquare)
         {
             var root = ResolveOrCreateRoot();
@@ -170,7 +161,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             if (includeGoalSquare)
                 EnsureGoalSquare(root.transform);
         }
-
         private void BuildPackagePickups()
         {
             var root = ResolveOrCreateRoot().transform;
@@ -194,7 +184,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 _packagePickups[i] = pickup;
             }
         }
-
         private TutorialToolPickup CreatePickup(Transform parent, string toolName, Vector3 position, int index)
         {
             var root = new GameObject($"ToolPickup_{index + 1:00}_{Sanitize(toolName)}");
@@ -226,7 +215,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             return pickup;
         }
-
         private void HandlePackageMode()
         {
             var collectedCount = 0;
@@ -265,7 +253,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 SetFeedback("Time ran out.");
             }
         }
-
         private void HandleSceneToolsCollected()
         {
             if (_completionAt >= 0f)
@@ -275,7 +262,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             _currentObjective = "All tools found!";
             SetFeedback("Tools recovered. Continuing...");
         }
-
         private void HandleGoalReached()
         {
             if (_goalReached || _player == null)
@@ -292,7 +278,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             _completionAt = Time.time + 1.1f;
             SetFeedback("Reached the marker. Continuing...");
         }
-
         private void HandleCompletion()
         {
             if (_completionAt < 0f || Time.time < _completionAt)
@@ -301,7 +286,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             _completionAt = -1f;
             TutorialFlowController.Instance?.CompleteCurrentSceneAndLoadNext();
         }
-
         private void DrawObjectivePanel()
         {
             var text = _usePackageMode
@@ -316,7 +300,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             GUI.color = Color.white;
             GUI.Label(new Rect(32f, 132f, 348f, 108f), text, _bodyStyle);
         }
-
         private void DrawFeedback()
         {
             if (string.IsNullOrWhiteSpace(_feedbackMessage) || Time.time > _feedbackUntil)
@@ -329,18 +312,15 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             GUI.color = Color.white;
             GUI.Label(new Rect(x + 10f, 38f, width - 20f, 22f), _feedbackMessage, _feedbackStyle);
         }
-
         private static string Mark(bool recovered)
         {
             return recovered ? "[x]" : "[ ]";
         }
-
         private void SetFeedback(string message)
         {
             _feedbackMessage = message;
             _feedbackUntil = Time.time + 2f;
         }
-
         private void BuildStyles()
         {
             if (_stylesReady)
@@ -361,13 +341,11 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             _feedbackStyle.normal.textColor = Color.white;
             _stylesReady = true;
         }
-
         private static GameObject ResolveOrCreateRoot()
         {
             var root = GameObject.Find("TutorialFindTools_Root");
             return root != null ? root : new GameObject("TutorialFindTools_Root");
         }
-
         private static void EnsureGround(Transform parent)
         {
             var ground = FindChild(parent, "Ground");
@@ -381,7 +359,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             SetRendererColor(ground.GetComponent<Renderer>(), new Color(0.35f, 0.44f, 0.28f));
         }
-
         private static void EnsureSpawnPoint(Transform parent)
         {
             var spawnPoint = FindChild(parent, "SpawnPoint");
@@ -393,7 +370,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             spawnPoint.transform.position = new Vector3(0f, 0.1f, -8f);
         }
-
         private static void EnsureGoalSquare(Transform parent)
         {
             var goalSquare = FindChild(parent, "GoalSquare");
@@ -408,7 +384,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             SetRendererColor(goalSquare.GetComponent<Renderer>(), new Color(0.3f, 0.85f, 0.45f));
         }
-
         private static void EnsureFence(Transform parent, Vector3 position, Vector3 scale)
         {
             var fence = FindChildAt(parent, "Boundary", position);
@@ -423,7 +398,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             fence.transform.localScale = scale;
             SetRendererColor(fence.GetComponent<Renderer>(), new Color(0.48f, 0.33f, 0.19f));
         }
-
         private static void EnsureMarkerPost(Transform parent, Vector3 position, string name, Color color)
         {
             var post = FindChild(parent, name);
@@ -450,7 +424,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             topper.transform.localScale = new Vector3(0.9f, 0.45f, 0.9f);
             SetRendererColor(topper.GetComponent<Renderer>(), color);
         }
-
         private static PrimitiveType ResolvePrimitive(string toolName)
         {
             if (toolName.Contains("Watering") || toolName.Contains("Bucket"))
@@ -459,7 +432,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 return PrimitiveType.Sphere;
             return PrimitiveType.Cube;
         }
-
         private static Vector3 ResolveScale(string toolName)
         {
             if (toolName.Contains("Watering") || toolName.Contains("Bucket"))
@@ -468,7 +440,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 return new Vector3(0.5f, 0.5f, 0.5f);
             return new Vector3(0.55f, 0.35f, 0.55f);
         }
-
         private static Color ResolveToolColor(string toolName)
         {
             if (toolName.Contains("Watering") || toolName.Contains("Bucket"))
@@ -479,7 +450,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 return new Color(0.72f, 0.48f, 0.20f);
             return new Color(0.58f, 0.86f, 0.34f);
         }
-
         private void MarkRecoveredTool(string toolName)
         {
             if (TutorialFlowController.Instance == null)
@@ -498,13 +468,11 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                     break;
             }
         }
-
         private static GameObject FindChild(Transform parent, string childName)
         {
             var child = parent.Find(childName);
             return child != null ? child.gameObject : null;
         }
-
         private static GameObject FindChildAt(Transform parent, string childName, Vector3 localPosition)
         {
             for (var i = 0; i < parent.childCount; i++)
@@ -519,7 +487,6 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             return null;
         }
-
         private static void SetRendererColor(Renderer renderer, Color color)
         {
             if (renderer == null)
@@ -531,14 +498,12 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             block.SetColor(BaseColorId, color);
             renderer.SetPropertyBlock(block);
         }
-
         private static string Sanitize(string value)
         {
             return string.IsNullOrWhiteSpace(value)
                 ? "Tool"
                 : value.Replace(" ", string.Empty);
         }
-
         private static void DestroyUnityObject(Object target)
         {
             if (target == null)
