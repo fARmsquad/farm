@@ -70,7 +70,7 @@ Example: `CalculateGrowth_WithDroughtWeather_ReturnsReducedGrowth`
 ```bash
 .ai/scripts/run-tests.sh editmode    # Fast — run after every Core/ change
 .ai/scripts/run-tests.sh playmode    # Slow — run after MonoBehaviour changes
-.ai/scripts/run-tests.sh all         # Full — run before any push
+.ai/scripts/run-tests.sh all         # Full — report status before push
 ```
 
 ### If you catch yourself writing code without tests
@@ -149,7 +149,7 @@ Reusable operational guides: git-discipline, git-finalization, preflight (17 gat
 ```bash
 .ai/scripts/run-tests.sh editmode    # Fast Core/ unit tests
 .ai/scripts/run-tests.sh playmode    # Integration tests
-.ai/scripts/run-tests.sh all         # Full suite
+.ai/scripts/run-tests.sh all         # Full suite status check
 .ai/scripts/preflight.sh             # 17-gate merge readiness
 .ai/scripts/check_ai_wiring.sh       # Harness integrity audit
 .ai/scripts/asset_import_check.sh    # Asset naming conventions

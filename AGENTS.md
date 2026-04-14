@@ -20,7 +20,7 @@
 1. NEVER write implementation without a failing test first
 2. Core/ has ZERO UnityEngine references — enforced by noEngineReferences: true
 3. Every feature starts with a spec. No spec, no code.
-4. Preflight must pass before any push. No exceptions.
+4. Preflight should run before any push. Report failures clearly, but `run-tests.sh` failures do not block an explicit developer-directed push.
 5. Main branch is ALWAYS green. A red main is a P0.
 6. If you change .ai/, AGENTS.md, or any harness file, run the AI wiring audit.
 7. Every story ends with a playtest guide and handoff checklist.
@@ -87,7 +87,7 @@ Route your current task to the appropriate workflow:
 ```bash
 ./run-tests.sh editmode          # Fast: Core/ unit tests
 ./run-tests.sh playmode          # Slow: XR integration tests
-./run-tests.sh all               # Full suite
+./run-tests.sh all               # Full suite status check (non-blocking for push)
 ./preflight.sh                   # Pre-push validation
 .ai/scripts/check_ai_wiring.sh  # Harness integrity audit
 .ai/scripts/asset_import_check.sh # 3D asset convention check

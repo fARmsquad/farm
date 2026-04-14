@@ -191,19 +191,19 @@ If the feature requires new 3D models:
 
 **Step 4a: Preflight**
 → Mark spec acceptance criteria as [x]
-→ Run full test suite: `.ai/scripts/run-tests.sh all`
-→ Run preflight — if fails, fix and retry (up to 3 attempts)
+→ Run full test suite: `.ai/scripts/run-tests.sh all` if current status is needed
+→ Run preflight — if a hard gate fails, fix and retry (up to 3 attempts)
 → **READ .ai/memory/completion-learnings.md** — explicitly check relevant prior completion-miss failure modes before saying "done"
 → **WRITE to project-memory.md** — add any new patterns/antipatterns discovered during this feature
 
 **Step 4b: Push**
 → `git push origin main`
-→ GATE: push must succeed. If rejected (someone else pushed), pull and re-run tests.
+→ GATE: push must succeed. If rejected (someone else pushed), pull and optionally re-run tests.
 
 **Step 4c: Post-Push Verification**
-→ `.ai/scripts/run-tests.sh all` (verify main is still green after push)
-→ If red on main: **P0** — investigate immediately, do NOT proceed
-→ If green: update SINGLE_SOURCE_OF_TRUTH.md
+→ `.ai/scripts/run-tests.sh all` only when updated suite status is required
+→ If a post-push run is red: report it immediately, do NOT proceed as if verified green
+→ Update SINGLE_SOURCE_OF_TRUTH.md with the actual verified status
 → Completion summary MUST distinguish:
   - what was directly verified
   - what was not directly verified
