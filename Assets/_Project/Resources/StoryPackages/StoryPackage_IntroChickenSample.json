@@ -50,7 +50,7 @@
       "DisplayName": "Post Chicken Bridge",
       "Kind": "Cutscene",
       "SceneName": "CaughtChickenCutscene",
-      "NextSceneName": "CoreScene",
+      "NextSceneName": "PlayerCollectTools",
       "SequenceSteps": [
         {
           "StepType": "ObjectivePopup",
@@ -88,11 +88,113 @@
       }
     },
     {
+      "BeatId": "find_tools_intro",
+      "DisplayName": "Find Tools Intro",
+      "Kind": "Minigame",
+      "SceneName": "PlayerCollectTools",
+      "NextSceneName": "PlayerGettingSeeds",
+      "Minigame": {
+        "AdapterId": "tutorial.find_tools",
+        "ObjectiveText": "Find the 3 hidden tools.",
+        "RequiredCount": 3,
+        "TimeLimitSeconds": 0.0,
+        "GeneratorId": "find_tools_cluster_v1",
+        "MinigameId": "find_tools",
+        "FallbackGeneratorIds": [
+          "find_tools_linear_safe_v1"
+        ],
+        "ResolvedParameterEntries": [
+          {
+            "Name": "targetToolSet",
+            "ValueType": "String",
+            "StringValue": "starter",
+            "IntValue": 0,
+            "FloatValue": 0.0,
+            "BoolValue": false
+          },
+          {
+            "Name": "toolCount",
+            "ValueType": "Int",
+            "StringValue": "",
+            "IntValue": 3,
+            "FloatValue": 0.0,
+            "BoolValue": false
+          },
+          {
+            "Name": "searchZone",
+            "ValueType": "String",
+            "StringValue": "yard",
+            "IntValue": 0,
+            "FloatValue": 0.0,
+            "BoolValue": false
+          },
+          {
+            "Name": "hintStrength",
+            "ValueType": "String",
+            "StringValue": "strong",
+            "IntValue": 0,
+            "FloatValue": 0.0,
+            "BoolValue": false
+          },
+          {
+            "Name": "timeLimitSeconds",
+            "ValueType": "Float",
+            "StringValue": "",
+            "IntValue": 0,
+            "FloatValue": 0.0,
+            "BoolValue": false
+          }
+        ]
+      }
+    },
+    {
+      "BeatId": "pre_farm_bridge",
+      "DisplayName": "Pre-Farm Bridge",
+      "Kind": "Cutscene",
+      "SceneName": "Tutorial_PreFarmCutscene",
+      "NextSceneName": "FarmMain",
+      "SequenceSteps": [
+        {
+          "StepType": "ObjectivePopup",
+          "StringParam": "Nice work. The starter tools are back where they belong."
+        }
+      ],
+      "Storyboard": {
+        "StylePresetId": "farm_storybook_v1",
+        "Shots": [
+          {
+            "ShotId": "shot_01",
+            "SubtitleText": "Nice work. The starter tools are back where they belong.",
+            "NarrationText": "Nice work. The starter tools are back where they belong.",
+            "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/pre_farm_bridge/shot_01",
+            "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/pre_farm_bridge/shot_01",
+            "DurationSeconds": 4.166666666666667
+          },
+          {
+            "ShotId": "shot_02",
+            "SubtitleText": "The starter tools are back in your hands. Head to the plots and get ready to plant.",
+            "NarrationText": "The starter tools are back in your hands. Head to the plots and get ready to plant.",
+            "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/pre_farm_bridge/shot_02",
+            "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/pre_farm_bridge/shot_02",
+            "DurationSeconds": 7.083333333333334
+          },
+          {
+            "ShotId": "shot_03",
+            "SubtitleText": "The fields are waiting. Let's start the first real farm loop.",
+            "NarrationText": "The fields are waiting. Let's start the first real farm loop.",
+            "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/pre_farm_bridge/shot_03",
+            "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/pre_farm_bridge/shot_03",
+            "DurationSeconds": 4.583333333333334
+          }
+        ]
+      }
+    },
+    {
       "BeatId": "plant_rows_intro",
       "DisplayName": "Plant Rows Intro",
       "Kind": "Minigame",
       "SceneName": "FarmMain",
-      "NextSceneName": "FindToolsGame",
+      "NextSceneName": "CoreScene",
       "Minigame": {
         "AdapterId": "tutorial.plant_rows",
         "ObjectiveText": "Plant 3 carrots in 5 minutes.",
@@ -150,108 +252,6 @@
             "IntValue": 0,
             "FloatValue": 0.0,
             "BoolValue": false
-          }
-        ]
-      }
-    },
-    {
-      "BeatId": "find_tools_intro",
-      "DisplayName": "Find Tools Intro",
-      "Kind": "Minigame",
-      "SceneName": "FindToolsGame",
-      "NextSceneName": "Tutorial_PreFarmCutscene",
-      "Minigame": {
-        "AdapterId": "tutorial.find_tools",
-        "ObjectiveText": "Find 2 starter tools around the yard in 4 minutes.",
-        "RequiredCount": 2,
-        "TimeLimitSeconds": 240.0,
-        "GeneratorId": "find_tools_cluster_v1",
-        "MinigameId": "find_tools",
-        "FallbackGeneratorIds": [
-          "find_tools_linear_safe_v1"
-        ],
-        "ResolvedParameterEntries": [
-          {
-            "Name": "targetToolSet",
-            "ValueType": "String",
-            "StringValue": "starter",
-            "IntValue": 0,
-            "FloatValue": 0.0,
-            "BoolValue": false
-          },
-          {
-            "Name": "toolCount",
-            "ValueType": "Int",
-            "StringValue": "",
-            "IntValue": 2,
-            "FloatValue": 0.0,
-            "BoolValue": false
-          },
-          {
-            "Name": "searchZone",
-            "ValueType": "String",
-            "StringValue": "yard",
-            "IntValue": 0,
-            "FloatValue": 0.0,
-            "BoolValue": false
-          },
-          {
-            "Name": "hintStrength",
-            "ValueType": "String",
-            "StringValue": "strong",
-            "IntValue": 0,
-            "FloatValue": 0.0,
-            "BoolValue": false
-          },
-          {
-            "Name": "timeLimitSeconds",
-            "ValueType": "Float",
-            "StringValue": "",
-            "IntValue": 0,
-            "FloatValue": 240.0,
-            "BoolValue": false
-          }
-        ]
-      }
-    },
-    {
-      "BeatId": "pre_farm_bridge",
-      "DisplayName": "Pre-Farm Bridge",
-      "Kind": "Cutscene",
-      "SceneName": "Tutorial_PreFarmCutscene",
-      "NextSceneName": "",
-      "SequenceSteps": [
-        {
-          "StepType": "ObjectivePopup",
-          "StringParam": "Nice work. The starter tools are back where they belong."
-        }
-      ],
-      "Storyboard": {
-        "StylePresetId": "farm_storybook_v1",
-        "Shots": [
-          {
-            "ShotId": "shot_01",
-            "SubtitleText": "Nice work. The starter tools are back where they belong.",
-            "NarrationText": "Nice work. The starter tools are back where they belong.",
-            "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/pre_farm_bridge/shot_01",
-            "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/pre_farm_bridge/shot_01",
-            "DurationSeconds": 4.166666666666667
-          },
-          {
-            "ShotId": "shot_02",
-            "SubtitleText": "The starter tools are back in your hands. Head to the plots and get ready to plant.",
-            "NarrationText": "The starter tools are back in your hands. Head to the plots and get ready to plant.",
-            "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/pre_farm_bridge/shot_02",
-            "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/pre_farm_bridge/shot_02",
-            "DurationSeconds": 7.083333333333334
-          },
-          {
-            "ShotId": "shot_03",
-            "SubtitleText": "The fields are waiting. Let's start the first real farm loop.",
-            "NarrationText": "The fields are waiting. Let's start the first real farm loop.",
-            "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/pre_farm_bridge/shot_03",
-            "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/pre_farm_bridge/shot_03",
-            "DurationSeconds": 4.583333333333334
           }
         ]
       }

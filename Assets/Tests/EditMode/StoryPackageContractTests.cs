@@ -144,18 +144,18 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(farmBeat.Minigame.AdapterId, Is.EqualTo("tutorial.plant_rows"));
             Assert.That(farmBeat.Minigame.RequiredCount, Is.EqualTo(3));
             Assert.That(farmBeat.Minigame.TimeLimitSeconds, Is.EqualTo(300f));
-            Assert.That(farmBeat.NextSceneName, Is.EqualTo("FindToolsGame"));
+            Assert.That(farmBeat.NextSceneName, Is.EqualTo("CoreScene"));
             Assert.That(farmBeat.Minigame.ResolvedParameterEntries, Is.Not.Null);
             Assert.That(farmBeat.Minigame.ResolvedParameterEntries, Has.Length.GreaterThanOrEqualTo(3));
             Assert.That(farmBeat.Minigame.ResolvedParameterEntries[0].Name, Is.Not.Empty);
 
-            Assert.That(StoryPackageNavigator.TryGetBeatBySceneName(package, "FindToolsGame", out var findToolsBeat), Is.True);
+            Assert.That(StoryPackageNavigator.TryGetBeatBySceneName(package, "PlayerCollectTools", out var findToolsBeat), Is.True);
             Assert.That(findToolsBeat, Is.Not.Null);
             Assert.That(findToolsBeat.BeatId, Is.EqualTo("find_tools_intro"));
             Assert.That(findToolsBeat.Minigame, Is.Not.Null);
             Assert.That(findToolsBeat.Minigame.AdapterId, Is.EqualTo("tutorial.find_tools"));
-            Assert.That(findToolsBeat.Minigame.RequiredCount, Is.EqualTo(2));
-            Assert.That(findToolsBeat.Minigame.TimeLimitSeconds, Is.EqualTo(240f));
+            Assert.That(findToolsBeat.Minigame.RequiredCount, Is.EqualTo(3));
+            Assert.That(findToolsBeat.Minigame.TimeLimitSeconds, Is.EqualTo(0f));
             Assert.That(findToolsBeat.Minigame.ResolvedParameterEntries, Is.Not.Null);
             Assert.That(findToolsBeat.Minigame.ResolvedParameterEntries, Has.Length.GreaterThanOrEqualTo(4));
 
@@ -163,7 +163,7 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(preFarmBeat, Is.Not.Null);
             Assert.That(preFarmBeat.BeatId, Is.EqualTo("pre_farm_bridge"));
             Assert.That(preFarmBeat.Kind, Is.EqualTo("Cutscene"));
-            Assert.That(preFarmBeat.NextSceneName, Is.Empty);
+            Assert.That(preFarmBeat.NextSceneName, Is.EqualTo("FarmMain"));
             Assert.That(preFarmBeat.Storyboard, Is.Not.Null);
             Assert.That(preFarmBeat.Storyboard.Shots, Has.Length.EqualTo(3));
         }

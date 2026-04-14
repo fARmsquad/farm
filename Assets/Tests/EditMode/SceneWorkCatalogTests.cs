@@ -18,10 +18,10 @@ namespace FarmSimVR.Tests.EditMode
                 TutorialSceneCatalog.IntroSceneName,
                 TutorialSceneCatalog.ChickenGameSceneName,
                 TutorialSceneCatalog.PostChickenCutsceneSceneName,
-                TutorialSceneCatalog.CoreSceneSceneName,
                 TutorialSceneCatalog.FindToolsSceneName,
                 TutorialSceneCatalog.PreFarmCutsceneSceneName,
                 TutorialSceneCatalog.FarmTutorialSceneName,
+                TutorialSceneCatalog.CoreSceneSceneName,
                 SceneWorkCatalog.WorldSandboxSceneName,
             }));
         }
@@ -37,10 +37,10 @@ namespace FarmSimVR.Tests.EditMode
                 "Assets/_Project/Scenes/Intro.unity",
                 "Assets/_Project/Scenes/ChickenGame.unity",
                 "Assets/_Project/Scenes/CaughtChickenCutscene.unity",
-                "Assets/_Project/Scenes/CoreScene.unity",
-                "Assets/_Project/Scenes/FindToolsGame.unity",
+                "Assets/_Project/Scenes/PlayerCollectTools.unity",
                 "Assets/_Project/Scenes/Tutorial_PreFarmCutscene.unity",
                 "Assets/_Project/Scenes/FarmMain.unity",
+                "Assets/_Project/Scenes/CoreScene.unity",
             }));
         }
 
@@ -54,10 +54,10 @@ namespace FarmSimVR.Tests.EditMode
                 TutorialSceneCatalog.IntroSceneName,
                 TutorialSceneCatalog.ChickenGameSceneName,
                 TutorialSceneCatalog.PostChickenCutsceneSceneName,
-                TutorialSceneCatalog.CoreSceneSceneName,
                 TutorialSceneCatalog.FindToolsSceneName,
                 TutorialSceneCatalog.PreFarmCutsceneSceneName,
                 TutorialSceneCatalog.FarmTutorialSceneName,
+                TutorialSceneCatalog.CoreSceneSceneName,
                 SceneWorkCatalog.HorseTrainingSceneName,
                 SceneWorkCatalog.TownSceneName,
                 SceneWorkCatalog.FarmVegetableStatesSceneName,

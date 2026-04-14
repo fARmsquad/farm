@@ -70,7 +70,7 @@ namespace FarmSimVR.Tests.EditMode
         [Test]
         public void FindToolsGameScene_StartUsesPackageDrivenToolRecoveryBeat_WhenStoryBeatExists()
         {
-            var scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/FindToolsGame.unity", OpenSceneMode.Single);
+            var scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/PlayerCollectTools.unity", OpenSceneMode.Single);
 
             Assert.That(scene.IsValid(), Is.True);
 
@@ -108,13 +108,14 @@ namespace FarmSimVR.Tests.EditMode
                     "Assets/_Project/Scenes/Intro.unity",
                     "Assets/_Project/Scenes/ChickenGame.unity",
                     "Assets/_Project/Scenes/CaughtChickenCutscene.unity",
-                    "Assets/_Project/Scenes/CoreScene.unity",
-                    "Assets/_Project/Scenes/FindToolsGame.unity",
+                    "Assets/_Project/Scenes/PlayerCollectTools.unity",
                     "Assets/_Project/Scenes/Tutorial_PreFarmCutscene.unity",
                     "Assets/_Project/Scenes/FarmMain.unity",
+                    "Assets/_Project/Scenes/CoreScene.unity",
                     "Assets/_Project/Scenes/HorseTrainingGame.unity",
                     "Assets/_Project/Scenes/Town.unity",
                     "Assets/_Project/Scenes/FarmVegetableStates.unity",
+                    "Assets/_Project/Scenes/PlayerGettingSeeds.unity",
                     "Assets/_Project/Scenes/WorldMain.unity",
                 }));
         }
@@ -261,14 +262,14 @@ namespace FarmSimVR.Tests.EditMode
             var controller = runtime.AddComponent<TutorialFlowController>();
 
             Assert.That(
-                controller.ResolveLoadableSceneRequest(TutorialSceneCatalog.CoreSceneSceneName),
-                Is.EqualTo("CoreScene"));
+                controller.ResolveLoadableSceneRequest(TutorialSceneCatalog.FindToolsSceneName),
+                Is.EqualTo("PlayerCollectTools"));
         }
 
         [Test]
         public void TutorialFlowController_CompleteCurrentSceneAndLoadNext_ShowsCompletionBanner_ForTerminalStoryPackageBeat()
         {
-            var scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/Tutorial_PreFarmCutscene.unity", OpenSceneMode.Single);
+            var scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/CoreScene.unity", OpenSceneMode.Single);
 
             Assert.That(scene.IsValid(), Is.True);
 
@@ -277,14 +278,14 @@ namespace FarmSimVR.Tests.EditMode
             var runtime = new GameObject("TutorialRuntime");
             var controller = runtime.AddComponent<TutorialFlowController>();
             var flow = new TutorialFlowService();
-            flow.EnterScene(TutorialSceneCatalog.PreFarmCutsceneSceneName);
+            flow.EnterScene(TutorialSceneCatalog.CoreSceneSceneName);
             SetPrivateField(controller, "<Flow>k__BackingField", flow);
             SetPrivateField(controller, "<ToolRecovery>k__BackingField", new ToolRecoveryService());
 
             controller.CompleteCurrentSceneAndLoadNext();
 
             Assert.That(controller.ShowCompletionBanner, Is.True);
-            Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo("Tutorial_PreFarmCutscene"));
+            Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo("CoreScene"));
         }
 
         [Test]
