@@ -1,8 +1,11 @@
 using FarmSimVR.Core.Farming;
+using FarmSimVR.Core.Story;
 using FarmSimVR.Core.Tutorial;
 using FarmSimVR.MonoBehaviours;
+using FarmSimVR.MonoBehaviours.Cinematics;
 using FarmSimVR.MonoBehaviours.Farming;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace FarmSimVR.MonoBehaviours.Tutorial
 {
@@ -29,17 +32,24 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         [SerializeField] private float _completionBannerDuration = 4f;
 
         private readonly FarmTutorialMissionService _missionService = new();
+        private readonly PackagePlantRowsMissionService _packagePlantRowsService = new();
 
         private CropPlotController _heroCropController;
+        private CropPlotController[] _allPlotControllers = System.Array.Empty<CropPlotController>();
         private bool _showCompletion;
         private float _completionTimer;
         private GUIStyle _objectiveStyle;
         private GUIStyle _completionStyle;
         private bool _stylesBuilt;
         private bool _heroPlotConfigured;
+        private bool _usePackagePlantRowsMode;
+        private bool _packagePlotsRegistered;
         private string _currentObjective = string.Empty;
+        private int _packageRowCount = 1;
 
-        public bool IsComplete => _missionService.IsComplete;
+        public bool IsComplete => _usePackagePlantRowsMode
+            ? _packagePlantRowsService.IsComplete
+            : _missionService.IsComplete;
         public string CurrentObjectiveText => string.IsNullOrEmpty(_objectivePrefix)
             ? _currentObjective
             : $"{_objectivePrefix}{_currentObjective}";
@@ -50,6 +60,15 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 _driver = FindAnyObjectByType<FarmSimDriver>();
 
             CacheHeroPlotController();
+            CacheAllPlotControllers();
+            if (TryConfigurePackagePlantRowsMode())
+            {
+                EnsurePackagePlantRowsPlots();
+                CacheAllPlotControllers();
+                _currentObjective = _packagePlantRowsService.CurrentObjective;
+                return;
+            }
+
             EnsureHeroPlotConfigured();
             _missionService.Reset();
             _currentObjective = _missionService.CurrentObjective;
@@ -57,6 +76,13 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         private void Update()
         {
+            if (_usePackagePlantRowsMode)
+            {
+                EnsurePackagePlantRowsPlots();
+                TickPackagePlantRowsMode();
+                return;
+            }
+
             EnsureHeroPlotConfigured();
 
             if (_showCompletion)
@@ -72,10 +98,17 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         public bool IsActionAllowed(FarmPlotAction action, CropPlotController plotController)
         {
-            EnsureHeroPlotConfigured();
-
             if (plotController == null)
                 return false;
+
+            if (_usePackagePlantRowsMode)
+            {
+                var packageSoilStatus = plotController.SoilState?.Status ?? PlotStatus.Untilled;
+                var packageCropId = plotController.SoilState?.CurrentCropId;
+                return _packagePlantRowsService.IsActionAllowed(action, packageSoilStatus, packageCropId);
+            }
+
+            EnsureHeroPlotConfigured();
 
             if (!IsHeroPlot(plotController) && !IsComplete)
                 return false;
@@ -89,10 +122,17 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         public FarmPlotAction? GetPrimaryAction(CropPlotController plotController)
         {
-            EnsureHeroPlotConfigured();
-
             if (plotController == null)
                 return null;
+
+            if (_usePackagePlantRowsMode)
+            {
+                var packageSoilStatus = plotController.SoilState?.Status ?? PlotStatus.Untilled;
+                var packageCropId = plotController.SoilState?.CurrentCropId;
+                return _packagePlantRowsService.GetPrimaryAction(packageSoilStatus, packageCropId);
+            }
+
+            EnsureHeroPlotConfigured();
 
             if (!IsHeroPlot(plotController) && !IsComplete)
                 return null;
@@ -106,6 +146,9 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         public void EnsureHeroPlotConfigured()
         {
+            if (_usePackagePlantRowsMode)
+                return;
+
             if (_heroPlotConfigured)
                 return;
 
@@ -140,6 +183,11 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 _heroCropController = _heroCropPlot.GetComponent<CropPlotController>();
         }
 
+        private void CacheAllPlotControllers()
+        {
+            _allPlotControllers = FindObjectsByType<CropPlotController>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        }
+
         private GameObject FindStageRoot(params string[] names)
         {
             if (_heroCropPlot == null)
@@ -172,6 +220,30 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             _currentObjective = _missionService.CurrentObjective;
 
             if (_missionService.IsComplete && !_showCompletion)
+                CompleteScene();
+        }
+
+        private void TickPackagePlantRowsMode()
+        {
+            if (_showCompletion)
+            {
+                _completionTimer -= Time.deltaTime;
+                if (_completionTimer <= 0f)
+                    _showCompletion = false;
+                return;
+            }
+
+            if (!_packagePlotsRegistered || _allPlotControllers.Length < _packagePlantRowsService.DesiredPlotCount)
+                EnsurePackagePlantRowsPlots();
+
+            if (_driver != null)
+                _driver.SetSelectedSeed(ResolveSelectedSeedIndex(_packagePlantRowsService.TargetSeedId));
+
+            var plantedCount = CountTargetCropPlots();
+            _packagePlantRowsService.Observe(plantedCount, Time.deltaTime);
+            _currentObjective = _packagePlantRowsService.CurrentObjective;
+
+            if (_packagePlantRowsService.IsComplete)
                 CompleteScene();
         }
 
@@ -252,6 +324,108 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         private bool IsHeroPlot(CropPlotController plotController)
         {
             return plotController != null && plotController == _heroCropController;
+        }
+
+        private bool TryConfigurePackagePlantRowsMode()
+        {
+            var sceneName = SceneManager.GetActiveScene().name;
+            if (!StoryPackageRuntimeCatalog.TryGetMinigameConfig(sceneName, out _, out var minigame))
+                return false;
+
+            if (minigame == null || !string.Equals(minigame.AdapterId, "tutorial.plant_rows", System.StringComparison.Ordinal))
+                return false;
+
+            var cropType = "carrot";
+            if (!minigame.TryGetStringParameter("cropType", out cropType))
+                cropType = InferCropType(minigame.ObjectiveText);
+            if (!minigame.TryGetIntParameter("rowCount", out _packageRowCount))
+                _packageRowCount = 1;
+
+            _packagePlantRowsService.Configure(
+                minigame.ObjectiveText,
+                cropType,
+                minigame.RequiredCount,
+                _packageRowCount,
+                minigame.TimeLimitSeconds);
+            _packagePlotsRegistered = false;
+            _usePackagePlantRowsMode = true;
+            return true;
+        }
+
+        private void EnsurePackagePlantRowsPlots()
+        {
+            if (!_usePackagePlantRowsMode || _heroCropPlot == null)
+                return;
+
+            PackagePlantRowsPlotSpawner.EnsurePlots(
+                _heroCropPlot,
+                _packagePlantRowsService.DesiredPlotCount,
+                _packageRowCount);
+            if (_allPlotControllers.Length < _packagePlantRowsService.DesiredPlotCount)
+                CacheAllPlotControllers();
+
+            if (_driver == null)
+                _driver = FindAnyObjectByType<FarmSimDriver>();
+            if (_driver == null || !_driver.IsInitialized)
+                return;
+
+            var registeredCount = 0;
+            for (int i = 0; i < _allPlotControllers.Length; i++)
+            {
+                var plot = _allPlotControllers[i];
+                if (plot == null)
+                    continue;
+
+                _driver.RegisterRuntimePlot(plot.gameObject);
+                if (_driver.HasRegisteredPlot(plot.gameObject.name))
+                    registeredCount++;
+            }
+
+            _packagePlotsRegistered = registeredCount >= _packagePlantRowsService.DesiredPlotCount;
+        }
+
+        private int CountTargetCropPlots()
+        {
+            var seedId = _packagePlantRowsService.TargetSeedId;
+            var cropId = seedId.Replace("seed_", "crop_");
+            var count = 0;
+
+            for (int i = 0; i < _allPlotControllers.Length; i++)
+            {
+                var soilState = _allPlotControllers[i]?.SoilState;
+                var currentCropId = soilState?.CurrentCropId;
+                if (string.Equals(currentCropId, seedId, System.StringComparison.Ordinal) ||
+                    string.Equals(currentCropId, cropId, System.StringComparison.Ordinal))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private static int ResolveSelectedSeedIndex(string seedId)
+        {
+            return seedId switch
+            {
+                "seed_tomato" => 0,
+                "seed_carrot" => 1,
+                "seed_lettuce" => 2,
+                _ => 1,
+            };
+        }
+
+        private static string InferCropType(string objectiveText)
+        {
+            if (string.IsNullOrWhiteSpace(objectiveText))
+                return "carrot";
+
+            var normalized = objectiveText.ToLowerInvariant();
+            if (normalized.Contains("tomato"))
+                return "tomato";
+            if (normalized.Contains("lettuce"))
+                return "lettuce";
+            return "carrot";
         }
     }
 }

@@ -37,6 +37,7 @@ namespace FarmSimVR.MonoBehaviours
 
         private List<ChatMessage> _history = new();
         private string _activeNpc;
+        private readonly TownConversationMemoryStore _conversationMemory = new();
 
         // ── Lifecycle ─────────────────────────────────────────────────────────
 
@@ -73,7 +74,7 @@ namespace FarmSimVR.MonoBehaviours
                 new("system", NPCPersonaCatalog.GetSystemPrompt(npcName))
             };
 
-            _history.Add(new ChatMessage("user", "[START_CONVERSATION]"));
+            _history.Add(new ChatMessage("user", TownKnowledgeGraph.BuildOpeningPrompt(npcName)));
             StartCoroutine(StreamAndUpdate());
         }
 
@@ -92,6 +93,7 @@ namespace FarmSimVR.MonoBehaviours
                 return;
             }
 
+            _conversationMemory.RecordPlayerPrompt(_activeNpc, option);
             _history.Add(new ChatMessage("user", option));
             StartCoroutine(StreamAndUpdate());
         }
@@ -117,9 +119,10 @@ namespace FarmSimVR.MonoBehaviours
             bool streamStartedFired = false;
             string fullText = null;
             string error    = null;
+            TownConversationContextWindow requestContext = _conversationMemory.BuildContextWindow(_activeNpc);
 
             yield return openAIClient.ChatStream(
-                _history,
+                BuildRequestMessages(requestContext),
                 onChunk: token =>
                 {
                     if (!streamStartedFired)
@@ -152,8 +155,16 @@ namespace FarmSimVR.MonoBehaviours
             }
 
             int turnIndex = CountAssistantMessages(_history);
-            _history.Add(new ChatMessage("assistant", fullText));
-            string[] displayOptions = TownDialogueOptionComposer.BuildOptions(_activeNpc, turnIndex, parsed.response, parsed.options);
+            _conversationMemory.RecordNpcResponse(_activeNpc, parsed.response);
+            _history.Add(new ChatMessage("assistant", parsed.response));
+            TownConversationContextWindow responseContext = _conversationMemory.BuildContextWindow(_activeNpc);
+            string[] displayOptions = TownDialogueOptionComposer.BuildOptions(
+                _activeNpc,
+                turnIndex,
+                parsed.response,
+                parsed.options,
+                _history,
+                responseContext);
 
             Debug.Log($"{LOG_PREFIX} [{_activeNpc}] {parsed.response}");
             if (displayOptions != null)
@@ -164,6 +175,24 @@ namespace FarmSimVR.MonoBehaviours
 
             OnNPCResponse?.Invoke(_activeNpc, parsed.response);
             OnOptionsReady?.Invoke(displayOptions);
+        }
+
+        private List<ChatMessage> BuildRequestMessages(TownConversationContextWindow contextWindow)
+        {
+            var requestMessages = new List<ChatMessage>(_history.Count + 1);
+            for (int i = 0; i < _history.Count; i++)
+            {
+                requestMessages.Add(_history[i]);
+                if (i != 0 || !string.Equals(_history[i].Role, "system", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                if (contextWindow == null || string.IsNullOrWhiteSpace(contextWindow.AdditionalInstructions))
+                    continue;
+
+                requestMessages.Add(new ChatMessage("system", contextWindow.AdditionalInstructions));
+            }
+
+            return requestMessages;
         }
 
         // ── Helpers ───────────────────────────────────────────────────────────

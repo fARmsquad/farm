@@ -134,7 +134,38 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(asset, Is.Not.Null);
             Assert.That(StoryPackageImporter.TryImport(asset, out var package, out var error), Is.True, error);
             Assert.That(package.PackageId, Is.EqualTo("storypkg_intro_chicken_sample"));
-            Assert.That(package.Beats, Has.Length.EqualTo(3));
+            Assert.That(package.DisplayName, Is.EqualTo("Generative Story Slice"));
+            Assert.That(package.Beats, Has.Length.EqualTo(6));
+
+            Assert.That(StoryPackageNavigator.TryGetBeatBySceneName(package, "FarmMain", out var farmBeat), Is.True);
+            Assert.That(farmBeat, Is.Not.Null);
+            Assert.That(farmBeat.BeatId, Is.EqualTo("plant_rows_intro"));
+            Assert.That(farmBeat.Minigame, Is.Not.Null);
+            Assert.That(farmBeat.Minigame.AdapterId, Is.EqualTo("tutorial.plant_rows"));
+            Assert.That(farmBeat.Minigame.RequiredCount, Is.EqualTo(3));
+            Assert.That(farmBeat.Minigame.TimeLimitSeconds, Is.EqualTo(300f));
+            Assert.That(farmBeat.NextSceneName, Is.EqualTo("FindToolsGame"));
+            Assert.That(farmBeat.Minigame.ResolvedParameterEntries, Is.Not.Null);
+            Assert.That(farmBeat.Minigame.ResolvedParameterEntries, Has.Length.GreaterThanOrEqualTo(3));
+            Assert.That(farmBeat.Minigame.ResolvedParameterEntries[0].Name, Is.Not.Empty);
+
+            Assert.That(StoryPackageNavigator.TryGetBeatBySceneName(package, "FindToolsGame", out var findToolsBeat), Is.True);
+            Assert.That(findToolsBeat, Is.Not.Null);
+            Assert.That(findToolsBeat.BeatId, Is.EqualTo("find_tools_intro"));
+            Assert.That(findToolsBeat.Minigame, Is.Not.Null);
+            Assert.That(findToolsBeat.Minigame.AdapterId, Is.EqualTo("tutorial.find_tools"));
+            Assert.That(findToolsBeat.Minigame.RequiredCount, Is.EqualTo(2));
+            Assert.That(findToolsBeat.Minigame.TimeLimitSeconds, Is.EqualTo(240f));
+            Assert.That(findToolsBeat.Minigame.ResolvedParameterEntries, Is.Not.Null);
+            Assert.That(findToolsBeat.Minigame.ResolvedParameterEntries, Has.Length.GreaterThanOrEqualTo(4));
+
+            Assert.That(StoryPackageNavigator.TryGetBeatBySceneName(package, "Tutorial_PreFarmCutscene", out var preFarmBeat), Is.True);
+            Assert.That(preFarmBeat, Is.Not.Null);
+            Assert.That(preFarmBeat.BeatId, Is.EqualTo("pre_farm_bridge"));
+            Assert.That(preFarmBeat.Kind, Is.EqualTo("Cutscene"));
+            Assert.That(preFarmBeat.NextSceneName, Is.Empty);
+            Assert.That(preFarmBeat.Storyboard, Is.Not.Null);
+            Assert.That(preFarmBeat.Storyboard.Shots, Has.Length.EqualTo(3));
         }
 
         [Test]

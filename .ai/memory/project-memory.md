@@ -62,6 +62,10 @@
 
 ### Tutorial Entry Points
 - Title-screen launchers, play-mode start-scene helpers, and scripted Build Settings updates for the tutorial should all read from `SceneWorkCatalog` instead of maintaining separate hardcoded scene lists. If the tutorial sequence changes, update the catalog once and let the editor/runtime entry points follow it.
+- Title-screen launchers must resolve canonical tutorial aliases to build-loadable scene names through `SceneWorkCatalog`; routing names like `PostChickenCutscene` are not always the same as the actual scene asset names in the build profile.
+- Generative Story Orchestrator progress should keep updating the standing `Generative Story Slice` on the title screen, backed by `StoryPackage_IntroChickenSample`, instead of creating a new ad hoc sample slice for each increment.
+- The standing `Generative Story Slice` should launch the current generated proof beat (`PostChickenCutscene` right now), not the authored `Intro` Timeline, unless a spec explicitly calls for an end-to-end intro regression path.
+- Package-driven tutorial routing must distinguish between "no package beat exists" and "package beat exists with an empty `NextSceneName`". The latter is an explicit terminal slice boundary and must not fall back into the authored tutorial flow.
 
 ### Scene Art Review
 - When the developer is still choosing the look of a mechanic, place curated asset options directly in the scene and get a pick before adding more lifecycle-specific logic or polish.
@@ -103,6 +107,7 @@
 ### Completion Claims
 - DON'T say work is fully done without stating what was directly verified vs what was assumed
 - DON'T treat a developer-reported post-"done" issue as routine feedback — log it as a completion learning and update the guardrail
+- DON'T assume backend consumers will receive the raw `ResolvedParameters` dictionary. Unity-facing story packages may only carry `ResolvedParameterEntries`, so cross-runtime readers need to support that contract shape too.
 
 ---
 
@@ -238,6 +243,12 @@ broken, which will only surface when Unity tries to open the scene.
 
 ### Unity Harnesses Need Editor-Lock Fallbacks (2026-04-13)
 If a local verification command is expected to run while the Unity editor is
+
+### OpenAI Credentials Must Stay Out Of Scene Data (2026-04-13)
+For Town and other live LLM scenes, resolve OpenAI credentials from environment
+first and do not leave API keys serialized into Unity scene or prefab YAML.
+Add a configuration regression test when a runtime can read both inspector and
+environment values so stale local overrides cannot silently win.
 already open, the harness should provide a safe fallback path instead of
 stopping at the project lock. For batchmode test runs, a disposable copy of the
 current on-disk project state is preferable to a skip-only response.
@@ -277,6 +288,22 @@ from turn index or a canned ladder. Compose the visible prompts from the
 latest parsed reply first so cooking lines yield cooking follow-ups, town
 history lines yield story or town prompts, and cadence rules like late
 `Goodbye.` unlocks only shape the final set after that response-aware pass.
+
+### Storyboard Controllers Need Unity-Safe Component Bootstrap (2026-04-13)
+When a storyboard or cutscene controller lazily creates required runtime
+components such as `AudioSource`, resolve them through explicit Unity null
+checks before caching or using them. Do not use `GetComponent<T>() ?? AddComponent<T>()`
+for Unity objects on player-facing bootstrap paths, because Unity's custom null
+semantics can leave you with an invalid component reference that only fails once
+playback begins.
+
+### Tutorial Scene Loads Must Resolve Canonical Aliases Before Runtime Transition (2026-04-13)
+When tutorial scenes, story-package beats, or generic scene-loading helpers
+transition by canonical names such as `MidpointPlaceholder`, resolve them
+through `SceneWorkCatalog.GetLoadableSceneName()` before calling
+`SceneManager.LoadScene`. Fixing one entry path is not enough; title launchers,
+flow controllers, autoplay bridges, and generic loaders all need the same
+mapping or aliased bridge scenes will fail at runtime.
 
 ---
 

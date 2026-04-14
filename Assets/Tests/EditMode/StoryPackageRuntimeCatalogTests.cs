@@ -45,7 +45,7 @@ namespace FarmSimVR.Tests.EditMode
 
             Assert.That(found, Is.True);
             Assert.That(title, Is.EqualTo("Post Chicken Bridge"));
-            Assert.That(body, Is.EqualTo("Nice work. The farm still needs your hands."));
+            Assert.That(body, Is.EqualTo("Nice work. The carrot beds are finally ready for you."));
         }
 
         [Test]
@@ -65,18 +65,81 @@ namespace FarmSimVR.Tests.EditMode
         }
 
         [Test]
-        public void Installer_UsesStoryPackageText_WhenAvailable()
+        public void RuntimeCatalog_ProvidesPreFarmStoryboard_FromResourcePackage()
+        {
+            var found = StoryPackageRuntimeCatalog.TryGetStoryboard(
+                TutorialSceneCatalog.PreFarmCutsceneSceneName,
+                out var title,
+                out var storyboard);
+
+            Assert.That(found, Is.True);
+            Assert.That(title, Is.EqualTo("Pre-Farm Bridge"));
+            Assert.That(storyboard, Is.Not.Null);
+            Assert.That(storyboard.StylePresetId, Is.EqualTo("farm_storybook_v1"));
+            Assert.That(storyboard.Shots, Has.Length.EqualTo(3));
+            Assert.That(storyboard.Shots[0].SubtitleText, Does.Contain("starter tools"));
+        }
+
+        [Test]
+        public void RuntimeCatalog_TryGetNextScene_FindsTerminalPackageBeat()
+        {
+            var found = StoryPackageRuntimeCatalog.TryGetNextScene(
+                TutorialSceneCatalog.PreFarmCutsceneSceneName,
+                out var nextScene);
+
+            Assert.That(found, Is.True);
+            Assert.That(nextScene, Is.Empty);
+        }
+
+        [Test]
+        public void RuntimeCatalog_ProvidesFarmTutorialMinigameConfig_FromResourcePackage()
+        {
+            var found = StoryPackageRuntimeCatalog.TryGetMinigameConfig(
+                TutorialSceneCatalog.FarmTutorialSceneName,
+                out var title,
+                out var minigame);
+
+            Assert.That(found, Is.True);
+            Assert.That(title, Is.EqualTo("Plant Rows Intro"));
+            Assert.That(minigame, Is.Not.Null);
+            Assert.That(minigame.AdapterId, Is.EqualTo("tutorial.plant_rows"));
+            Assert.That(minigame.RequiredCount, Is.EqualTo(3));
+            Assert.That(minigame.TimeLimitSeconds, Is.EqualTo(300f));
+            Assert.That(minigame.ResolvedParameterEntries, Is.Not.Null);
+            Assert.That(minigame.ResolvedParameterEntries, Has.Length.GreaterThanOrEqualTo(3));
+        }
+
+        [Test]
+        public void RuntimeCatalog_ProvidesFindToolsMinigameConfig_FromResourcePackage()
+        {
+            var found = StoryPackageRuntimeCatalog.TryGetMinigameConfig(
+                "FindToolsGame",
+                out var title,
+                out var minigame);
+
+            Assert.That(found, Is.True);
+            Assert.That(title, Is.EqualTo("Find Tools Intro"));
+            Assert.That(minigame, Is.Not.Null);
+            Assert.That(minigame.AdapterId, Is.EqualTo("tutorial.find_tools"));
+            Assert.That(minigame.RequiredCount, Is.EqualTo(2));
+            Assert.That(minigame.TimeLimitSeconds, Is.EqualTo(240f));
+            Assert.That(minigame.TryGetStringParameter("targetToolSet", out var targetToolSet), Is.True);
+            Assert.That(targetToolSet, Is.EqualTo("starter"));
+        }
+
+        [Test]
+        public void Installer_UsesFallbackText_WhenStoryPackageBeatIsUnavailable()
         {
             var runtime = new GameObject("TutorialRuntime");
             var controller = runtime.AddComponent<TutorialFlowController>();
 
-            TutorialSceneInstaller.InstallForScene(TutorialSceneCatalog.PostChickenCutsceneSceneName, controller);
+            TutorialSceneInstaller.InstallForScene(TutorialSceneCatalog.MidpointPlaceholderSceneName, controller);
 
             var cutsceneController = Object.FindFirstObjectByType<TutorialCutsceneSceneController>();
             Assert.That(cutsceneController, Is.Not.Null);
 
-            Assert.That(ReadPrivateString(cutsceneController, "_title"), Is.EqualTo("Post Chicken Bridge"));
-            Assert.That(ReadPrivateString(cutsceneController, "_body"), Is.EqualTo("Nice work. The farm still needs your hands."));
+            Assert.That(ReadPrivateString(cutsceneController, "_title"), Is.EqualTo("Story Beat Placeholder"));
+            Assert.That(ReadPrivateString(cutsceneController, "_body"), Does.Contain("This bridge scene is intentionally lightweight for now."));
         }
 
         [Test]
@@ -98,6 +161,21 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(shots[0].SubtitleText, Does.Contain("Nice work"));
         }
 
+        [Test]
+        public void StoryboardController_PlayAudio_CreatesAudioSource_WhenMissing()
+        {
+            var sceneObject = new GameObject("PostChickenCutscene");
+            var controller = sceneObject.AddComponent<TutorialCutsceneSceneController>();
+
+            Assert.That(sceneObject.GetComponent<AudioSource>(), Is.Null);
+
+            Assert.That(
+                () => InvokePrivate(controller, "PlayAudio", (object)null),
+                Throws.Nothing);
+
+            Assert.That(sceneObject.GetComponent<AudioSource>(), Is.Not.Null);
+        }
+
         private static string ReadPrivateString(object instance, string fieldName)
         {
             var field = instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
@@ -110,6 +188,13 @@ namespace FarmSimVR.Tests.EditMode
             var field = instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.That(field, Is.Not.Null);
             return (T)field.GetValue(instance);
+        }
+
+        private static object InvokePrivate(object instance, string methodName, params object[] args)
+        {
+            var method = instance.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(method, Is.Not.Null);
+            return method.Invoke(instance, args);
         }
     }
 }

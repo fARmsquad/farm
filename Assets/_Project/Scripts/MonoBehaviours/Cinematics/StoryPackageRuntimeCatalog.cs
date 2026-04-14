@@ -30,7 +30,17 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
         public static string GetNextSceneOrNull(string sceneName)
         {
-            return TryGetBeat(sceneName, out var beat) ? beat.NextSceneName : null;
+            return TryGetNextScene(sceneName, out var nextScene) ? nextScene : null;
+        }
+
+        public static bool TryGetNextScene(string sceneName, out string nextScene)
+        {
+            nextScene = null;
+            if (!TryGetBeat(sceneName, out var beat))
+                return false;
+
+            nextScene = beat.NextSceneName ?? string.Empty;
+            return true;
         }
 
         public static bool TryGetCutsceneDisplayText(string sceneName, out string title, out string body)
@@ -73,6 +83,25 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
             title = beat.DisplayName ?? string.Empty;
             storyboard = beat.Storyboard;
+            return true;
+        }
+
+        public static bool TryGetMinigameConfig(string sceneName, out string title, out StoryMinigameConfigSnapshot minigame)
+        {
+            title = string.Empty;
+            minigame = null;
+
+            if (!TryGetBeat(sceneName, out var beat))
+                return false;
+
+            if (!StoryBeatKindParser.TryParse(beat.Kind, out var kind) || kind != StoryBeatKind.Minigame)
+                return false;
+
+            if (beat.Minigame == null)
+                return false;
+
+            title = beat.DisplayName ?? string.Empty;
+            minigame = beat.Minigame;
             return true;
         }
 

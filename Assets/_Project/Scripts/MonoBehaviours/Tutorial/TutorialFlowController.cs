@@ -61,26 +61,29 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             if (TutorialSceneCatalog.GetStepForScene(currentSceneName) == TutorialStep.None)
                 return requestedSceneName;
 
-            var packageNextScene = StoryPackageRuntimeCatalog.GetNextSceneOrNull(currentSceneName);
-            if (!string.IsNullOrWhiteSpace(packageNextScene))
+            if (StoryPackageRuntimeCatalog.TryGetNextScene(currentSceneName, out var packageNextScene))
                 return packageNextScene;
 
             var nextScene = Flow.GetNextScene();
             return string.IsNullOrWhiteSpace(nextScene) ? requestedSceneName : nextScene;
         }
 
+        public string ResolveLoadableSceneRequest(string requestedSceneName)
+        {
+            return SceneWorkCatalog.GetLoadableSceneName(ResolveSceneRequest(requestedSceneName));
+        }
+
         public void CompleteCurrentSceneAndLoadNext()
         {
             if (SceneManager.GetActiveScene().name == TutorialSceneCatalog.TitleScreenSceneName)
             {
-                SceneManager.LoadScene(TutorialSceneCatalog.IntroSceneName);
+                LoadSceneByCatalogName(TutorialSceneCatalog.IntroSceneName);
                 return;
             }
 
             var currentSceneName = SceneManager.GetActiveScene().name;
-            var packageNextScene = StoryPackageRuntimeCatalog.GetNextSceneOrNull(currentSceneName);
             var nextScene = Flow.CompleteCurrentStep();
-            if (!string.IsNullOrWhiteSpace(packageNextScene))
+            if (StoryPackageRuntimeCatalog.TryGetNextScene(currentSceneName, out var packageNextScene))
                 nextScene = packageNextScene;
 
             if (string.IsNullOrWhiteSpace(nextScene))
@@ -89,7 +92,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 return;
             }
 
-            SceneManager.LoadScene(nextScene);
+            LoadSceneByCatalogName(nextScene);
         }
 
         public void LoadPreviousScene()
@@ -98,7 +101,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             if (string.IsNullOrWhiteSpace(previousScene))
                 return;
 
-            SceneManager.LoadScene(previousScene);
+            LoadSceneByCatalogName(previousScene);
         }
 
         public void ReloadCurrentScene()
@@ -107,7 +110,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             if (!currentScene.IsValid())
                 return;
 
-            SceneManager.LoadScene(currentScene.name);
+            LoadSceneByCatalogName(currentScene.name);
         }
 
         public void JumpToStep(TutorialStep step)
@@ -116,7 +119,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             if (string.IsNullOrWhiteSpace(sceneName))
                 return;
 
-            SceneManager.LoadScene(sceneName);
+            LoadSceneByCatalogName(sceneName);
         }
 
         public void ResetTutorial()
@@ -124,7 +127,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             Flow.Reset();
             ToolRecovery = new ToolRecoveryService();
             ShowCompletionBanner = false;
-            SceneManager.LoadScene(TutorialSceneCatalog.IntroSceneName);
+            LoadSceneByCatalogName(TutorialSceneCatalog.IntroSceneName);
         }
 
         public bool MarkToolRecovered(TutorialToolId toolId)
@@ -144,6 +147,14 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             Flow.EnterScene(scene.name);
             TutorialSceneInstaller.InstallForScene(scene.name, this);
+        }
+
+        private static void LoadSceneByCatalogName(string sceneName)
+        {
+            if (string.IsNullOrWhiteSpace(sceneName))
+                return;
+
+            SceneManager.LoadScene(SceneWorkCatalog.GetLoadableSceneName(sceneName));
         }
     }
 }

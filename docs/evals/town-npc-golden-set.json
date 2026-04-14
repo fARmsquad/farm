@@ -15,7 +15,7 @@
     {
       "id": "old-garrett-opening",
       "npc": "Old Garrett",
-      "player_input": "[START_CONVERSATION]",
+      "player_input": "Opening cue: The player has just approached you in town. Greet them warmly, mention one concrete memory tied to the well, the schoolhouse, or the market square, and invite another question.",
       "must_include_any": ["village", "town", "farm", "story", "history"],
       "max_sentences": 3
     },
@@ -29,7 +29,7 @@
     {
       "id": "mira-opening",
       "npc": "Mira the Baker",
-      "player_input": "[START_CONVERSATION]",
+      "player_input": "Opening cue: The player has just stepped near your bakery. Welcome them warmly, mention a concrete smell, ingredient, or town connection from today's baking, and invite another question.",
       "must_include_any": ["bakery", "bread", "oven", "dough", "flour"],
       "max_sentences": 3
     },
@@ -43,7 +43,7 @@
     {
       "id": "young-pip-opening",
       "npc": "Young Pip",
-      "player_input": "[START_CONVERSATION]",
+      "player_input": "Opening cue: The player has just caught your attention in town. Jump in with excitement, mention one errand, rumor, or place you were just thinking about, and invite another question.",
       "must_include_any": ["delivery", "deliveries", "village", "town", "adventure"],
       "must_include_all": ["!"],
       "max_sentences": 3
@@ -54,6 +54,43 @@
       "player_input": "What have you been up to today?",
       "must_include_any": ["chicken", "race", "deliveries", "tree", "adventure"],
       "must_include_all": ["!"],
+      "max_sentences": 3
+    },
+    {
+      "id": "old-garrett-repeat-town-history",
+      "npc": "Old Garrett",
+      "player_input": "The player already asked how the town changed once. Answer that topic again from a fresh angle with a new concrete detail.",
+      "must_include_any": ["schoolhouse", "Miss Edna", "market", "well"],
+      "must_not_include": ["folks knew each other by name"],
+      "max_sentences": 3
+    },
+    {
+      "id": "mira-shared-town-connections",
+      "npc": "Mira the Baker",
+      "player_input": "Who helps keep your bakery going?",
+      "must_include_any": ["Garrett", "Pip", "market", "grain", "berries"],
+      "max_sentences": 3
+    },
+    {
+      "id": "young-pip-mill-rumor",
+      "npc": "Young Pip",
+      "player_input": "What's really going on at the old mill?",
+      "must_include_any": ["old mill", "Mira", "Garrett", "lights", "rumor"],
+      "must_include_all": ["!"],
+      "max_sentences": 3
+    },
+    {
+      "id": "old-garrett-relay-mill-rumor",
+      "npc": "Old Garrett",
+      "player_input": "Pip mentioned strange lights at the old mill. What do you make of that?",
+      "must_include_any": ["old mill", "Pip", "lights", "fireflies"],
+      "max_sentences": 3
+    },
+    {
+      "id": "mira-relay-schoolhouse-memory",
+      "npc": "Mira the Baker",
+      "player_input": "Garrett said the whole town raised the schoolhouse together after the flood. What does that story mean to you?",
+      "must_include_any": ["schoolhouse", "Garrett", "flood", "town"],
       "max_sentences": 3
     }
   ]

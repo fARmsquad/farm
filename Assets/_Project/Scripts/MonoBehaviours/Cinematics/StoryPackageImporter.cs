@@ -59,6 +59,11 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                     continue;
 
                 beat.SequenceSteps ??= System.Array.Empty<StorySequenceStepSnapshot>();
+                if (beat.Minigame == null)
+                    continue;
+
+                beat.Minigame.FallbackGeneratorIds ??= System.Array.Empty<string>();
+                beat.Minigame.ResolvedParameterEntries ??= System.Array.Empty<StoryMinigameParameterSnapshot>();
             }
         }
     }

@@ -6,16 +6,17 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from app.config import Settings
+from app.generated_minigames import GeneratedMinigameBeatRequest, GeneratedMinigameBeatService
 from app.generated_storyboards import (
     GeneratedImageAsset,
     GeneratedSpeechAsset,
     GeneratedStoryboardContext,
     GeneratedStoryboardCutsceneRequest,
-    GeneratedStoryboardPlan,
-    GeneratedStoryboardPlanShot,
     GeneratedStoryboardService,
+    TemplateStoryboardPlanner,
 )
 from app.main import create_app
+from app.storyboard_media import PlaceholderSpeechGenerator
 
 
 class GeneratedStoryboardServiceTests(unittest.TestCase):
@@ -26,7 +27,7 @@ class GeneratedStoryboardServiceTests(unittest.TestCase):
         self.service = GeneratedStoryboardService(
             output_root=self.output_root,
             package_output_path=self.package_output_path,
-            planner=FakeStoryboardPlanner(),
+            planner=TemplateStoryboardPlanner(),
             image_generator=FakeImageGenerator(),
             speech_generator=FakeSpeechGenerator(),
         )
@@ -53,6 +54,104 @@ class GeneratedStoryboardServiceTests(unittest.TestCase):
         written_package = json.loads(self.package_output_path.read_text(encoding="utf-8"))
         self.assertEqual(written_package["Beats"][0]["Storyboard"]["Shots"][2]["ShotId"], "shot_03")
 
+    def test_create_package_can_derive_minigame_goal_from_linked_materialized_beat(self) -> None:
+        minigame_service = GeneratedMinigameBeatService(package_output_path=self.package_output_path)
+        minigame_service.create_package(
+            GeneratedMinigameBeatRequest(
+                package_id="storypkg_intro_chicken_sample",
+                package_display_name="Intro Chicken Sample",
+                beat_id="plant_rows_intro",
+                display_name="Plant Rows Intro",
+                scene_name="PlantRowsScene",
+                next_scene_name="PostPlantRowsCutscene",
+                generator_id="plant_rows_v1",
+                parameters={
+                    "cropType": "carrot",
+                    "targetCount": 6,
+                    "timeLimitSeconds": 300,
+                },
+                context={
+                    "fit_tags": ["intro"],
+                    "world_state": ["farm_plots_unlocked"],
+                    "difficulty_band": "tutorial",
+                },
+            )
+        )
+
+        request = build_request(
+            context=GeneratedStoryboardContext(
+                character_name="Old Garrett",
+                crop_name="",
+                minigame_goal="",
+            ),
+            linked_minigame_beat_id="plant_rows_intro",
+        )
+
+        result = self.service.create_package(request)
+
+        storyboard_shot = result.unity_package["Beats"][1]["Storyboard"]["Shots"][1]
+        self.assertEqual(
+            storyboard_shot["SubtitleText"],
+            "Plant 6 carrots in 5 minutes, and keep the rows tidy.",
+        )
+
+        written_package = json.loads(self.package_output_path.read_text(encoding="utf-8"))
+        self.assertEqual(len(written_package["Beats"]), 2)
+        self.assertEqual(written_package["Beats"][0]["Minigame"]["ObjectiveText"], "Plant 6 carrots in 5 minutes.")
+        self.assertEqual(written_package["Beats"][1]["BeatId"], "post_chicken_bridge")
+
+    def test_create_package_can_derive_non_crop_context_from_linked_find_tools_beat(self) -> None:
+        minigame_service = GeneratedMinigameBeatService(package_output_path=self.package_output_path)
+        minigame_service.create_package(
+            GeneratedMinigameBeatRequest(
+                package_id="storypkg_intro_chicken_sample",
+                package_display_name="Intro Chicken Sample",
+                beat_id="find_tools_intro",
+                display_name="Find Tools Intro",
+                scene_name="FindToolsGame",
+                next_scene_name="Tutorial_PreFarmCutscene",
+                generator_id="find_tools_cluster_v1",
+                parameters={
+                    "targetToolSet": "starter",
+                    "toolCount": 2,
+                    "searchZone": "yard",
+                    "hintStrength": "strong",
+                    "timeLimitSeconds": 240,
+                },
+                context={
+                    "fit_tags": ["bridge"],
+                    "world_state": ["tool_search_enabled"],
+                    "difficulty_band": "tutorial",
+                },
+            )
+        )
+
+        request = GeneratedStoryboardCutsceneRequest(
+            package_id="storypkg_intro_chicken_sample",
+            package_display_name="Intro Chicken Sample",
+            beat_id="pre_farm_bridge",
+            display_name="Pre-Farm Bridge",
+            scene_name="Tutorial_PreFarmCutscene",
+            next_scene_name="",
+            linked_minigame_beat_id="find_tools_intro",
+            story_brief="Bridge tool recovery into the first real farm loop.",
+            style_preset_id="farm_storybook_v1",
+            voice_id="voice-test",
+            context=GeneratedStoryboardContext(
+                character_name="Old Garrett",
+                crop_name="",
+                minigame_goal="",
+            ),
+        )
+
+        result = self.service.create_package(request)
+
+        storyboard_shot = result.unity_package["Beats"][1]["Storyboard"]["Shots"][0]
+        self.assertEqual(
+            storyboard_shot["SubtitleText"],
+            "Nice work. The starter tools are back where they belong.",
+        )
+
 
 class GeneratedStoryboardEndpointTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -68,7 +167,7 @@ class GeneratedStoryboardEndpointTests(unittest.TestCase):
         service = GeneratedStoryboardService(
             output_root=output_root,
             package_output_path=package_output_path,
-            planner=FakeStoryboardPlanner(),
+            planner=TemplateStoryboardPlanner(),
             image_generator=FakeImageGenerator(),
             speech_generator=FakeSpeechGenerator(),
         )
@@ -105,7 +204,40 @@ class GeneratedStoryboardEndpointTests(unittest.TestCase):
         self.assertEqual(payload["unity_package"]["Beats"][0]["Storyboard"]["Shots"][1]["ImageResourcePath"], "GeneratedStoryboards/storypkg_intro_chicken_sample/post_chicken_bridge/shot_02")
 
 
-def build_request() -> "GeneratedStoryboardCutsceneRequest":
+class PlaceholderSpeechGeneratorTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._temp_dir = tempfile.TemporaryDirectory()
+        self.output_root = Path(self._temp_dir.name)
+
+    def tearDown(self) -> None:
+        self._temp_dir.cleanup()
+
+    def test_generate_speech_removes_stale_sibling_audio_assets(self) -> None:
+        generator = PlaceholderSpeechGenerator()
+        stale_mp3 = self.output_root / "shot_01.mp3"
+        stale_meta = self.output_root / "shot_01.mp3.meta"
+        stale_mp3.write_bytes(b"old-mp3")
+        stale_meta.write_text("old-meta", encoding="utf-8")
+
+        result = generator.generate_speech(
+            text="Fresh fallback narration.",
+            voice_id="placeholder",
+            output_path=stale_mp3,
+            previous_text="",
+            next_text="",
+        )
+
+        self.assertEqual(result.output_path.suffix, ".wav")
+        self.assertTrue(result.output_path.exists())
+        self.assertFalse(stale_mp3.exists())
+        self.assertFalse(stale_meta.exists())
+
+
+def build_request(
+    *,
+    context: "GeneratedStoryboardContext | None" = None,
+    linked_minigame_beat_id: str | None = None,
+) -> "GeneratedStoryboardCutsceneRequest":
     return GeneratedStoryboardCutsceneRequest(
         package_id="storypkg_intro_chicken_sample",
         package_display_name="Intro Chicken Sample",
@@ -113,50 +245,17 @@ def build_request() -> "GeneratedStoryboardCutsceneRequest":
         display_name="Post Chicken Bridge",
         scene_name="PostChickenCutscene",
         next_scene_name="MidpointPlaceholder",
+        linked_minigame_beat_id=linked_minigame_beat_id,
         story_brief="Bridge the chicken chase into the first planting task.",
         style_preset_id="farm_storybook_v1",
         voice_id="voice-test",
-        context=GeneratedStoryboardContext(
+        context=context
+        or GeneratedStoryboardContext(
             character_name="Old Garrett",
             crop_name="carrots",
             minigame_goal="Plant 3 carrots in 5 minutes",
         ),
     )
-
-
-class FakeStoryboardPlanner:
-    def plan(self, request: "GeneratedStoryboardCutsceneRequest") -> "GeneratedStoryboardPlan":
-        return GeneratedStoryboardPlan(
-            beat_id=request.beat_id,
-            display_name=request.display_name,
-            scene_name=request.scene_name,
-            next_scene_name=request.next_scene_name or "",
-            style_preset_id=request.style_preset_id,
-            shots=[
-                GeneratedStoryboardPlanShot(
-                    shot_id="shot_01",
-                    subtitle_text="Nice work. The carrot beds are finally ready for you.",
-                    narration_text="Nice work. The carrot beds are finally ready for you.",
-                    image_prompt="A warm farm sunrise with Old Garrett turning toward the carrot beds.",
-                    duration_seconds=3.2,
-                ),
-                GeneratedStoryboardPlanShot(
-                    shot_id="shot_02",
-                    subtitle_text="Plant 3 carrots in 5 minutes, and keep the rows tidy.",
-                    narration_text="Plant 3 carrots in 5 minutes, and keep the rows tidy.",
-                    image_prompt="Old Garrett points at tidy carrot rows with tools ready beside the soil.",
-                    duration_seconds=3.6,
-                ),
-                GeneratedStoryboardPlanShot(
-                    shot_id="shot_03",
-                    subtitle_text="Head to the plots. The farm is waiting on your hands.",
-                    narration_text="Head to the plots. The farm is waiting on your hands.",
-                    image_prompt="A forward-looking farm path leading from the chicken pen to the carrot plots.",
-                    duration_seconds=3.0,
-                ),
-            ],
-        )
-
 
 class FakeImageGenerator:
     def generate_image(

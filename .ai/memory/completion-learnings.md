@@ -36,6 +36,126 @@
 
 ## Log
 
+### Scene Loader Alias Fix Missed The Core Tutorial Namespace Import (2026-04-13)
+- Status: Addressed
+- Related story/task: Tutorial alias-resolution fix for post-chicken -> midpoint runtime transitions
+- Original completion claim: The runtime scene-loading paths were updated to resolve canonical tutorial aliases through `SceneWorkCatalog`.
+- Reported issue: Unity compile failed with `Assets/_Project/Scripts/MonoBehaviours/SceneLoader.cs(18,19): error CS0103: The name 'SceneWorkCatalog' does not exist in the current context`.
+- Failing evidence: Developer-reported compiler error in `SceneLoader.cs` after the alias-resolution patch landed.
+- Approach that produced the miss: The implementation updated `SceneLoader` to use `SceneWorkCatalog.GetLoadableSceneName()` but did not add the required `using FarmSimVR.Core.Tutorial;` import to the MonoBehaviours file.
+- Why it was mistaken for done: The patch was validated by local source inspection and `git diff --check`, but not by a fresh compile, and the changed file did not get a final cross-assembly import sweep.
+- What should have been verified or stated differently: Any cross-assembly symbol added to a MonoBehaviour file needs a final namespace-import scan before handoff, especially when broader Unity test execution is already known to be blocked elsewhere.
+- Prevention rules for future work:
+  - When adding `Core` symbols into `MonoBehaviours`, do a file-level import audit before calling the patch done.
+  - Reuse the existing `Namespace Imports After Cross-Assembly Wiring` rule explicitly when a compile run is unavailable or blocked.
+- Follow-up actions:
+  - Add the missing `using FarmSimVR.Core.Tutorial;` import to `SceneLoader.cs`.
+  - Re-scan the edited files for unresolved `SceneWorkCatalog` references.
+- Actual root cause after fix: `SceneLoader.cs` referenced `SceneWorkCatalog` from `FarmSimVR.Core.Tutorial` without importing that namespace.
+- Guardrail added: No new project-memory rule; this is covered by the existing `Namespace Imports After Cross-Assembly Wiring (2026-04-11)` rule, which should have been applied to this patch.
+- Distilled rule added to project-memory.md: `Namespace Imports After Cross-Assembly Wiring (2026-04-11)`
+
+### Tutorial Flow Loaded Canonical Next-Scene Aliases Instead Of Build-Loadable Names (2026-04-13)
+- Status: Addressed
+- Related story/task: Generated storyboard tutorial slice spanning the post-chicken bridge into the midpoint placeholder
+- Original completion claim: The story-package slice was handed off as playable through the post-chicken cutscene into the next tutorial bridge.
+- Reported issue: Completing the post-chicken storyboard cutscene threw `Scene 'MidpointPlaceholder' couldn't be loaded` because `TutorialFlowController` attempted to load the canonical tutorial alias instead of the actual build-profile scene name.
+- Failing evidence: Runtime log from `TutorialFlowController.CompleteCurrentSceneAndLoadNext()` at `Assets/_Project/Scripts/MonoBehaviours/Tutorial/TutorialFlowController.cs:92` calling `SceneManager.LoadScene("MidpointPlaceholder")` while the build profile contains `Tutorial_MidpointPlaceholder`.
+- Approach that produced the miss: The earlier alias fix only covered the title-screen launcher path. The follow-up tutorial runtime path still loaded `NextSceneName` values from the story package and tutorial flow service directly without resolving them through `SceneWorkCatalog`.
+- Why it was mistaken for done: Verification focused on entering the generated cutscene and playing the storyboard assets, but it did not directly exercise the runtime handoff from one aliased bridge scene to the next.
+- What should have been verified or stated differently: A tutorial handoff must validate both entry and exit transitions for any scene chain that uses canonical routing aliases different from actual scene asset names.
+- Prevention rules for future work:
+  - Treat every Unity scene-loading path as a separate integration surface; fixing one launcher does not prove tutorial transitions are safe.
+  - Centralize canonical-scene-to-build-scene resolution before every `SceneManager.LoadScene` call that touches tutorial routing.
+  - Add a regression around story-package next-scene resolution whenever a package references canonical aliases.
+- Follow-up actions:
+  - Add a focused regression covering loadable resolution of the post-chicken package next-scene alias.
+  - Route tutorial flow scene loads through `SceneWorkCatalog.GetLoadableSceneName`.
+- Actual root cause after fix: `TutorialFlowController.CompleteCurrentSceneAndLoadNext()` loaded `packageNextScene` and tutorial flow outputs directly, and `SceneLoader` also passed resolved tutorial aliases straight into `SceneManager.LoadScene`. Both paths bypassed the existing `SceneWorkCatalog.GetLoadableSceneName()` mapping that the title-screen launcher already used.
+- Guardrail added: `TutorialFlowController.ResolveLoadableSceneRequest()` now resolves canonical tutorial aliases to build-loadable scene names, `TutorialFlowController` routes all tutorial scene loads through that mapping, and `SceneLoader` falls back to the same catalog mapping when no controller is present. `TutorialSceneConfigurationTests.TutorialFlowController_ResolveLoadableSceneRequest_UsesBuildProfileNameForStoryPackageNextScene` locks the post-chicken -> midpoint alias conversion in source.
+- Distilled rule added to project-memory.md: `All tutorial scene-loading paths must resolve canonical aliases through SceneWorkCatalog before calling SceneManager.LoadScene (2026-04-13)`
+
+### Storyboard Cutscene Playback Assumed An AudioSource Existed (2026-04-13)
+- Status: Addressed
+- Related story/task: Generated storyboard cutscene slice on the post-chicken bridge scene
+- Original completion claim: The title-screen story package slice was handed off as testable with generated Gemini stills and narration-backed cutscene playback.
+- Reported issue: Entering the post-chicken cutscene threw `MissingComponentException` because `TutorialCutsceneSceneController` tried to stop an `AudioSource` on a game object that did not have one yet.
+- Failing evidence: Runtime log from `TutorialCutsceneSceneController.PlayAudio` at `Assets/_Project/Scripts/MonoBehaviours/Tutorial/TutorialCutsceneSceneController.cs:219` after loading `Tutorial_PostChickenCutscene`.
+- Approach that produced the miss: The controller cached audio setup through `GetComponent<AudioSource>() ?? AddComponent<AudioSource>()` and the handoff focused on generated assets and story routing without exercising the actual storyboard playback path in Unity.
+- Why it was mistaken for done: Verification confirmed that the package, images, and audio assets existed, but it did not directly play the cutscene scene to prove the controller could bootstrap its own runtime audio component.
+- What should have been verified or stated differently: A storyboard cutscene handoff must verify that the controller can start playback from a clean scene object with no pre-attached `AudioSource`, or state explicitly that the scene requires one to be authored in advance.
+- Prevention rules for future work:
+  - Add a focused regression test for cutscene playback bootstrap whenever a controller lazily creates required components at runtime.
+  - Avoid Unity null-coalescing shortcuts for component creation when runtime safety depends on Unity's custom null semantics.
+  - Treat "asset generation complete" and "scene playback verified" as separate completion claims.
+- Follow-up actions:
+  - Add a targeted test around `TutorialCutsceneSceneController` playback with no pre-existing `AudioSource`.
+  - Patch the controller to resolve or create a valid audio component before calling `Stop()` or `Play()`.
+- Actual root cause after fix: `TutorialCutsceneSceneController` used `gameObject.GetComponent<AudioSource>() ?? gameObject.AddComponent<AudioSource>()`, and that null-coalescing path was not safe against Unity's custom null semantics for missing components. The controller could cache an invalid `AudioSource` reference and then throw `MissingComponentException` on `_audioSource.Stop()` during storyboard playback.
+- Guardrail added: `StoryPackageRuntimeCatalogTests.StoryboardController_PlayAudio_CreatesAudioSource_WhenMissing` now locks the bootstrap behavior in source, and `TutorialCutsceneSceneController` resolves the component through explicit Unity null checks before caching or using it. Direct Unity test execution was still blocked in the disposable copy by unrelated `TownConversationMemoryTests` compile errors, so runtime verification remains limited to source inspection plus the reported failure path.
+- Distilled rule added to project-memory.md: `Storyboard cutscene controllers must resolve runtime-required components with explicit Unity null checks, not null-coalescing shortcuts (2026-04-13)`
+
+### Title Screen Slice Launcher Used Canonical Tutorial Aliases As Loadable Scene Names (2026-04-13)
+- Status: Addressed
+- Related story/task: Generated storyboard cutscene slice on the post-chicken bridge scene
+- Original completion claim: The post-chicken bridge was handed off as testable from the title screen through the existing slice launcher.
+- Reported issue: Launching the post-chicken slice from the title screen failed with `Scene 'PostChickenCutscene' couldn't be loaded`.
+- Failing evidence: Runtime log from `TitleScreenManager/<TransitionToGame>d__12` calling `SceneManager.LoadScene("PostChickenCutscene")` even though the build profile contains `Tutorial_PostChickenCutscene`.
+- Approach that produced the miss: The implementation reused the canonical scene names from `SceneWorkCatalog` for both story routing and Unity scene loading without verifying that every canonical tutorial alias matched an actual scene asset name.
+- Why it was mistaken for done: Verification covered package routing, generated assets, and button presence, but it did not exercise the title-screen launch path for aliased bridge scenes.
+- What should have been verified or stated differently: A title-screen handoff must verify that each launcher button resolves to a scene name that exists in the build profile, especially when runtime routing uses normalized aliases.
+- Prevention rules for future work:
+  - Keep story-routing scene aliases separate from Unity loadable scene names whenever the asset names still carry migration prefixes.
+  - Add a regression test for title-screen launcher resolution whenever `SceneWorkCatalog` exposes canonical names that differ from scene asset names.
+  - Treat launch-path verification as distinct from tutorial-flow verification; a scene being routable does not prove it is directly loadable from the menu.
+- Follow-up actions:
+  - Added `SceneWorkCatalog.GetLoadableSceneName()` and routed `TitleScreenManager` through it before `SceneManager.LoadScene`.
+  - Added `TutorialSceneConfigurationTests.SceneWorkCatalog_GetLoadableSceneName_ResolvesBuildProfileSceneNames` to lock the alias-to-build-name mapping for the aliased bridge scenes.
+  - Root cause was mixing canonical tutorial routing names with actual scene asset names in the title-screen launcher path.
+- Distilled rule added to project-memory.md: `Title-screen launchers must resolve canonical tutorial aliases to build-loadable scene names through SceneWorkCatalog (2026-04-13)`
+
+### Generative Story Slice Launched The Tutorial Intro Instead Of The Generated Beat (2026-04-13)
+- Status: Addressed
+- Related story/task: Standing `Generative Story Slice` launcher on the title screen
+- Original completion claim: The standing title-screen slice was handed off as the stable test surface for ongoing Generative Story Orchestrator work.
+- Reported issue: The developer reported that clicking `Generative Story Slice` still starts from `Intro`, which is the authored tutorial opening rather than the generated slice.
+- Failing evidence: Developer report after using the title-screen launcher: "the `generative story slice` just starts from the intro which it shouldnt lol".
+- Approach that produced the miss: The launcher label and package backing were updated, but the slice entry scene remained hardcoded to `TutorialSceneCatalog.IntroSceneName`.
+- Why it was mistaken for done: Verification focused on the presence of the standing slice button and package naming, but it did not validate that the button targeted the generated storyboard beat described in the GSO specs.
+- What should have been verified or stated differently: The handoff should have stated the exact entry scene and checked that it matched the generated-slice target beat, not just that a package-backed launcher existed.
+- Prevention rules for future work:
+  - A standing slice launcher must verify both label and entry beat; a renamed button is not enough.
+  - When multiple specs describe the same slice, reconcile the entry scene against the most specific generated-slice spec before handoff.
+  - Add a source regression that locks the standing slice to the intended generated beat scene.
+- Follow-up actions:
+  - Added a failing regression for the standing slice entry scene in `TutorialSceneConfigurationTests.TitleScreenManager_StartBuildsTutorialSliceLauncherFromSharedSceneCatalogAndStoryPackageSampleEntry`.
+  - Retargeted `TitleScreenManager` from `Intro` to `PostChickenCutscene`, which is the current generated storyboard proof beat.
+  - Updated the slice spec and project memory so future increments preserve the correct entry point.
+- Actual root cause after fix: `TitleScreenManager` still hardcoded `StoryPackageSampleSceneName` to `TutorialSceneCatalog.IntroSceneName`, and the earlier GSO-003 slice spec repeated that mismatch even though the more specific generated-slice spec already targeted `PostChickenCutscene`.
+- Guardrail added: The standing slice test now asserts the launcher's internal scene constant resolves to `TutorialSceneCatalog.PostChickenCutsceneSceneName`, and project memory now records that the standing generative slice must launch the current generated proof beat instead of the authored intro unless a spec explicitly says otherwise.
+- Distilled rule added to project-memory.md: `The standing Generative Story Slice should launch the current generated proof beat, not the authored Intro Timeline (2026-04-13)`
+
+### Town Scene Shipped With A Stale Serialized OpenAI Key (2026-04-13)
+- Status: Addressed
+- Related story/task: Town NPC text streaming and voice-streaming handoff
+- Original completion claim: The Town scene was handed off as ready for local streamed NPC conversations with OpenAI text and ElevenLabs voice layered on top.
+- Reported issue: The developer hit a runtime 401 from OpenAI because the scene was still sending an invalid serialized API key.
+- Failing evidence: Runtime log from `LLMConversationController` / `OpenAIClient`: `OpenAI stream failed (401)` with `Incorrect API key provided`.
+- Approach that produced the miss: The implementation focused on request shape, stream parsing, and voice integration, but it did not audit the serialized `OpenAIClient` configuration already present in `Town.unity`.
+- Why it was mistaken for done: Verification covered focused tests and new runtime wiring, but not the actual credential source that the Town scene would use at play time.
+- What should have been verified or stated differently: A handoff for any live LLM scene must explicitly verify whether credentials come from environment, backend, or serialized scene data, and must call out any unverified local secret dependency.
+- Prevention rules for future work:
+  - Never leave provider API keys serialized into Unity scenes or prefabs.
+  - Add configuration coverage for credential resolution precedence whenever a runtime can read both inspector and environment values.
+  - Treat local secret sourcing as a first-class handoff item for AI features, not an implementation afterthought.
+- Follow-up actions:
+  - Add EditMode tests that fail if `Town.unity` contains a serialized OpenAI API key.
+  - Add EditMode tests that prove `OPENAI_API_KEY` wins over any stale inspector override.
+  - Remove the stale serialized key and update the resolver accordingly.
+- Actual root cause after fix: `Town.unity` still serialized a stale `apiKey` on `OpenAIClient`, and `ResolveApiKey()` preferred that inspector value over `OPENAI_API_KEY`, so the runtime kept sending the bad scene key.
+- Guardrail added: `OpenAIClientConfigurationTests` now verifies both environment-first key resolution and that `Town.unity` does not serialize an OpenAI key.
+- Distilled rule added to project-memory.md: `OpenAI credentials must come from environment-first runtime config, never serialized Town scene data (2026-04-13)`
+
 ### Town Early-Turn Choice Flow Fell Back To Continue/Goodbye Too Soon (2026-04-13)
 - Status: Addressed
 - Related story/task: Town direct text streaming and follow-up option flow

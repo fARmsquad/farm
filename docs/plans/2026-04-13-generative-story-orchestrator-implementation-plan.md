@@ -296,13 +296,14 @@ Deliverables:
 - `CharacterModule` schema
 - `NarrativeWorldState` schema
 - `MinigameCatalog` schema
+- `MinigameGeneratorDefinition` schema
 - `ReferenceAssetLibrary` schema
 - `VoiceProfileLibrary` schema
 - first 2-3 minigame adapters
 
 Acceptance gate:
 
-- every supported minigame has capability tags, config schema, validation rules, and tuning bounds
+- every supported minigame has capability tags, config schema, validation rules, tuning bounds, and at least one generator definition
 - every supported character has approved references and continuity facts
 - planner inputs can be validated before generation begins
 
@@ -502,7 +503,39 @@ Acceptance:
 
 Acceptance:
 
-- each supported minigame exposes capability tags, parameter bounds, preview data, and fallback substitutions
+- each supported minigame exposes capability tags, parameter bounds, preview data, fallback substitutions, and one or more generator definitions
+
+#### GSO-007a: Define `MinigameGeneratorDefinition`
+
+Acceptance:
+
+- the planner selects a generator ID plus bounded parameters instead of inventing raw minigame config
+- each generator declares defaults, allowed ranges, coupling rules, and fallback generators
+- at least one planting generator and one fetch/search-style generator are represented in schema
+
+#### GSO-007b: Build generator materialization into package minigame beats
+
+Acceptance:
+
+- a chosen generator ID plus bounded parameters can be validated and materialized into a `Kind=Minigame` package beat
+- invalid selections return structured errors and fallback IDs without crashing the caller
+- successful materialization writes deterministic `AdapterId`, `ObjectiveText`, `RequiredCount`, `TimeLimitSeconds`, and resolved generator metadata into package JSON
+
+#### Immediate Next Slice: Build one-call intro package assembly
+
+Recommended next step:
+
+- accept one request that contains:
+  - minigame generator selection
+  - cutscene scene metadata
+  - character/storyboard context
+- materialize the target minigame beat first
+- generate the bridge cutscene second using the linked minigame beat
+- return one package result that contains both beats
+
+The point of this slice is to remove the current two-call orchestration burden
+from the operator path and make the intro package flow feel like one backend
+operation instead of two manually coordinated writes.
 
 #### GSO-008: Define reference and voice libraries
 

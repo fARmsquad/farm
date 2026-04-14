@@ -1,5 +1,10 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/_Project/Scenes/CaughtChickenCutscene.unity.meta
 guid: 78437b78425640af807d0de057880c75
+========
+guid: 144153840fa6f42528832e41b25fbaca
+folderAsset: yes
+>>>>>>>> 504e757e ([feature] checkpoint generative story package work):Assets/_Project/Resources/GeneratedStoryboards.meta
 DefaultImporter:
   externalObjects: {}
   userData: 

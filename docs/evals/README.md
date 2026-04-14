@@ -32,6 +32,8 @@ python3 tools/evals/town_llm_golden_eval.py \
 - no raw JSON keys like `"response"` or `"options"`
 - no code fences or chat role labels
 - per-case content guardrails
+- repeat-question cases that demand a fresh angle instead of the same canned line
+- shared-world grounding cases that mention connected people, places, or town history
 - maximum sentence count per reply
 
 Use it whenever Town prompts, model settings, or response parsing change.

@@ -319,7 +319,7 @@ The backend must store:
 
 Recommended structure:
 - `CharacterModule`: identity, look references, role, voice, lore, exclusions, continuity facts
-- `MinigameCatalog`: capability tags, config schema, tuning bounds, fallbacks, preview data
+- `MinigameCatalog`: capability tags, config schema, generator definitions, tuning bounds, fallbacks, preview data
 - `NarrativeWorldState`: season, farm status, unlocked content, relationship state, prior episode facts
 - `ReferenceAssetLibrary`: approved poses, costume references, environment references, visual red lines
 - `VoiceProfileLibrary`: voice IDs, seeds, speaking style constraints, fallback mapping
@@ -341,12 +341,80 @@ The planner must output structured JSON for:
 Each minigame must expose an MCP-like backend tool contract:
 - supported capabilities
 - input schema
+- generator definitions
 - validation rules
 - tuning bounds
 - preview payload
 - fallback substitutions
 
 This is not a literal MCP server per minigame. It is a backend contract that lets the planner reason about minigames as reliable tools.
+
+### 13.4.1 Per-Minigame Generator Pattern
+Each supported minigame should also expose one or more `MinigameGeneratorDefinition` entries. This is the layer the AI planner actually selects and tweaks.
+
+The rule is simple:
+- the planner does not invent raw gameplay config from scratch
+- it chooses a known generator
+- it fills bounded parameters
+- the adapter validates and materializes the final minigame config
+
+Each generator definition should include:
+- `generatorId`
+- narrative fit tags such as `intro`, `teaching`, `harvest`, `timed`, `calm`, `character-led`
+- supported difficulty bands
+- required world-state preconditions
+- parameter schema
+- allowed ranges or enums
+- default values
+- parameter coupling rules
+- preview text template
+- fallback generator IDs
+
+Example shape:
+```json
+{
+  "minigameId": "planting",
+  "generatorId": "plant_rows_v1",
+  "fitTags": ["intro", "teaching", "crop-focused"],
+  "parameters": {
+    "cropType": { "type": "enum", "values": ["carrot", "tomato", "corn"] },
+    "targetCount": { "type": "int", "min": 3, "max": 12, "default": 5 },
+    "timeLimitSeconds": { "type": "int", "min": 120, "max": 600, "default": 300 },
+    "rowCount": { "type": "int", "min": 1, "max": 4, "default": 2 },
+    "assistLevel": { "type": "enum", "values": ["high", "medium", "low"] }
+  },
+  "constraints": [
+    "intro episodes may not use assistLevel=low",
+    "targetCount must scale with rowCount",
+    "tomato is not valid until tomatoes are unlocked"
+  ],
+  "fallbackGenerators": ["plant_rows_tutorial_safe_v1"]
+}
+```
+
+This matters because it gives the system a clean boundary between:
+- narrative planning
+- minigame selection
+- minigame customization
+- runtime validation
+
+For FarmSim VR, this should become the standard model for every AI-tunable minigame:
+- planting generators
+- harvesting generators
+- find-tools generators
+- chicken-herding or chase generators
+- future horse-training generators
+
+The generator layer is what makes each minigame feel like its own controllable "tool" without requiring a separate service per game.
+
+V1 should start with exactly three generator definitions:
+- `plant_rows_v1`
+- `find_tools_cluster_v1`
+- `chicken_chase_intro_v1`
+
+That gives the system one crop-focused generator, one search/recovery generator,
+and one light-pressure action generator without widening the initial planning
+surface too early.
 
 ### 13.5 Story Package Output
 Each generated episode must produce a versioned `StoryPackage` with:

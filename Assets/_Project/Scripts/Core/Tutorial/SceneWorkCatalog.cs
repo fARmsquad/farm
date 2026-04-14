@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace FarmSimVR.Core.Tutorial
 {
@@ -45,6 +46,14 @@ namespace FarmSimVR.Core.Tutorial
             }
 
             return BySceneName.TryGetValue(sceneName, out definition);
+        }
+
+        public static string GetLoadableSceneName(string sceneName)
+        {
+            if (!TryGetBySceneName(sceneName, out var definition) || string.IsNullOrWhiteSpace(definition.ScenePath))
+                return sceneName;
+
+            return Path.GetFileNameWithoutExtension(definition.ScenePath);
         }
 
         private static IReadOnlyList<SceneWorkDefinition> BuildOrderedScenes()

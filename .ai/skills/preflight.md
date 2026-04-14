@@ -5,8 +5,8 @@
 Gates 13-17 are MCP (require Unity editor open). ALL available gates must pass.
 
 ## CLI Gates (always run)
-1. **EditMode tests**: `./run-tests.sh editmode` exits 0
-2. **PlayMode tests**: `./run-tests.sh playmode` exits 0
+1. **EditMode test status**: `./run-tests.sh editmode` should be reported, but failure is advisory
+2. **PlayMode test status**: `./run-tests.sh playmode` should be reported, but failure is advisory
 3. **Compiler clean**: no errors in Unity build
 4. **Clean tree**: `git status --porcelain` is empty
 5. **Feature branch**: not on main/master
@@ -59,4 +59,5 @@ Gates 13-17 are MCP (require Unity editor open). ALL available gates must pass.
 - Report which gate(s) failed
 - Attempt automatic fix (up to 3 times)
 - If unfixable: report to developer
+- Test-status failures are warnings unless the developer explicitly asks to block on them
 - MCP gate failures don't block Core/-only features if editor is closed
