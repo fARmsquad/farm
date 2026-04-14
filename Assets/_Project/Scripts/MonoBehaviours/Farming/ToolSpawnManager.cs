@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using FarmSimVR.Core.Farming;
 using FarmSimVR.Core.Inventory;
 using FarmSimVR.MonoBehaviours.UI;
 
@@ -24,6 +25,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private IInventorySystem _inventory;
         private IItemDatabase _database;
         private ToolEquipState _toolEquip;
+        private WateringCanState _waterCan;
         private int _toolsRemaining;
 
         private const float DefaultToolScale = 0.33f;
@@ -204,6 +206,17 @@ namespace FarmSimVR.MonoBehaviours.Farming
             _database = ItemDatabase.CreateStarterDatabase();
             _inventory = new InventorySystem(_database, 24);
             _toolEquip = new ToolEquipState();
+            _waterCan = new WateringCanState();
+
+            // Initialize well interaction
+            var wellController = FindAnyObjectByType<WellInteractionController>();
+            if (wellController != null)
+                wellController.Initialize(_waterCan, _toolEquip);
+
+            // Initialize watering can feedback (SFX, particles, empty message)
+            var feedbackController = FindAnyObjectByType<WateringCanFeedbackController>();
+            if (feedbackController != null)
+                feedbackController.Initialize(_waterCan, _toolEquip);
 
             // Initialize inventory UI
             var inventoryUI = FindAnyObjectByType<InventoryUIController>();
@@ -213,7 +226,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
             // Initialize hotbar UI
             var hotbarUI = FindAnyObjectByType<HotbarUIController>();
             if (hotbarUI != null)
-                hotbarUI.Initialize(_inventory, _database, _toolEquip);
+                hotbarUI.Initialize(_inventory, _database, _toolEquip, waterCan: _waterCan);
 
             Debug.Log("[ToolSpawnManager] Created standalone inventory and initialized UI.");
         }

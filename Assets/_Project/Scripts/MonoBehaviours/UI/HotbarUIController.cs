@@ -26,6 +26,7 @@ namespace FarmSimVR.MonoBehaviours.UI
         private ItemIconDatabase _iconDb;
         private ItemTooltipController _tooltip;
         private ToolEquipState _toolEquip;
+        private WateringCanState _waterCan;
         private readonly List<HotbarSlotView> _slotViews = new();
 
         private static readonly Color EquippedColor = new(1f, 0.85f, 0.2f, 1f);
@@ -45,7 +46,7 @@ namespace FarmSimVR.MonoBehaviours.UI
         /// Initializes the hotbar. Called from FarmSimDriver.Start().
         /// </summary>
         public void Initialize(IInventorySystem inventory, IItemDatabase database, ToolEquipState toolEquip,
-            ItemIconDatabase iconDb = null)
+            ItemIconDatabase iconDb = null, WateringCanState waterCan = null)
         {
             if (inventory == null)
             {
@@ -58,11 +59,15 @@ namespace FarmSimVR.MonoBehaviours.UI
             _database = database;
             _toolEquip = toolEquip;
             _iconDb = iconDb;
+            _waterCan = waterCan;
             _tooltip = FindAnyObjectByType<ItemTooltipController>();
 
             BuildSlotViews();
             Refresh();
         }
+
+        /// <summary>Drain rate per second when holding LMB with the watering can.</summary>
+        private const float WaterDrainPerSecond = 0.15f;
 
         private void Update()
         {
@@ -79,6 +84,18 @@ namespace FarmSimVR.MonoBehaviours.UI
 
             if (changed)
                 Refresh();
+
+            // Continuous LMB drain when watering can is equipped
+            if (_waterCan != null && _toolEquip != null
+                && _toolEquip.EquippedTool == FarmToolId.WateringCan
+                && !_waterCan.IsEmpty)
+            {
+                var mouse = Mouse.current;
+                if (mouse != null && mouse.leftButton.isPressed)
+                {
+                    _waterCan.TryDrain(WaterDrainPerSecond * Time.deltaTime, out _);
+                }
+            }
         }
 
         /// <summary>
@@ -170,6 +187,44 @@ namespace FarmSimVR.MonoBehaviours.UI
             if (itemId.StartsWith("crop_")) return CategoryColors[ItemCategory.Crop];
             if (itemId.StartsWith("tool_")) return CategoryColors[ItemCategory.Tool];
             return CategoryColors[ItemCategory.Material];
+        }
+
+        private void OnGUI()
+        {
+            if (_waterCan == null || _toolEquip == null)
+                return;
+
+            // Only show when watering can is equipped
+            if (_toolEquip.EquippedTool != FarmToolId.WateringCan)
+                return;
+
+            const float barWidth = 120f;
+            const float barHeight = 12f;
+            const float labelHeight = 16f;
+            float x = (Screen.width - barWidth) * 0.5f;
+            float y = Screen.height - 100f;
+
+            // Label
+            int waterPercent = Mathf.RoundToInt(_waterCan.WaterLevel * 100f);
+            var labelContent = new GUIContent($"Water: {waterPercent}%");
+            var labelStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 11,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter
+            };
+            labelStyle.normal.textColor = new Color(0.8f, 0.9f, 1f, 0.95f);
+            GUI.Label(new Rect(x, y - labelHeight - 2f, barWidth, labelHeight), labelContent, labelStyle);
+
+            // Background
+            GUI.color = new Color(0.1f, 0.1f, 0.3f, 0.8f);
+            GUI.DrawTexture(new Rect(x, y, barWidth, barHeight), Texture2D.whiteTexture);
+
+            // Fill
+            GUI.color = new Color(0.2f, 0.7f, 1.0f, 0.9f);
+            GUI.DrawTexture(new Rect(x, y, barWidth * Mathf.Clamp01(_waterCan.WaterLevel), barHeight), Texture2D.whiteTexture);
+
+            GUI.color = Color.white;
         }
 
         /// <summary>

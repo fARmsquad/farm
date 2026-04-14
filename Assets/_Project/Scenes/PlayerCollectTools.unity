@@ -1907,6 +1907,7 @@ GameObject:
   - component: {fileID: 613280149}
   - component: {fileID: 613280154}
   - component: {fileID: 613280153}
+  - component: {fileID: 613280155}
   m_Layer: 0
   m_Name: InventoryCanvas
   m_TagString: Untagged
@@ -2029,6 +2030,24 @@ MonoBehaviour:
   backpackPanel: {fileID: 362279292}
   slotContainer: {fileID: 572051036}
   slotPrefab: {fileID: 5895365751809842530, guid: 736fe101b8557497b8415b84bb3be64d, type: 3}
+--- !u!114 &613280155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613280148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caca4ce8b3c314bb9834850089fad9e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.Farming.WateringCanFeedbackController
+  pourLoopClip: {fileID: 8300000, guid: 0ebedea0ad7e34c59a71b295adc752ea, type: 3}
+  emptyClip: {fileID: 8300000, guid: 3d9b76927ce57455ea068d451ddc393b, type: 3}
+  pourVolume: 0.6
+  emptyVolume: 0.8
+  splashPrefab: {fileID: 1497628649277390, guid: 5d5da19b06b71d74baef1d8c22f634e1, type: 3}
+  splashOffset: {x: 0, y: 0.05, z: 1}
 --- !u!1 &616692931
 GameObject:
   m_ObjectHideFlags: 0
@@ -4013,13 +4032,137 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1036262024562578, guid: 67762d8bd3734a7438c2df391d2709de, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1361413000}
+    - targetCorrespondingSourceObject: {fileID: 1036262024562578, guid: 67762d8bd3734a7438c2df391d2709de, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1361412999}
   m_SourcePrefab: {fileID: 100100000, guid: 67762d8bd3734a7438c2df391d2709de, type: 3}
 --- !u!4 &1358722044 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4097871005362856, guid: 67762d8bd3734a7438c2df391d2709de, type: 3}
   m_PrefabInstance: {fileID: 1358722043}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1361412995 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1036262024562578, guid: 67762d8bd3734a7438c2df391d2709de, type: 3}
+  m_PrefabInstance: {fileID: 1358722043}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1361412999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1361412995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0922a5c95d5924aaba4ff1b7b13ed226, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.Farming.WellInteractionController
+  interactRadius: 3
+  fillDuration: 1.5
+  fillStartClip: {fileID: 8300000, guid: ae213c218bd4e40b49ef9a54e7e1053b, type: 3}
+  fillCompleteClip: {fileID: 8300000, guid: 9325291c70ada416686a940e751104d4, type: 3}
+--- !u!82 &1361413000
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1361412995}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 15
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &1371344351
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4266,6 +4409,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1450056632}
   - component: {fileID: 1450056631}
+  - component: {fileID: 1450056633}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -4339,6 +4483,14 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!81 &1450056633
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1450056630}
+  m_Enabled: 1
 --- !u!1 &1486895115
 GameObject:
   m_ObjectHideFlags: 0
