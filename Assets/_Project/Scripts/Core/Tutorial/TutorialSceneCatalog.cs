@@ -27,8 +27,7 @@ namespace FarmSimVR.Core.Tutorial
             ChickenGameSceneName,
             PostChickenCutsceneSceneName,
             FindToolsSceneName,
-            PreFarmCutsceneSceneName,
-            FarmTutorialSceneName,
+            SceneWorkCatalog.PlayerGettingSeedsSceneName,
             CoreSceneSceneName,
         };
 
@@ -69,6 +68,8 @@ namespace FarmSimVR.Core.Tutorial
                     return CoreSceneSceneName;
                 case TutorialStep.FindTools:
                     return FindToolsSceneName;
+                case TutorialStep.GettingSeeds:
+                    return SceneWorkCatalog.PlayerGettingSeedsSceneName;
                 case TutorialStep.PreFarmCutscene:
                     return PreFarmCutsceneSceneName;
                 case TutorialStep.FarmTutorial:
@@ -90,6 +91,7 @@ namespace FarmSimVR.Core.Tutorial
             if (sceneName == PostChickenCutsceneSceneName) return TutorialStep.PostChickenCutscene;
             if (sceneName == CoreSceneSceneName) return TutorialStep.MidpointPlaceholder;
             if (sceneName == FindToolsSceneName) return TutorialStep.FindTools;
+            if (sceneName == SceneWorkCatalog.PlayerGettingSeedsSceneName) return TutorialStep.GettingSeeds;
             if (sceneName == PreFarmCutsceneSceneName) return TutorialStep.PreFarmCutscene;
             if (sceneName == FarmTutorialSceneName) return TutorialStep.FarmTutorial;
 
@@ -107,10 +109,8 @@ namespace FarmSimVR.Core.Tutorial
                 case TutorialStep.PostChickenCutscene:
                     return TutorialStep.FindTools;
                 case TutorialStep.FindTools:
-                    return TutorialStep.PreFarmCutscene;
-                case TutorialStep.PreFarmCutscene:
-                    return TutorialStep.FarmTutorial;
-                case TutorialStep.FarmTutorial:
+                    return TutorialStep.GettingSeeds;
+                case TutorialStep.GettingSeeds:
                     return TutorialStep.MidpointPlaceholder;
                 case TutorialStep.MidpointPlaceholder:
                     return TutorialStep.None;
@@ -129,12 +129,10 @@ namespace FarmSimVR.Core.Tutorial
                     return TutorialStep.ChickenHunt;
                 case TutorialStep.FindTools:
                     return TutorialStep.PostChickenCutscene;
-                case TutorialStep.PreFarmCutscene:
+                case TutorialStep.GettingSeeds:
                     return TutorialStep.FindTools;
-                case TutorialStep.FarmTutorial:
-                    return TutorialStep.PreFarmCutscene;
                 case TutorialStep.MidpointPlaceholder:
-                    return TutorialStep.FarmTutorial;
+                    return TutorialStep.GettingSeeds;
                 default:
                     return TutorialStep.None;
             }

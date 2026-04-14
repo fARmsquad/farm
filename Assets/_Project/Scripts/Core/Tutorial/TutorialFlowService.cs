@@ -19,6 +19,7 @@ namespace FarmSimVR.Core.Tutorial
             State.PostChickenCutsceneComplete = false;
             State.PlaceholderCutsceneVisited = false;
             State.FindToolsComplete = false;
+            State.GettingSeedsComplete = false;
             State.PreFarmCutsceneComplete = false;
             State.FarmTutorialStarted = false;
             State.FarmTutorialComplete = false;
@@ -83,6 +84,7 @@ namespace FarmSimVR.Core.Tutorial
                 State.PostChickenCutsceneComplete,
                 State.PlaceholderCutsceneVisited,
                 State.FindToolsComplete,
+                State.GettingSeedsComplete,
                 State.PreFarmCutsceneComplete,
                 State.FarmTutorialStarted,
                 State.FarmTutorialComplete);
@@ -97,6 +99,7 @@ namespace FarmSimVR.Core.Tutorial
             State.PostChickenCutsceneComplete = snapshot.PostChickenCutsceneComplete;
             State.PlaceholderCutsceneVisited = snapshot.PlaceholderCutsceneVisited;
             State.FindToolsComplete = snapshot.FindToolsComplete;
+            State.GettingSeedsComplete = snapshot.GettingSeedsComplete;
             State.PreFarmCutsceneComplete = snapshot.PreFarmCutsceneComplete;
             State.FarmTutorialStarted = snapshot.FarmTutorialStarted;
             State.FarmTutorialComplete = snapshot.FarmTutorialComplete;
@@ -120,6 +123,9 @@ namespace FarmSimVR.Core.Tutorial
                     break;
                 case TutorialStep.FindTools:
                     State.FindToolsComplete = true;
+                    break;
+                case TutorialStep.GettingSeeds:
+                    State.GettingSeedsComplete = true;
                     break;
                 case TutorialStep.PreFarmCutscene:
                     State.PreFarmCutsceneComplete = true;

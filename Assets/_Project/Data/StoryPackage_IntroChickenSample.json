@@ -148,6 +148,23 @@
       }
     },
     {
+      "BeatId": "player_getting_seeds",
+      "DisplayName": "Getting Seeds",
+      "Kind": "Cutscene",
+      "SceneName": "PlayerGettingSeeds",
+      "NextSceneName": "CoreScene",
+      "SequenceSteps": [
+        {
+          "StepType": "ObjectivePopup",
+          "StringParam": "You found the tools. Now let\u2019s gather the seeds."
+        }
+      ],
+      "Storyboard": {
+        "StylePresetId": "farm_storybook_v1",
+        "Shots": []
+      }
+    },
+    {
       "BeatId": "pre_farm_bridge",
       "DisplayName": "Pre-Farm Bridge",
       "Kind": "Cutscene",

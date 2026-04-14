@@ -135,7 +135,7 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(StoryPackageImporter.TryImport(asset, out var package, out var error), Is.True, error);
             Assert.That(package.PackageId, Is.EqualTo("storypkg_intro_chicken_sample"));
             Assert.That(package.DisplayName, Is.EqualTo("Generative Story Slice"));
-            Assert.That(package.Beats, Has.Length.EqualTo(6));
+            Assert.That(package.Beats, Has.Length.EqualTo(7));
 
             Assert.That(StoryPackageNavigator.TryGetBeatBySceneName(package, "FarmMain", out var farmBeat), Is.True);
             Assert.That(farmBeat, Is.Not.Null);

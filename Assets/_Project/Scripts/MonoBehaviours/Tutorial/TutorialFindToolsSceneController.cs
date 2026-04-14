@@ -25,8 +25,10 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         private bool _usePackageMode;
         private bool _failureAcknowledged;
         private bool _sceneHasEnvironment;
+        private bool _useSceneToolSpawnManager;
         private string _currentObjective = string.Empty;
         private TutorialToolPickup[] _packagePickups = System.Array.Empty<TutorialToolPickup>();
+        private ToolSpawnManager _toolSpawnManager;
 
         private GUIStyle _bodyStyle;
         private GUIStyle _feedbackStyle;
@@ -43,7 +45,20 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             if (!_sceneHasEnvironment)
                 BuildEnvironment(includeGoalSquare: !_usePackageMode);
 
-            if (_usePackageMode)
+            // When the scene has its own ToolSpawnManager, delegate collection
+            // tracking to it instead of creating invisible pickups.
+            _toolSpawnManager = FindAnyObjectByType<ToolSpawnManager>();
+            _useSceneToolSpawnManager = _sceneHasEnvironment && _toolSpawnManager != null;
+
+            if (_useSceneToolSpawnManager)
+            {
+                _toolSpawnManager.OnAllToolsCollected += HandleSceneToolsCollected;
+                _currentObjective = _usePackageMode
+                    ? _packageMission.CurrentObjective
+                    : "Find the 3 hidden tools.";
+                SetFeedback("Find the tools scattered around the yard.");
+            }
+            else if (_usePackageMode)
             {
                 BuildPackagePickups();
                 _currentObjective = _packageMission.CurrentObjective;
@@ -68,12 +83,32 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                     _player = rig.transform;
             }
 
-            if (_usePackageMode)
+            if (_useSceneToolSpawnManager)
+            {
+                // ToolSpawnManager drives collection; just update the objective display.
+                if (_toolSpawnManager != null)
+                {
+                    var remaining = _toolSpawnManager.ToolsRemaining;
+                    if (remaining > 0)
+                        _currentObjective = $"Find the 3 hidden tools. {remaining} remaining.";
+                }
+            }
+            else if (_usePackageMode)
+            {
                 HandlePackageMode();
+            }
             else
+            {
                 HandleGoalReached();
+            }
 
             HandleCompletion();
+        }
+
+        private void OnDestroy()
+        {
+            if (_toolSpawnManager != null)
+                _toolSpawnManager.OnAllToolsCollected -= HandleSceneToolsCollected;
         }
 
         private void OnGUI()
@@ -216,6 +251,16 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 _failureAcknowledged = true;
                 SetFeedback("Time ran out.");
             }
+        }
+
+        private void HandleSceneToolsCollected()
+        {
+            if (_completionAt >= 0f)
+                return;
+
+            _completionAt = Time.time + 1.1f;
+            _currentObjective = "All tools found!";
+            SetFeedback("Tools recovered. Continuing...");
         }
 
         private void HandleGoalReached()
