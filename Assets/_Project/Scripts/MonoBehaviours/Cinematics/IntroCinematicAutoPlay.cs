@@ -3,6 +3,7 @@ using FarmSimVR.Core.Tutorial;
 using FarmSimVR.MonoBehaviours;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.SceneManagement;
 
 namespace FarmSimVR.MonoBehaviours.Cinematics
 {
@@ -15,7 +16,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
     {
         [Header("Legacy (no longer used — kept for migration reference)")]
         [SerializeField] private CinematicSequence sequence;
-        [SerializeField] private string completionSceneName = TutorialSceneCatalog.FarmTutorialSceneName;
+        [SerializeField] private string completionSceneName = TutorialSceneCatalog.ChickenGameSceneName;
         [SerializeField] private float playbackSpeed = TutorialDevTuning.IntroCutscenePlaybackSpeed;
 
         private PlayableDirector _director;
@@ -48,6 +49,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
             _director.Play();
             ApplyPlaybackSpeed();
+            GetComponent<SkipPrompt>()?.Activate();
         }
 
         private void OnDestroy()
@@ -56,13 +58,35 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                 _director.stopped -= HandleDirectorStopped;
         }
 
+        /// <summary>Skips the timeline and loads the same next scene as natural completion (UnityEvent / skip button).</summary>
+        public void LoadNextScene()
+        {
+            if (_sceneLoader == null || _director == null)
+                return;
+
+            CompleteAndLoadNextScene(requestStopIfPlaying: true);
+        }
+
         private void HandleDirectorStopped(PlayableDirector director)
         {
-            if (_completionHandled)
+            CompleteAndLoadNextScene(requestStopIfPlaying: false);
+        }
+
+        private void CompleteAndLoadNextScene(bool requestStopIfPlaying)
+        {
+            if (_completionHandled || _sceneLoader == null)
                 return;
 
             _completionHandled = true;
-            var nextScene = StoryPackageRuntimeCatalog.GetNextSceneOrNull(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+
+            if (_director != null)
+            {
+                _director.stopped -= HandleDirectorStopped;
+                if (requestStopIfPlaying && _director.state == PlayState.Playing)
+                    _director.Stop();
+            }
+
+            var nextScene = StoryPackageRuntimeCatalog.GetNextSceneOrNull(SceneManager.GetActiveScene().name);
             _sceneLoader.LoadScene(string.IsNullOrWhiteSpace(nextScene) ? completionSceneName : nextScene);
         }
 

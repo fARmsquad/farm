@@ -37,7 +37,7 @@
       "DisplayName": "Chicken Chase",
       "Kind": "Minigame",
       "SceneName": "ChickenGame",
-      "NextSceneName": "Tutorial_PostChickenCutscene",
+      "NextSceneName": "CaughtChickenCutscene",
       "Minigame": {
         "AdapterId": "tutorial.chicken_chase",
         "ObjectiveText": "Catch El Pollo Loco before he escapes the pen.",
@@ -49,8 +49,8 @@
       "BeatId": "post_chicken_bridge",
       "DisplayName": "Post Chicken Bridge",
       "Kind": "Cutscene",
-      "SceneName": "Tutorial_PostChickenCutscene",
-      "NextSceneName": "FarmMain",
+      "SceneName": "CaughtChickenCutscene",
+      "NextSceneName": "CoreScene",
       "SequenceSteps": [
         {
           "StepType": "ObjectivePopup",

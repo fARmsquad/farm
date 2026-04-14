@@ -128,22 +128,27 @@ namespace FarmSimVR.Tests.EditMode
         }
 
         [Test]
-        public void Installer_UsesFallbackText_WhenStoryPackageBeatIsUnavailable()
+        public void Installer_DoesNotInjectCutscene_OnCoreScene()
         {
             var runtime = new GameObject("TutorialRuntime");
             var controller = runtime.AddComponent<TutorialFlowController>();
 
-            TutorialSceneInstaller.InstallForScene(TutorialSceneCatalog.MidpointPlaceholderSceneName, controller);
+            TutorialSceneInstaller.InstallForScene(TutorialSceneCatalog.CoreSceneSceneName, controller);
 
             var cutsceneController = Object.FindFirstObjectByType<TutorialCutsceneSceneController>();
-            Assert.That(cutsceneController, Is.Not.Null);
-
-            Assert.That(ReadPrivateString(cutsceneController, "_title"), Is.EqualTo("Story Beat Placeholder"));
-            Assert.That(ReadPrivateString(cutsceneController, "_body"), Does.Contain("This bridge scene is intentionally lightweight for now."));
+            Assert.That(cutsceneController, Is.Null);
         }
 
         [Test]
-        public void Installer_UsesStoryPackageStoryboard_WhenAvailable()
+        public void RuntimeCatalog_ResolvesPostChickenNextScene_FromResourcePackage()
+        {
+            var nextScene = StoryPackageRuntimeCatalog.GetNextSceneOrNull(TutorialSceneCatalog.PostChickenCutsceneSceneName);
+
+            Assert.That(nextScene, Is.EqualTo(TutorialSceneCatalog.CoreSceneSceneName));
+        }
+
+        [Test]
+        public void Installer_DoesNotInjectStoryboardCutscene_OnPostChickenScene()
         {
             var runtime = new GameObject("TutorialRuntime");
             var controller = runtime.AddComponent<TutorialFlowController>();
@@ -151,14 +156,7 @@ namespace FarmSimVR.Tests.EditMode
             TutorialSceneInstaller.InstallForScene(TutorialSceneCatalog.PostChickenCutsceneSceneName, controller);
 
             var cutsceneController = Object.FindFirstObjectByType<TutorialCutsceneSceneController>();
-            Assert.That(cutsceneController, Is.Not.Null);
-
-            var shots = ReadPrivateField<StoryStoryboardShotSnapshot[]>(cutsceneController, "_storyboardShots");
-
-            Assert.That(ReadPrivateString(cutsceneController, "_title"), Is.EqualTo("Post Chicken Bridge"));
-            Assert.That(shots, Is.Not.Null);
-            Assert.That(shots, Has.Length.EqualTo(3));
-            Assert.That(shots[0].SubtitleText, Does.Contain("Nice work"));
+            Assert.That(cutsceneController, Is.Null);
         }
 
         [Test]

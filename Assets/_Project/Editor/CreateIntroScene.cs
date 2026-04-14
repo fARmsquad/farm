@@ -116,7 +116,7 @@ namespace FarmSimVR.Editor
             mgrGO.AddComponent<CinematicSequencer>();
             var autoPlay = mgrGO.AddComponent<IntroCinematicAutoPlay>();
             var autoPlaySo = new SerializedObject(autoPlay);
-            autoPlaySo.FindProperty("completionSceneName").stringValue = TutorialSceneCatalog.FarmTutorialSceneName;
+            autoPlaySo.FindProperty("completionSceneName").stringValue = TutorialSceneCatalog.ChickenGameSceneName;
             autoPlaySo.FindProperty("playbackSpeed").floatValue = TutorialDevTuning.IntroCutscenePlaybackSpeed;
             autoPlaySo.ApplyModifiedPropertiesWithoutUndo();
 

@@ -39,9 +39,13 @@ namespace FarmSimVR.Core.Story
 
             var trimmed = sceneName.Trim();
             const string tutorialPrefix = "Tutorial_";
-            return trimmed.StartsWith(tutorialPrefix, System.StringComparison.Ordinal)
-                ? trimmed.Substring(tutorialPrefix.Length)
-                : trimmed;
+            if (trimmed.StartsWith(tutorialPrefix, System.StringComparison.Ordinal))
+                trimmed = trimmed.Substring(tutorialPrefix.Length);
+
+            if (string.Equals(trimmed, "CaughtChickenCutscene", System.StringComparison.OrdinalIgnoreCase))
+                return "PostChickenCutscene";
+
+            return trimmed;
         }
     }
 }

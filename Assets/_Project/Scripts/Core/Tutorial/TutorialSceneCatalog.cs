@@ -8,7 +8,9 @@ namespace FarmSimVR.Core.Tutorial
         public const string IntroSceneName = "Intro";
         public const string ChickenGameSceneName = "ChickenGame";
         public const string PostChickenCutsceneSceneName = "PostChickenCutscene";
+        public const string CoreSceneSceneName = "CoreScene";
         public const string FindToolsSceneName = "PlayerGettingSeeds";
+        /// <summary>Legacy catalog key; runtime Unity scene is <see cref="CoreSceneSceneName"/>.</summary>
         public const string MidpointPlaceholderSceneName = "MidpointPlaceholder";
         public const string PreFarmCutsceneSceneName = "PreFarmCutscene";
         public const string FarmTutorialSceneName = "FarmMain";
@@ -24,7 +26,7 @@ namespace FarmSimVR.Core.Tutorial
             IntroSceneName,
             ChickenGameSceneName,
             PostChickenCutsceneSceneName,
-            MidpointPlaceholderSceneName,
+            CoreSceneSceneName,
             FindToolsSceneName,
             PreFarmCutsceneSceneName,
             FarmTutorialSceneName,
@@ -37,10 +39,13 @@ namespace FarmSimVR.Core.Tutorial
 
             switch (sceneName)
             {
+                case "CaughtChickenCutscene":
+                    return PostChickenCutsceneSceneName;
                 case "Tutorial_PostChickenCutscene":
                     return PostChickenCutsceneSceneName;
                 case "Tutorial_MidpointPlaceholder":
-                    return MidpointPlaceholderSceneName;
+                case "MidpointPlaceholder":
+                    return CoreSceneSceneName;
                 case "FindToolsGame":
                     return FindToolsSceneName;
                 case "Tutorial_PreFarmCutscene":
@@ -61,7 +66,7 @@ namespace FarmSimVR.Core.Tutorial
                 case TutorialStep.PostChickenCutscene:
                     return PostChickenCutsceneSceneName;
                 case TutorialStep.MidpointPlaceholder:
-                    return MidpointPlaceholderSceneName;
+                    return CoreSceneSceneName;
                 case TutorialStep.FindTools:
                     return FindToolsSceneName;
                 case TutorialStep.PreFarmCutscene:
@@ -83,7 +88,7 @@ namespace FarmSimVR.Core.Tutorial
             if (sceneName == IntroSceneName) return TutorialStep.Intro;
             if (sceneName == ChickenGameSceneName) return TutorialStep.ChickenHunt;
             if (sceneName == PostChickenCutsceneSceneName) return TutorialStep.PostChickenCutscene;
-            if (sceneName == MidpointPlaceholderSceneName) return TutorialStep.MidpointPlaceholder;
+            if (sceneName == CoreSceneSceneName) return TutorialStep.MidpointPlaceholder;
             if (sceneName == FindToolsSceneName) return TutorialStep.FindTools;
             if (sceneName == PreFarmCutsceneSceneName) return TutorialStep.PreFarmCutscene;
             if (sceneName == FarmTutorialSceneName) return TutorialStep.FarmTutorial;

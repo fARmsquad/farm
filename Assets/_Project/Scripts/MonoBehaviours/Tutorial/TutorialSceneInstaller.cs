@@ -18,18 +18,9 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             switch (sceneName)
             {
                 case TutorialSceneCatalog.PostChickenCutsceneSceneName:
-                    EnsureCutscene(
-                        sceneName,
-                        "Chicken Hunt Complete",
-                        "You proved you can handle the first job. Now gather what you need to start farming.",
-                        QuickCutsceneDelay);
+                    // CaughtChickenCutscene: scene-owned Timeline + SlideshowPanel (not story-package IMGUI).
                     break;
-                case TutorialSceneCatalog.MidpointPlaceholderSceneName:
-                    EnsureCutscene(
-                        sceneName,
-                        "Story Beat Placeholder",
-                        "This bridge scene is intentionally lightweight for now. It preserves pacing until the real story content lands.",
-                        QuickCutsceneDelay);
+                case TutorialSceneCatalog.CoreSceneSceneName:
                     break;
                 case TutorialSceneCatalog.PreFarmCutsceneSceneName:
                     EnsureCutscene(

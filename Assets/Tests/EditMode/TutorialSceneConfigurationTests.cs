@@ -107,8 +107,8 @@ namespace FarmSimVR.Tests.EditMode
                     "Assets/_Project/Scenes/TitleScreen.unity",
                     "Assets/_Project/Scenes/Intro.unity",
                     "Assets/_Project/Scenes/ChickenGame.unity",
-                    "Assets/_Project/Scenes/Tutorial_PostChickenCutscene.unity",
-                    "Assets/_Project/Scenes/Tutorial_MidpointPlaceholder.unity",
+                    "Assets/_Project/Scenes/CaughtChickenCutscene.unity",
+                    "Assets/_Project/Scenes/CoreScene.unity",
                     "Assets/_Project/Scenes/FindToolsGame.unity",
                     "Assets/_Project/Scenes/Tutorial_PreFarmCutscene.unity",
                     "Assets/_Project/Scenes/FarmMain.unity",
@@ -134,10 +134,10 @@ namespace FarmSimVR.Tests.EditMode
             var playbackSpeed = serializedObject.FindProperty("playbackSpeed");
 
             Assert.That(completionSceneName, Is.Not.Null);
-            Assert.That(completionSceneName.stringValue, Is.EqualTo(TutorialSceneCatalog.FarmTutorialSceneName));
+            Assert.That(completionSceneName.stringValue, Is.EqualTo(TutorialSceneCatalog.ChickenGameSceneName));
 
             Assert.That(playbackSpeed, Is.Not.Null);
-            Assert.That(playbackSpeed.floatValue, Is.GreaterThan(1f));
+            Assert.That(playbackSpeed.floatValue, Is.EqualTo(TutorialDevTuning.IntroCutscenePlaybackSpeed));
         }
 
         [Test]
@@ -166,7 +166,7 @@ namespace FarmSimVR.Tests.EditMode
         }
 
         [TestCase(TutorialSceneCatalog.PostChickenCutsceneSceneName)]
-        [TestCase(TutorialSceneCatalog.MidpointPlaceholderSceneName)]
+        [TestCase("CaughtChickenCutscene")]
         [TestCase(TutorialSceneCatalog.PreFarmCutsceneSceneName)]
         public void Installer_ConfiguresPlaceholderCutscenesForQuickAutoAdvance(string sceneName)
         {
@@ -186,7 +186,9 @@ namespace FarmSimVR.Tests.EditMode
         }
 
         [TestCase("Tutorial_PostChickenCutscene", TutorialStep.PostChickenCutscene)]
+        [TestCase("CaughtChickenCutscene", TutorialStep.PostChickenCutscene)]
         [TestCase("Tutorial_MidpointPlaceholder", TutorialStep.MidpointPlaceholder)]
+        [TestCase(TutorialSceneCatalog.CoreSceneSceneName, TutorialStep.MidpointPlaceholder)]
         [TestCase("FindToolsGame", TutorialStep.FindTools)]
         [TestCase("Tutorial_PreFarmCutscene", TutorialStep.PreFarmCutscene)]
         public void TutorialSceneCatalog_NormalizesRuntimeSceneAliases(string runtimeSceneName, TutorialStep expectedStep)
@@ -234,8 +236,8 @@ namespace FarmSimVR.Tests.EditMode
         }
 
         [TestCase(TutorialSceneCatalog.IntroSceneName, "Intro")]
-        [TestCase(TutorialSceneCatalog.PostChickenCutsceneSceneName, "Tutorial_PostChickenCutscene")]
-        [TestCase(TutorialSceneCatalog.MidpointPlaceholderSceneName, "Tutorial_MidpointPlaceholder")]
+        [TestCase(TutorialSceneCatalog.PostChickenCutsceneSceneName, "CaughtChickenCutscene")]
+        [TestCase(TutorialSceneCatalog.CoreSceneSceneName, "CoreScene")]
         [TestCase(TutorialSceneCatalog.PreFarmCutsceneSceneName, "Tutorial_PreFarmCutscene")]
         public void SceneWorkCatalog_GetLoadableSceneName_ResolvesBuildProfileSceneNames(
             string sceneName,
@@ -249,7 +251,7 @@ namespace FarmSimVR.Tests.EditMode
         [Test]
         public void TutorialFlowController_ResolveLoadableSceneRequest_UsesBuildProfileNameForStoryPackageNextScene()
         {
-            var scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/Tutorial_PostChickenCutscene.unity", OpenSceneMode.Single);
+            var scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/CaughtChickenCutscene.unity", OpenSceneMode.Single);
 
             Assert.That(scene.IsValid(), Is.True);
 
@@ -259,8 +261,8 @@ namespace FarmSimVR.Tests.EditMode
             var controller = runtime.AddComponent<TutorialFlowController>();
 
             Assert.That(
-                controller.ResolveLoadableSceneRequest(TutorialSceneCatalog.MidpointPlaceholderSceneName),
-                Is.EqualTo("FarmMain"));
+                controller.ResolveLoadableSceneRequest(TutorialSceneCatalog.CoreSceneSceneName),
+                Is.EqualTo("CoreScene"));
         }
 
         [Test]

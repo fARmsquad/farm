@@ -157,7 +157,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PLACEHOLDER 03 — Nobody moves.
+  m_text: Night falls...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -294,7 +294,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PLACEHOLDER 02 — The chicken blinks.
+  m_text: "\u201CI can\u2019t wait till tomorrow! You gonna give me some eggs, mister,
+    I mean, uuhh, Miss Chicken?\u201C"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -431,7 +432,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PLACEHOLDER 08 — To be continued…
+  m_text: "\u201CGolly, what\u2019s in this place? Maybe I can find some farm tools
+    for tomorrah...if no ghost spooks me first!\u201D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -568,7 +570,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PLACEHOLDER 06 — Stare-down at high noon.
+  m_text: Uneasily, our hero follows the chicken towards the old McCluckin house.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -750,9 +752,9 @@ RectTransform:
   m_Father: {fileID: 1079096687}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -334.4582}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &744052444
 GameObject:
@@ -790,7 +792,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -334.4582}
+  m_SizeDelta: {x: 0, y: -468.57532}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &744052446
 MonoBehaviour:
@@ -971,7 +973,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PLACEHOLDER 04 — Feathers settle…
+  m_text: "The night\u2019s peace was short-lived, as a familiar noise soon echoed
+    across the farm."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -1153,37 +1156,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1079096686}
   m_CullTransparentMesh: 1
---- !u!1 &1441240759
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1441240760}
-  m_Layer: 0
-  m_Name: SlideshowPanel
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1441240760
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1441240759}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1489215052
 GameObject:
   m_ObjectHideFlags: 0
@@ -1220,7 +1192,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -334.4582}
+  m_SizeDelta: {x: 0, y: -468.57532}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1489215054
 MonoBehaviour:
@@ -1235,14 +1207,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 5ead6d815fd440bea817eddb4b6e23d0, type: 3}
+  m_Texture: {fileID: 0}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -1404,7 +1376,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -334.4582}
+  m_SizeDelta: {x: 0, y: -468.57532}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1522689758
 MonoBehaviour:
@@ -1466,6 +1438,7 @@ GameObject:
   - component: {fileID: 1530974532}
   - component: {fileID: 1530974531}
   - component: {fileID: 1530974533}
+  - component: {fileID: 1530974534}
   m_Layer: 0
   m_Name: SlideshowDirector
   m_TagString: Untagged
@@ -1484,7 +1457,7 @@ PlayableDirector:
   serializedVersion: 3
   m_PlayableAsset: {fileID: 11400000, guid: bb045df2599447f892e40ad2eb34f9dc, type: 2}
   m_InitialState: 1
-  m_WrapMode: 2
+  m_WrapMode: 0
   m_DirectorUpdateMode: 1
   m_InitialTime: 0
   m_SceneBindings:
@@ -1652,6 +1625,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1530974534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1530974530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6478990abcdef12345678, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.Cinematics.PlayableDirectorCompleteTutorialFlow
 --- !u!1 &1588090832
 GameObject:
   m_ObjectHideFlags: 0
@@ -1690,7 +1675,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PLACEHOLDER 07 — Something's about to pop off.
+  m_text: "\u201CYou\u2019ve got some magic feathers!? Oh wow, what\u2019s going
+    on?\u201D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -1825,7 +1811,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -334.4582}
+  m_SizeDelta: {x: 0, y: -468.57532}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1708623482
 MonoBehaviour:
@@ -1912,7 +1898,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -334.4582}
+  m_SizeDelta: {x: 0, y: -468.57532}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1768826486
 MonoBehaviour:
@@ -2248,9 +2234,9 @@ RectTransform:
   m_Father: {fileID: 1079096687}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -334.4582}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1823404352
 MonoBehaviour:
@@ -2265,14 +2251,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 86bd8f5c216d448ba1bca83b45e1c91f, type: 3}
+  m_Texture: {fileID: 0}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -2339,7 +2325,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PLACEHOLDER 01 — Caught red-handed!
+  m_text: "Once caught, the chicken quickly became docile. \nThis chicken was no
+    menace -- just a scared creature trying to find its friends!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -2476,7 +2463,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PLACEHOLDER 05 — This is fine. (It is not fine.)
+  m_text: "\U0001F631 However, something was different about tonight's clucking...it
+    seemed to contain a note of distress..."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -2611,7 +2599,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -334.4582}
+  m_SizeDelta: {x: 0, y: -468.57532}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1990590643
 MonoBehaviour:
@@ -2670,5 +2658,4 @@ SceneRoots:
   - {fileID: 1495941257}
   - {fileID: 1780098356}
   - {fileID: 1530974532}
-  - {fileID: 1441240760}
   - {fileID: 1817068862}

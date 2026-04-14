@@ -114,6 +114,8 @@ namespace FarmSimVR.Editor.Cinematics
                 Debug.Log("[CaughtChickenCutsceneSlideshow] Canvas created.");
             }
 
+            canvas.transform.localScale = Vector3.one;
+
             var existing = canvas.transform.Find("SlideshowPanel");
             if (existing != null)
                 Object.DestroyImmediate(existing.gameObject);
