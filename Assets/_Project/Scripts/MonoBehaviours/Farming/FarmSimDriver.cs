@@ -35,9 +35,13 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private readonly List<GameObject> _plots = new();
 
         private ToolEquipState _toolEquip;
+        private WateringCanState _waterCan;
 
         /// <summary>Current tool equip state for UI and enforcement.</summary>
         public ToolEquipState ToolEquip => _toolEquip;
+
+        /// <summary>Watering can water level state for UI and enforcement.</summary>
+        public WateringCanState WaterCan => _waterCan;
 
         /// <summary>Inventory accessor for UI controllers.</summary>
         public IInventorySystem Inventory => _inv;
@@ -75,6 +79,17 @@ namespace FarmSimVR.MonoBehaviours.Farming
             // Initialize tool equip state
             _toolEquip = new ToolEquipState();
 
+            // Initialize watering can state (starts empty — player must visit well)
+            _waterCan = new WateringCanState();
+
+            var wellController = FindAnyObjectByType<WellInteractionController>();
+            if (wellController != null)
+                wellController.Initialize(_waterCan, _toolEquip);
+
+            var feedbackController = FindAnyObjectByType<WateringCanFeedbackController>();
+            if (feedbackController != null)
+                feedbackController.Initialize(_waterCan, _toolEquip);
+
             var found = GameObject.FindGameObjectsWithTag("CropPlot");
             System.Array.Sort(found, (a, b) =>
                 string.Compare(a.name, b.name, System.StringComparison.Ordinal));
@@ -106,7 +121,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
             var hotbarUI = FindAnyObjectByType<HotbarUIController>();
             if (hotbarUI != null)
-                hotbarUI.Initialize(_inv, _db, _toolEquip, iconDatabase);
+                hotbarUI.Initialize(_inv, _db, _toolEquip, iconDatabase, _waterCan);
 
             // Initialize tool visual controller
             var toolVisual = FindAnyObjectByType<ToolVisualController>();
@@ -390,11 +405,18 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
         private bool TryWater(int plotIndex, out string message)
         {
+            if (_waterCan == null || _waterCan.IsEmpty)
+                return Fail("Watering can is empty \u2014 refill at the well.", out message);
+
+            if (!_waterCan.TryDrain(WateringCanState.DrainPerUse, out _))
+                return Fail("Watering can is empty \u2014 refill at the well.", out message);
+
             var soil = _soil.AllPlots[plotIndex];
             var waterAmount = 0.4f * (_progression != null ? _progression.WateringMultiplier : 1f);
             _soil.Water(soil.PlotId, waterAmount);
             _sim.Plots[plotIndex].NotifyWatered();
-            message = $"Watered {soil.PlotId} — moisture now {soil.Moisture:F2}";
+            int waterPercent = Mathf.RoundToInt(_waterCan.WaterLevel * 100f);
+            message = $"Watered {soil.PlotId} \u2014 moisture now {soil.Moisture:F2}, can {waterPercent}%";
             return true;
         }
 
