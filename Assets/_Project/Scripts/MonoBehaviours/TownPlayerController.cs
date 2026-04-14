@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FarmSimVR.MonoBehaviours.Cinematics;
+using FarmSimVR.MonoBehaviours.Interaction;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,7 +15,7 @@ namespace FarmSimVR.MonoBehaviours
     ///   Mouse X  → turns the character (yaw).
     ///   WASD     → camera-relative movement.
     ///   Shift    → run.
-    ///   E        → interact with nearest NPC in range.
+    ///   E        → interact with nearest NPC or interactable object in range.
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
     public class TownPlayerController : MonoBehaviour
@@ -41,6 +42,7 @@ namespace FarmSimVR.MonoBehaviours
         private bool _wasInConversation;
 
         private List<NPCController> _npcs = new();
+        private List<InteractableObject> _interactables = new();
 
         // ── Lifecycle ─────────────────────────────────────────────────────────
 
@@ -48,6 +50,7 @@ namespace FarmSimVR.MonoBehaviours
         {
             _cc = GetComponent<CharacterController>();
             _npcs.AddRange(FindObjectsByType<NPCController>(FindObjectsSortMode.None));
+            _interactables.AddRange(FindObjectsByType<InteractableObject>(FindObjectsSortMode.None));
 
             if (cameraRig != null)
                 _cameraFollow = cameraRig.GetComponent<TownCameraFollow>();
@@ -58,8 +61,7 @@ namespace FarmSimVR.MonoBehaviours
 
         private void Start()
         {
-            _npcs.Clear();
-            _npcs.AddRange(FindObjectsByType<NPCController>(FindObjectsSortMode.None));
+            RefreshInteractables();
         }
 
         private void Update()
@@ -111,30 +113,55 @@ namespace FarmSimVR.MonoBehaviours
             ShowHint("WASD to move  |  Mouse to look  |  E to talk");
         }
 
+        /// <summary>
+        /// Re-populates NPC and interactable lists. Call after scene transitions
+        /// so newly loaded objects are detected.
+        /// </summary>
+        public void RefreshInteractables()
+        {
+            _npcs.Clear();
+            _npcs.AddRange(FindObjectsByType<NPCController>(FindObjectsSortMode.None));
+
+            _interactables.Clear();
+            _interactables.AddRange(FindObjectsByType<InteractableObject>(FindObjectsSortMode.None));
+        }
+
         // ── Interaction prompt ────────────────────────────────────────────────
 
         /// <summary>
-        /// Shows "Press E to talk" when the player is within range of any NPC.
+        /// Shows "Press E to talk/interact" when the player is within range of any NPC or interactable.
+        /// NPCs take priority over interactable objects when both are in range.
         /// </summary>
         private void UpdateInteractPrompt()
         {
             if (interactPromptLabel == null) return;
 
-            NPCController nearest = GetNearestNPCInRange();
-            bool inRange = nearest != null;
-
-            if (inRange)
+            // Check NPCs first (they take priority)
+            NPCController nearestNpc = GetNearestNPCInRange();
+            if (nearestNpc != null)
             {
-                interactPromptLabel.text = $"Press E to talk to {nearest.NpcName}";
+                interactPromptLabel.text = $"Press E to talk to {nearestNpc.NpcName}";
                 interactPromptLabel.gameObject.SetActive(true);
 
                 if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
-                    nearest.TriggerInteraction();
+                    nearestNpc.TriggerInteraction();
+                return;
             }
-            else if (interactPromptLabel.gameObject.activeSelf)
+
+            // Check interactable objects as fallback
+            InteractableObject nearestInteractable = GetNearestInteractableInRange();
+            if (nearestInteractable != null)
             {
-                interactPromptLabel.gameObject.SetActive(false);
+                interactPromptLabel.text = nearestInteractable.InteractionPrompt;
+                interactPromptLabel.gameObject.SetActive(true);
+
+                if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+                    nearestInteractable.OnInteract();
+                return;
             }
+
+            if (interactPromptLabel.gameObject.activeSelf)
+                interactPromptLabel.gameObject.SetActive(false);
         }
 
         private NPCController GetNearestNPCInRange()
@@ -152,6 +179,27 @@ namespace FarmSimVR.MonoBehaviours
                 {
                     nearestSqDist = sqDist;
                     nearest       = npc;
+                }
+            }
+
+            return nearest;
+        }
+
+        private InteractableObject GetNearestInteractableInRange()
+        {
+            InteractableObject nearest = null;
+            float nearestSqDist = float.MaxValue;
+
+            foreach (var interactable in _interactables)
+            {
+                if (interactable == null || !interactable.gameObject.activeInHierarchy) continue;
+                if (!interactable.IsPlayerInRange) continue;
+
+                float sqDist = (interactable.transform.position - transform.position).sqrMagnitude;
+                if (sqDist < nearestSqDist)
+                {
+                    nearestSqDist = sqDist;
+                    nearest       = interactable;
                 }
             }
 
