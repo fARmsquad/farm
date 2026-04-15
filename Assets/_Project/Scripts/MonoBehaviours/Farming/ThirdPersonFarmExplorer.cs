@@ -21,6 +21,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
         [SerializeField] private float maxPitch = 55f;
 
         private CharacterController _controller;
+        private Animator _animator;
         private Transform _cameraTransform;
         private FarmPlotInteractionController _interactionController;
         private InventoryUIController _inventoryUI;
@@ -49,6 +50,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
             HandleLook();
             HandleMove();
+            UpdateAnimator();
         }
 
         private void LateUpdate()
@@ -122,6 +124,18 @@ namespace FarmSimVR.MonoBehaviours.Farming
             _controller.Move(move * Time.deltaTime);
         }
 
+        private void UpdateAnimator()
+        {
+            if (_animator == null) return;
+            var kb = Keyboard.current;
+            bool moving = kb != null && (
+                kb.wKey.isPressed || kb.sKey.isPressed ||
+                kb.aKey.isPressed || kb.dKey.isPressed ||
+                kb.upArrowKey.isPressed || kb.downArrowKey.isPressed ||
+                kb.leftArrowKey.isPressed || kb.rightArrowKey.isPressed);
+            _animator.SetFloat("Speed", moving ? 1f : 0f);
+        }
+
         private void OnDisable()
         {
             Cursor.lockState = CursorLockMode.None;
@@ -132,6 +146,9 @@ namespace FarmSimVR.MonoBehaviours.Farming
         {
             if (_controller == null)
                 _controller = GetComponent<CharacterController>();
+
+            if (_animator == null)
+                _animator = GetComponent<Animator>();
 
             if (_cameraTransform == null)
             {

@@ -35,6 +35,7 @@ namespace FarmSimVR.MonoBehaviours
         [SerializeField] private TextMeshProUGUI interactPromptLabel;
 
         private CharacterController _cc;
+        private Animator _animator;
         private TownCameraFollow _cameraFollow;
         private float _verticalVelocity;
         private float _pitch;
@@ -50,6 +51,7 @@ namespace FarmSimVR.MonoBehaviours
         private void Awake()
         {
             _cc = GetComponent<CharacterController>();
+            _animator = GetComponent<Animator>();
             _npcs.AddRange(FindObjectsByType<NPCController>(FindObjectsSortMode.None));
             _interactables.AddRange(FindObjectsByType<InteractableObject>(FindObjectsSortMode.None));
 
@@ -63,6 +65,7 @@ namespace FarmSimVR.MonoBehaviours
         private void Start()
         {
             RefreshInteractables();
+            EnableControl();
         }
 
         private void Update()
@@ -73,6 +76,8 @@ namespace FarmSimVR.MonoBehaviours
             {
                 EnableControl();
             }
+
+            UpdateAnimator();
 
             if (!_controlEnabled || _suspended) return;
 
@@ -98,6 +103,20 @@ namespace FarmSimVR.MonoBehaviours
             UpdateInteractPrompt();
             HandleMouseLook();
             HandleMovement();
+        }
+
+        // ── Animator ──────────────────────────────────────────────────────────
+
+        private void UpdateAnimator()
+        {
+            if (_animator == null) return;
+            var kb = Keyboard.current;
+            bool moving = kb != null && (
+                kb.wKey.isPressed || kb.sKey.isPressed ||
+                kb.aKey.isPressed || kb.dKey.isPressed ||
+                kb.upArrowKey.isPressed || kb.downArrowKey.isPressed ||
+                kb.leftArrowKey.isPressed || kb.rightArrowKey.isPressed);
+            _animator.SetFloat("Speed", moving ? 1f : 0f);
         }
 
         // ── Public API ────────────────────────────────────────────────────────
