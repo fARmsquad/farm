@@ -173,7 +173,7 @@ namespace FarmSimVR.MonoBehaviours.Diagnostics
         private void WriteWildAnimals(StringBuilder sb)
         {
             sb.AppendLine("--- WILD ANIMALS ---");
-            var fleers = FindObjectsByType<AnimalFleeBehavior>();
+            var fleers = FindObjectsByType<AnimalFleeBehavior>(FindObjectsSortMode.None);
             if (fleers.Length == 0) { sb.AppendLine("  (none)"); return; }
 
             foreach (var flee in fleers)

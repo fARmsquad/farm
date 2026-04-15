@@ -116,7 +116,7 @@ namespace FarmSimVR.Tests.EditMode
         [TearDown]
         public void TearDown()
         {
-            foreach (var go in UnityEngine.Object.FindObjectsByType<CinematicSequencer>(FindObjectsInactive.Include))
+            foreach (var go in UnityEngine.Object.FindObjectsByType<CinematicSequencer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 UnityEngine.Object.DestroyImmediate(go.gameObject);
         }
 

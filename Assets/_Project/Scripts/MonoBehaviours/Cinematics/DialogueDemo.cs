@@ -19,7 +19,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         {
             if (dialogueManager == null)
             {
-                var found = FindObjectsByType<DialogueManager>(FindObjectsInactive.Include);
+                var found = FindObjectsByType<DialogueManager>(FindObjectsSortMode.None);
                 if (found.Length > 0) dialogueManager = found[0];
             }
         }

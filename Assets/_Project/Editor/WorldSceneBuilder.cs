@@ -611,7 +611,7 @@ namespace FarmSimVR.Editor
             camGo.AddComponent<UniversalAdditionalCameraData>();
 
             Camera gameplayCam = null;
-            foreach (var c in Object.FindObjectsByType<Camera>())
+            foreach (var c in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
             {
                 if (c.gameObject.CompareTag("MainCamera"))
                 { gameplayCam = c; break; }
@@ -695,7 +695,7 @@ namespace FarmSimVR.Editor
 
             // DialogueManager starts inactive, need to search inactive objects
             DialogueManager dialogueMgr = null;
-            var found = Object.FindObjectsByType<DialogueManager>(FindObjectsInactive.Include);
+            var found = Object.FindObjectsByType<DialogueManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             if (found.Length > 0) dialogueMgr = found[0];
 
             if (screenFx != null) seqSo.FindProperty("_screenEffects").objectReferenceValue = screenFx;

@@ -6,7 +6,10 @@ namespace FarmSimVR.Core.Farming
     {
         Sunny,
         Cloudy,
-        Rain
+        Rain,
+        Snow,
+        Heatwave,
+        Blizzard
     }
 
     public enum SoilQuality

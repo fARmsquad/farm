@@ -78,7 +78,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
 
         private static void DisableExtraDirectionalLights()
         {
-            var lights = Object.FindObjectsByType<Light>(FindObjectsInactive.Include);
+            var lights = Object.FindObjectsByType<Light>(FindObjectsSortMode.None);
             var keptOne = false;
 
             foreach (var light in lights)

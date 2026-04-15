@@ -161,7 +161,7 @@ namespace FarmSimVR.MonoBehaviours.Farming
             if (RenderSettings.sun != null)
                 return RenderSettings.sun;
 
-            foreach (var light in Object.FindObjectsByType<Light>(FindObjectsInactive.Exclude))
+            foreach (var light in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
             {
                 if (light.type == LightType.Directional)
                     return light;
