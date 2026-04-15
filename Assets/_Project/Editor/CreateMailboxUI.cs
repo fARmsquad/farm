@@ -60,31 +60,53 @@ namespace FarmSimVR.Editor
             badgeNav.mode = Navigation.Mode.None;
             badgeBtn.navigation = badgeNav;
 
-            // Badge icon label (envelope emoji substitute — plain text)
-            var iconGO   = new GameObject("Icon");
-            iconGO.transform.SetParent(badgeGO.transform, false);
-            var iconText = iconGO.AddComponent<TextMeshProUGUI>();
-            iconText.text      = "✉";
-            iconText.fontSize  = 32f;
-            iconText.alignment = TextAlignmentOptions.Center;
-            var iconRect = iconText.GetComponent<RectTransform>();
-            iconRect.anchorMin        = Vector2.zero;
-            iconRect.anchorMax        = Vector2.one;
-            iconRect.offsetMin        = Vector2.zero;
-            iconRect.offsetMax        = new Vector2(0f, -20f);
+            // Envelope body rect
+            var envGO   = new GameObject("EnvelopeBody");
+            envGO.transform.SetParent(badgeGO.transform, false);
+            var envRect = envGO.AddComponent<RectTransform>();
+            envRect.anchorMin        = new Vector2(0.5f, 0.5f);
+            envRect.anchorMax        = new Vector2(0.5f, 0.5f);
+            envRect.pivot            = new Vector2(0.5f, 0.5f);
+            envRect.anchoredPosition = new Vector2(0f, 8f);
+            envRect.sizeDelta        = new Vector2(46f, 30f);
+            envGO.AddComponent<Image>().color = new Color(0.88f, 0.82f, 0.68f);
 
-            // Count label (bottom of badge)
+            // Flap V — left diagonal
+            var flapL     = new GameObject("FlapL");
+            flapL.transform.SetParent(envGO.transform, false);
+            var flapLRect = flapL.AddComponent<RectTransform>();
+            flapLRect.anchorMin        = new Vector2(0f, 0.5f);
+            flapLRect.anchorMax        = new Vector2(0f, 0.5f);
+            flapLRect.pivot            = new Vector2(0f, 0.5f);
+            flapLRect.anchoredPosition = new Vector2(0f, 7f);
+            flapLRect.sizeDelta        = new Vector2(26f, 2f);
+            flapL.transform.localRotation = Quaternion.Euler(0f, 0f, -24f);
+            flapL.AddComponent<Image>().color = new Color(0.45f, 0.40f, 0.32f);
+
+            // Flap V — right diagonal
+            var flapR     = new GameObject("FlapR");
+            flapR.transform.SetParent(envGO.transform, false);
+            var flapRRect = flapR.AddComponent<RectTransform>();
+            flapRRect.anchorMin        = new Vector2(1f, 0.5f);
+            flapRRect.anchorMax        = new Vector2(1f, 0.5f);
+            flapRRect.pivot            = new Vector2(1f, 0.5f);
+            flapRRect.anchoredPosition = new Vector2(0f, 7f);
+            flapRRect.sizeDelta        = new Vector2(26f, 2f);
+            flapR.transform.localRotation = Quaternion.Euler(0f, 0f, 24f);
+            flapR.AddComponent<Image>().color = new Color(0.45f, 0.40f, 0.32f);
+
+            // Count label — bottom of badge
             var countGO   = new GameObject("CountLabel");
             countGO.transform.SetParent(badgeGO.transform, false);
             var countText = countGO.AddComponent<TextMeshProUGUI>();
-            countText.text      = "0";
-            countText.fontSize  = 18f;
+            countText.text      = string.Empty;
+            countText.fontSize  = 16f;
             countText.color     = Color.white;
             countText.fontStyle = FontStyles.Bold;
             countText.alignment = TextAlignmentOptions.Center;
             var countRect = countText.GetComponent<RectTransform>();
             countRect.anchorMin        = new Vector2(0f, 0f);
-            countRect.anchorMax        = new Vector2(1f, 0.35f);
+            countRect.anchorMax        = new Vector2(1f, 0.28f);
             countRect.offsetMin        = Vector2.zero;
             countRect.offsetMax        = Vector2.zero;
 
@@ -95,8 +117,8 @@ namespace FarmSimVR.Editor
 
             // Stretch to fill ~90% of screen so it reads well at any resolution
             var panelRect = panelGO.AddComponent<RectTransform>();
-            panelRect.anchorMin = new Vector2(0.05f, 0.06f);
-            panelRect.anchorMax = new Vector2(0.95f, 0.96f);
+            panelRect.anchorMin = new Vector2(0.15f, 0.10f);
+            panelRect.anchorMax = new Vector2(0.85f, 0.90f);
             panelRect.offsetMin = Vector2.zero;
             panelRect.offsetMax = Vector2.zero;
 
@@ -120,7 +142,7 @@ namespace FarmSimVR.Editor
             titleRect.sizeDelta        = new Vector2(0f, 40f);
 
             // Close button
-            var closeBtnGO  = CreateButton("CloseButton", panelGO.transform, "✕",
+            var closeBtnGO  = CreateButton("CloseButton", panelGO.transform, "X",
                 new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f),
                 new Vector2(-8f, -8f), new Vector2(36f, 36f));
 
@@ -154,7 +176,7 @@ namespace FarmSimVR.Editor
             contentRect.pivot     = new Vector2(0f, 1f);
             contentRect.sizeDelta = new Vector2(0f, 0f);
             var vlg = contentGO.AddComponent<VerticalLayoutGroup>();
-            vlg.spacing           = 4f;
+            vlg.spacing           = 8f;
             vlg.childForceExpandWidth  = true;
             vlg.childForceExpandHeight = false;
             contentGO.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -166,18 +188,18 @@ namespace FarmSimVR.Editor
             rowPrefabGO.SetActive(false);
 
             var rowRect = rowPrefabGO.AddComponent<RectTransform>();
-            rowRect.sizeDelta = new Vector2(0f, 68f);
+            rowRect.sizeDelta = new Vector2(0f, 84f);
 
             var rowBg = rowPrefabGO.AddComponent<Image>();
             rowBg.color = new Color(0.15f, 0.13f, 0.11f, 1f);
             rowPrefabGO.AddComponent<Button>();
 
             var rowHlg = rowPrefabGO.AddComponent<HorizontalLayoutGroup>();
-            rowHlg.padding               = new RectOffset(10, 10, 8, 8);
+            rowHlg.padding               = new RectOffset(14, 14, 12, 12);
             rowHlg.spacing               = 10f;
             rowHlg.childForceExpandWidth  = false;
             rowHlg.childForceExpandHeight = true;
-            rowHlg.childAlignment         = TextAnchor.MiddleLeft;
+            rowHlg.childAlignment         = TextAnchor.UpperLeft;
 
             // UnreadDot — centred vertically on the left
             var dotGO     = new GameObject("UnreadDot");
@@ -199,7 +221,7 @@ namespace FarmSimVR.Editor
             textsVlg.spacing               = 3f;
             textsVlg.childForceExpandWidth  = true;
             textsVlg.childForceExpandHeight = false;
-            textsVlg.childAlignment         = TextAnchor.MiddleLeft;
+            textsVlg.childAlignment         = TextAnchor.UpperLeft;
             var textsLayout = textsGO.AddComponent<LayoutElement>();
             textsLayout.flexibleWidth = 1f;
 
@@ -212,8 +234,10 @@ namespace FarmSimVR.Editor
             subjectTxt.fontStyle          = FontStyles.Bold;
             subjectTxt.color              = new Color(0.95f, 0.90f, 0.80f);
             subjectTxt.alignment          = TextAlignmentOptions.Left;
-            subjectTxt.overflowMode       = TextOverflowModes.Ellipsis;
-            subjectTxt.enableWordWrapping = false;
+            subjectTxt.overflowMode       = TextOverflowModes.Truncate;
+            subjectTxt.enableWordWrapping = true;
+            subjectTxt.maxVisibleLines    = 2;
+            subjectGO.AddComponent<LayoutElement>().preferredHeight = 36f;
 
             // Sender label — secondary, dimmer, smaller
             var senderGO  = new GameObject("SenderLabel");
@@ -240,8 +264,8 @@ namespace FarmSimVR.Editor
             detailPaneBg.color = new Color(0.08f, 0.07f, 0.06f, 0.8f);
 
             var detailLayout = detailPaneGO.AddComponent<VerticalLayoutGroup>();
-            detailLayout.padding               = new RectOffset(20, 20, 16, 16);
-            detailLayout.spacing               = 8f;
+            detailLayout.padding               = new RectOffset(24, 24, 20, 20);
+            detailLayout.spacing               = 12f;
             detailLayout.childForceExpandWidth  = true;
             detailLayout.childForceExpandHeight = false;
             detailLayout.childControlWidth      = true;
@@ -254,7 +278,7 @@ namespace FarmSimVR.Editor
             subjectDetailTxt.GetComponent<LayoutElement>().minHeight = 30f;
 
             // Sender — smaller subtitle below subject
-            var senderDetailTxt = CreateDetailText("SenderLabel", detailPaneGO.transform, "", 14f, FontStyles.Normal);
+            var senderDetailTxt = CreateDetailText("SenderLabel", detailPaneGO.transform, "", 15f, FontStyles.Normal);
             senderDetailTxt.color = new Color(0.60f, 0.56f, 0.48f);
             senderDetailTxt.enableWordWrapping = false;
 
@@ -267,8 +291,10 @@ namespace FarmSimVR.Editor
             dividerLayout.minHeight       = 2f;
             dividerLayout.preferredHeight = 2f;
 
-            // Body — fills remaining space, wraps naturally
-            var bodyDetailTxt = CreateDetailText("BodyLabel", detailPaneGO.transform, "", 16f, FontStyles.Normal);
+            // Body — fills remaining space, wraps naturally with paragraph spacing
+            var bodyDetailTxt = CreateDetailText("BodyLabel", detailPaneGO.transform, "", 18f, FontStyles.Normal);
+            bodyDetailTxt.lineSpacing      = 2f;
+            bodyDetailTxt.paragraphSpacing = 8f;
             bodyDetailTxt.GetComponent<LayoutElement>().flexibleHeight = 1f;
 
             // Claim button — hidden by default, shown when attachment is unclaimed
