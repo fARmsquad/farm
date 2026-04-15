@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+from PIL import Image, ImageDraw
 
 from app.config import Settings
 from app.generated_minigames import GeneratedMinigameBeatRequest, GeneratedMinigameBeatService
@@ -60,6 +61,18 @@ class GeneratedStoryboardServiceTests(unittest.TestCase):
 
         written_package = json.loads(self.package_output_path.read_text(encoding="utf-8"))
         self.assertEqual(written_package["Beats"][0]["Storyboard"]["Shots"][2]["ShotId"], "shot_03")
+
+    def test_create_package_writes_prompt_with_explicit_no_text_constraints(self) -> None:
+        result = self.service.create_package(build_request())
+
+        first_asset = result.generated_assets[0]
+        prompt = first_asset.metadata["prompt"].lower()
+
+        self.assertIn("do not draw subtitle boxes", prompt)
+        self.assertIn("readable text", prompt)
+        self.assertIn("speech bubbles", prompt)
+        self.assertIn("do not copy camera angle", prompt)
+        self.assertIn("fresh composition", prompt)
 
     def test_create_package_can_derive_minigame_goal_from_linked_materialized_beat(self) -> None:
         minigame_service = GeneratedMinigameBeatService(package_output_path=self.package_output_path)
@@ -213,6 +226,54 @@ class GeneratedStoryboardEndpointTests(unittest.TestCase):
         self.assertEqual(payload["generated_assets"][1]["asset_type"], "audio")
 
 
+class StoryboardImageQualityGateTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._temp_dir = tempfile.TemporaryDirectory()
+        self.output_root = Path(self._temp_dir.name)
+
+    def tearDown(self) -> None:
+        self._temp_dir.cleanup()
+
+    def test_quality_gate_rejects_placeholder_fallback_assets(self) -> None:
+        from app.storyboard_quality import StoryboardImageQualityGate
+
+        output_path = self.output_root / "placeholder.png"
+        _write_quality_test_image(output_path, include_caption_panel=False)
+        asset = GeneratedImageAsset(
+            output_path=output_path,
+            mime_type="image/png",
+            provider_name="placeholder-image",
+            provider_model="placeholder-image-v1",
+            fallback_used=True,
+            source_metadata={},
+        )
+
+        result = StoryboardImageQualityGate().evaluate(asset)
+
+        self.assertFalse(result.accepted)
+        self.assertEqual(result.reason, "provider_fallback")
+
+    def test_quality_gated_generator_retries_rejected_caption_panel_asset(self) -> None:
+        from app.storyboard_quality import QualityGatedImageGenerator
+
+        output_path = self.output_root / "retry.png"
+        sequence = SequenceImageGenerator([True, False])
+        generator = QualityGatedImageGenerator(sequence, max_attempts=2)
+
+        asset = generator.generate_image(
+            prompt="test prompt",
+            reference_image_paths=[],
+            output_path=output_path,
+            aspect_ratio="16:9",
+            image_size="2K",
+        )
+
+        self.assertEqual(sequence.calls, 2)
+        self.assertEqual(sequence.path_exists_at_call_start, [False, False])
+        self.assertEqual(asset.provider_name, "gemini-image")
+        self.assertTrue(output_path.exists())
+
+
 class PlaceholderSpeechGeneratorTests(unittest.TestCase):
     def setUp(self) -> None:
         self._temp_dir = tempfile.TemporaryDirectory()
@@ -283,6 +344,56 @@ class FakeImageGenerator:
             mime_type="image/png",
             provider_name="fake-image",
             provider_model="fake-image-v1",
+            fallback_used=False,
+            source_metadata={
+                "prompt": prompt,
+                "reference_image_paths": list(reference_image_paths),
+                "aspect_ratio": aspect_ratio,
+                "image_size": image_size,
+            },
+        )
+
+
+def _write_quality_test_image(output_path: Path, *, include_caption_panel: bool) -> None:
+    width, height = 1280, 720
+    image = Image.new("RGB", (width, height), "#87b36b")
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0, 0, width, int(height * 0.58)), fill="#d8b46b")
+    draw.rectangle((0, int(height * 0.58), width, height), fill="#5f8c52")
+    if include_caption_panel:
+        draw.rounded_rectangle(
+            (40, height - 220, width - 40, height - 35),
+            radius=24,
+            fill=(10, 10, 10),
+        )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    image.save(output_path, format="PNG")
+
+
+class SequenceImageGenerator:
+    def __init__(self, caption_panel_sequence: list[bool]) -> None:
+        self._caption_panel_sequence = list(caption_panel_sequence)
+        self.calls = 0
+        self.path_exists_at_call_start: list[bool] = []
+
+    def generate_image(
+        self,
+        *,
+        prompt: str,
+        reference_image_paths: list[str],
+        output_path: Path,
+        aspect_ratio: str,
+        image_size: str,
+    ) -> "GeneratedImageAsset":
+        self.path_exists_at_call_start.append(output_path.exists())
+        include_caption_panel = self._caption_panel_sequence[self.calls]
+        self.calls += 1
+        _write_quality_test_image(output_path, include_caption_panel=include_caption_panel)
+        return GeneratedImageAsset(
+            output_path=output_path,
+            mime_type="image/png",
+            provider_name="gemini-image",
+            provider_model="gemini-test",
             fallback_used=False,
             source_metadata={
                 "prompt": prompt,

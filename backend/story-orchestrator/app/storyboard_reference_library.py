@@ -94,19 +94,30 @@ class StoryboardReferencePathResolver:
 
     def resolve_paths(self, request: "GeneratedStoryboardCutsceneRequest") -> list[str]:
         resolved: list[str] = []
-        self._append_paths(resolved, request.reference_image_paths)
+        explicit_paths = self._normalize_paths(request.reference_image_paths)
+        character_paths = self._collect_character_reference_paths(request.context.character_name)
+
+        if request.continuity_reference_mode == "character_priority":
+            self._append_paths(resolved, character_paths)
+            continuity_paths = explicit_paths[:1] if character_paths else explicit_paths
+            self._append_paths(resolved, continuity_paths)
+            if not explicit_paths and not character_paths:
+                self._append_recent_generated_images(resolved, request.package_id)
+            return resolved[: request.max_reference_images]
+
+        self._append_paths(resolved, explicit_paths)
         explicit_reference_count = len(resolved)
         if request.continuity_reference_mode != "explicit_only":
-            self._append_character_references(resolved, request.context.character_name)
+            self._append_paths(resolved, character_paths)
             if explicit_reference_count == 0:
                 self._append_recent_generated_images(resolved, request.package_id)
         return resolved[: request.max_reference_images]
 
-    def _append_character_references(self, resolved: list[str], character_name: str) -> None:
+    def _collect_character_reference_paths(self, character_name: str) -> list[str]:
         if self._reference_library is None or not character_name:
-            return
+            return []
         records = self._reference_library.list_references(character_name=character_name, reference_role="character")
-        self._append_paths(resolved, [record.stored_path for record in reversed(records)])
+        return [record.stored_path for record in reversed(records)]
 
     def _append_recent_generated_images(self, resolved: list[str], package_id: str) -> None:
         package_root = self._output_root / "GeneratedStoryboards" / package_id
@@ -116,7 +127,8 @@ class StoryboardReferencePathResolver:
         self._append_paths(resolved, [str(path.resolve()) for path in images])
 
     @staticmethod
-    def _append_paths(resolved: list[str], candidate_paths: list[str]) -> None:
+    def _normalize_paths(candidate_paths: list[str]) -> list[str]:
+        resolved: list[str] = []
         for path in candidate_paths:
             if not path:
                 continue
@@ -126,3 +138,11 @@ class StoryboardReferencePathResolver:
             if resolved_path in resolved:
                 continue
             resolved.append(resolved_path)
+        return resolved
+
+    @staticmethod
+    def _append_paths(resolved: list[str], candidate_paths: list[str]) -> None:
+        for path in candidate_paths:
+            if path in resolved:
+                continue
+            resolved.append(path)

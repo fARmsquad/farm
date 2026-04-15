@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -16,6 +17,8 @@ from .generated_storyboards import (
     GeneratedStoryboardService,
 )
 from .minigame_generator_models import MinigameGenerationContext
+
+_LOGGER = logging.getLogger("uvicorn.error")
 
 
 class GeneratedPackageAssemblyMinigameInput(BaseModel):
@@ -119,6 +122,12 @@ class GeneratedPackageAssemblyService:
         self,
         request: GeneratedPackageAssemblyRequest,
     ) -> GeneratedPackageAssemblyResult:
+        _LOGGER.info(
+            "[GeneratedStoryBackend] package assembly start package_id=%s generator=%s cutscene_beat=%s",
+            request.package_id,
+            request.minigame.generator_id,
+            request.cutscene.beat_id,
+        )
         minigame_result = self._minigame_service.create_package(
             request.minigame.to_request(
                 package_id=request.package_id,
@@ -126,6 +135,12 @@ class GeneratedPackageAssemblyService:
             )
         )
         if not minigame_result.is_valid:
+            _LOGGER.warning(
+                "[GeneratedStoryBackend] minigame generation failed package_id=%s generator=%s errors=%s",
+                request.package_id,
+                request.minigame.generator_id,
+                minigame_result.errors,
+            )
             return GeneratedPackageAssemblyResult(
                 is_valid=False,
                 minigame_result=minigame_result,
@@ -133,12 +148,23 @@ class GeneratedPackageAssemblyService:
                 fallback_generator_ids=minigame_result.fallback_generator_ids,
             )
 
+        _LOGGER.info(
+            "[GeneratedStoryBackend] minigame generation complete package_id=%s generator=%s",
+            request.package_id,
+            request.minigame.generator_id,
+        )
         cutscene_result = self._storyboard_service.create_package(
             request.cutscene.to_request(
                 package_id=request.package_id,
                 package_display_name=request.package_display_name,
                 linked_minigame_beat_id=request.minigame.beat_id,
             )
+        )
+        _LOGGER.info(
+            "[GeneratedStoryBackend] storyboard generation complete package_id=%s beat_id=%s assets=%s",
+            request.package_id,
+            request.cutscene.beat_id,
+            len(cutscene_result.generated_assets),
         )
 
         return GeneratedPackageAssemblyResult(

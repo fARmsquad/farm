@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Reflection;
+using System.IO;
 using FarmSimVR.Core.Story;
 using FarmSimVR.Core.Tutorial;
 using FarmSimVR.MonoBehaviours.Cinematics;
@@ -108,6 +109,8 @@ namespace FarmSimVR.Tests.EditMode
             var controller = runtimeObject.AddComponent<StorySequenceRuntimeController>();
             string loadedSceneName = null;
 
+            SetEnsureReadySuccess(controller);
+
             SetPrivateField(
                 controller,
                 "_beginSequenceRequestOverride",
@@ -151,6 +154,132 @@ namespace FarmSimVR.Tests.EditMode
         }
 
         [Test]
+        public void StorySequenceRuntimeController_BeginSequencePreparationRoutine_AppliesGeneratedPayloadWithoutLoadingScene()
+        {
+            var runtimeObject = new GameObject("StorySequenceRuntime");
+            var controller = runtimeObject.AddComponent<StorySequenceRuntimeController>();
+            string loadedSceneName = null;
+            string preparedSceneName = null;
+
+            SetEnsureReadySuccess(controller);
+
+            SetPrivateField(
+                controller,
+                "_beginSequenceRequestOverride",
+                (Func<Action<StorySequenceAdvancePayload>, IEnumerator>)(callback =>
+                    CompleteImmediately(
+                        callback,
+                        new StorySequenceAdvancePayload(
+                            "http://127.0.0.1:8012",
+                            "session-001",
+                            TutorialSceneCatalog.PostChickenCutsceneSceneName,
+                            BuildPackage(
+                                "Generated Bridge Prepared",
+                                "sequence_turn_000_cutscene",
+                                TutorialSceneCatalog.PostChickenCutsceneSceneName,
+                                TutorialSceneCatalog.FarmTutorialSceneName,
+                                "generated_prepared")))));
+
+            SetPrivateField(
+                controller,
+                "_sceneLoadOverride",
+                (Action<string>)(sceneName => loadedSceneName = sceneName));
+
+            var routine = InvokePrivate<IEnumerator>(
+                controller,
+                "BeginSequencePreparationRoutine",
+                (Action<string>)(sceneName => preparedSceneName = sceneName));
+
+            Drain(routine);
+
+            Assert.That(loadedSceneName, Is.Null);
+            Assert.That(preparedSceneName, Is.EqualTo(TutorialSceneCatalog.PostChickenCutsceneSceneName));
+            Assert.That(controller.ActiveSessionId, Is.EqualTo("session-001"));
+            Assert.That(ReadPrivateField<string>(controller, "_preparedEntrySceneName"), Is.EqualTo(TutorialSceneCatalog.PostChickenCutsceneSceneName));
+            Assert.That(
+                StoryPackageRuntimeCatalog.TryGetStoryboard(
+                    TutorialSceneCatalog.PostChickenCutsceneSceneName,
+                    out var title,
+                    out _),
+                Is.True);
+            Assert.That(title, Is.EqualTo("Generated Bridge Prepared"));
+        }
+
+        [Test]
+        public void StorySequenceRuntimeController_BeginSequencePreparationRoutine_WaitsForLocalOrchestratorReadinessBeforeRequest()
+        {
+            var runtimeObject = new GameObject("StorySequenceRuntime");
+            var controller = runtimeObject.AddComponent<StorySequenceRuntimeController>();
+            bool orchestratorEnsured = false;
+            bool requestStartedAfterEnsure = false;
+
+            SetPrivateField(
+                controller,
+                "_ensureOrchestratorReadyOverride",
+                (Func<Action<LocalStoryOrchestratorReadyResult>, IEnumerator>)(callback =>
+                    CompleteImmediately(
+                        callback,
+                        MarkEnsured(ref orchestratorEnsured))));
+
+            SetPrivateField(
+                controller,
+                "_beginSequenceRequestOverride",
+                (Func<Action<StorySequenceAdvancePayload>, IEnumerator>)(callback =>
+                    CompleteImmediately(
+                        callback,
+                        BuildPayloadAfterEnsure(orchestratorEnsured, value => requestStartedAfterEnsure = value))));
+
+            var routine = InvokePrivate<IEnumerator>(
+                controller,
+                "BeginSequencePreparationRoutine",
+                (Action<string>)(_ => { }));
+
+            Drain(routine);
+
+            Assert.That(orchestratorEnsured, Is.True);
+            Assert.That(requestStartedAfterEnsure, Is.True);
+        }
+
+        [Test]
+        public void StorySequenceRuntimeController_BeginSequenceAndLoadRoutine_DoesNotLoadFallbackWhenGeneratedPayloadUnavailable()
+        {
+            var runtimeObject = new GameObject("StorySequenceRuntime");
+            var controller = runtimeObject.AddComponent<StorySequenceRuntimeController>();
+            string loadedSceneName = null;
+
+            SetEnsureReadySuccess(controller);
+
+            SetPrivateField(
+                controller,
+                "_beginSequenceRequestOverride",
+                (Func<Action<StorySequenceAdvancePayload>, IEnumerator>)(callback =>
+                    CompleteImmediately(
+                        callback,
+                        new StorySequenceAdvancePayload(
+                            string.Empty,
+                            string.Empty,
+                            string.Empty,
+                            null,
+                            "Generated story sequence is unavailable right now."))));
+
+            SetPrivateField(
+                controller,
+                "_sceneLoadOverride",
+                (Action<string>)(sceneName => loadedSceneName = sceneName));
+
+            var routine = InvokePrivate<IEnumerator>(
+                controller,
+                "BeginSequenceAndLoadRoutine",
+                TutorialSceneCatalog.PostChickenCutsceneSceneName);
+
+            Drain(routine);
+
+            Assert.That(loadedSceneName, Is.Null);
+            Assert.That(controller.HasActiveSession, Is.False);
+            Assert.That(controller.LastError, Is.EqualTo("Generated story sequence is unavailable right now."));
+        }
+
+        [Test]
         public void StorySequenceRuntimeController_AdvanceSequenceAndLoadRoutine_AppliesLaterGeneratedTurn()
         {
             var runtimeObject = new GameObject("StorySequenceRuntime");
@@ -158,6 +287,8 @@ namespace FarmSimVR.Tests.EditMode
             var flowObject = new GameObject("TutorialFlow");
             var flowController = flowObject.AddComponent<TutorialFlowController>();
             string loadedSceneName = null;
+
+            SetEnsureReadySuccess(controller);
 
             var seeded = StoryPackageRuntimeCatalog.TrySetRuntimeOverride(
                 BuildPackage(
@@ -212,6 +343,15 @@ namespace FarmSimVR.Tests.EditMode
                     out _),
                 Is.True);
             Assert.That(title, Is.EqualTo("Generated Bridge Two"));
+        }
+
+        [Test]
+        public void StorySequenceRuntimeController_ExecuteBeginSequenceRequest_EnsuresLocalOrchestratorReady_FromSource()
+        {
+            var source = File.ReadAllText("Assets/_Project/Scripts/MonoBehaviours/Cinematics/StorySequenceRuntimeController.cs");
+
+            Assert.That(source, Does.Contain("EnsureLocalOrchestratorReady("));
+            Assert.That(source, Does.Contain("yield return ensureRoutine;"));
         }
 
         private static StoryPackageSnapshot BuildPackage(
@@ -302,6 +442,56 @@ namespace FarmSimVR.Tests.EditMode
             yield break;
         }
 
+        private static void SetEnsureReadySuccess(StorySequenceRuntimeController controller)
+        {
+            SetPrivateField(
+                controller,
+                "_ensureOrchestratorReadyOverride",
+                (Func<Action<LocalStoryOrchestratorReadyResult>, IEnumerator>)(callback =>
+                    CompleteImmediately(
+                        callback,
+                        new LocalStoryOrchestratorReadyResult(
+                            "http://127.0.0.1:8012",
+                            true,
+                            false,
+                            string.Empty))));
+        }
+
+        private static LocalStoryOrchestratorReadyResult MarkEnsured(ref bool orchestratorEnsured)
+        {
+            orchestratorEnsured = true;
+            return new LocalStoryOrchestratorReadyResult(
+                "http://127.0.0.1:8012",
+                true,
+                false,
+                string.Empty);
+        }
+
+        private static StorySequenceAdvancePayload BuildPayloadAfterEnsure(
+            bool orchestratorEnsured,
+            Action<bool> recordRequestOrdering)
+        {
+            recordRequestOrdering(orchestratorEnsured);
+            return new StorySequenceAdvancePayload(
+                "http://127.0.0.1:8012",
+                "session-ensure-order",
+                TutorialSceneCatalog.PostChickenCutsceneSceneName,
+                BuildPackage(
+                    "Generated Bridge Ordered",
+                    "sequence_turn_000_cutscene",
+                    TutorialSceneCatalog.PostChickenCutsceneSceneName,
+                    TutorialSceneCatalog.FarmTutorialSceneName,
+                    "generated_ordered"));
+        }
+
+        private static IEnumerator CompleteImmediately(
+            Action<LocalStoryOrchestratorReadyResult> callback,
+            LocalStoryOrchestratorReadyResult payload)
+        {
+            callback(payload);
+            yield break;
+        }
+
         private static void Drain(IEnumerator routine)
         {
             while (routine != null && routine.MoveNext())
@@ -323,6 +513,13 @@ namespace FarmSimVR.Tests.EditMode
             var field = instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.That(field, Is.Not.Null);
             field.SetValue(instance, value);
+        }
+
+        private static T ReadPrivateField<T>(object instance, string fieldName)
+        {
+            var field = instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(field, Is.Not.Null);
+            return (T)field.GetValue(instance);
         }
     }
 }

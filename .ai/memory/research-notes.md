@@ -26,6 +26,11 @@ Codex agents (which have no internet) read this file to access research findings
 - [Tutorial Dev Fast-Complete Shortcut](#research-tutorial-dev-fast-complete-shortcut) — 2026-04-14
 - [Reference Library Operator Surface](#research-reference-library-operator-surface) — 2026-04-14
 - [Sequence Session Continuity Memory](#research-sequence-session-continuity-memory) — 2026-04-14
+- [Generated Slice Launch And Storyboard Quality Gates](#research-generated-slice-launch-and-storyboard-quality-gates) — 2026-04-14
+- [Continuity Freshness And Reference Balance](#research-continuity-freshness-and-reference-balance) — 2026-04-14
+- [Unique Playthrough Generate Then Play Title Slice](#research-unique-playthrough-generate-then-play-title-slice) — 2026-04-14
+- [Generated Playthrough Title Diagnostics Surface](#research-generated-playthrough-title-diagnostics-surface) — 2026-04-14
+- [LLM-Directed Sequence Narrative Generation](#research-llm-directed-sequence-narrative-generation) — 2026-04-14
 
 ---
 
@@ -1172,3 +1177,249 @@ sweep, because that dilutes the session's intended continuity signal.
 1. [Google AI for Developers: Image generation with Gemini](https://ai.google.dev/gemini-api/docs/image-generation) — Confirms image generation can accept text-plus-image context and return inline image outputs.
 2. [Google AI for Developers: Image understanding](https://ai.google.dev/gemini-api/docs/image-understanding) — Confirms inline image inputs, File API guidance, and multiple image parts in a single request.
 3. [Google AI for Developers: Media resolution](https://ai.google.dev/gemini-api/docs/media-resolution) — Confirms multimodal image inputs have cost/latency tradeoffs and should stay deliberate.
+
+## Research: Generated Slice Launch And Storyboard Quality Gates
+**Date**: 2026-04-14
+**Queries**:
+- `site:ai.google.dev Gemini API image generation prompt constraints reference images`
+- `site:ai.google.dev Gemini API prompting strategies constraints`
+- `site:docs.unity3d.com SceneManager.LoadScene scene name build settings`
+
+### Recommended Packages
+No new packages found. The repo already has what this slice needs:
+- Pillow is already present in the backend image placeholder path and is enough
+  for a cheap local quality heuristic.
+- Unity's built-in UI and scene-loading APIs are enough for a title-screen
+  status/error surface.
+
+### Key Patterns Found
+- Gemini's `generateContent` flow accepts multimodal request contents and model
+  generation settings directly in one request, which fits the current reference
+  image plus prompt-driven storyboard generation pipeline without adding another
+  service layer. Source: https://ai.google.dev/api/generate-content
+- Google's prompt design guidance recommends structured prompts with explicit
+  constraints, which supports moving the storyboard prompt from a vague
+  "readable for subtitles" instruction to a hard negative list that forbids
+  subtitle boxes, captions, and readable text in-frame. Source:
+  https://ai.google.dev/gemini-api/docs/prompting-strategies
+- Unity's `SceneManager.LoadScene` will load the named build scene on the next
+  frame, so a failed live bootstrap should avoid calling it at all rather than
+  loading a fallback scene and hoping the operator notices later. Source:
+  https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadScene.html
+
+### Recommended Approach
+Keep the standing slice honest:
+1. In Unity, generated bootstrap failure should stop before scene load, clear
+   runtime override state, and report the error on the title surface.
+2. In the backend, tighten the image prompt with explicit negative constraints,
+   then run a cheap local quality gate that rejects provider fallback assets and
+   obvious caption-panel frames before they are published into shared
+   `Resources`.
+3. Retry rejected frames once or twice locally before surfacing the failure back
+   to Unity.
+
+This preserves the current live architecture while removing the two biggest
+sources of false confidence: stale fallback launches and visibly broken
+storyboard frames.
+
+### Gotchas & Pitfalls
+- Do not ask for "room for subtitles" without also saying not to draw subtitle
+  UI inside the image. That wording invites models to render black caption bars.
+- Do not silently accept a fallback provider result just because the call
+  returned an image file. Provider provenance matters.
+- Do not auto-load a fallback tutorial scene after a generated bootstrap error;
+  that hides the real problem and pollutes the standing slice.
+
+### Sources
+1. [Gemini API: Generating content](https://ai.google.dev/api/generate-content) — Confirms the current multimodal request shape for prompt plus reference-image generation.
+2. [Gemini API: Prompt design strategies](https://ai.google.dev/gemini-api/docs/prompting-strategies) — Supports explicit structured constraints and negative instructions in prompts.
+3. [Unity Scripting API: SceneManager.LoadScene](https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadScene.html) — Supports gating scene loads entirely on live bootstrap success.
+
+## Research: Continuity Freshness And Reference Balance
+**Date**: 2026-04-14
+**Queries**:
+- `site:ai.google.dev Gemini prompt constraints avoid overfitting to examples`
+- `site:ai.google.dev Gemini prompt design strategies constraints examples`
+
+### Recommended Packages
+No new packages found. This is a prompt-and-selection change on top of the
+existing reference pipeline.
+
+### Key Patterns Found
+- Google's prompt guidance recommends clear instructions and explicit
+  constraints instead of leaving behavior implied, which supports telling the
+  model exactly what reference images are for and what they are not for. Source:
+  https://ai.google.dev/gemini-api/docs/prompting-strategies
+- The same guidance warns that too many examples can cause the model to overfit
+  to the examples, which maps directly to feeding multiple recent generated
+  storyboard frames back into the next beat. Source:
+  https://ai.google.dev/gemini-api/docs/prompting-strategies
+- Gemini's multimodal request shape accepts multiple image inputs, so the fix
+  should be about curating and ordering references rather than adding another
+  generation layer. Source: https://ai.google.dev/api/generate-content
+
+### Recommended Approach
+Use uploaded character sheets as the primary anchor, keep only one generated
+continuity frame as a soft hint, and tell the model to preserve identity and
+style while creating a fresh composition.
+
+### Gotchas & Pitfalls
+- Do not stack multiple recent generated frames when the complaint is that the
+  new beat looks too much like the old one.
+- Do not ask for continuity without also stating that pose, framing, and
+  staging should change.
+
+### Sources
+1. [Gemini API: Prompt design strategies](https://ai.google.dev/gemini-api/docs/prompting-strategies) — Supports explicit constraints and warns about overfitting to examples.
+2. [Gemini API: Generating content](https://ai.google.dev/api/generate-content) — Confirms multimodal reference images are already supported, so selection/order is the right lever.
+
+## Research: Unique Playthrough Generate Then Play Title Slice
+**Date**: 2026-04-14
+**Queries**:
+- `Unity Selectable.interactable button enabled after async task`
+- `Unity StartCoroutine keep menu visible while async work runs`
+- `Unity scene load after async preparation title screen`
+
+### Recommended Packages
+No new packages found. The repo already has what this slice needs:
+- Unity UI `Button` / `Selectable` state is enough to gate the play button.
+- Coroutines are enough to keep the title screen live while the backend prepares a
+  generated package.
+- The existing runtime story-sequence bridge already knows how to hold a
+  generated package in memory across scene loads.
+
+### Key Patterns Found
+- Unity's `Selectable.interactable` is the built-in way to enable or disable a
+  button until the system is ready, and disabled controls present as grayed out.
+  Source: https://docs.unity3d.com/es/2018.4/ScriptReference/UI.Selectable-interactable.html
+- `MonoBehaviour.StartCoroutine` is the supported pattern for work that should
+  continue over multiple frames while the current scene stays active, which fits
+  "generate now, stay on the title screen, update UI when ready." Source:
+  https://docs.unity3d.com/ScriptReference/MonoBehaviour.StartCoroutine.html
+- Unity scene loading is a separate step from background preparation. The scene
+  should only load after the generated package is ready and the player chooses
+  to enter it. Source:
+  https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadScene.html
+
+### Recommended Approach
+Split the standing generated slice into two explicit phases on the title screen:
+1. `Generate Unique Playthrough` starts the live story-sequence bootstrap and
+   keeps the title screen visible while the request runs.
+2. When the runtime package is ready, enable `Play Unique Playthrough` and let
+   the player choose when to enter that exact prepared run.
+
+The runtime bridge should therefore separate "prepare generated sequence" from
+"load prepared entry scene" instead of forcing those actions to happen in the
+same public method.
+
+### Gotchas & Pitfalls
+- Do not auto-load the prepared scene as soon as generation finishes; the whole
+  point of this slice is to let the developer wait for readiness and then enter
+  deliberately.
+- Do not clear the prepared runtime package when the player clicks `Play Unique
+  Playthrough`; authored scene launches and prepared generated launches need
+  different state-handling paths.
+- Do not leave the play button interactable while a new generation request is
+  still in flight, or the player can enter stale prepared content by mistake.
+
+### Sources
+1. [Unity Scripting API: Selectable.interactable](https://docs.unity3d.com/es/2018.4/ScriptReference/UI.Selectable-interactable.html) — Supports disabling the play button until the generated run is ready.
+2. [Unity Scripting API: MonoBehaviour.StartCoroutine](https://docs.unity3d.com/ScriptReference/MonoBehaviour.StartCoroutine.html) — Supports keeping the title screen live while generation continues over multiple frames.
+3. [Unity Scripting API: SceneManager.LoadScene](https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadScene.html) — Confirms scene transition should remain a separate explicit step once preparation is complete.
+
+
+## Research: Generated Playthrough Title Diagnostics Surface
+**Date**: 2026-04-14
+**Queries**:
+- `Unity UI text multiline diagnostics menu label`
+- `Unity Selectable interactable async button state`
+- `Unity StartCoroutine update menu while async request runs`
+
+### Recommended Packages
+No new packages found. The existing Unity UI stack is enough:
+- `Text.text` supports updating an on-screen diagnostics block with generated-run details.
+- `Selectable.interactable` is still the right way to gate the generate/play buttons while async work is in flight.
+- `StartCoroutine` remains the supported way to let generation continue over multiple frames while the title screen stays visible.
+
+### Key Patterns Found
+- Unity UI `Text.text` is the direct supported property for changing the message shown in a `Text` component, which fits a compact multiline diagnostics block on the title surface. Source: https://docs.unity3d.com/2018.4/Documentation/ScriptReference/UI.Text-text.html
+- `Selectable.interactable` remains the built-in way to show buttons as unavailable while generation is pending, and disabled controls render as grayed out. Source: https://docs.unity3d.com/2018.4/Documentation/ScriptReference/UI.Selectable-interactable.html
+- `MonoBehaviour.StartCoroutine` is still the right pattern for behavior that spans several frames while the menu remains active, which fits surfacing in-flight generation progress and then updating the UI once the backend responds. Source: https://docs.unity3d.com/ScriptReference/MonoBehaviour.StartCoroutine.html
+
+### Recommended Approach
+Keep the diagnostics surface on the title screen itself instead of introducing a second review scene. Reuse the standing generated-slice footer/status area as a richer multiline block that shows:
+- current lifecycle state (`Idle`, `Generating`, `Ready`, `Loading`, `Failed`)
+- session/entry-scene details once a run exists
+- prepared beat/package/storyboard summary from the runtime override package
+- last error when generation fails
+
+This keeps the player-facing workflow obvious without adding another launcher step, and it matches the repo's earlier completion learnings that generated title-screen flows need visibly trustworthy availability state.
+
+### Gotchas & Pitfalls
+- Do not show authored fallback package details as if they were live generated output; only surface package/beat details when the generated runtime controller actually holds an active session or prepared run.
+- Do not replace the existing visible blocking state with a subtle footer again; the diagnostics surface should add detail, not weaken the current obvious loading/failure cues.
+- Do not clear the diagnostics before an authored launch and leave stale generated metadata visible on the title screen.
+
+### Sources
+1. [Unity Scripting API: Text.text](https://docs.unity3d.com/2018.4/Documentation/ScriptReference/UI.Text-text.html) — Supports updating a multiline diagnostics block from code.
+2. [Unity Scripting API: Selectable.interactable](https://docs.unity3d.com/2018.4/Documentation/ScriptReference/UI.Selectable-interactable.html) — Supports disabling generate/play actions while the run is not ready.
+3. [Unity Scripting API: MonoBehaviour.StartCoroutine](https://docs.unity3d.com/ScriptReference/MonoBehaviour.StartCoroutine.html) — Supports keeping the menu live while generation work continues over multiple frames.
+
+## Research: LLM-Directed Sequence Narrative Generation
+**Date**: 2026-04-14
+**Queries**:
+- `OpenAI Responses API structured outputs text.format JSON schema`
+- `OpenAI Responses API create response endpoint`
+- `OpenAI structured outputs JSON schema tips`
+
+### Recommended Packages
+| Package | Source | Why | Status |
+|---------|--------|-----|--------|
+| `httpx` | Repo requirements + existing provider clients | Already used by this backend for Gemini and ElevenLabs, so it is the least disruptive transport for a new OpenAI narrative layer | In Use |
+| OpenAI Python SDK | OpenAI docs | Useful for parse helpers, but not required because this repo already favors thin direct HTTP clients and can generate JSON schema from Pydantic models | Deferred |
+
+### Key Patterns Found
+- OpenAI's Responses API supports schema-constrained structured outputs through
+  `text.format` with `type: "json_schema"` and `strict: true`, which is the
+  right fit when the model should return a typed narrative plan rather than
+  call tools.
+- OpenAI explicitly recommends Structured Outputs over plain JSON mode when
+  possible because it guarantees schema adherence instead of only valid JSON.
+- Structured output consumers still need to handle refusal and incomplete
+  responses explicitly.
+- For this repo, the best compatibility path is a direct `httpx` client around
+  `/v1/responses` plus Pydantic-generated JSON schema, because the existing
+  backend already uses direct provider clients and Pydantic models.
+
+### Recommended Approach
+Split the feature into two bounded LLM roles:
+
+1. A turn director that chooses the next minigame generator and speaking
+   character from the existing bounded catalogs, then writes a concise story
+   brief for the beat.
+2. A storyboard planner that turns that brief plus the resolved minigame goal
+   into structured storyboard shots: subtitles, narration, image prompts, and
+   durations.
+
+Both layers must fall back locally:
+
+- Invalid or unavailable turn direction falls back to the current bounded
+  session-planning logic.
+- Invalid or unavailable storyboard planning falls back to the current template
+  storyboard planner.
+
+### Gotchas & Pitfalls
+- Do not use unconstrained freeform JSON prompting when the output drives
+  package assembly; use Structured Outputs and a typed schema.
+- Do not let the model invent generator IDs, Unity scene names, or arbitrary
+  runtime parameters outside the validated minigame catalog.
+- Structured Outputs can still yield refusal or incomplete results, so the
+  caller must detect and route those cases into bounded fallback logic.
+- The first request for a schema may pay extra latency while the schema is
+  processed, so the title-screen loading path still needs the visible blocking
+  state added in earlier slices.
+
+### Sources
+1. [OpenAI Docs: Structured model outputs](https://developers.openai.com/api/docs/guides/structured-outputs) — Confirms `text.format` / `json_schema`, schema adherence, refusal handling, and JSON-mode tradeoffs.
+2. [OpenAI OpenAPI Spec: POST /v1/responses](https://api.openai.com/v1/responses) — Confirms the request/response surface for direct Responses API calls and supports a thin `httpx` client in this repo.
+3. [OpenAI Docs Search Hit: Tips for your JSON Schema](https://developers.openai.com/api/docs/guides/structured-outputs#tips-for-your-json-schema) — Reinforces clear key naming, schema-driven parsing, and handling invalid/incomplete outputs.

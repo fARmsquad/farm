@@ -58,6 +58,13 @@ valid minigame generator, varies bounded parameters, generates the next
 minigame + cutscene turn through the existing package assembly service, and
 persists the updated session state.
 
+When `OPENAI_API_KEY` is configured, that same story-sequence path now also
+uses an OpenAI structured-output turn director to choose the next bounded
+catalog beat plus character, and an OpenAI storyboard planner to author the
+cutscene subtitles, narration lines, image prompts, and shot durations before
+Gemini image rendering and ElevenLabs narration run. Invalid or unavailable
+OpenAI output falls back to the existing bounded local planners.
+
 `GET /api/v1/story-sequence-sessions/{session_id}` returns the stored session
 plus its generated turn history in order.
 
@@ -120,6 +127,13 @@ source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
+
+Create `backend/story-orchestrator/.env.local` for local provider keys. The
+current slice expects at least:
+
+- `OPENAI_API_KEY` for LLM turn direction and storyboard writing
+- `GEMINI_API_KEY` plus Gemini project settings for storyboard image rendering
+- `ELEVENLABS_API_KEY` for narration audio generation
 
 ## Local test
 

@@ -36,6 +36,61 @@
 
 ## Log
 
+### Generated Story Slice Button Became Inert After Title-Screen UX Change (2026-04-14)
+- Status: Addressed
+- Related story/task: generated-slice title-screen loading UX fix
+- Original completion claim: The generated slice launch path was updated to keep the title screen visible while live generation runs.
+- Reported issue: The developer reported that clicking the generated slice button now does nothing.
+- Failing evidence: Developer report after retrying the standing slice: clicking the button produces no visible transition into the generated scene.
+- Approach that produced the miss: The title-screen flow was changed so the generated branch exits before fade, but that path was not re-verified for the case where the runtime controller refuses to start or the title manager remains locked in transition state without a visible scene change.
+- Why it was mistaken for done: Verification covered backend reachability and a live HTTP generation call, but not the exact Unity click-to-request state machine after the branch rewrite.
+- What should have been verified or stated differently: The handoff should have included one explicit click-path verification for request-start success, request-in-flight refusal, and callback reset behavior.
+- Prevention rules for future work:
+  - Any title-screen async launch path must prove both ''request started'' and ''UI unlocked again if request did not start.''
+  - A backend-health check is not a substitute for verifying the Unity-side click state machine.
+- Follow-up actions:
+  - Added `TitleScreenManager_GeneratedSliceButtonClick_ShowsVisibleLoadingStateImmediately` so title-screen clicks have a focused regression.
+  - Updated `TitleScreenManager` to raise a full-screen loading overlay immediately, disable the generated slice button during bootstrap, and restore the title surface when bootstrap is refused or unavailable.
+- Actual root cause after fix: The generated branch no longer faded away immediately, but the remaining feedback was only a small status label. For a live bootstrap that can take around a minute, that looked like a dead click even when the request had started.
+- Guardrail added: The title-screen generated slice now exposes an obvious blocking loading state plus a busy/unavailable recovery path instead of relying on subtle footer text.
+- Distilled rule added to project-memory.md: `Async title-screen launch flows must show an obvious loading state immediately and recover visibly if the request never starts (2026-04-14)`
+
+### Generated Story Slice Returned To Title Screen After Fail-Closed Bootstrap (2026-04-14)
+- Status: Open
+- Related story/task: GSO-017 generated slice launch gating and storyboard quality gates
+- Original completion claim: The title-screen generated slice was handed off as failing closed on backend/bootstrap errors instead of loading stale fallback content.
+- Reported issue: The developer reported that playing the slice now goes to black and returns to the title screen.
+- Failing evidence: Developer report after running the title-screen slice: fade to black, then immediate return to title instead of a playable generated beat.
+- Approach that produced the miss: The fail-closed title flow was added before the live backend availability and quality-gated generation path were re-verified end to end in the actual title-screen launch loop.
+- Why it was mistaken for done: Verification covered focused backend tests and source review of the Unity callback path, but it did not prove that a real title-screen launch still had a healthy backend/generation path to land on.
+- What should have been verified or stated differently: The handoff should have separated ''fail-closed path is working'' from ''live generated slice still succeeds end to end right now.''
+- Prevention rules for future work:
+  - Any fail-closed runtime path must be re-verified with a healthy live backend before handoff so ''returns safely'' does not mask ''never launches successfully.''
+  - Title-screen generated slice changes need one explicit end-to-end live launch check, not only unit/backend coverage.
+- Follow-up actions:
+  - Confirm whether the local story-orchestrator is reachable on the configured port.
+  - Reproduce the bootstrap failure directly against the backend and patch the actual failing dependency.
+- Distilled rule added to project-memory.md: `Generated-slice fail-closed changes still need one healthy live launch verification before handoff (2026-04-14)`
+
+### Generative Story Slice Fell Back Into Trash Content When Live Bootstrap Failed (2026-04-14)
+- Status: Open
+- Related story/task: Standing `Generative Story Slice` runtime bridge and live storyboard generation
+- Original completion claim: The standing title-screen slice was described as using the live story-sequence backend path, with the baked package only as a fallback.
+- Reported issue: The developer reported that the `Generative Story Slice` looked like trash.
+- Failing evidence: The standing slice launched into stale packaged/generated content when the local backend was unavailable, and the shared generated storyboard folder also contained live Gemini frames with a large dark caption box baked into the bottom of the image.
+- Approach that produced the miss: The Unity bootstrap path treated generated-sequence failure as a reason to load the fallback scene, and the backend accepted any returned image artifact without a quality gate beyond transport success.
+- Why it was mistaken for done: Verification proved that the title button existed and that the generated path could work when the backend was healthy, but it did not treat backend unavailability and obviously degraded image output as first-class handoff cases.
+- What should have been verified or stated differently: The handoff should have stated that the standing slice was only trustworthy while the backend was up and that storyboard output still lacked rejection logic for caption-box or placeholder frames.
+- Prevention rules for future work:
+  - A standing generated slice must never silently load stale fallback content after live bootstrap failure.
+  - Generated asset pipelines must gate on visible output quality and provider provenance, not only HTTP success and file creation.
+  - Handoffs for live generation paths must distinguish "live path can succeed" from "fallback and degraded-output cases are contained."
+- Follow-up actions:
+  - Add a title-screen bootstrap regression that proves failure does not load a fallback scene.
+  - Add a storyboard image quality gate with retry and rejected-asset cleanup.
+  - Surface generated-slice availability state directly on the title-screen slice launcher.
+- Distilled rule added to project-memory.md: `Standing generated slices must fail closed on bootstrap errors and reject visibly degraded storyboard frames (2026-04-14)`
+
 ### GTM Approval Flow Did Not Publish Approved X Replies (2026-04-14)
 - Status: Open
 - Related story/task: McCluckin Farm GTM X-only monitor + review dashboard
@@ -504,3 +559,82 @@
 - Actual root cause after fix: `TownNpcVoiceStreamController` trusted one serialized `tokenServiceBaseUrl` value from `Town.unity` and never tried an environment override or the alternate local orchestrator port. On this machine the backend was healthy on `127.0.0.1:8011`, so the scene-side token fetch failed before voice streaming could start.
 - Guardrail added: `TownVoiceTokenServiceEndpointResolver` now builds ordered candidate base URLs from an explicit environment override, the serialized scene value, and bounded local fallbacks (`8000`, `8011`). `TownVoiceTokenServiceClient` probes those candidates before giving up, and `TownVoiceStreamingTests` locks the override ordering plus local fallback behavior.
 - Distilled rule added to project-memory.md: `Town local backend integrations must not depend on one hardcoded localhost port (2026-04-14)`
+
+
+### Generate Unique Playthrough Finished But Never Enabled Play (2026-04-14)
+- Status: Addressed
+- Related story/task: GSO-021 LLM-directed story sequence generation
+- Original completion claim: The real generative title-screen flow was handed off as wired to the live story-sequence backend with a generated first turn landing in the standing slice package.
+- Reported issue: The developer reported that `Generate Unique Playthrough` completes but `Play Unique Playthrough` remains disabled.
+- Failing evidence: Developer report from the title screen after generation finishes: the prepare step ends, but the play button never becomes interactable.
+- Approach that produced the miss: The backend live smoke was verified through direct API/package output, but the exact Unity-side prepared-state handoff from generation completion into button interactivity was not re-verified in the title-screen state machine.
+- Why it was mistaken for done: Verification proved the providers could generate assets and update the package, but it did not prove that Unity stored the prepared generated session and refreshed the button state after the async flow returned.
+- What should have been verified or stated differently: The handoff should have separated backend generation success from title-screen readiness success and included one explicit UI-state verification that `Play Unique Playthrough` becomes enabled after a successful prepare.
+- Prevention rules for future work:
+  - Backend generation success is not enough; generated-slice handoffs must verify the title-screen prepared-state transition and button interactivity.
+  - Async title-screen flows must log each phase transition so a stuck disabled button can be diagnosed from one play-mode run.
+- Follow-up actions:
+  - Added `TitleScreenManager_Update_RestoresPreparedGeneratedPlaythroughStateFromRuntimeController` to lock recovery when runtime state is prepared but the UI has not re-enabled play yet.
+  - Added conditional generated-slice diagnostics across the title-screen manager, runtime controller, and Unity HTTP client so one play-mode run shows create, advance, payload-apply, ready, failure, and load transitions.
+- Actual root cause after fix: `TitleScreenManager` only enabled `Play Unique Playthrough` on the direct prepared callback path. If the runtime controller already held a prepared session and entry scene but the UI state had not been advanced to `Ready`, the button stayed disabled because nothing reconciled the title-screen controls back from the runtime state.
+- Guardrail added: `TitleScreenManager.Update()` now reconciles the generate/play buttons and ready status from `StorySequenceRuntimeController.HasPreparedSequence`, and the generated-slice diagnostics logs show each phase so callback/state mismatches are visible immediately.
+- Distilled rule added to project-memory.md: `Generated title-screen slices must reconcile button state from runtime prepared state, not only from one callback path (2026-04-14)`
+
+### Better Title Screen Was Hidden Behind Editor-Only Compilation (2026-04-14)
+- Status: Addressed
+- Related story/task: generated title-screen slice UX refresh
+- Original completion claim: The updated title-screen flow with separate generate/play actions and diagnostics was treated as the current improved title-screen experience.
+- Reported issue: The developer reported that after pulling changes, the better title screen was not present.
+- Failing evidence: Git history showed the larger title-screen overhaul existed only as local changes, and source inspection showed `TitleScreenManager.CreateTutorialSliceLauncher()` was wrapped in `#if UNITY_EDITOR || DEVELOPMENT_BUILD`, so the improved launcher never appeared in a normal build even when the local code was present.
+- Approach that produced the miss: The improved title-screen surface was implemented as runtime-generated UI for fast iteration, but it was left behind an editor/development compile guard without an explicit shipping decision or regression against that gate.
+- Why it was mistaken for done: Editor-side verification always saw the new launcher, which masked the fact that a normal build compiled the whole surface out.
+- What should have been verified or stated differently: The handoff needed to distinguish editor-only tooling from the player-facing title screen and state whether the improved launcher was intended to ship.
+- Prevention rules for future work:
+  - Any player-facing title-screen improvement must be verified in shipping compilation conditions, not only in the editor.
+  - Runtime-generated menu UI should not live behind editor-only compile guards unless the spec explicitly marks it as debug tooling.
+  - When a UX refresh is considered the better default, add a regression that fails if a compile guard removes it from non-development builds.
+- Follow-up actions:
+  - Add a regression test that fails if `CreateTutorialSliceLauncher()` is guarded by `UNITY_EDITOR` or `DEVELOPMENT_BUILD`.
+  - Remove the compile guard so the improved title-screen launcher ships in normal builds.
+- Actual root cause after fix: The improved title-screen surface was implemented as runtime-generated UI but accidentally left inside an editor/development-only compile block, so editor verification always showed the better launcher while normal builds compiled it out.
+- Guardrail added: `TitleScreenManager_CreateTutorialSliceLauncher_IsNotEditorOnly` now fails if the launcher is wrapped in the old compile guard, and `CreateTutorialSliceLauncher()` now runs in all builds.
+- Distilled rule added to project-memory.md: `Player-facing title-screen UI must not be hidden behind UNITY_EDITOR or DEVELOPMENT_BUILD guards unless it is explicitly debug-only (2026-04-14)`
+
+
+### Generated Playthrough Loaded Authored Post-Chicken Cutscene Instead Of Runtime Storyboard (2026-04-14)
+- Status: Addressed
+- Related story/task: GSO-021 LLM-directed story sequence generation
+- Original completion claim: The generated playthrough was handed off as using the live generated first cutscene beat through the standing title-screen slice.
+- Reported issue: The developer reported that `Play Unique Playthrough` still shows the old authored `Once caught, the chicken quickly became docile...` cutscene instead of the generated storyboard.
+- Failing evidence: Developer playthrough report plus source inspection of `TutorialSceneInstaller` showing `PostChickenCutscene` explicitly skips story-package-driven installation.
+- Approach that produced the miss: The backend/runtime package generation path was wired and the title-screen launch target was retargeted, but the specific post-chicken scene remained on its old scene-owned slideshow/timeline content path.
+- Why it was mistaken for done: Verification proved generation and package writing, but it did not verify that the loaded scene actually consumed the runtime override package for the first generated bridge beat.
+- What should have been verified or stated differently: The handoff should have explicitly checked that the first generated cutscene scene uses `StoryPackageRuntimeCatalog` content rather than only launching the correct scene name.
+- Prevention rules for future work:
+  - A generated scene launch is not enough; verify the loaded scene binds runtime package content instead of scene-authored fallback content.
+  - Any installer special-case that bypasses package-driven cutscene setup must be revisited when that scene becomes a generated entry beat.
+- Follow-up actions:
+  - Add a regression proving PostChicken cutscene installation consumes runtime storyboard data.
+  - Patch the installer or scene binding to replace the authored bridge content with the generated storyboard for runtime package launches.
+- Actual root cause after fix: `StorySequenceRuntimeController` was preparing and importing the generated runtime package correctly, but `TutorialSceneInstaller` still special-cased `PostChickenCutscene` as a scene-owned slideshow/timeline and never created a `TutorialCutsceneSceneController` from the runtime package. The authored `SlideshowPanel` / `SlideshowDirector` path therefore remained active and surfaced the old baked cutscene.
+- Guardrail added: `TutorialSceneConfigurationTests.Installer_PostChickenCutscene_UsesRuntimeStoryboardAndDisablesAuthoredSlideshow_WhenGeneratedBeatExists` now proves the generated storyboard is bound for PostChicken, `StoryPackageRuntimeCatalogTests.Installer_InjectsStoryboardCutscene_OnPostChickenScene` locks the installer contract, and `TutorialSceneInstaller` now disables the authored slideshow objects when it installs the runtime cutscene controller for that scene.
+- Distilled rule added to project-memory.md: `Generated entry cutscenes must not keep installer bypasses for authored slideshow/timeline content once they become runtime package beats (2026-04-14)`
+
+### Generated Story And Town Voice Required Manual Local Backend Startup (2026-04-14)
+- Status: Addressed
+- Related story/task: generated story slice bootstrap and local story-orchestrator integration
+- Original completion claim: The generated-story flow and Town voice path were handed off as usable with the local story-orchestrator running on `127.0.0.1:8012`.
+- Reported issue: The developer asked for the backend to be launched with the game so the earlier `Cannot connect to destination host` failure cannot recur as a manual startup miss.
+- Failing evidence: Earlier Unity logs showed generated-story requests cycling through local ports and failing to connect until the orchestrator was started by hand outside Unity.
+- Approach that produced the miss: The implementation assumed the local Python orchestrator would already be running and treated backend reachability as an operator concern instead of part of the runtime bootstrap contract.
+- Why it was mistaken for done: Verification proved that the feature works with a healthy backend, but it did not close the loop on how that backend gets started for a normal dev play session.
+- What should have been verified or stated differently: The handoff should have said explicitly that the local orchestrator still required manual startup, or the runtime should have owned that startup itself.
+- Prevention rules for future work:
+  - Local AI backends that are required for a first-party game flow must either auto-start from the game in development or surface a built-in bootstrap action, not rely on hidden terminal steps.
+  - Backend-health verification is incomplete unless the runtime path covers the server lifecycle the developer is expected to use.
+- Follow-up actions:
+  - Add a regression proving the generated-story request path ensures local orchestrator readiness before the HTTP request runs.
+  - Add a dev launcher path that warms the local story-orchestrator when the game starts and before story/voice requests.
+- Actual root cause after fix: The generated-story and Town voice clients only knew how to call the local Python orchestrator after it was already running. No Unity-side bootstrap existed, so a fresh editor/game session could hit `Cannot connect to destination host` until the developer launched `uvicorn` manually.
+- Guardrail added: `TitleScreenManager` now warms the local story-orchestrator in the background on startup, `StorySequenceRuntimeController` blocks generated-story requests until local orchestrator readiness succeeds, `TownVoiceTokenServiceClient` runs the same readiness bootstrap before requesting ElevenLabs voice tokens, and the repo-owned `backend/story-orchestrator/start_local_backend.sh` script gives Unity one stable launch path to invoke. `StorySequenceRuntimeBridgeTests.StorySequenceRuntimeController_BeginSequencePreparationRoutine_WaitsForLocalOrchestratorReadinessBeforeRequest` locks the request ordering, and `TutorialSceneConfigurationTests.TitleScreenManager_Start_WarmsLocalStoryOrchestratorInBackground_FromSource` guards the title-screen warm-up hook.
+- Distilled rule added to project-memory.md: `Local AI backends required for first-party dev flows must have a Unity-owned bootstrap path, not a hidden manual terminal prerequisite (2026-04-14)`

@@ -1,9 +1,11 @@
+using System;
 using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using FarmSimVR.Core;
 using FarmSimVR.Core.Farming;
+using FarmSimVR.Core.Story;
 using FarmSimVR.Core.Tutorial;
 using FarmSimVR.Editor;
 using FarmSimVR.MonoBehaviours;
@@ -28,12 +30,14 @@ namespace FarmSimVR.Tests.EditMode
         [SetUp]
         public void SetUp()
         {
+            DestroyPersistentRuntimeControllers();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         }
 
         [TearDown]
         public void TearDown()
         {
+            DestroyPersistentRuntimeControllers();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         }
 
@@ -186,6 +190,37 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(delay, Is.LessThanOrEqualTo(1.5f));
         }
 
+        [Test]
+        public void Installer_PostChickenCutscene_UsesRuntimeStoryboardAndDisablesAuthoredSlideshow_WhenGeneratedBeatExists()
+        {
+            StoryPackageRuntimeCatalog.ResetCacheForTests();
+
+            var imported = StoryPackageRuntimeCatalog.TrySetRuntimeOverride(
+                BuildGeneratedTitleDiagnosticsPackage(),
+                out var importError);
+            Assert.That(imported, Is.True, importError);
+
+            var slideshowPanel = new GameObject("SlideshowPanel");
+            var slideshowDirector = new GameObject("SlideshowDirector");
+
+            var runtime = new GameObject("TutorialRuntime");
+            var controller = runtime.AddComponent<TutorialFlowController>();
+
+            TutorialSceneInstaller.InstallForScene(TutorialSceneCatalog.PostChickenCutsceneSceneName, controller);
+
+            var cutsceneController = Object.FindFirstObjectByType<TutorialCutsceneSceneController>();
+            Assert.That(cutsceneController, Is.Not.Null);
+            Assert.That(cutsceneController.gameObject.name, Is.EqualTo(TutorialSceneCatalog.PostChickenCutsceneSceneName));
+
+            var shots = ReadField<StoryStoryboardShotSnapshot[]>(cutsceneController, "_storyboardShots");
+            Assert.That(shots, Is.Not.Null);
+            Assert.That(shots.Length, Is.EqualTo(1));
+            Assert.That(shots[0].SubtitleText, Is.EqualTo("Garrett points toward the next task."));
+
+            Assert.That(slideshowPanel.activeSelf, Is.False);
+            Assert.That(slideshowDirector.activeSelf, Is.False);
+        }
+
         [TestCase("Tutorial_PostChickenCutscene", TutorialStep.PostChickenCutscene)]
         [TestCase("CaughtChickenCutscene", TutorialStep.PostChickenCutscene)]
         [TestCase("Tutorial_MidpointPlaceholder", TutorialStep.MidpointPlaceholder)]
@@ -198,9 +233,8 @@ namespace FarmSimVR.Tests.EditMode
         }
 
         [Test]
-        public void TitleScreenManager_StartBuildsTutorialSliceLauncherFromSharedSceneCatalogAndStoryPackageSampleEntry()
+        public void TitleScreenManager_StartBuildsGenerateAndPlayUniquePlaythroughButtons()
         {
-            Assert.That(TitleScreenManager.StoryPackageSampleLabel, Is.EqualTo("Generative Story Slice"));
             Assert.That(
                 typeof(TitleScreenManager)
                     .GetField("StoryPackageSampleSceneName", BindingFlags.NonPublic | BindingFlags.Static)?
@@ -221,7 +255,7 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(launcherRoot, Is.Not.Null);
 
             var buttons = launcherRoot.GetComponentsInChildren<Button>(true);
-            Assert.That(buttons.Length, Is.EqualTo(SceneWorkCatalog.TitleScreenLaunchableScenes.Count + 1));
+            Assert.That(buttons.Length, Is.EqualTo(SceneWorkCatalog.TitleScreenLaunchableScenes.Count + 2));
 
             var labels = buttons
                 .Select(button => button.GetComponentInChildren<Text>())
@@ -230,10 +264,204 @@ namespace FarmSimVR.Tests.EditMode
 
             Assert.That(
                 labels,
-                Is.EqualTo((new[] { TitleScreenManager.StoryPackageSampleLabel }).Concat(
+                Is.EqualTo((new[] { "Generate Unique Playthrough", "Play Unique Playthrough" }).Concat(
                     SceneWorkCatalog.TitleScreenLaunchableScenes
                         .Select(scene => $"{scene.NumberLabel} {scene.DisplayName}"))
                     .ToArray()));
+
+            var playButton = GameObject.Find("TutorialSlice_PlayUniquePlaythrough")?.GetComponent<Button>();
+            Assert.That(playButton, Is.Not.Null);
+            Assert.That(playButton.interactable, Is.False);
+
+            var statusLabel = GameObject.Find(TitleScreenManager.GeneratedStorySliceStatusName)?.GetComponent<Text>();
+            Assert.That(statusLabel, Is.Not.Null);
+            Assert.That(statusLabel.text, Does.Contain("State: Idle"));
+            Assert.That(statusLabel.text, Does.Contain("Session: none"));
+        }
+
+        [Test]
+        public void TitleScreenManager_CreateTutorialSliceLauncher_IsNotEditorOnly()
+        {
+            var source = File.ReadAllText("Assets/_Project/Scripts/MonoBehaviours/TitleScreenManager.cs");
+            var methodIndex = source.IndexOf("private void CreateTutorialSliceLauncher()", StringComparison.Ordinal);
+
+            Assert.That(methodIndex, Is.GreaterThanOrEqualTo(0));
+
+            var guardIndex = source.IndexOf("#if UNITY_EDITOR || DEVELOPMENT_BUILD", StringComparison.Ordinal);
+            var endIfIndex = source.IndexOf("#endif", StringComparison.Ordinal);
+
+            Assert.That(
+                guardIndex < 0 || guardIndex > methodIndex || endIfIndex < methodIndex,
+                Is.True,
+                "CreateTutorialSliceLauncher should ship in non-development builds.");
+        }
+
+        [Test]
+        public void TitleScreenManager_Start_WarmsLocalStoryOrchestratorInBackground_FromSource()
+        {
+            var source = File.ReadAllText("Assets/_Project/Scripts/MonoBehaviours/TitleScreenManager.cs");
+
+            Assert.That(
+                source,
+                Does.Contain("StorySequenceRuntimeController.GetOrCreate().EnsureLocalOrchestratorRunningInBackground();"));
+        }
+
+        [Test]
+        public void TitleScreenManager_GenerateUniquePlaythrough_ShowsVisibleLoadingStateImmediately()
+        {
+            var canvasObject = new GameObject("Canvas");
+            canvasObject.AddComponent<Canvas>();
+            canvasObject.AddComponent<GraphicRaycaster>();
+
+            var managerObject = new GameObject("TitleScreenManager");
+            managerObject.AddComponent<AudioSource>();
+            var manager = managerObject.AddComponent<TitleScreenManager>();
+
+            InvokePrivateInstance(manager, "Start");
+
+            var runtimeController = StorySequenceRuntimeController.GetOrCreate();
+            SetPrivateField(
+                runtimeController,
+                "_beginSequenceRequestOverride",
+                (Func<System.Action<StorySequenceAdvancePayload>, System.Collections.IEnumerator>)(_ => HoldForever()));
+
+            var generateButton = GameObject.Find("TutorialSlice_GenerateUniquePlaythrough")?.GetComponent<Button>();
+            var playButton = GameObject.Find("TutorialSlice_PlayUniquePlaythrough")?.GetComponent<Button>();
+            Assert.That(generateButton, Is.Not.Null);
+            Assert.That(playButton, Is.Not.Null);
+
+            generateButton.onClick.Invoke();
+
+            var loadingOverlay = ReadField<GameObject>(manager, "generatedStoryLoadingOverlay");
+            var statusLabel = GameObject.Find(TitleScreenManager.GeneratedStorySliceStatusName)?.GetComponent<Text>();
+
+            Assert.That(ReadPrivateBool(manager, "isTransitioning"), Is.True);
+            Assert.That(loadingOverlay, Is.Not.Null);
+            Assert.That(loadingOverlay.name, Is.EqualTo(TitleScreenManager.GeneratedStorySliceLoadingOverlayName));
+            Assert.That(loadingOverlay.activeSelf, Is.True);
+            Assert.That(generateButton.interactable, Is.False);
+            Assert.That(playButton.interactable, Is.False);
+            Assert.That(statusLabel, Is.Not.Null);
+            Assert.That(statusLabel.text, Does.Contain("Generating unique playthrough"));
+            Assert.That(statusLabel.text, Does.Contain("State: Generating"));
+            Assert.That(statusLabel.text, Does.Contain("Session: pending"));
+        }
+
+        [Test]
+        public void TitleScreenManager_HandleGeneratedPlaythroughPrepared_EnablesPlayButtonAndShowsReadyState()
+        {
+            var canvasObject = new GameObject("Canvas");
+            canvasObject.AddComponent<Canvas>();
+            canvasObject.AddComponent<GraphicRaycaster>();
+
+            var managerObject = new GameObject("TitleScreenManager");
+            managerObject.AddComponent<AudioSource>();
+            var manager = managerObject.AddComponent<TitleScreenManager>();
+
+            InvokePrivateInstance(manager, "Start");
+
+            var runtimeController = StorySequenceRuntimeController.GetOrCreate();
+            SetPrivateField(runtimeController, "_activeSessionId", "session-title-diagnostics");
+            SetPrivateField(runtimeController, "_preparedEntrySceneName", TutorialSceneCatalog.PostChickenCutsceneSceneName);
+
+            var imported = StoryPackageRuntimeCatalog.TrySetRuntimeOverride(
+                BuildGeneratedTitleDiagnosticsPackage(),
+                out var importError);
+            Assert.That(imported, Is.True, importError);
+
+            InvokePrivateInstance(manager, "HandleGeneratedStorySlicePrepared", TutorialSceneCatalog.PostChickenCutsceneSceneName);
+
+            var generateButton = GameObject.Find("TutorialSlice_GenerateUniquePlaythrough")?.GetComponent<Button>();
+            var playButton = GameObject.Find("TutorialSlice_PlayUniquePlaythrough")?.GetComponent<Button>();
+            var statusLabel = GameObject.Find(TitleScreenManager.GeneratedStorySliceStatusName)?.GetComponent<Text>();
+
+            Assert.That(ReadPrivateBool(manager, "isTransitioning"), Is.False);
+            Assert.That(generateButton, Is.Not.Null);
+            Assert.That(generateButton.interactable, Is.True);
+            Assert.That(playButton, Is.Not.Null);
+            Assert.That(playButton.interactable, Is.True);
+            Assert.That(statusLabel, Is.Not.Null);
+            Assert.That(statusLabel.text, Does.Contain("ready").IgnoreCase);
+            Assert.That(statusLabel.text, Does.Contain("State: Ready"));
+            Assert.That(statusLabel.text, Does.Contain("Session: session-title-diagnostics"));
+            Assert.That(statusLabel.text, Does.Contain("Package: Generated Diagnostics Package"));
+            Assert.That(statusLabel.text, Does.Contain("Beat: Generated Diagnostics Bridge"));
+            Assert.That(statusLabel.text, Does.Contain("Shots: 1"));
+        }
+
+        [Test]
+        public void TitleScreenManager_Update_RestoresPreparedGeneratedPlaythroughStateFromRuntimeController()
+        {
+            var canvasObject = new GameObject("Canvas");
+            canvasObject.AddComponent<Canvas>();
+            canvasObject.AddComponent<GraphicRaycaster>();
+
+            var managerObject = new GameObject("TitleScreenManager");
+            managerObject.AddComponent<AudioSource>();
+            var manager = managerObject.AddComponent<TitleScreenManager>();
+
+            InvokePrivateInstance(manager, "Start");
+
+            var runtimeController = StorySequenceRuntimeController.GetOrCreate();
+            SetPrivateField(runtimeController, "_activeSessionId", "session-runtime-recovery");
+            SetPrivateField(runtimeController, "_preparedEntrySceneName", TutorialSceneCatalog.PostChickenCutsceneSceneName);
+
+            var imported = StoryPackageRuntimeCatalog.TrySetRuntimeOverride(
+                BuildGeneratedTitleDiagnosticsPackage(),
+                out var importError);
+            Assert.That(imported, Is.True, importError);
+
+            InvokePrivateInstance(manager, "Update");
+
+            var generateButton = GameObject.Find("TutorialSlice_GenerateUniquePlaythrough")?.GetComponent<Button>();
+            var playButton = GameObject.Find("TutorialSlice_PlayUniquePlaythrough")?.GetComponent<Button>();
+            var statusLabel = GameObject.Find(TitleScreenManager.GeneratedStorySliceStatusName)?.GetComponent<Text>();
+
+            Assert.That(generateButton, Is.Not.Null);
+            Assert.That(generateButton.interactable, Is.True);
+            Assert.That(playButton, Is.Not.Null);
+            Assert.That(playButton.interactable, Is.True);
+            Assert.That(statusLabel, Is.Not.Null);
+            Assert.That(statusLabel.text, Does.Contain("State: Ready"));
+            Assert.That(statusLabel.text, Does.Contain("Session: session-runtime-recovery"));
+            Assert.That(statusLabel.text, Does.Contain("Beat: Generated Diagnostics Bridge"));
+        }
+
+        [Test]
+        public void TitleScreenManager_TransitionToGame_UnlocksTitleWhenGeneratedSliceRequestDoesNotStart()
+        {
+            var canvasObject = new GameObject("Canvas");
+            canvasObject.AddComponent<Canvas>();
+            canvasObject.AddComponent<GraphicRaycaster>();
+
+            var managerObject = new GameObject("TitleScreenManager");
+            managerObject.AddComponent<AudioSource>();
+            var manager = managerObject.AddComponent<TitleScreenManager>();
+
+            InvokePrivateInstance(manager, "Start");
+
+            var runtimeController = StorySequenceRuntimeController.GetOrCreate();
+            SetPrivateField(runtimeController, "_requestInFlight", true);
+            SetPrivateField(manager, "targetSceneName", TutorialSceneCatalog.PostChickenCutsceneSceneName);
+            SetPrivateField(manager, "launchGeneratedStorySlice", true);
+            SetPrivateField(manager, "isTransitioning", true);
+
+            var routine = InvokePrivateInstance<System.Collections.IEnumerator>(manager, "TransitionToGame");
+            while (routine.MoveNext())
+            {
+            }
+
+            var generateButton = GameObject.Find("TutorialSlice_GenerateUniquePlaythrough")?.GetComponent<Button>();
+            var playButton = GameObject.Find("TutorialSlice_PlayUniquePlaythrough")?.GetComponent<Button>();
+            var statusLabel = GameObject.Find(TitleScreenManager.GeneratedStorySliceStatusName)?.GetComponent<Text>();
+
+            Assert.That(ReadPrivateBool(manager, "isTransitioning"), Is.False);
+            Assert.That(generateButton, Is.Not.Null);
+            Assert.That(generateButton.interactable, Is.True);
+            Assert.That(playButton, Is.Not.Null);
+            Assert.That(playButton.interactable, Is.False);
+            Assert.That(statusLabel, Is.Not.Null);
+            Assert.That(statusLabel.text, Does.Contain("already starting"));
         }
 
         [TestCase(TutorialSceneCatalog.IntroSceneName, "Intro")]
@@ -498,6 +726,60 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(
                 plots.Count(plot => tutorialController.IsActionAllowed(FarmPlotAction.Till, plot)),
                 Is.EqualTo(6));
+        }
+
+        private static void DestroyPersistentRuntimeControllers()
+        {
+            foreach (var controller in Object.FindObjectsByType<StorySequenceRuntimeController>(
+                         FindObjectsInactive.Include,
+                         FindObjectsSortMode.None))
+            {
+                Object.DestroyImmediate(controller.gameObject);
+            }
+        }
+
+        private static System.Collections.IEnumerator HoldForever()
+        {
+            while (true)
+                yield return null;
+        }
+
+        private static StoryPackageSnapshot BuildGeneratedTitleDiagnosticsPackage()
+        {
+            return new StoryPackageSnapshot
+            {
+                PackageId = "storypkg_title_diagnostics",
+                SchemaVersion = 1,
+                PackageVersion = 1,
+                DisplayName = "Generated Diagnostics Package",
+                Beats = new[]
+                {
+                    new StoryBeatSnapshot
+                    {
+                        BeatId = "sequence_turn_000_cutscene",
+                        DisplayName = "Generated Diagnostics Bridge",
+                        Kind = "Cutscene",
+                        SceneName = TutorialSceneCatalog.PostChickenCutsceneSceneName,
+                        NextSceneName = TutorialSceneCatalog.FarmTutorialSceneName,
+                        Storyboard = new StoryStoryboardSnapshot
+                        {
+                            StylePresetId = "farm_storybook_v1",
+                            Shots = new[]
+                            {
+                                new StoryStoryboardShotSnapshot
+                                {
+                                    ShotId = "shot_01",
+                                    SubtitleText = "Garrett points toward the next task.",
+                                    NarrationText = "Garrett points toward the next task.",
+                                    DurationSeconds = 3f,
+                                    ImageResourcePath = "GeneratedStoryboards/storypkg_title_diagnostics/sequence_turn_000_cutscene/shot_01",
+                                    AudioResourcePath = "GeneratedStoryboards/storypkg_title_diagnostics/sequence_turn_000_cutscene/shot_01",
+                                },
+                            },
+                        },
+                    },
+                },
+            };
         }
 
         private static void InvokePrivateInstance(object target, string methodName, params object[] args)

@@ -26,7 +26,7 @@ class GeneratedStoryboardCutsceneRequest(BaseModel):
     style_preset_id: str = Field(default="farm_storybook_v1", min_length=1)
     voice_id: str | None = None
     reference_image_paths: list[str] = Field(default_factory=list)
-    continuity_reference_mode: Literal["auto", "explicit_only"] = "auto"
+    continuity_reference_mode: Literal["auto", "explicit_only", "character_priority"] = "auto"
     max_reference_images: int = Field(default=4, ge=0, le=8)
     aspect_ratio: str = Field(default="16:9", min_length=1)
     image_size: str = Field(default="2K", min_length=1)

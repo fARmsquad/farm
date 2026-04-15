@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from random import Random
 from typing import Any
 
 from .generated_package_assembly import (
@@ -13,6 +13,9 @@ from .generated_package_assembly import (
     GeneratedPackageAssemblyResult,
     GeneratedPackageAssemblyService,
 )
+from .generated_storyboard_models import GeneratedStoryboardContext
+from .minigame_generator_models import MinigameGenerationContext
+from .minigame_generators import MinigameGeneratorCatalog
 from .story_sequence_models import (
     StorySequenceAdvanceResult,
     StorySequenceContinuityImageRecord,
@@ -21,13 +24,13 @@ from .story_sequence_models import (
     StorySequenceSessionRecord,
     StorySequenceTurnRecord,
 )
-from .generated_storyboard_models import GeneratedStoryboardContext
-from .minigame_generator_models import MinigameGenerationContext
-from .minigame_generators import MinigameGeneratorCatalog
 from .story_sequence_store import StorySequenceSessionStore
+from .story_sequence_rules import build_turn_parameters, updated_world_state
+from .story_sequence_turn_director import StorySequenceGeneratorOption, StorySequenceTurnDirector
 
 _DEFAULT_VOICE_ID = "voice-test"
 _PROOF_CUTSCENE_SCENE = "PostChickenCutscene"
+_LOGGER = logging.getLogger("uvicorn.error")
 _MINIGAME_SCENES = {
     "plant_rows_v1": "FarmMain",
     "find_tools_cluster_v1": "FindToolsGame",
@@ -51,11 +54,13 @@ class StorySequenceSessionService:
         store: StorySequenceSessionStore,
         catalog: MinigameGeneratorCatalog | None = None,
         default_voice_id: str = "",
+        turn_director: StorySequenceTurnDirector | None = None,
     ) -> None:
         self._package_assembly_service = package_assembly_service
         self._store = store
         self._catalog = catalog or MinigameGeneratorCatalog.default()
         self._default_voice_id = default_voice_id or _DEFAULT_VOICE_ID
+        self._turn_director = turn_director
 
     def create_session(self, request: StorySequenceSessionCreateRequest) -> StorySequenceSessionRecord:
         record = StorySequenceSessionRecord.create_active(request)
@@ -70,26 +75,133 @@ class StorySequenceSessionService:
             return None
 
         turn_index = len(detail.turns)
-        plan = self._plan_turn(detail.session)
+        _LOGGER.info(
+            "[GeneratedStoryBackend] advance_session start session_id=%s turn_index=%s beat_cursor=%s",
+            session_id,
+            turn_index,
+            detail.session.state.beat_cursor,
+        )
+        plan = self._plan_turn(detail)
+        _LOGGER.info(
+            "[GeneratedStoryBackend] planned turn session_id=%s turn_index=%s generator=%s character=%s",
+            session_id,
+            turn_index,
+            plan.generator_id,
+            plan.character_name,
+        )
         result = self._create_package(plan.request)
         turn = self._build_turn_record(detail.session, turn_index, plan, result)
         session = self._advance_session_state(detail.session, turn)
         persisted = self._store.append_turn(session, turn)
         if persisted is None:
             raise RuntimeError(f"Story sequence session '{session_id}' could not be updated.")
+        if result.is_valid:
+            _LOGGER.info(
+                "[GeneratedStoryBackend] advance_session complete session_id=%s turn_index=%s valid=%s errors=%s",
+                session_id,
+                turn_index,
+                result.is_valid,
+                len(result.errors),
+            )
+        else:
+            _LOGGER.warning(
+                "[GeneratedStoryBackend] advance_session complete session_id=%s turn_index=%s valid=%s errors=%s details=%s",
+                session_id,
+                turn_index,
+                result.is_valid,
+                len(result.errors),
+                result.errors,
+            )
         return StorySequenceAdvanceResult(session=persisted.session, turn=turn)
 
-    def _plan_turn(self, session: StorySequenceSessionRecord) -> _TurnPlan:
+    def _plan_turn(self, detail: StorySequenceSessionDetail) -> _TurnPlan:
+        session = detail.session
         candidate_ids = self._ordered_generator_ids(session)
         plans = [plan for generator_id in candidate_ids if (plan := self._build_plan(session, generator_id))]
         if not plans:
             raise RuntimeError("No valid sequence generator is available for the current session state.")
 
+        default_plan = self._select_preferred_plan(session, plans)
+        directive = self._choose_directed_turn(detail, candidate_ids, default_plan)
+        if directive is None:
+            return default_plan
+
+        if directive.generator_id not in candidate_ids:
+            return default_plan
+        if directive.character_name not in session.state.character_pool:
+            return default_plan
+
+        directed_character = directive.character_name
+        directed_display_name = directive.cutscene_display_name.strip() or default_plan.request.cutscene.display_name
+        directed_story_brief = directive.story_brief.strip() or default_plan.request.cutscene.story_brief
+        try:
+            directed_plan = self._build_plan(
+                session,
+                directive.generator_id,
+                character_name=directed_character,
+                story_brief=directed_story_brief,
+                cutscene_display_name=directed_display_name,
+            )
+        except Exception:
+            directed_plan = None
+        return directed_plan or default_plan
+
+    def _select_preferred_plan(
+        self,
+        session: StorySequenceSessionRecord,
+        plans: list[_TurnPlan],
+    ) -> _TurnPlan:
         recent = set(session.state.recent_generator_ids[-session.state.max_recent_generators :])
         for plan in plans:
             if plan.generator_id not in recent:
                 return plan
         return plans[0]
+
+    def _choose_directed_turn(
+        self,
+        detail: StorySequenceSessionDetail,
+        candidate_ids: list[str],
+        default_plan: _TurnPlan,
+    ):
+        if self._turn_director is None:
+            return None
+
+        session = detail.session
+        recent_turn_summaries = [turn.summary for turn in detail.turns[-3:]]
+        candidate_generators = self._build_generator_options(candidate_ids)
+        try:
+            return self._turn_director.choose_turn(
+                narrative_seed=session.state.narrative_seed,
+                beat_cursor=session.state.beat_cursor,
+                fit_tags=list(session.state.fit_tags),
+                world_state=list(session.state.world_state),
+                difficulty_band=session.state.difficulty_band,
+                last_minigame_goal=session.state.last_minigame_goal,
+                recent_turn_summaries=recent_turn_summaries,
+                candidate_generators=candidate_generators,
+                candidate_character_names=list(session.state.character_pool),
+                default_generator_id=default_plan.generator_id,
+                default_character_name=default_plan.character_name,
+            )
+        except Exception:
+            return None
+
+    def _build_generator_options(self, generator_ids: list[str]) -> list[StorySequenceGeneratorOption]:
+        options: list[StorySequenceGeneratorOption] = []
+        for generator_id in generator_ids:
+            definition = self._catalog.get_definition(generator_id)
+            if definition is None:
+                continue
+            options.append(
+                StorySequenceGeneratorOption(
+                    generator_id=definition.generator_id,
+                    display_name=definition.display_name,
+                    minigame_id=definition.minigame_id,
+                    fit_tags=list(definition.fit_tags),
+                    preview_text_template=definition.preview_text_template,
+                )
+            )
+        return options
 
     def _ordered_generator_ids(self, session: StorySequenceSessionRecord) -> list[str]:
         definitions = self._catalog.list_definitions()
@@ -100,26 +212,38 @@ class StorySequenceSessionService:
         ordered = definitions[start_index:] + definitions[:start_index]
         return [definition.generator_id for definition in ordered]
 
-    def _build_plan(self, session: StorySequenceSessionRecord, generator_id: str) -> _TurnPlan | None:
+    def _build_plan(
+        self,
+        session: StorySequenceSessionRecord,
+        generator_id: str,
+        *,
+        character_name: str | None = None,
+        story_brief: str | None = None,
+        cutscene_display_name: str | None = None,
+    ) -> _TurnPlan | None:
         turn_index = session.state.beat_cursor
-        parameters = self._build_parameters(session, generator_id)
+        parameters = build_turn_parameters(session, generator_id)
         context = self._build_context(session)
         validation = self._catalog.validate_selection(generator_id, parameters=parameters, context=context)
         if not validation.is_valid:
             return None
 
-        character_name = self._select_character_name(session)
+        selected_character_name = character_name or self._select_character_name(session)
+        selected_story_brief = story_brief or self._build_story_brief(session, generator_id, selected_character_name)
+        selected_display_name = cutscene_display_name or f"Sequence Bridge {turn_index + 1}"
         request = self._build_request(
             session=session,
             generator_id=generator_id,
-            character_name=character_name,
+            character_name=selected_character_name,
             parameters=validation.resolved_parameters,
             turn_index=turn_index,
             context=context,
+            story_brief=selected_story_brief,
+            cutscene_display_name=selected_display_name,
         )
         return _TurnPlan(
             generator_id=generator_id,
-            character_name=character_name,
+            character_name=selected_character_name,
             parameters=validation.resolved_parameters,
             request=request,
         )
@@ -140,9 +264,10 @@ class StorySequenceSessionService:
         parameters: dict[str, Any],
         turn_index: int,
         context: MinigameGenerationContext,
+        story_brief: str,
+        cutscene_display_name: str,
     ) -> GeneratedPackageAssemblyRequest:
         turn_slug = f"sequence_turn_{turn_index:03d}"
-        story_brief = self._build_story_brief(session, generator_id, character_name)
         minigame_scene = _MINIGAME_SCENES[generator_id]
         continuity_reference_paths = self._select_continuity_reference_paths(session, character_name)
 
@@ -160,13 +285,14 @@ class StorySequenceSessionService:
             ),
             cutscene=GeneratedPackageAssemblyCutsceneInput(
                 beat_id=f"{turn_slug}_cutscene",
-                display_name=f"Sequence Bridge {turn_index + 1}",
+                display_name=cutscene_display_name,
                 scene_name=_PROOF_CUTSCENE_SCENE,
                 next_scene_name=minigame_scene,
                 story_brief=story_brief,
                 style_preset_id="farm_storybook_v1",
                 voice_id=self._default_voice_id,
                 reference_image_paths=continuity_reference_paths,
+                continuity_reference_mode="character_priority",
                 context=GeneratedStoryboardContext(
                     character_name=character_name,
                     crop_name="",
@@ -203,78 +329,6 @@ class StorySequenceSessionService:
             raise RuntimeError("Story sequence session has no available character pool.")
         index = session.state.beat_cursor % len(pool)
         return pool[index]
-
-    def _build_parameters(self, session: StorySequenceSessionRecord, generator_id: str) -> dict[str, Any]:
-        if generator_id == "plant_rows_v1":
-            return self._plant_rows_parameters(session)
-        if generator_id == "find_tools_cluster_v1":
-            return self._find_tools_parameters(session)
-        if generator_id == "chicken_chase_intro_v1":
-            return self._chicken_chase_parameters(session)
-        raise RuntimeError(f"Sequence planner does not know generator '{generator_id}'.")
-
-    def _plant_rows_parameters(self, session: StorySequenceSessionRecord) -> dict[str, Any]:
-        rng = self._rng(session, "plant_rows")
-        crop_options = ["carrot"]
-        if "tomatoes_unlocked" in set(session.state.world_state):
-            crop_options.append("tomato")
-        if "corn_unlocked" in set(session.state.world_state):
-            crop_options.append("corn")
-
-        crop_type = self._pick_preferred(crop_options, session.state.recent_crop_types[-1:])
-        target_count = min(8, 5 + session.state.beat_cursor)
-        row_count = 3 if target_count >= 6 and rng.choice([False, True]) else 2
-        assist_level = "high" if session.state.beat_cursor == 0 else "medium"
-        return {
-            "cropType": crop_type,
-            "targetCount": target_count,
-            "timeLimitSeconds": 300 if target_count <= 6 else 360,
-            "rowCount": row_count,
-            "assistLevel": assist_level,
-        }
-
-    def _find_tools_parameters(self, session: StorySequenceSessionRecord) -> dict[str, Any]:
-        rng = self._rng(session, "find_tools")
-        tool_sets = ["starter"]
-        if "watering_tools_unlocked" in set(session.state.world_state):
-            tool_sets.append("watering")
-        if "planting_tools_unlocked" in set(session.state.world_state):
-            tool_sets.append("planting")
-
-        zone_options = ["yard", "shed_edge"]
-        if "earliest_tutorial_bridge" not in set(session.state.world_state):
-            zone_options.append("field_path")
-
-        tool_count = 2 if session.state.beat_cursor < 2 else 3
-        hint_strength = "strong" if tool_count == 3 else rng.choice(["strong", "medium"])
-        target_tool_set = tool_sets[min(session.state.beat_cursor, len(tool_sets) - 1)]
-        search_zone = zone_options[session.state.beat_cursor % len(zone_options)]
-        return {
-            "targetToolSet": target_tool_set,
-            "toolCount": tool_count,
-            "searchZone": search_zone,
-            "hintStrength": hint_strength,
-            "timeLimitSeconds": 240 if target_tool_set == "starter" else 300,
-        }
-
-    def _chicken_chase_parameters(self, session: StorySequenceSessionRecord) -> dict[str, Any]:
-        capture_count = 1 if session.state.beat_cursor < 3 else 2
-        chicken_count = max(2, capture_count + 1)
-        arena_preset_id = "tutorial_pen_small" if capture_count == 1 else "tutorial_pen_medium"
-        return {
-            "targetCaptureCount": capture_count,
-            "chickenCount": chicken_count,
-            "arenaPresetId": arena_preset_id,
-            "timeLimitSeconds": 120 if arena_preset_id == "tutorial_pen_medium" else 90,
-            "guidanceLevel": "high" if session.state.beat_cursor == 0 else "medium",
-        }
-
-    def _pick_preferred(self, options: list[str], recent_values: list[str]) -> str:
-        recent = set(recent_values)
-        for option in options:
-            if option not in recent:
-                return option
-        return options[0]
 
     def _display_name_for(self, generator_id: str) -> str:
         definition = self._catalog.get_definition(generator_id)
@@ -322,7 +376,7 @@ class StorySequenceSessionService:
         session: StorySequenceSessionRecord,
         turn: StorySequenceTurnRecord,
     ) -> StorySequenceSessionRecord:
-        world_state = self._updated_world_state(session, turn.turn_index)
+        world_state = updated_world_state(session, turn.turn_index)
         recent_generators = self._roll_recent(
             session.state.recent_generator_ids,
             turn.generator_id,
@@ -392,13 +446,29 @@ class StorySequenceSessionService:
     ) -> list[str]:
         available = [
             image
-            for image in reversed(session.state.continuity_images)
+            for image in session.state.continuity_images
             if image.output_path and Path(image.output_path).exists()
         ]
-        same_character = [image.output_path for image in available if image.character_name == character_name]
-        if same_character:
-            return self._dedupe_paths(same_character)[:2]
-        return self._dedupe_paths([image.output_path for image in available])[:2]
+        same_character = [image for image in available if image.character_name == character_name]
+        selected = self._select_continuity_anchor_path(same_character)
+        if selected:
+            return [selected]
+
+        selected = self._select_continuity_anchor_path(available)
+        return [selected] if selected else []
+
+    def _select_continuity_anchor_path(
+        self,
+        images: list[StorySequenceContinuityImageRecord],
+    ) -> str:
+        if not images:
+            return ""
+
+        latest_turn_index = max(image.turn_index for image in images)
+        latest_turn_images = [image for image in images if image.turn_index == latest_turn_index]
+        shot_priority = {"shot_01": 0, "shot_02": 1, "shot_03": 2}
+        latest_turn_images.sort(key=lambda image: (shot_priority.get(image.shot_id, 99), image.shot_id))
+        return latest_turn_images[0].output_path
 
     def _extract_continuity_images(
         self,
@@ -434,6 +504,3 @@ class StorySequenceSessionService:
                 continue
             resolved.append(path)
         return resolved
-
-    def _rng(self, session: StorySequenceSessionRecord, label: str) -> Random:
-        return Random(f"{session.state.seed}:{session.state.beat_cursor}:{label}")

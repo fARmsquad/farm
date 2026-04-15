@@ -183,6 +183,8 @@ def test_system_prompt_requires_specific_farm_voice_for_x_replies() -> None:
     assert "concrete observation" in prompt
     assert "generic openers" in prompt
     assert "farmhand" in prompt
+    assert "nuanced take" in prompt
+    assert "\"we're working on\"" in prompt
 
 
 @pytest.mark.asyncio
@@ -218,4 +220,3 @@ async def test_process_new_leads_allows_stardew_discussion_without_vr_context(se
     assert lead.decision_note == "Draft generated for review."
     assert len(client.messages.calls) == 1
     assert len(drafts) == 1
-

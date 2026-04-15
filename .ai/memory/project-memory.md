@@ -65,7 +65,14 @@
 - Title-screen launchers must resolve canonical tutorial aliases to build-loadable scene names through `SceneWorkCatalog`; routing names like `PostChickenCutscene` are not always the same as the actual scene asset names in the build profile.
 - Generative Story Orchestrator progress should keep updating the standing `Generative Story Slice` on the title screen, backed by `StoryPackage_IntroChickenSample`, instead of creating a new ad hoc sample slice for each increment.
 - The standing `Generative Story Slice` should launch the current generated proof beat (`PostChickenCutscene` right now), not the authored `Intro` Timeline, unless a spec explicitly calls for an end-to-end intro regression path.
+- The standing generated title-screen slice now has separate prepare and play states: `Generate Unique Playthrough` keeps the title screen live and invalidates stale prepared runs, while `Play Unique Playthrough` stays disabled until `StorySequenceRuntimeController` holds a prepared entry scene and active session. Authored scene launches should clear that prepared generated state; the play path must not clear it before the generated scene loads.
+- Generated title-screen slices must reconcile button state from `StorySequenceRuntimeController.HasPreparedSequence`, not only from one callback path, so a prepared runtime session cannot leave `Play Unique Playthrough` disabled after the async prepare flow completes.
+- The generated title-screen status block should only show package/beat details when the runtime controller actually holds a live generated session. Idle or failed states must not accidentally present the authored fallback package as if it were freshly generated output.
 - Package-driven tutorial routing must distinguish between "no package beat exists" and "package beat exists with an empty `NextSceneName`". The latter is an explicit terminal slice boundary and must not fall back into the authored tutorial flow.
+- LLM-directed story turns must stay bounded by the minigame generator catalog and active character pool. Schema-valid OpenAI output can choose among those bounded options, but any invalid generator, invalid character, malformed payload, or provider failure must drop all the way back to the local rule-selected turn instead of partially reusing the bad directive.
+- Player-facing title-screen UI must not be hidden behind `UNITY_EDITOR` or `DEVELOPMENT_BUILD` guards unless the spec explicitly marks it as debug-only.
+- Generated entry cutscenes must not keep installer bypasses for authored slideshow/timeline content once they become runtime package beats; the installer has to bind the runtime storyboard and disable the old authored bridge objects.
+- Local AI backends required for first-party dev flows must have a Unity-owned bootstrap path, not a hidden manual terminal prerequisite.
 
 ### Scene Art Review
 - When the developer is still choosing the look of a mechanic, place curated asset options directly in the scene and get a pick before adding more lifecycle-specific logic or polish.
@@ -110,6 +117,9 @@
 - DON'T assume backend consumers will receive the raw `ResolvedParameters` dictionary. Unity-facing story packages may only carry `ResolvedParameterEntries`, so cross-runtime readers need to support that contract shape too.
 - DON'T set a Unity-side timeout for a local proxy call lower than the backend's own upstream provider timeout when Town voice depends on that proxy.
 - DON'T present approval in an outbound-content UI as effectively published unless the publish step is actually triggered and visibly tracked.
+- DON'T let a standing generated slice silently fall back into stale packaged content or publish visibly degraded storyboard frames after a live bootstrap failure.
+- DON'T hand off a generated-slice fail-closed change without one healthy end-to-end live launch against a running local orchestrator.
+- DON'T let an async title-screen launch set transition state unless the underlying request actually started, and don't leave long-running launches without an obvious loading state.
 
 ---
 

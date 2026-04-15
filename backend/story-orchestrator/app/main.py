@@ -49,6 +49,7 @@ from .story_sequence_models import (
 )
 from .story_sequence_service import StorySequenceSessionService
 from .story_sequence_store import StorySequenceSessionStore
+from .story_sequence_turn_director import OpenAIStorySequenceTurnDirector, StorySequenceTurnDirector
 from .store import GeneratedStandingSliceJobStore, StoryJobStore
 from .storyboard_reference_library import StoryboardReferenceLibrary
 from .storyboard_reference_models import StoryboardReferenceAssetRecord, StoryboardReferenceRole
@@ -64,6 +65,7 @@ def create_app(
     generated_standing_slice_job_service: GeneratedStandingSliceJobService | None = None,
     generated_standing_slice_publisher: GeneratedStandingSlicePublisher | None = None,
     story_sequence_session_store: StorySequenceSessionStore | None = None,
+    story_sequence_turn_director: StorySequenceTurnDirector | None = None,
     story_sequence_session_service: StorySequenceSessionService | None = None,
     storyboard_reference_library: StoryboardReferenceLibrary | None = None,
 ) -> FastAPI:
@@ -112,6 +114,7 @@ def create_app(
         package_assembly_service=package_assembly_service,
         store=sequence_session_store,
         default_voice_id=resolved_settings.elevenlabs_voice_id or "voice-test",
+        turn_director=story_sequence_turn_director or OpenAIStorySequenceTurnDirector.from_settings(resolved_settings),
     )
     minigame_generator_catalog = MinigameGeneratorCatalog.default()
     review_page_path = (base_dir / "app" / "static" / "standing_slice_review.html").resolve()

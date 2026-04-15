@@ -148,7 +148,7 @@ namespace FarmSimVR.Tests.EditMode
         }
 
         [Test]
-        public void Installer_DoesNotInjectStoryboardCutscene_OnPostChickenScene()
+        public void Installer_InjectsStoryboardCutscene_OnPostChickenScene()
         {
             var runtime = new GameObject("TutorialRuntime");
             var controller = runtime.AddComponent<TutorialFlowController>();
@@ -156,7 +156,8 @@ namespace FarmSimVR.Tests.EditMode
             TutorialSceneInstaller.InstallForScene(TutorialSceneCatalog.PostChickenCutsceneSceneName, controller);
 
             var cutsceneController = Object.FindFirstObjectByType<TutorialCutsceneSceneController>();
-            Assert.That(cutsceneController, Is.Null);
+            Assert.That(cutsceneController, Is.Not.Null);
+            Assert.That(cutsceneController.gameObject.name, Is.EqualTo(TutorialSceneCatalog.PostChickenCutsceneSceneName));
         }
 
         [Test]

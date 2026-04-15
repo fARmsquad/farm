@@ -9,6 +9,7 @@ from requests import Response
 from tweepy.errors import HTTPException
 
 from db.models import ControlFlag, Lead
+from monitor.audience import should_store_twitter_lead
 from monitor.keywords import TWITTER_QUERY_MAX_RESULTS, build_twitter_queries
 from monitor.reddit import collect_reddit_leads
 from monitor.twitter import collect_twitter_leads
@@ -169,13 +170,13 @@ async def test_reddit_monitor_returns_zero_when_credentials_are_missing(session_
 
 
 def test_twitter_monitor_uses_since_id_and_stores_newest_id(session_factory, settings, now) -> None:
-    query = '"cozy VR" -is:retweet'
+    query = '("games like stardew" OR "like stardew valley" OR "similar to stardew") -is:retweet lang:en'
     with session_factory() as session:
         session.add(ControlFlag(key=f"twitter_since::{sha1(query.encode()).hexdigest()}", value="100"))
         session.commit()
 
-    tweet = FakeTweet("101", "Need a cozy VR game on Quest", "user-1", now - timedelta(minutes=5))
-    own_tweet = FakeTweet("102", "Our own cozy VR update", "self", now - timedelta(minutes=2))
+    tweet = FakeTweet("101", "Anyone have games like Stardew? Need another farm game to sink into.", "user-1", now - timedelta(minutes=5))
+    own_tweet = FakeTweet("102", "Our own cozy farm game update", "self", now - timedelta(minutes=2))
     response = FakeTwitterResponse(
         data=[tweet, own_tweet],
         includes={"users": [{"id": "user-1", "username": "vrfan"}, {"id": "self", "username": settings.x_username}]},
@@ -247,6 +248,20 @@ def test_build_twitter_queries_focuses_on_farm_and_stardew_audiences_over_vr_dev
     assert "xr simulator" not in combined
     assert "eye strain" not in combined
 
+
+def test_should_store_twitter_lead_prefers_conversational_farm_chatter() -> None:
+    assert should_store_twitter_lead(
+        "Anyone have games like Stardew or Sun Haven to recommend? I want another farm game to sink into.",
+        ['("games like stardew" OR "similar to stardew") -is:retweet lang:en'],
+    )
+
+
+def test_should_store_twitter_lead_skips_formulaic_cozy_farming_slop() -> None:
+    assert not should_store_twitter_lead(
+        "Just logged 3 hours in my cozy farming sim, watered crops, sold 50 eggs for gold, and accidentally watered a neighbor's sheep. Who's grinding today? #GamingDaily #CozyGaming",
+        ['("farm game" OR "farming game" OR "farming sim") (recommend OR recommendations OR favorite) -is:retweet lang:en'],
+    )
+
 def test_twitter_monitor_filters_generic_devlogs_before_storing(session_factory, settings, now) -> None:
     query = '("games like stardew" OR "like stardew valley" OR "similar to stardew") -is:retweet lang:en'
     response = FakeTwitterResponse(
@@ -294,4 +309,3 @@ def test_twitter_monitor_keeps_stardew_discussion_when_query_matches(session_fac
     assert inserted == 1
     assert leads[0].author == "farmfan"
     assert leads[0].platform_id == "301"
-

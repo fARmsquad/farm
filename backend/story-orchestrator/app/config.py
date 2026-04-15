@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     elevenlabs_api_key: str = ""
     elevenlabs_voice_id: str = ""
     elevenlabs_model_id: str = "eleven_flash_v2_5"
+    openai_api_key: str = ""
+    openai_narrative_model: str = "gpt-4o-mini"
+    openai_timeout_seconds: float = 45.0
     database_path: str = "data/story_orchestrator.db"
     generated_storyboard_output_root: str = "../../Assets/_Project/Resources"
     generated_storyboard_package_path: str = "../../Assets/_Project/Resources/StoryPackages/StoryPackage_IntroChickenSample.json"

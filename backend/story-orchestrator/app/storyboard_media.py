@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import textwrap
 import wave
 from dataclasses import replace
@@ -8,6 +9,8 @@ from pathlib import Path
 from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
+
+_LOGGER = logging.getLogger("uvicorn.error")
 
 
 class ChainImageGenerator:
@@ -20,10 +23,19 @@ class ChainImageGenerator:
             try:
                 asset = generator.generate_image(**kwargs)
                 if index > 0 and hasattr(asset, "fallback_used"):
+                    _LOGGER.warning(
+                        "[GeneratedStoryBackend] image generator fallback engaged provider=%s",
+                        getattr(asset, "provider_name", type(generator).__name__),
+                    )
                     return replace(asset, fallback_used=True)
                 return asset
             except Exception as error:  # pragma: no cover - fallback path is integration-led
                 last_error = error
+                _LOGGER.warning(
+                    "[GeneratedStoryBackend] image generator failed provider=%s error=%s",
+                    type(generator).__name__,
+                    error,
+                )
 
         if last_error is not None:
             raise last_error
@@ -102,10 +114,19 @@ class ChainSpeechGenerator:
             try:
                 asset = generator.generate_speech(**kwargs)
                 if index > 0 and hasattr(asset, "fallback_used"):
+                    _LOGGER.warning(
+                        "[GeneratedStoryBackend] speech generator fallback engaged provider=%s",
+                        getattr(asset, "provider_name", type(generator).__name__),
+                    )
                     return replace(asset, fallback_used=True)
                 return asset
             except Exception as error:  # pragma: no cover - fallback path is integration-led
                 last_error = error
+                _LOGGER.warning(
+                    "[GeneratedStoryBackend] speech generator failed provider=%s error=%s",
+                    type(generator).__name__,
+                    error,
+                )
 
         if last_error is not None:
             raise last_error

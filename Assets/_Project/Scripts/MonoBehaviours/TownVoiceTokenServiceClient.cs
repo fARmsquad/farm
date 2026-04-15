@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using FarmSimVR.Core;
+using FarmSimVR.MonoBehaviours.Cinematics;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -50,6 +51,13 @@ namespace FarmSimVR.MonoBehaviours
             string configuredBaseUrl,
             Action<TownVoiceTokenRequestResult> onComplete)
         {
+            LocalStoryOrchestratorReadyResult readyResult = null;
+            yield return LocalStoryOrchestratorLauncher.EnsureReady(
+                configuredBaseUrl,
+                result => readyResult = result);
+            if (readyResult != null && readyResult.Success && !string.IsNullOrWhiteSpace(readyResult.BaseUrl))
+                configuredBaseUrl = readyResult.BaseUrl;
+
             string environmentOverride = Environment.GetEnvironmentVariable(
                 TownVoiceTokenServiceEndpointResolver.EnvironmentVariableName);
             string lastError = null;

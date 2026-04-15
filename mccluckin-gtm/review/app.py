@@ -43,13 +43,27 @@ def create_app(
     def queue() -> dict[str, object]:
         with session_factory() as session:
             drafts = _pending_drafts(session)
-            return {"count": len(drafts), "items": [_serialize_draft(draft) for draft in drafts]}
+            publish_errors = _latest_publish_errors(session, [draft.id for draft in drafts])
+            return {
+                "count": len(drafts),
+                "items": [
+                    _serialize_draft(draft, publish_error=publish_errors.get(draft.id))
+                    for draft in drafts
+                ],
+            }
 
     @app.get("/api/ready")
     def ready() -> dict[str, object]:
         with session_factory() as session:
             drafts = _ready_drafts(session)
-            return {"count": len(drafts), "items": [_serialize_draft(draft) for draft in drafts]}
+            publish_errors = _latest_publish_errors(session, [draft.id for draft in drafts])
+            return {
+                "count": len(drafts),
+                "items": [
+                    _serialize_draft(draft, publish_error=publish_errors.get(draft.id))
+                    for draft in drafts
+                ],
+            }
 
     @app.get("/api/queue/{draft_id}")
     def queue_item(draft_id: str) -> dict[str, object]:
@@ -119,6 +133,12 @@ def create_app(
             approved = session.scalar(select(func.count(Lead.id)).where(Lead.status == "approved")) or 0
             published = session.scalar(select(func.count(Published.id))) or 0
             skipped = session.scalar(select(func.count(Lead.id)).where(Lead.status == "skipped")) or 0
+            publish_errors = session.scalar(
+                select(func.count(ApiCallLog.id)).where(
+                    ApiCallLog.action == "publish.error",
+                    ApiCallLog.succeeded == False,  # noqa: E712
+                )
+            ) or 0
             ready = session.scalar(
                 select(func.count(Draft.id))
                 .outerjoin(Published, Published.draft_id == Draft.id)
@@ -131,6 +151,7 @@ def create_app(
             "approved": approved,
             "published": published,
             "ready": ready,
+            "publish_errors": publish_errors,
             "skip_rate": skip_rate,
         }
 
@@ -143,7 +164,29 @@ def create_app(
                 .order_by(Lead.discovered_at.desc())
                 .limit(limit)
             ).unique().scalars().all()
-            return {"count": len(leads), "items": [_serialize_history_item(lead) for lead in leads]}
+            latest_draft_ids = [
+                latest_draft.id
+                for latest_draft in (
+                    max(lead.drafts, key=lambda item: item.created_at, default=None)
+                    for lead in leads
+                )
+                if latest_draft is not None
+            ]
+            publish_errors = _latest_publish_errors(session, latest_draft_ids)
+            return {
+                "count": len(leads),
+                "items": [
+                    _serialize_history_item(
+                        lead,
+                        publish_error=publish_errors.get(
+                            max(lead.drafts, key=lambda item: item.created_at, default=None).id
+                        )
+                        if lead.drafts
+                        else None,
+                    )
+                    for lead in leads
+                ],
+            }
 
     @app.get("/api/activity")
     def activity(limit: int = 25) -> dict[str, object]:
@@ -241,13 +284,15 @@ async def _review_draft(
     draft = _reload_draft_if_present(session_factory, draft_id)
     if draft is None:
         raise HTTPException(status_code=404, detail="Draft not found.")
-    payload = _serialize_draft(draft)
+    with session_factory() as session:
+        publish_error = _latest_publish_errors(session, [draft.id]).get(draft.id)
+    payload = _serialize_draft(draft, publish_error=publish_error)
     if publish_result is not None:
         payload["publish_result"] = publish_result
     return payload
 
 
-def _serialize_draft(draft: Draft) -> dict[str, object]:
+def _serialize_draft(draft: Draft, *, publish_error: ApiCallLog | None = None) -> dict[str, object]:
     lead = draft.lead
     item = draft.content_item
     publication = draft.publication
@@ -266,6 +311,7 @@ def _serialize_draft(draft: Draft) -> dict[str, object]:
             "platform_response_id": publication.platform_response_id,
             "published_at": publication.published_at.isoformat(),
         },
+        "publish_error": _serialize_publish_error(publish_error),
         "lead": None
         if lead is None
         else {
@@ -294,7 +340,7 @@ def _serialize_draft(draft: Draft) -> dict[str, object]:
     }
 
 
-def _serialize_history_item(lead: Lead) -> dict[str, object]:
+def _serialize_history_item(lead: Lead, *, publish_error: ApiCallLog | None = None) -> dict[str, object]:
     latest_draft = max(lead.drafts, key=lambda item: item.created_at, default=None)
     return {
         "id": lead.id,
@@ -317,6 +363,7 @@ def _serialize_history_item(lead: Lead) -> dict[str, object]:
             "final_text": latest_draft.final_text,
             "reviewer_action": latest_draft.reviewer_action,
             "created_at": latest_draft.created_at.isoformat(),
+            "publish_error": _serialize_publish_error(publish_error),
             "publication": None
             if latest_draft.publication is None
             else {
@@ -335,4 +382,34 @@ def _serialize_activity_item(item: ApiCallLog) -> dict[str, object]:
         "payload": item.payload,
         "succeeded": item.succeeded,
         "created_at": item.created_at.isoformat(),
+    }
+
+
+def _latest_publish_errors(session, draft_ids: list[str]) -> dict[str, ApiCallLog]:
+    if not draft_ids:
+        return {}
+    draft_id_set = set(draft_ids)
+    entries = session.scalars(
+        select(ApiCallLog)
+        .where(ApiCallLog.action == "publish.error", ApiCallLog.succeeded == False)  # noqa: E712
+        .order_by(ApiCallLog.created_at.desc())
+    ).all()
+    errors: dict[str, ApiCallLog] = {}
+    for entry in entries:
+        payload = entry.payload or {}
+        draft_id = payload.get("draft_id")
+        if draft_id in draft_id_set and draft_id not in errors:
+            errors[draft_id] = entry
+    return errors
+
+
+def _serialize_publish_error(item: ApiCallLog | None) -> dict[str, object] | None:
+    if item is None:
+        return None
+    payload = item.payload or {}
+    return {
+        "error": payload.get("error", "Publish failed."),
+        "created_at": item.created_at.isoformat(),
+        "provider": item.provider,
+        "action": item.action,
     }

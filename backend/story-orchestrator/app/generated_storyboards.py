@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -23,7 +24,11 @@ from .storyboard_media import (
     PlaceholderSpeechGenerator,
 )
 from .storyboard_provider_clients import ElevenLabsSpeechGenerator, GeminiImageGenerator
+from .storyboard_llm_planner import OpenAIStoryboardPlanner, StoryboardPlannerChain
+from .storyboard_quality import QualityGatedImageGenerator
 from .storyboard_reference_library import StoryboardReferenceLibrary, StoryboardReferencePathResolver
+
+_LOGGER = logging.getLogger("uvicorn.error")
 
 
 class TemplateStoryboardPlanner:
@@ -70,18 +75,26 @@ class GeneratedStoryboardService:
         return cls(
             output_root=output_root,
             package_output_path=package_output_path,
-            planner=TemplateStoryboardPlanner(),
-            image_generator=ChainImageGenerator(
-                [
-                    GeminiImageGenerator(
-                        api_key=settings.gemini_api_key,
-                        models=[
-                            settings.gemini_image_model,
-                            settings.gemini_image_fallback_model,
-                        ],
-                    ),
-                    PlaceholderImageGenerator(),
+            planner=StoryboardPlannerChain(
+                planners=[
+                    OpenAIStoryboardPlanner.from_settings(settings),
+                    TemplateStoryboardPlanner(),
                 ]
+            ),
+            image_generator=QualityGatedImageGenerator(
+                ChainImageGenerator(
+                    [
+                        GeminiImageGenerator(
+                            api_key=settings.gemini_api_key,
+                            models=[
+                                settings.gemini_image_model,
+                                settings.gemini_image_fallback_model,
+                            ],
+                        ),
+                        PlaceholderImageGenerator(),
+                    ]
+                ),
+                max_attempts=2,
             ),
             speech_generator=ChainSpeechGenerator(
                 [
@@ -101,6 +114,12 @@ class GeneratedStoryboardService:
         request: GeneratedStoryboardCutsceneRequest,
     ) -> GeneratedStoryboardPackageResult:
         resolved_request = self._resolve_request_context(request)
+        _LOGGER.info(
+            "[GeneratedStoryBackend] storyboard planning start package_id=%s beat_id=%s scene=%s",
+            resolved_request.package_id,
+            resolved_request.beat_id,
+            resolved_request.scene_name,
+        )
         plan = self._planner.plan(resolved_request)
         voice_id = request.voice_id or self._default_voice_id
         if not voice_id:
@@ -108,6 +127,13 @@ class GeneratedStoryboardService:
 
         base_asset_dir = self._output_root / "GeneratedStoryboards" / resolved_request.package_id / resolved_request.beat_id
         reference_image_paths = self._reference_path_resolver.resolve_paths(resolved_request)
+        _LOGGER.info(
+            "[GeneratedStoryBackend] storyboard plan ready beat_id=%s shots=%s refs=%s character=%s",
+            plan.beat_id,
+            len(plan.shots),
+            len(reference_image_paths),
+            resolved_request.context.character_name,
+        )
         shots = []
         generated_assets: list[GeneratedStoryboardAssetRecord] = []
         for index, shot in enumerate(plan.shots):
@@ -115,6 +141,13 @@ class GeneratedStoryboardService:
             image_prompt = self._build_image_prompt(resolved_request, shot)
             previous_text = plan.shots[index - 1].narration_text if index > 0 else ""
             next_text = plan.shots[index + 1].narration_text if index + 1 < len(plan.shots) else ""
+            _LOGGER.info(
+                "[GeneratedStoryBackend] storyboard shot start beat_id=%s shot_id=%s index=%s/%s",
+                plan.beat_id,
+                shot.shot_id,
+                index + 1,
+                len(plan.shots),
+            )
             image_asset = self._image_generator.generate_image(
                 prompt=image_prompt,
                 reference_image_paths=reference_image_paths,
@@ -128,6 +161,13 @@ class GeneratedStoryboardService:
                 output_path=stem.with_suffix(".mp3"),
                 previous_text=previous_text,
                 next_text=next_text,
+            )
+            _LOGGER.info(
+                "[GeneratedStoryBackend] storyboard shot complete beat_id=%s shot_id=%s image_provider=%s audio_provider=%s",
+                plan.beat_id,
+                shot.shot_id,
+                image_asset.provider_name,
+                speech_asset.provider_name,
             )
             image_resource_path = self._to_resource_path(image_asset.output_path)
             audio_resource_path = self._to_resource_path(speech_asset.output_path)
@@ -215,6 +255,11 @@ class GeneratedStoryboardService:
             json.dumps(unity_package, indent=2),
             encoding="utf-8",
         )
+        _LOGGER.info(
+            "[GeneratedStoryBackend] storyboard package written package_id=%s output_path=%s",
+            resolved_request.package_id,
+            self._package_output_path,
+        )
 
         return GeneratedStoryboardPackageResult(
             package_output_path=str(self._package_output_path),
@@ -269,7 +314,10 @@ class GeneratedStoryboardService:
             f"Character: {context.character_name}. Focus: {subject_label}. "
             f"Gameplay goal: {context.minigame_goal}. "
             f"Frame direction: {shot.image_prompt}. "
-            "Keep the framing readable for subtitles and preserve character identity across shots."
+            "Use any reference images only for character identity, outfit, palette, and overall art style. "
+            "Create a fresh composition for this beat and preserve character identity across shots. "
+            "Do not copy camera angle, framing, background layout, staging, or pose from prior images. "
+            "Do not draw subtitle boxes, caption panels, readable text, speech bubbles, UI overlays, labels, watermarks, or prompt text inside the image."
         )
 
     def _to_resource_path(self, asset_path: Path) -> str:

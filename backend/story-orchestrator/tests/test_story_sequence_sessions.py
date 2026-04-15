@@ -107,9 +107,10 @@ class StorySequenceSessionServiceTests(unittest.TestCase):
         second = self.service.advance_session(created.session_id)
 
         self.assertEqual(second.turn.character_name, "Old Garrett")
+        self.assertEqual(second.turn.request.cutscene.continuity_reference_mode, "character_priority")
         self.assertEqual(
             second.turn.request.cutscene.reference_image_paths,
-            [continuity_images[2].output_path, continuity_images[1].output_path],
+            [continuity_images[0].output_path],
         )
 
 

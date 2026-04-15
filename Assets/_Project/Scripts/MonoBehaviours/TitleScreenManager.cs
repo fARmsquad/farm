@@ -1,93 +1,159 @@
 using System.Collections;
+using FarmSimVR.Core.Tutorial;
 using FarmSimVR.MonoBehaviours.Cinematics;
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
-using FarmSimVR.Core.Tutorial;
-
 namespace FarmSimVR.MonoBehaviours
 {
     public class TitleScreenManager : MonoBehaviour
     {
         public const string TutorialSliceLauncherRootName = "TutorialSliceLauncher";
-        public const string StoryPackageSampleLabel = "Generative Story Slice";
-
+        public const string GenerateUniquePlaythroughLabel = "Generate Unique Playthrough";
+        public const string PlayUniquePlaythroughLabel = "Play Unique Playthrough";
+        public const string StoryPackageSampleLabel = GenerateUniquePlaythroughLabel;
+        public const string GeneratedStorySliceStatusName = "GeneratedStorySliceStatus";
+        public const string GeneratedStorySliceLoadingOverlayName = "GeneratedStorySliceLoadingOverlay";
         private const string StoryPackageSampleSceneName = TutorialSceneCatalog.PostChickenCutsceneSceneName;
-
+        private const string GenerateUniquePlaythroughButtonName = "TutorialSlice_GenerateUniquePlaythrough";
+        private const string PlayUniquePlaythroughButtonName = "TutorialSlice_PlayUniquePlaythrough";
+        private const string GeneratingUniquePlaythroughMessage = "Generating unique playthrough... writing the story, then cutscene images, then narration audio. Check Console logs for live steps.";
+        private const string LoadingUniquePlaythroughMessage = "Loading unique playthrough...";
+        private const string ReadyUniquePlaythroughMessage = "Unique playthrough ready. Press Play Unique Playthrough.";
+        private const string GenerateUniquePlaythroughFirstMessage = "Generate a unique playthrough first.";
+        private const string UniquePlaythroughAlreadyStartingMessage = "Unique playthrough generation is already starting. Please wait a moment.";
+        private const string DefaultGeneratedStoryDiagnosticsNote = "Generate a unique playthrough to inspect the next run.";
+        private const string IdleGeneratedStoryState = "Idle";
+        private const string GeneratingGeneratedStoryState = "Generating";
+        private const string ReadyGeneratedStoryState = "Ready";
+        private const string LoadingGeneratedStoryState = "Loading";
+        private const string BusyGeneratedStoryState = "Busy";
+        private const string FailedGeneratedStoryState = "Failed";
         [FormerlySerializedAs("farmMainSceneName")]
         [SerializeField] private string targetSceneName = TutorialSceneCatalog.IntroSceneName;
         [SerializeField] private AudioSource musicSource;
         [SerializeField] private float fadeDuration = 1.2f;
-
         private Canvas fadeCanvas;
         private Image fadeImage;
         private bool isTransitioning;
         private bool launchGeneratedStorySlice;
-
+        private Text generatedStoryStatusLabel;
+        private GameObject generatedStoryLoadingOverlay;
+        private Text generatedStoryLoadingLabel;
+        private Button generateUniquePlaythroughButton;
+        private Button playUniquePlaythroughButton;
+        private string generatedStoryLifecycleState = IdleGeneratedStoryState;
+        private string generatedStoryLifecycleNote = DefaultGeneratedStoryDiagnosticsNote;
+        private string generatedStoryLifecycleError = string.Empty;
+        private string generatedStoryPreparedAtUtc = string.Empty;
         private void Start()
         {
+            StorySequenceRuntimeController.GetOrCreate().EnsureLocalOrchestratorRunningInBackground();
             if (musicSource != null && !musicSource.isPlaying)
                 musicSource.Play();
-
             CreateTutorialSliceLauncher();
             CreateFadeOverlay();
+            RefreshGeneratedStoryStatus();
+            GeneratedStorySliceDiagnostics.Log(nameof(TitleScreenManager), "Title screen initialized.");
         }
-
+        private void Update() => SyncPreparedGeneratedPlaythroughStateFromRuntimeController();
         public void StartGame()
         {
             StartScene(SceneWorkCatalog.FirstTutorialSceneName);
         }
-
         public void StartScene(string sceneName)
         {
-            if (isTransitioning) return;
+            if (isTransitioning)
+                return;
             StorySequenceRuntimeController.Instance?.ClearSequenceState();
+            HideGeneratedStoryLoading();
+            SetGeneratedPlaythroughButtons(true, false);
+            SetGeneratedStoryStatus(DefaultGeneratedStoryDiagnosticsNote);
+            SetGeneratedStoryLifecycleState(IdleGeneratedStoryState, clearError: true, resetPreparedAt: true);
             launchGeneratedStorySlice = false;
             targetSceneName = ResolveTargetSceneName(sceneName);
             isTransitioning = true;
             StartCoroutine(TransitionToGame());
         }
-
         public void StartGeneratedStorySlice()
         {
-            if (isTransitioning) return;
-
+            if (isTransitioning) { GeneratedStorySliceDiagnostics.LogWarning(nameof(TitleScreenManager), "Generate requested while a transition is already in progress."); return; }
+            GeneratedStorySliceDiagnostics.Log(nameof(TitleScreenManager), "Generate Unique Playthrough clicked.");
+            StorySequenceRuntimeController.GetOrCreate().ClearSequenceState();
+            ShowGeneratedStoryLoading(GeneratingUniquePlaythroughMessage);
+            SetGeneratedStoryStatus(GeneratingUniquePlaythroughMessage);
+            SetGeneratedStoryLifecycleState(GeneratingGeneratedStoryState, clearError: true, resetPreparedAt: true);
+            SetGeneratedPlaythroughButtons(false, false);
             targetSceneName = StoryPackageSampleSceneName;
             launchGeneratedStorySlice = true;
             isTransitioning = true;
             StartCoroutine(TransitionToGame());
         }
-
+        public void PlayGeneratedStorySlice()
+        {
+            if (isTransitioning) { GeneratedStorySliceDiagnostics.LogWarning(nameof(TitleScreenManager), "Play requested while a transition is already in progress."); return; }
+            GeneratedStorySliceDiagnostics.Log(nameof(TitleScreenManager), "Play Unique Playthrough clicked.");
+            var runtimeController = StorySequenceRuntimeController.Instance;
+            if (runtimeController == null || !runtimeController.HasPreparedSequence)
+            {
+                GeneratedStorySliceDiagnostics.LogWarning(nameof(TitleScreenManager), "Play requested without a prepared generated sequence.");
+                HideGeneratedStoryLoading();
+                SetGeneratedPlaythroughButtons(true, false);
+                SetGeneratedStoryStatus(GenerateUniquePlaythroughFirstMessage);
+                SetGeneratedStoryLifecycleState(IdleGeneratedStoryState, clearError: true, resetPreparedAt: true);
+                return;
+            }
+            HideGeneratedStoryLoading();
+            SetGeneratedPlaythroughButtons(false, false);
+            SetGeneratedStoryStatus(LoadingUniquePlaythroughMessage);
+            SetGeneratedStoryLifecycleState(LoadingGeneratedStoryState, clearError: true);
+            launchGeneratedStorySlice = false;
+            targetSceneName = ResolveTargetSceneName(runtimeController.PreparedEntrySceneName);
+            isTransitioning = true;
+            StartCoroutine(TransitionToGame());
+        }
         private IEnumerator TransitionToGame()
         {
-            // Fade to black
+            var sceneName = ResolveTargetSceneName(targetSceneName);
+            if (launchGeneratedStorySlice)
+            {
+                GeneratedStorySliceDiagnostics.Log(nameof(TitleScreenManager), "Transition entering generated playthrough preparation.");
+                launchGeneratedStorySlice = false;
+                var runtimeController = StorySequenceRuntimeController.GetOrCreate();
+                if (!runtimeController.BeginSequencePreparation(HandleGeneratedStorySlicePrepared, HandleGeneratedStorySliceUnavailable))
+                {
+                    GeneratedStorySliceDiagnostics.LogWarning(nameof(TitleScreenManager), "Runtime controller refused to start generated sequence preparation because a request is already in flight.");
+                    HideGeneratedStoryLoading();
+                    SetGeneratedPlaythroughButtons(true, false);
+                    isTransitioning = false;
+                    SetGeneratedStoryStatus(UniquePlaythroughAlreadyStartingMessage);
+                    SetGeneratedStoryLifecycleState(BusyGeneratedStoryState, clearError: true);
+                    yield break;
+                }
+                ShowGeneratedStoryLoading(GeneratingUniquePlaythroughMessage);
+                SetGeneratedStoryStatus(GeneratingUniquePlaythroughMessage);
+                yield break;
+            }
+            GeneratedStorySliceDiagnostics.Log(nameof(TitleScreenManager), $"Loading scene '{sceneName}'.");
+            HideGeneratedStoryLoading();
+            var duration = Mathf.Max(0f, fadeDuration);
             float elapsed = 0f;
-            while (elapsed < fadeDuration)
+            while (elapsed < duration)
             {
                 elapsed += Time.unscaledDeltaTime;
-                float t = elapsed / fadeDuration;
-                fadeImage.color = new Color(0, 0, 0, t);
+                float t = duration <= 0f ? 1f : elapsed / duration;
+                fadeImage.color = new Color(0f, 0f, 0f, t);
                 if (musicSource != null)
                     musicSource.volume = 1f - t;
                 yield return null;
             }
             fadeImage.color = Color.black;
-
             if (musicSource != null)
                 musicSource.Stop();
-
-            var sceneName = ResolveTargetSceneName(targetSceneName);
-            if (launchGeneratedStorySlice)
-            {
-                launchGeneratedStorySlice = false;
-                StorySequenceRuntimeController.GetOrCreate().BeginSequenceAndLoad(sceneName);
-                yield break;
-            }
-
             SceneManager.LoadScene(SceneWorkCatalog.GetLoadableSceneName(sceneName));
         }
-
         private void CreateFadeOverlay()
         {
             var go = new GameObject("FadeOverlay");
@@ -95,53 +161,200 @@ namespace FarmSimVR.MonoBehaviours
             fadeCanvas = go.AddComponent<Canvas>();
             fadeCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
             fadeCanvas.sortingOrder = 999;
-
             var imgGo = new GameObject("FadeImage");
             imgGo.transform.SetParent(go.transform, false);
             fadeImage = imgGo.AddComponent<Image>();
-            fadeImage.color = new Color(0, 0, 0, 0);
+            fadeImage.color = new Color(0f, 0f, 0f, 0f);
             fadeImage.raycastTarget = false;
-
             var rect = imgGo.GetComponent<RectTransform>();
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
             rect.sizeDelta = Vector2.zero;
+            CreateGeneratedStoryLoadingOverlay(go.transform);
         }
-
         private static string ResolveTargetSceneName(string sceneName)
         {
             return string.IsNullOrWhiteSpace(sceneName)
                 ? SceneWorkCatalog.FirstTutorialSceneName
                 : sceneName;
         }
-
+        private void SyncPreparedGeneratedPlaythroughStateFromRuntimeController()
+        {
+            var runtimeController = StorySequenceRuntimeController.Instance;
+            if (runtimeController == null || !runtimeController.HasPreparedSequence)
+                return;
+            if (generatedStoryLifecycleState == LoadingGeneratedStoryState)
+                return;
+            bool playButtonReady = playUniquePlaythroughButton != null && playUniquePlaythroughButton.interactable;
+            bool lifecycleReady = generatedStoryLifecycleState == ReadyGeneratedStoryState;
+            if (!isTransitioning && playButtonReady && lifecycleReady)
+                return;
+            bool stampPreparedAt = string.IsNullOrWhiteSpace(generatedStoryPreparedAtUtc);
+            isTransitioning = false;
+            HideGeneratedStoryLoading();
+            RestoreTitlePresentation();
+            SetGeneratedPlaythroughButtons(true, true);
+            SetGeneratedStoryStatus(ReadyUniquePlaythroughMessage);
+            SetGeneratedStoryLifecycleState(ReadyGeneratedStoryState, clearError: true, stampPreparedAt: stampPreparedAt);
+            GeneratedStorySliceDiagnostics.Log(nameof(TitleScreenManager), $"Recovered generated playthrough readiness from runtime state for session '{runtimeController.ActiveSessionId}' and scene '{runtimeController.PreparedEntrySceneName}'.");
+        }
+        private void HandleGeneratedStorySlicePrepared(string sceneName)
+        {
+            GeneratedStorySliceDiagnostics.Log(nameof(TitleScreenManager), $"Generated playthrough prepared with entry scene '{sceneName}'.");
+            targetSceneName = ResolveTargetSceneName(sceneName);
+            isTransitioning = false;
+            HideGeneratedStoryLoading();
+            RestoreTitlePresentation();
+            SetGeneratedPlaythroughButtons(true, true);
+            SetGeneratedStoryStatus(ReadyUniquePlaythroughMessage);
+            SetGeneratedStoryLifecycleState(ReadyGeneratedStoryState, clearError: true, stampPreparedAt: true);
+        }
+        private void HandleGeneratedStorySliceUnavailable(string errorMessage)
+        {
+            GeneratedStorySliceDiagnostics.LogWarning(nameof(TitleScreenManager), $"Generated playthrough unavailable: {errorMessage}");
+            launchGeneratedStorySlice = false;
+            isTransitioning = false;
+            HideGeneratedStoryLoading();
+            SetGeneratedPlaythroughButtons(true, false);
+            RestoreTitlePresentation();
+            StorySequenceRuntimeController.Instance?.ClearSequenceState();
+            SetGeneratedStoryStatus(BuildGeneratedStorySliceStatus(errorMessage));
+            SetGeneratedStoryLifecycleState(FailedGeneratedStoryState, errorMessage);
+        }
+        private void RestoreTitlePresentation()
+        {
+            if (fadeImage != null)
+                fadeImage.color = new Color(0f, 0f, 0f, 0f);
+            if (musicSource == null)
+                return;
+            musicSource.volume = 1f;
+            if (!musicSource.isPlaying)
+                musicSource.Play();
+        }
+        private void SetGeneratedStoryStatus(string message)
+        {
+            generatedStoryLifecycleNote = message ?? string.Empty;
+            RefreshGeneratedStoryStatus();
+        }
+        private void SetGeneratedStoryLifecycleState(
+            string lifecycleState,
+            string errorMessage = null,
+            bool clearError = false,
+            bool resetPreparedAt = false,
+            bool stampPreparedAt = false)
+        {
+            generatedStoryLifecycleState = string.IsNullOrWhiteSpace(lifecycleState)
+                ? IdleGeneratedStoryState
+                : lifecycleState;
+            if (clearError)
+                generatedStoryLifecycleError = string.Empty;
+            else if (errorMessage != null)
+                generatedStoryLifecycleError = errorMessage;
+            if (resetPreparedAt)
+                generatedStoryPreparedAtUtc = string.Empty;
+            else if (stampPreparedAt)
+                generatedStoryPreparedAtUtc = System.DateTime.UtcNow.ToString("u");
+            RefreshGeneratedStoryStatus();
+        }
+        private void RefreshGeneratedStoryStatus()
+        {
+            if (generatedStoryStatusLabel == null)
+                return;
+            generatedStoryStatusLabel.text = GeneratedPlaythroughStatusFormatter.Build(
+                generatedStoryLifecycleState,
+                generatedStoryLifecycleNote,
+                generatedStoryLifecycleError,
+                generatedStoryPreparedAtUtc,
+                StorySequenceRuntimeController.Instance);
+        }
+        private void ShowGeneratedStoryLoading(string message)
+        {
+            if (generatedStoryLoadingLabel != null)
+                generatedStoryLoadingLabel.text = message ?? string.Empty;
+            if (generatedStoryLoadingOverlay != null)
+                generatedStoryLoadingOverlay.SetActive(true);
+        }
+        private void HideGeneratedStoryLoading()
+        {
+            if (generatedStoryLoadingLabel != null)
+                generatedStoryLoadingLabel.text = string.Empty;
+            if (generatedStoryLoadingOverlay != null)
+                generatedStoryLoadingOverlay.SetActive(false);
+        }
+        private void SetGeneratedPlaythroughButtons(bool generateEnabled, bool playEnabled)
+        {
+            if (generateUniquePlaythroughButton != null)
+                generateUniquePlaythroughButton.interactable = generateEnabled;
+            if (playUniquePlaythroughButton != null)
+                playUniquePlaythroughButton.interactable = playEnabled;
+        }
+        private static string BuildGeneratedStorySliceStatus(string errorMessage)
+        {
+            const string prefix = "Unique playthrough unavailable. Unity could not reach or start the local story-orchestrator on 127.0.0.1:8012.";
+            if (string.IsNullOrWhiteSpace(errorMessage))
+                return prefix;
+            var singleLine = errorMessage.Replace('\r', ' ').Replace('\n', ' ').Trim();
+            if (singleLine.Length > 120)
+                singleLine = singleLine.Substring(0, 117) + "...";
+            return prefix + " " + singleLine;
+        }
+        private void CreateGeneratedStoryLoadingOverlay(Transform parent)
+        {
+            var overlay = new GameObject(GeneratedStorySliceLoadingOverlayName);
+            overlay.transform.SetParent(parent, false);
+            overlay.SetActive(false);
+            var overlayRect = overlay.AddComponent<RectTransform>();
+            overlayRect.anchorMin = Vector2.zero;
+            overlayRect.anchorMax = Vector2.one;
+            overlayRect.sizeDelta = Vector2.zero;
+            overlay.AddComponent<CanvasRenderer>();
+            var overlayImage = overlay.AddComponent<Image>();
+            overlayImage.color = new Color(0f, 0f, 0f, 0.62f);
+            overlayImage.raycastTarget = true;
+            var panel = new GameObject("Panel");
+            panel.transform.SetParent(overlay.transform, false);
+            var panelRect = panel.AddComponent<RectTransform>();
+            panelRect.anchorMin = new Vector2(0.5f, 0.5f);
+            panelRect.anchorMax = new Vector2(0.5f, 0.5f);
+            panelRect.pivot = new Vector2(0.5f, 0.5f);
+            panelRect.sizeDelta = new Vector2(440f, 140f);
+            panel.AddComponent<CanvasRenderer>();
+            var panelImage = panel.AddComponent<Image>();
+            panelImage.color = new Color(0.11f, 0.15f, 0.11f, 0.96f);
+            var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            generatedStoryLoadingLabel = CreateLabel(
+                "Message",
+                panel.transform,
+                font,
+                string.Empty,
+                20,
+                FontStyle.Bold,
+                TextAnchor.MiddleCenter,
+                new Rect(18f, 18f, 404f, 104f),
+                Color.white);
+            generatedStoryLoadingOverlay = overlay;
+        }
         private void CreateTutorialSliceLauncher()
         {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (GameObject.Find(TutorialSliceLauncherRootName) != null)
                 return;
-
             var canvas = FindFirstObjectByType<Canvas>();
             if (canvas == null)
                 return;
-
             var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             var root = new GameObject(TutorialSliceLauncherRootName);
             root.transform.SetParent(canvas.transform, false);
-
             var rootRect = root.AddComponent<RectTransform>();
             root.AddComponent<CanvasRenderer>();
             var rootImage = root.AddComponent<Image>();
             rootImage.color = new Color(0.05f, 0.06f, 0.05f, 0.86f);
-
-            var totalButtonCount = SceneWorkCatalog.TitleScreenLaunchableScenes.Count + 1;
-            var height = 72f + (totalButtonCount * 46f);
+            var totalButtonCount = SceneWorkCatalog.TitleScreenLaunchableScenes.Count + 2;
+            var height = 230f + (totalButtonCount * 46f);
             rootRect.anchorMin = new Vector2(1f, 1f);
             rootRect.anchorMax = new Vector2(1f, 1f);
             rootRect.pivot = new Vector2(1f, 1f);
             rootRect.sizeDelta = new Vector2(320f, height);
             rootRect.anchoredPosition = new Vector2(-32f, -32f);
-
             CreateLabel(
                 "Header",
                 root.transform,
@@ -152,24 +365,39 @@ namespace FarmSimVR.MonoBehaviours
                 TextAnchor.MiddleLeft,
                 new Rect(16f, 12f, 288f, 28f),
                 Color.white);
-
-            CreateSliceButton(
+            generateUniquePlaythroughButton = CreateSliceButton(
                 root.transform,
                 font,
-                "TutorialSlice_GenerativeStorySlice",
-                StoryPackageSampleLabel,
-                StoryPackageSampleSceneName,
+                GenerateUniquePlaythroughButtonName,
+                GenerateUniquePlaythroughLabel,
                 48f,
-                isGeneratedStorySlice: true);
-
+                StartGeneratedStorySlice);
+            playUniquePlaythroughButton = CreateSliceButton(
+                root.transform,
+                font,
+                PlayUniquePlaythroughButtonName,
+                PlayUniquePlaythroughLabel,
+                94f,
+                PlayGeneratedStorySlice);
+            SetGeneratedPlaythroughButtons(true, false);
             for (int i = 0; i < SceneWorkCatalog.TitleScreenLaunchableScenes.Count; i++)
             {
                 var scene = SceneWorkCatalog.TitleScreenLaunchableScenes[i];
-                CreateSliceButton(root.transform, font, scene, 94f + (i * 46f));
+                CreateSliceButton(root.transform, font, scene, 140f + (i * 46f));
             }
-#endif
+            var statusTopOffset = 48f + (totalButtonCount * 46f);
+            generatedStoryStatusLabel = CreateLabel(
+                GeneratedStorySliceStatusName,
+                root.transform,
+                font,
+                string.Empty,
+                12,
+                FontStyle.Normal,
+                TextAnchor.UpperLeft,
+                new Rect(16f, statusTopOffset, 288f, 156f),
+                new Color(0.98f, 0.84f, 0.74f));
+            RefreshGeneratedStoryStatus();
         }
-
         private void CreateSliceButton(Transform parent, Font font, SceneWorkDefinition scene, float topOffset)
         {
             CreateSliceButton(
@@ -177,46 +405,35 @@ namespace FarmSimVR.MonoBehaviours
                 font,
                 $"TutorialSlice_{scene.NumberLabel}_{scene.SceneName}",
                 $"{scene.NumberLabel} {scene.DisplayName}",
-                scene.SceneName,
-                topOffset);
+                topOffset,
+                () => StartScene(scene.SceneName));
         }
-
-        private void CreateSliceButton(
+        private Button CreateSliceButton(
             Transform parent,
             Font font,
             string objectName,
             string label,
-            string sceneName,
             float topOffset,
-            bool isGeneratedStorySlice = false)
+            UnityAction onClick)
         {
             var buttonObject = new GameObject(objectName);
             buttonObject.transform.SetParent(parent, false);
-
             var buttonRect = buttonObject.AddComponent<RectTransform>();
             buttonRect.anchorMin = new Vector2(0f, 1f);
             buttonRect.anchorMax = new Vector2(1f, 1f);
             buttonRect.pivot = new Vector2(0.5f, 1f);
             buttonRect.sizeDelta = new Vector2(-24f, 36f);
             buttonRect.anchoredPosition = new Vector2(0f, -topOffset);
-
             var buttonImage = buttonObject.AddComponent<Image>();
             buttonImage.color = new Color(0.17f, 0.25f, 0.17f, 0.95f);
-
             var button = buttonObject.AddComponent<Button>();
             button.targetGraphic = buttonImage;
-
+            button.onClick.AddListener(onClick);
             var colors = button.colors;
             colors.normalColor = new Color(0.17f, 0.25f, 0.17f, 0.95f);
             colors.highlightedColor = new Color(0.22f, 0.36f, 0.22f, 0.95f);
             colors.pressedColor = new Color(0.12f, 0.18f, 0.12f, 0.95f);
             button.colors = colors;
-
-            if (isGeneratedStorySlice)
-                button.onClick.AddListener(StartGeneratedStorySlice);
-            else
-                button.onClick.AddListener(() => StartScene(sceneName));
-
             CreateLabel(
                 "Label",
                 buttonObject.transform,
@@ -228,8 +445,8 @@ namespace FarmSimVR.MonoBehaviours
                 new Rect(0f, 0f, 0f, 0f),
                 Color.white,
                 stretchToParent: true);
+            return button;
         }
-
         private static Text CreateLabel(
             string name,
             Transform parent,
@@ -244,7 +461,6 @@ namespace FarmSimVR.MonoBehaviours
         {
             var labelObject = new GameObject(name);
             labelObject.transform.SetParent(parent, false);
-
             var labelRect = labelObject.AddComponent<RectTransform>();
             if (stretchToParent)
             {
@@ -261,7 +477,6 @@ namespace FarmSimVR.MonoBehaviours
                 labelRect.anchoredPosition = new Vector2(rect.x, -rect.y);
                 labelRect.sizeDelta = new Vector2(rect.width, rect.height);
             }
-
             var label = labelObject.AddComponent<Text>();
             label.font = font;
             label.text = text;

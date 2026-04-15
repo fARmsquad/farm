@@ -7,6 +7,12 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
     public static class TutorialSceneInstaller
     {
         private const float QuickCutsceneDelay = TutorialDevTuning.PlaceholderCutsceneAutoAdvanceDelay;
+        private static readonly string[] AuthoredPostChickenObjectNames =
+        {
+            "SlideshowPanel",
+            "SlideshowDirector",
+            "TextOverlayCanvas",
+        };
 
         public static void InstallForScene(string sceneName, TutorialFlowController controller)
         {
@@ -18,7 +24,12 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             switch (sceneName)
             {
                 case TutorialSceneCatalog.PostChickenCutsceneSceneName:
-                    // CaughtChickenCutscene: scene-owned Timeline + SlideshowPanel (not story-package IMGUI).
+                    EnsureCutscene(
+                        sceneName,
+                        "Post Chicken Bridge",
+                        "The chicken chase is over. Follow the story into the next task.",
+                        QuickCutsceneDelay);
+                    DisableAuthoredPostChickenCutscene();
                     break;
                 case TutorialSceneCatalog.CoreSceneSceneName:
                     break;
@@ -68,6 +79,12 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             controller.Configure(title, body, autoAdvanceDelay);
         }
 
+        private static void DisableAuthoredPostChickenCutscene()
+        {
+            for (int i = 0; i < AuthoredPostChickenObjectNames.Length; i++)
+                DisableSceneObject(AuthoredPostChickenObjectNames[i]);
+        }
+
         private static T EnsureComponent<T>(string objectName) where T : Component
         {
             var existing = Object.FindAnyObjectByType<T>();
@@ -76,6 +93,18 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             var gameObject = new GameObject(objectName);
             return gameObject.AddComponent<T>();
+        }
+
+        private static void DisableSceneObject(string objectName)
+        {
+            var sceneObject = GameObject.Find(objectName);
+            if (sceneObject == null)
+                return;
+
+            sceneObject.SetActive(false);
+            GeneratedStorySliceDiagnostics.Log(
+                nameof(TutorialSceneInstaller),
+                $"Disabled authored PostChicken object '{objectName}' in favor of runtime cutscene playback.");
         }
     }
 }

@@ -98,7 +98,14 @@ def draft() -> None:
 @app.command()
 def review(port: int | None = None) -> None:
     settings, session_factory = _bootstrap()
-    app_instance = create_app(session_factory, settings)
+    reddit = RedditPublisher(settings) if settings.reddit_enabled else None
+    twitter = TwitterPublisher(settings) if settings.x_publish_enabled else None
+    app_instance = create_app(
+        session_factory,
+        settings,
+        reddit_publisher=reddit,
+        twitter_publisher=twitter,
+    )
     uvicorn.run(app_instance, host="127.0.0.1", port=port or settings.review_port)
 
 

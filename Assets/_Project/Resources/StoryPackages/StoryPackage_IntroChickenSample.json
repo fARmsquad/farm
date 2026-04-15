@@ -265,14 +265,14 @@
     },
     {
       "BeatId": "sequence_turn_000_cutscene",
-      "DisplayName": "Sequence Bridge 1",
+      "DisplayName": "Ready the Fields",
       "Kind": "Cutscene",
       "SceneName": "PostChickenCutscene",
       "NextSceneName": "FarmMain",
       "SequenceSteps": [
         {
           "StepType": "ObjectivePopup",
-          "StringParam": "Nice work. The carrot beds are finally ready for you."
+          "StringParam": "Awakening the Farm"
         }
       ],
       "Storyboard": {
@@ -280,27 +280,35 @@
         "Shots": [
           {
             "ShotId": "shot_01",
-            "SubtitleText": "Nice work. The carrot beds are finally ready for you.",
-            "NarrationText": "Nice work. The carrot beds are finally ready for you.",
+            "SubtitleText": "Awakening the Farm",
+            "NarrationText": "The morning sun casts a warm glow on our farm, as Old Garrett wipes the dust off his cherished tools.",
             "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_01",
             "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_01",
-            "DurationSeconds": 4.166666666666667
+            "DurationSeconds": 8.333333333333334
           },
           {
             "ShotId": "shot_02",
-            "SubtitleText": "Plant 5 carrots in 5 minutes, and keep the rows tidy.",
-            "NarrationText": "Plant 5 carrots in 5 minutes, and keep the rows tidy.",
+            "SubtitleText": "Setting the Stage",
+            "NarrationText": "Today, we're planting vibrant carrots! Let\u2019s prepare the soil and lay out our rows.",
             "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_02",
             "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_02",
-            "DurationSeconds": 4.583333333333334
+            "DurationSeconds": 5.833333333333334
           },
           {
             "ShotId": "shot_03",
-            "SubtitleText": "Head to the plots. The farm is waiting on your hands.",
-            "NarrationText": "Head to the plots. The farm is waiting on your hands.",
+            "SubtitleText": "Time to Plant!",
+            "NarrationText": "We have limited time to make our farm flourish. Let\u2019s get those carrots in the ground!",
             "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_03",
             "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_03",
-            "DurationSeconds": 4.583333333333334
+            "DurationSeconds": 6.666666666666667
+          },
+          {
+            "ShotId": "shot_04",
+            "SubtitleText": "Your Turn!",
+            "NarrationText": "Now it's your turn to plant five carrots before the sun sets. Let's make this farm beautiful!",
+            "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_04",
+            "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_04",
+            "DurationSeconds": 7.083333333333334
           }
         ]
       }

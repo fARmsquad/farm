@@ -55,29 +55,31 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                          configuredBaseUrl,
                          environmentOverride))
             {
+                GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Creating story sequence session at '{baseUrl}'.");
                 using var createRequest = BuildJsonPostRequest(baseUrl + SessionRoute, "{}");
                 yield return createRequest.SendWebRequest();
 
                 if (createRequest.result != UnityWebRequest.Result.Success)
                 {
                     lastError = ReadErrorMessage(createRequest);
+                    GeneratedStorySliceDiagnostics.LogWarning(nameof(StorySequenceServiceClient), $"Create session request failed at '{baseUrl}': {lastError}");
                     continue;
                 }
 
                 if (!TryParseCreatedSession(createRequest.downloadHandler?.text, out var sessionId))
                 {
                     lastError = "Story sequence session create response was invalid.";
+                    GeneratedStorySliceDiagnostics.LogWarning(nameof(StorySequenceServiceClient), $"Create session response parse failed at '{baseUrl}'.");
                     continue;
                 }
 
+                GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Created story sequence session '{sessionId}' at '{baseUrl}'.");
                 StorySequenceAdvancePayload payload = null;
-                yield return AdvanceSessionAtBaseUrl(
-                    baseUrl,
-                    sessionId,
-                    result => payload = result);
+                yield return AdvanceSessionAtBaseUrl(baseUrl, sessionId, result => payload = result);
 
                 if (payload != null && payload.Success)
                 {
+                    GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Create+advance succeeded for session '{payload.SessionId}' with entry scene '{payload.EntrySceneName}'.");
                     onComplete?.Invoke(payload);
                     yield break;
                 }
@@ -109,11 +111,13 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                          configuredBaseUrl,
                          environmentOverride))
             {
+                GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Advancing story sequence session '{sessionId}' at '{baseUrl}'.");
                 StorySequenceAdvancePayload payload = null;
                 yield return AdvanceSessionAtBaseUrl(baseUrl, sessionId, result => payload = result);
 
                 if (payload != null && payload.Success)
                 {
+                    GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Advance succeeded for session '{payload.SessionId}' with entry scene '{payload.EntrySceneName}'.");
                     onComplete?.Invoke(payload);
                     yield break;
                 }
@@ -137,6 +141,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             string sessionId,
             Action<StorySequenceAdvancePayload> onComplete)
         {
+            GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Posting next-turn request for session '{sessionId}' to '{baseUrl}'.");
             using var request = BuildJsonPostRequest(
                 $"{baseUrl}{SessionRoute}/{sessionId}/next-turn",
                 "{}");
@@ -144,18 +149,21 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
             if (request.result != UnityWebRequest.Result.Success)
             {
+                string errorMessage = ReadErrorMessage(request);
+                GeneratedStorySliceDiagnostics.LogWarning(nameof(StorySequenceServiceClient), $"Next-turn request failed for session '{sessionId}' at '{baseUrl}': {errorMessage}");
                 onComplete?.Invoke(
                     new StorySequenceAdvancePayload(
                         string.Empty,
                         sessionId,
                         string.Empty,
                         null,
-                        ReadErrorMessage(request)));
+                        errorMessage));
                 yield break;
             }
 
             if (!TryParseAdvanceResponse(baseUrl, sessionId, request.downloadHandler?.text, out var payload))
             {
+                GeneratedStorySliceDiagnostics.LogWarning(nameof(StorySequenceServiceClient), $"Next-turn response parse failed for session '{sessionId}' at '{baseUrl}'.");
                 payload = new StorySequenceAdvancePayload(
                     string.Empty,
                     sessionId,
@@ -164,6 +172,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                     "Story sequence advance response was invalid.");
             }
 
+            GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Next-turn response processed for session '{payload.SessionId}' with success={payload.Success}.");
             onComplete?.Invoke(payload);
         }
 

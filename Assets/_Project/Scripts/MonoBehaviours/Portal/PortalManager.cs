@@ -30,6 +30,7 @@ namespace FarmSimVR.MonoBehaviours.Portal
         [Header("Transition Timing")]
         [SerializeField] private float fadeDuration = DEFAULT_FADE_DURATION;
         [SerializeField] private float holdBlackDuration = DEFAULT_HOLD_BLACK_DURATION;
+        private bool bootstrapFromActiveScene;
 
         /// <summary>True while a transition coroutine is running.</summary>
         public bool IsTransitioning { get; private set; }
@@ -49,6 +50,12 @@ namespace FarmSimVR.MonoBehaviours.Portal
 
         private void Start()
         {
+            if (bootstrapFromActiveScene)
+            {
+                SetActiveAreaScene(CurrentAreaScenePath);
+                return;
+            }
+
             if (string.IsNullOrEmpty(initialScenePath))
             {
                 Debug.LogError("[PortalManager] initialScenePath is not set. No area scene will be loaded.");
@@ -77,6 +84,18 @@ namespace FarmSimVR.MonoBehaviours.Portal
             }
 
             StartCoroutine(TransitionCoroutine(destinationScenePath, spawnPointName));
+        }
+
+        public void BootstrapFromActiveScene(
+            Transform runtimePlayerTransform,
+            CharacterController runtimePlayerCharacterController,
+            string activeScenePath)
+        {
+            playerTransform = runtimePlayerTransform;
+            playerCharacterController = runtimePlayerCharacterController;
+            initialScenePath = activeScenePath;
+            CurrentAreaScenePath = activeScenePath;
+            bootstrapFromActiveScene = true;
         }
 
         private IEnumerator LoadInitialScene()

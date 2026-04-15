@@ -175,3 +175,49 @@ async def test_review_api_lists_ready_drafts_and_can_publish_them(session_factor
     assert len(published) == 1
     assert published[0].platform_response_id == "tweet-123"
 
+
+@pytest.mark.asyncio
+async def test_ready_endpoint_surfaces_publish_errors_and_stats(session_factory, settings) -> None:
+    with session_factory() as session:
+        lead = create_lead(
+            session,
+            platform="twitter",
+            platform_id="tweet-failed",
+            subreddit=None,
+            author="farmfan",
+            title=None,
+            body="Stardew makes me care way too much about pacing.",
+            url="https://x.com/farmfan/status/tweet-failed",
+            status="approved",
+        )
+        draft = create_draft(
+            session,
+            lead=lead,
+            draft_text="The sneaky part is how pacing turns chores into ritual.",
+            reviewer_action="approved",
+        )
+        session.add(
+            ApiCallLog(
+                provider="twitter",
+                action="publish.error",
+                payload={"draft_id": draft.id, "error": "403 Forbidden: app lacks write permission"},
+                succeeded=False,
+                created_at=datetime(2026, 4, 14, 18, 5, tzinfo=UTC),
+            )
+        )
+        session.commit()
+
+    app = create_app(session_factory, settings)
+    transport = ASGITransport(app=app)
+
+    async with AsyncClient(transport=transport, base_url="http://testserver") as client:
+        ready_response = await client.get("/api/ready")
+        stats_response = await client.get("/api/stats")
+
+    assert ready_response.status_code == 200
+    ready_payload = ready_response.json()
+    assert ready_payload["count"] == 1
+    assert "403 Forbidden" in ready_payload["items"][0]["publish_error"]["error"]
+
+    assert stats_response.status_code == 200
+    assert stats_response.json()["publish_errors"] == 1

@@ -1,5 +1,6 @@
 import base64
 import json
+import logging
 import mimetypes
 from pathlib import Path
 from typing import Any
@@ -7,6 +8,8 @@ from typing import Any
 import httpx
 
 from .generated_storyboard_models import GeneratedImageAsset, GeneratedSpeechAsset
+
+_LOGGER = logging.getLogger("uvicorn.error")
 
 
 class GeminiImageGenerator:
@@ -42,6 +45,12 @@ class GeminiImageGenerator:
         last_error: Exception | None = None
         for model in self._models:
             try:
+                _LOGGER.info(
+                    "[GeneratedStoryBackend] gemini image request model=%s refs=%s output=%s",
+                    model,
+                    len(reference_image_paths),
+                    output_path,
+                )
                 payload = self._build_payload(
                     model=model,
                     parts=parts,
@@ -63,6 +72,11 @@ class GeminiImageGenerator:
                 inline_data = self._extract_inline_image(data)
                 output_path.parent.mkdir(parents=True, exist_ok=True)
                 output_path.write_bytes(base64.b64decode(inline_data["data"]))
+                _LOGGER.info(
+                    "[GeneratedStoryBackend] gemini image success model=%s output=%s",
+                    model,
+                    output_path,
+                )
                 return GeneratedImageAsset(
                     output_path=output_path,
                     mime_type=inline_data.get("mimeType", "image/png"),
@@ -78,10 +92,21 @@ class GeminiImageGenerator:
                 )
             except httpx.HTTPStatusError as error:
                 last_error = error
+                _LOGGER.warning(
+                    "[GeneratedStoryBackend] gemini image http_error model=%s status=%s output=%s",
+                    model,
+                    error.response.status_code,
+                    output_path,
+                )
                 if error.response.status_code not in (403, 404, 429):
                     raise
             except Exception as error:
                 last_error = error
+                _LOGGER.exception(
+                    "[GeneratedStoryBackend] gemini image failure model=%s output=%s",
+                    model,
+                    output_path,
+                )
                 raise
 
         if last_error is not None:
@@ -144,6 +169,12 @@ class ElevenLabsSpeechGenerator:
         if next_text:
             payload["next_text"] = next_text
 
+        _LOGGER.info(
+            "[GeneratedStoryBackend] elevenlabs narration request voice_id=%s model=%s output=%s",
+            voice_id,
+            self._model_id,
+            output_path,
+        )
         response = httpx.post(
             f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/with-timestamps",
             headers={
@@ -168,6 +199,12 @@ class ElevenLabsSpeechGenerator:
         alignment_path.write_text(json.dumps(alignment, indent=2), encoding="utf-8")
 
         duration_seconds = _extract_alignment_duration(alignment)
+        _LOGGER.info(
+            "[GeneratedStoryBackend] elevenlabs narration success voice_id=%s output=%s duration=%.2fs",
+            voice_id,
+            output_path,
+            duration_seconds,
+        )
         return GeneratedSpeechAsset(
             output_path=output_path,
             alignment_path=alignment_path,

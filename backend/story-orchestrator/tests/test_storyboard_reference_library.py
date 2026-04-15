@@ -80,6 +80,31 @@ class StoryboardReferenceContinuityTests(unittest.TestCase):
         self.assertIn(str(prior_image.resolve()), reference_paths)
 
 
+    def test_create_package_character_priority_puts_character_refs_before_generated_continuity(self) -> None:
+        character_reference = self.reference_library.import_reference(
+            filename="old-garrett-sheet.png",
+            content=b"garrett-reference",
+            reference_role="character",
+            label="Old Garrett Sheet",
+            character_name="Old Garrett",
+            tags=["hero"],
+        )
+        explicit_image = self.output_root / "manual_refs" / "old_garrett_turn.png"
+        explicit_image.parent.mkdir(parents=True, exist_ok=True)
+        explicit_image.write_bytes(b"explicit-generated-image")
+
+        result = self.service.create_package(
+            build_request(
+                reference_image_paths=[str(explicit_image.resolve())],
+                continuity_reference_mode="character_priority",
+            )
+        )
+
+        reference_paths = result.generated_assets[0].metadata["reference_image_paths"]
+
+        self.assertEqual(reference_paths[0], character_reference.stored_path)
+        self.assertIn(str(explicit_image.resolve()), reference_paths)
+
     def test_create_package_skips_generic_package_sweep_when_explicit_reference_paths_exist(self) -> None:
         character_reference = self.reference_library.import_reference(
             filename="old-garrett-sheet.png",
@@ -190,6 +215,7 @@ class StoryboardReferenceEndpointTests(unittest.TestCase):
 def build_request(
     *,
     reference_image_paths: list[str] | None = None,
+    continuity_reference_mode: str = "auto",
 ) -> GeneratedStoryboardCutsceneRequest:
     return GeneratedStoryboardCutsceneRequest(
         package_id="storypkg_intro_chicken_sample",
@@ -203,6 +229,7 @@ def build_request(
         style_preset_id="farm_storybook_v1",
         voice_id="voice-test",
         reference_image_paths=list(reference_image_paths or []),
+        continuity_reference_mode=continuity_reference_mode,
         context=GeneratedStoryboardContext(
             character_name="Old Garrett",
             crop_name="carrots",
