@@ -638,3 +638,42 @@
 - Actual root cause after fix: The generated-story and Town voice clients only knew how to call the local Python orchestrator after it was already running. No Unity-side bootstrap existed, so a fresh editor/game session could hit `Cannot connect to destination host` until the developer launched `uvicorn` manually.
 - Guardrail added: `TitleScreenManager` now warms the local story-orchestrator in the background on startup, `StorySequenceRuntimeController` blocks generated-story requests until local orchestrator readiness succeeds, `TownVoiceTokenServiceClient` runs the same readiness bootstrap before requesting ElevenLabs voice tokens, and the repo-owned `backend/story-orchestrator/start_local_backend.sh` script gives Unity one stable launch path to invoke. `StorySequenceRuntimeBridgeTests.StorySequenceRuntimeController_BeginSequencePreparationRoutine_WaitsForLocalOrchestratorReadinessBeforeRequest` locks the request ordering, and `TutorialSceneConfigurationTests.TitleScreenManager_Start_WarmsLocalStoryOrchestratorInBackground_FromSource` guards the title-screen warm-up hook.
 - Distilled rule added to project-memory.md: `Local AI backends required for first-party dev flows must have a Unity-owned bootstrap path, not a hidden manual terminal prerequisite (2026-04-14)`
+
+### Standalone Portal Scenes Assumed CoreScene Was Already Loaded (2026-04-14)
+- Status: Addressed
+- Related story/task: portal traversal from title-screen standalone scenes
+- Original completion claim: Town, FarmMain, and related portal scenes were left launchable/usable outside the additive CoreScene flow.
+- Reported issue: The developer hit `[PortalTrigger] PortalManager.Instance is null. Is PortalManager in the Core scene?` when entering a portal trigger.
+- Failing evidence: Runtime stack trace from `PortalTrigger.OnTriggerEnter` at `Assets/_Project/Scripts/MonoBehaviours/Portal/PortalTrigger.cs:32`.
+- Approach that produced the miss: The portal runtime assumed `CoreScene` would always be the bootstrap entry and never added a fallback path for scenes opened directly from the title screen or editor.
+- Why it was mistaken for done: Verification covered additive portal wiring with `CoreScene`, but it did not prove that standalone portal scenes could self-host the required runtime manager.
+- What should have been verified or stated differently: The handoff should have called out that portal scenes depended on `CoreScene`, or the runtime should have created that dependency automatically when the scene was loaded standalone.
+- Prevention rules for future work:
+  - Any scene that contains a `PortalTrigger` and is launchable standalone must either include its own portal runtime bootstrap or prove `CoreScene` is always loaded first.
+  - Scene-level smoke coverage must include the title-screen/editor direct-launch path for standalone gameplay slices, not only the intended additive flow.
+- Follow-up actions:
+  - Added `PortalRuntimeBootstrapTests` to lock the standalone-bootstrap contract.
+  - Added a runtime bootstrap path that creates a transient `PortalManager` for already-loaded portal scenes when no manager exists yet.
+- Actual root cause after fix: `PortalManager` only existed in `CoreScene`, while standalone portal scenes could load with either a known controller type or only a generic `CharacterController`. The bootstrap path was too narrow about which player rigs it recognized, and the singleton registration was not explicitly locked in the edit-mode regression harness, so the scene could still reach a `PortalTrigger` with no live manager.
+- Guardrail added: `PortalRuntimeBootstrap` now falls back to any loaded `CharacterController` when the known portal-scene controller types are absent, and `PortalRuntimeBootstrapTests` now prove the bootstrap works for known controller rigs, generic controller rigs, and the no-trigger no-op path.
+- Distilled rule added to project-memory.md: `Standalone scenes with PortalTrigger components must self-bootstrap portal runtime when CoreScene is not part of the entry path (2026-04-14)`
+
+### Story-Orchestrator Bootstrap Failures Were Too Opaque (2026-04-14)
+- Status: Addressed
+- Related story/task: generated playthrough local backend bootstrap
+- Original completion claim: Unity-owned local backend bootstrap was handed off as the fix for manual story-orchestrator startup.
+- Reported issue: The developer still saw "unable to start story-orchestrator" and asked whether tokens needed to be hardcoded somewhere.
+- Failing evidence: Runtime generated-playthrough status only reported that the local story-orchestrator did not become healthy and pointed at `/tmp/story-orchestrator-8012.log`, without surfacing missing venv or `.env.local` guidance in the Unity-side error path.
+- Approach that produced the miss: The launcher automation was added, but its failure reporting stopped at health polling and delegated all real diagnosis to a log file that the in-game message did not summarize.
+- Why it was mistaken for done: Verification proved the happy path with a healthy local backend, but it did not verify that a broken local bootstrap would explain where provider keys and Python setup actually belong.
+- What should have been verified or stated differently: The handoff should have included one failure-path check proving Unity explains the local venv and `backend/story-orchestrator/.env.local` contract directly, without nudging the developer toward hardcoded secrets.
+- Prevention rules for future work:
+  - Local backend bootstrap failures must surface actionable setup guidance in-product, not only a raw "not healthy" timeout plus a log path.
+  - Secret-dependent local flows must point at repo-local env files and explicitly avoid hardcoded Unity-scene secrets.
+- Follow-up actions:
+  - Added `LocalStoryOrchestratorLauncherTests` to lock source-level guidance for launcher logging and `.env.local` messaging.
+  - Updated the launcher script to log startup preflight, load `.env.local`, and warn about missing provider keys.
+  - Updated Unity bootstrap failure messages to point at `.env.local`, `pip install -r requirements.txt`, and relevant log summaries.
+- Actual root cause after fix: The backend launcher could fail for ordinary local setup reasons, but the Unity-side message collapsed those into a generic health failure. That made the operator guess about hardcoding keys instead of checking the repo-local backend env and venv setup.
+- Guardrail added: `LocalStoryOrchestratorLauncher` now builds actionable failure messages with `backend/story-orchestrator/.env.local` guidance, venv bootstrap instructions, and log summaries, while `start_local_backend.sh` writes its own startup diagnostics into the launcher log.
+- Distilled rule added to project-memory.md: `Unity-owned local backend bootstraps must explain env-file and venv setup directly when startup fails; do not leave secret/config diagnosis hidden in logs (2026-04-14)`

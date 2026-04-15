@@ -121,7 +121,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                 "Ready" => "Press Play Unique Playthrough to load the generated run.",
                 "Loading" => "Unity is fading into the generated entry scene.",
                 "Busy" => "A previous generation request is still running.",
-                "Failed" => "Check the Unity Console and /tmp/story-orchestrator-8012.log.",
+                "Failed" => "Check the Unity Console, /tmp/story-orchestrator-8012.log, and backend/story-orchestrator/.env.local.",
                 _ => "Press Generate Unique Playthrough to request a fresh run.",
             };
         }

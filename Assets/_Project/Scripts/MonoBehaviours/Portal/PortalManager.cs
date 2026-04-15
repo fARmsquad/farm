@@ -40,12 +40,7 @@ namespace FarmSimVR.MonoBehaviours.Portal
 
         private void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;
+            RegisterAsInstance();
         }
 
         private void Start()
@@ -91,11 +86,26 @@ namespace FarmSimVR.MonoBehaviours.Portal
             CharacterController runtimePlayerCharacterController,
             string activeScenePath)
         {
+            RegisterAsInstance();
+            if (Instance != this)
+                return;
+
             playerTransform = runtimePlayerTransform;
             playerCharacterController = runtimePlayerCharacterController;
             initialScenePath = activeScenePath;
             CurrentAreaScenePath = activeScenePath;
             bootstrapFromActiveScene = true;
+        }
+
+        private void RegisterAsInstance()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
         }
 
         private IEnumerator LoadInitialScene()

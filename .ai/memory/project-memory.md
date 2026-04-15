@@ -340,6 +340,20 @@ carry generated state, and make the config application resilient to Unity
 `Start` ordering so the standing `Generative Story Slice` can keep evolving on
 one stable test surface.
 
+### Standalone Portal Scenes Must Bootstrap Their Own Runtime (2026-04-14)
+If a scene contains `PortalTrigger` components and can be opened directly from
+the title screen or editor, do not assume `CoreScene` already loaded the
+`PortalManager`. Standalone portal scenes must self-bootstrap a transient
+portal runtime or otherwise guarantee the manager exists before the first
+trigger entry.
+
+### Backend Bootstrap Failures Must Explain Local Setup Directly (2026-04-14)
+When Unity owns startup for a local backend such as the story-orchestrator,
+failure messages must point directly at the repo-local env file and venv setup
+(`backend/story-orchestrator/.env.local`, `.venv`, `pip install -r requirements.txt`)
+instead of only saying the service never became healthy. Do not nudge the
+developer toward hardcoded Unity-side secrets.
+
 ---
 
 ## Performance Budgets (Quest 2)

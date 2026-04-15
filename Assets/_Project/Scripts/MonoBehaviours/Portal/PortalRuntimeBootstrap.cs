@@ -55,21 +55,29 @@ namespace FarmSimVR.MonoBehaviours.Portal
 
         private static bool TryResolvePlayer(out Transform playerTransform, out CharacterController characterController)
         {
-            var townPlayer = Object.FindFirstObjectByType<TownPlayerController>(FindObjectsInactive.Include);
+            var townPlayer = Object.FindAnyObjectByType<TownPlayerController>(FindObjectsInactive.Include);
             if (TryGetPlayerReferences(townPlayer != null ? townPlayer.transform : null, out playerTransform, out characterController))
                 return true;
 
-            var farmExplorer = Object.FindFirstObjectByType<ThirdPersonFarmExplorer>(FindObjectsInactive.Include);
+            var farmExplorer = Object.FindAnyObjectByType<ThirdPersonFarmExplorer>(FindObjectsInactive.Include);
             if (TryGetPlayerReferences(farmExplorer != null ? farmExplorer.transform : null, out playerTransform, out characterController))
                 return true;
 
-            var firstPersonExplorer = Object.FindFirstObjectByType<FirstPersonExplorer>(FindObjectsInactive.Include);
+            var firstPersonExplorer = Object.FindAnyObjectByType<FirstPersonExplorer>(FindObjectsInactive.Include);
             if (TryGetPlayerReferences(firstPersonExplorer != null ? firstPersonExplorer.transform : null, out playerTransform, out characterController))
                 return true;
 
             var taggedPlayer = GameObject.FindGameObjectWithTag("Player");
             if (TryGetPlayerReferences(taggedPlayer != null ? taggedPlayer.transform : null, out playerTransform, out characterController))
                 return true;
+
+            var genericCharacterController = Object.FindAnyObjectByType<CharacterController>(FindObjectsInactive.Include);
+            if (genericCharacterController != null)
+            {
+                playerTransform = genericCharacterController.transform;
+                characterController = genericCharacterController;
+                return true;
+            }
 
             playerTransform = null;
             characterController = null;

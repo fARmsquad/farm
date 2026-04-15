@@ -34,7 +34,10 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         private const int HealthRequestTimeoutSeconds = 2;
         private const int LaunchPollAttemptCount = 20;
         private const float LaunchPollDelaySeconds = 0.5f;
+        private const string BackendDirectoryRelativePath = "backend/story-orchestrator";
         private const string LauncherScriptRelativePath = "backend/story-orchestrator/start_local_backend.sh";
+        private const string BackendEnvLocalRelativePath = "backend/story-orchestrator/.env.local";
+        private const string BackendEnvExampleRelativePath = "backend/story-orchestrator/.env.example";
 
         public static IEnumerator EnsureReady(
             string configuredBaseUrl,
@@ -104,10 +107,16 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                 launchBaseUrl,
                 false,
                 true,
-                $"Local story-orchestrator did not become healthy at '{launchBaseUrl}'. Check {logPath}."));
+                BuildLaunchFailureMessage(
+                    $"Local story-orchestrator did not become healthy at '{launchBaseUrl}'.",
+                    logPath,
+                    ResolveProjectRootPath())));
             GeneratedStorySliceDiagnostics.LogWarning(
                 nameof(LocalStoryOrchestratorLauncher),
-                $"Local story-orchestrator did not become healthy at '{launchBaseUrl}'. Check {logPath}.");
+                BuildLaunchFailureMessage(
+                    $"Local story-orchestrator did not become healthy at '{launchBaseUrl}'.",
+                    logPath,
+                    ResolveProjectRootPath()));
         }
 
         private static IEnumerator CheckHealth(string baseUrl, Action<bool> onComplete)
@@ -195,6 +204,123 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             }
 
             return true;
+        }
+
+        private static string BuildLaunchFailureMessage(
+            string summary,
+            string logPath,
+            string projectRoot,
+            string extraHint = null)
+        {
+            var message = summary?.Trim() ?? "Local story-orchestrator launch failed.";
+            if (!string.IsNullOrWhiteSpace(logPath))
+                message += $" Check {logPath}.";
+
+            string configHint = BuildConfigurationHint(projectRoot);
+            if (!string.IsNullOrWhiteSpace(configHint))
+                message += " " + configHint;
+
+            if (!string.IsNullOrWhiteSpace(extraHint))
+                message += " " + extraHint.Trim();
+
+            string logSummary = ReadRelevantLogSummary(logPath);
+            if (!string.IsNullOrWhiteSpace(logSummary))
+                message += " Log says: " + logSummary;
+
+            return message.Trim();
+        }
+
+        private static string BuildConfigurationHint(string projectRoot)
+        {
+            if (string.IsNullOrWhiteSpace(projectRoot))
+                return "Provider keys live in backend/story-orchestrator/.env.local. Do not hardcode provider keys into Unity scenes or scripts.";
+
+            string envLocalPath = Path.Combine(projectRoot, BackendEnvLocalRelativePath);
+            string envExamplePath = Path.Combine(projectRoot, BackendEnvExampleRelativePath);
+            string backendDirectoryPath = Path.Combine(projectRoot, BackendDirectoryRelativePath);
+
+            if (!File.Exists(envLocalPath))
+            {
+                return
+                    $"Provider keys live in {envLocalPath}. Copy {envExamplePath} to .env.local and set OPENAI_API_KEY, GEMINI_API_KEY, and ELEVENLABS_API_KEY there. Do not hardcode provider keys into Unity scenes or scripts.";
+            }
+
+            if (!TryReadMissingProviderKeys(envLocalPath, out var missingKeys))
+                return
+                    $"Provider keys live in {envLocalPath}. Do not hardcode provider keys into Unity scenes or scripts.";
+
+            if (missingKeys.Length == 0)
+                return
+                    $"Provider keys are configured in {envLocalPath}. If launch still fails, re-run `cd {backendDirectoryPath} && source .venv/bin/activate && pip install -r requirements.txt` and inspect the launcher log.";
+
+            return
+                $"{envLocalPath} is missing {string.Join(", ", missingKeys)}. Add them there instead of hardcoding provider keys into Unity scenes or scripts.";
+        }
+
+        private static bool TryReadMissingProviderKeys(string envLocalPath, out string[] missingKeys)
+        {
+            missingKeys = Array.Empty<string>();
+            if (!File.Exists(envLocalPath))
+                return false;
+
+            string[] requiredKeys = { "OPENAI_API_KEY", "GEMINI_API_KEY", "ELEVENLABS_API_KEY" };
+            var presentKeys = new System.Collections.Generic.HashSet<string>(StringComparer.Ordinal);
+            foreach (string rawLine in File.ReadAllLines(envLocalPath))
+            {
+                if (string.IsNullOrWhiteSpace(rawLine))
+                    continue;
+
+                int separatorIndex = rawLine.IndexOf('=');
+                if (separatorIndex <= 0)
+                    continue;
+
+                string key = rawLine.Substring(0, separatorIndex).Trim();
+                string value = rawLine.Substring(separatorIndex + 1).Trim().Trim('"', '\'');
+                if (!string.IsNullOrWhiteSpace(value))
+                    presentKeys.Add(key);
+            }
+
+            var missing = new System.Collections.Generic.List<string>();
+            foreach (string key in requiredKeys)
+            {
+                if (!presentKeys.Contains(key))
+                    missing.Add(key);
+            }
+
+            missingKeys = missing.ToArray();
+            return true;
+        }
+
+        private static string ReadRelevantLogSummary(string logPath)
+        {
+            if (string.IsNullOrWhiteSpace(logPath) || !File.Exists(logPath))
+                return string.Empty;
+
+            try
+            {
+                var lines = File.ReadAllLines(logPath);
+                for (int i = lines.Length - 1; i >= 0; i--)
+                {
+                    string line = lines[i].Trim();
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    if (line.Contains("ERROR:", StringComparison.OrdinalIgnoreCase) ||
+                        line.Contains("Exception", StringComparison.OrdinalIgnoreCase) ||
+                        line.Contains("Traceback", StringComparison.OrdinalIgnoreCase) ||
+                        line.Contains("WARNING:", StringComparison.OrdinalIgnoreCase) ||
+                        line.Contains("Missing", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return line;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+
+            return string.Empty;
         }
 
         private static string ResolveProjectRootPath()
