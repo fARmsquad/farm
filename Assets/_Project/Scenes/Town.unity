@@ -171,6 +171,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 95365376127056996, guid: 6a71738add6483c4e8a1479556240d54, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: df577d69473b47198d04ef1b835108b0, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -199,8 +203,14 @@ MonoBehaviour:
   npcName: Young Pip
   capsuleColor: {r: 0, g: 1, b: 1, a: 1}
   dialogueData: {fileID: 0}
+  animator: {fileID: 91299}
   interactionRange: 3.5
   turnSpeed: 5
+--- !u!95 &91299 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 95365376127056996, guid: 6a71738add6483c4e8a1479556240d54, type: 3}
+  m_PrefabInstance: {fileID: 91296}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &19251154
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3863,7 +3873,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b21e8e39b3ab409080d4f12ab74454a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.OpenAIClient
-  apiKey:
+  apiKey: 
   model: gpt-4o-mini
   temperature: 0.8
   maxTokens: 140
@@ -3950,6 +3960,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 95309627407803296, guid: 827a26e9b261b7847ac6cc3df54f2677, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: df577d69473b47198d04ef1b835108b0, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3978,8 +3992,14 @@ MonoBehaviour:
   npcName: Mira the Baker
   capsuleColor: {r: 0, g: 1, b: 1, a: 1}
   dialogueData: {fileID: 0}
+  animator: {fileID: 933511419}
   interactionRange: 3.5
   turnSpeed: 5
+--- !u!95 &933511419 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 95309627407803296, guid: 827a26e9b261b7847ac6cc3df54f2677, type: 3}
+  m_PrefabInstance: {fileID: 933511416}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &939266400
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4556,6 +4576,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 95311695241237188, guid: 3c3a8236be548bb4c892cf39a5abadfe, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: df577d69473b47198d04ef1b835108b0, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4584,8 +4608,14 @@ MonoBehaviour:
   npcName: Old Garrett
   capsuleColor: {r: 0, g: 1, b: 1, a: 1}
   dialogueData: {fileID: 11400000, guid: a5a7b596d25cc40aebbc0e02539df9f9, type: 2}
+  animator: {fileID: 1101695761}
   interactionRange: 3.5
   turnSpeed: 5
+--- !u!95 &1101695761 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 95311695241237188, guid: 3c3a8236be548bb4c892cf39a5abadfe, type: 3}
+  m_PrefabInstance: {fileID: 1101695758}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1110401393
 PrefabInstance:
   m_ObjectHideFlags: 0
