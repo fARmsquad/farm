@@ -24,14 +24,17 @@ def create_app(
     *,
     reddit_publisher=None,
     twitter_publisher=None,
+    lifespan=None,
+    runtime=None,
 ) -> FastAPI:
     template_path = Path(__file__).resolve().parents[1] / "templates" / "index.html"
-    app = FastAPI(title="McCluckin GTM Review", version="0.1.0")
+    app = FastAPI(title="McCluckin GTM Review", version="0.1.0", lifespan=lifespan)
     app.state.session_factory = session_factory
     app.state.settings = settings
     app.state.template_path = template_path
     app.state.reddit_publisher = reddit_publisher
     app.state.twitter_publisher = twitter_publisher
+    app.state.runtime = runtime
 
     @app.get("/", response_class=HTMLResponse)
     def index() -> HTMLResponse:
@@ -39,10 +42,21 @@ def create_app(
             raise HTTPException(status_code=404, detail="Review UI not found.")
         return HTMLResponse(template_path.read_text(encoding="utf-8"))
 
+    @app.get("/health")
+    def health() -> dict[str, str]:
+        return {"status": "ok", "app": settings.app_name}
+
+    @app.get("/api/runtime")
+    def runtime_status() -> dict[str, object]:
+        active_runtime = getattr(app.state, "runtime", None)
+        if active_runtime is None:
+            return {"enabled": False, "tasks": {}}
+        return active_runtime.snapshot()
+
     @app.get("/api/queue")
     def queue() -> dict[str, object]:
         with session_factory() as session:
-            drafts = _pending_drafts(session)
+            drafts = _pending_drafts(session, settings)
             publish_errors = _latest_publish_errors(session, [draft.id for draft in drafts])
             return {
                 "count": len(drafts),
@@ -55,7 +69,7 @@ def create_app(
     @app.get("/api/ready")
     def ready() -> dict[str, object]:
         with session_factory() as session:
-            drafts = _ready_drafts(session)
+            drafts = _ready_drafts(session, settings)
             publish_errors = _latest_publish_errors(session, [draft.id for draft in drafts])
             return {
                 "count": len(drafts),
@@ -119,6 +133,7 @@ def create_app(
             reddit_publisher=reddit_publisher,
             twitter_publisher=twitter_publisher,
             apply_delay=False,
+            respect_terminal_errors=False,
         )
         draft = _reload_draft_if_present(session_factory, draft_id)
         if draft is not None:
@@ -139,11 +154,7 @@ def create_app(
                     ApiCallLog.succeeded == False,  # noqa: E712
                 )
             ) or 0
-            ready = session.scalar(
-                select(func.count(Draft.id))
-                .outerjoin(Published, Published.draft_id == Draft.id)
-                .where(Draft.reviewer_action.in_(("approved", "edited")), Published.id == None)  # noqa: E711
-            ) or 0
+            ready = len(_ready_drafts(session, settings))
         skip_rate = 0 if total == 0 else round((skipped / total) * 100, 2)
         return {
             "total_leads": total,
@@ -208,23 +219,25 @@ def create_app(
     return app
 
 
-def _pending_drafts(session) -> list[Draft]:
-    return session.scalars(
+def _pending_drafts(session, settings: Settings) -> list[Draft]:
+    drafts = session.scalars(
         select(Draft)
         .options(joinedload(Draft.lead), joinedload(Draft.content_item), joinedload(Draft.publication))
         .where(Draft.reviewer_action == None)  # noqa: E711
         .order_by(Draft.created_at)
     ).all()
+    return [draft for draft in drafts if _show_in_action_queues(draft, settings)]
 
 
-def _ready_drafts(session) -> list[Draft]:
-    return session.scalars(
+def _ready_drafts(session, settings: Settings) -> list[Draft]:
+    drafts = session.scalars(
         select(Draft)
         .options(joinedload(Draft.lead), joinedload(Draft.content_item), joinedload(Draft.publication))
         .outerjoin(Published, Published.draft_id == Draft.id)
         .where(Draft.reviewer_action.in_(("approved", "edited")), Published.id == None)  # noqa: E711
         .order_by(Draft.reviewed_at, Draft.created_at)
     ).all()
+    return [draft for draft in drafts if _show_in_action_queues(draft, settings)]
 
 
 def _load_draft(session, draft_id: str) -> Draft:
@@ -333,6 +346,7 @@ def _serialize_draft(draft: Draft, *, publish_error: ApiCallLog | None = None) -
             "id": item.id,
             "content_type": item.content_type,
             "topic": item.topic,
+            "description": item.description,
             "platform": item.platform,
             "subreddit": item.subreddit,
             "scheduled_date": item.scheduled_date.isoformat(),
@@ -413,3 +427,11 @@ def _serialize_publish_error(item: ApiCallLog | None) -> dict[str, object] | Non
         "provider": item.provider,
         "action": item.action,
     }
+
+
+def _show_in_action_queues(draft: Draft, settings: Settings) -> bool:
+    if draft.content_item is not None:
+        return True
+    if draft.lead is None:
+        return True
+    return settings.outbound_replies_enabled

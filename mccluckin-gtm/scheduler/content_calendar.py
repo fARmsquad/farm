@@ -7,24 +7,36 @@ from sqlalchemy.orm import sessionmaker
 
 from db.models import ContentCalendarItem
 
-CONTENT_TYPES = {
-    "devlog": {
-        "platforms": ["reddit"],
-        "subreddits": ["indiegames", "gamedev", "VRGaming"],
-        "frequency": "weekly",
-        "prompt_template": "Write a casual devlog post about: {topic}. Include what we worked on, what's next, and one interesting challenge. Keep it authentic and under 300 words.",
+STANDALONE_PROMPTS = (
+    {
+        "topic": "Why Stardew's morning routine feels so good",
+        "description": "A nuanced take on why the first few farm chores set the emotional pace for the whole day.",
     },
-    "screenshot": {
-        "platforms": ["twitter"],
-        "frequency": "3x_weekly",
-        "prompt_template": "Write a tweet to accompany this screenshot/concept art. Describe: {description}. Keep under 280 chars, be excited but genuine.",
+    {
+        "topic": "Farm games are better when chickens are a little unruly",
+        "description": "A wry observation about how a touch of chaos makes a farm feel alive instead of optimized.",
     },
-    "engagement": {
-        "platforms": ["twitter"],
-        "frequency": "daily",
-        "prompt_template": "Write an engagement tweet about cozy gaming or VR development. Topic: {topic}. Could be a question, hot take, or observation. Under 280 chars.",
+    {
+        "topic": "The best crop systems feel like rhythm, not homework",
+        "description": "A thoughtful take on why watering, harvesting, and replanting should feel like ritual instead of busywork.",
     },
-}
+    {
+        "topic": "Flower and honey loops make farms feel handmade",
+        "description": "A grounded observation about why side systems like flowers, bees, and crafting create emotional texture.",
+    },
+    {
+        "topic": "A good village matters as much as a good field",
+        "description": "A take on why farm games get richer when neighbors and town routines pull against pure efficiency.",
+    },
+    {
+        "topic": "Animal care works best when it changes your route",
+        "description": "A specific point about how animals should reshape the daily loop instead of acting like passive generators.",
+    },
+    {
+        "topic": "Cozy farm games live or die on pacing, not content volume",
+        "description": "A thoughtful opinion about why too many tasks can flatten the feeling that made Stardew special.",
+    },
+)
 
 
 def seed_content_calendar(session_factory: sessionmaker, *, weeks: int, now: datetime | None = None) -> int:
@@ -33,34 +45,16 @@ def seed_content_calendar(session_factory: sessionmaker, *, weeks: int, now: dat
     with session_factory() as session:
         for week in range(weeks):
             monday = _week_start(current_time) + timedelta(weeks=week)
-            created += _add_if_missing(
-                session,
-                content_type="devlog",
-                platform="reddit",
-                subreddit=CONTENT_TYPES["devlog"]["subreddits"][week % 3],
-                scheduled_date=datetime.combine(monday.date() + timedelta(days=1), time(10, 0), tzinfo=UTC),
-                topic=f"week {week + 1} development progress",
-                description="What the team built, what changed, and the toughest implementation challenge.",
-            )
-            for offset in (0, 2, 4):
-                created += _add_if_missing(
-                    session,
-                    content_type="screenshot",
-                    platform="twitter",
-                    subreddit=None,
-                    scheduled_date=datetime.combine(monday.date() + timedelta(days=offset), time(17, 0), tzinfo=UTC),
-                    topic=f"farm snapshot #{week + 1}-{offset}",
-                    description="a cozy farm sim moment, a chaotic chicken beat, or a quiet Quest sunset",
-                )
             for offset in range(7):
+                prompt = STANDALONE_PROMPTS[(week * 7 + offset) % len(STANDALONE_PROMPTS)]
                 created += _add_if_missing(
                     session,
                     content_type="engagement",
                     platform="twitter",
                     subreddit=None,
-                    scheduled_date=datetime.combine(monday.date() + timedelta(days=offset), time(15, 0), tzinfo=UTC),
-                    topic=f"cozy vr conversation prompt #{week + 1}-{offset + 1}",
-                    description=None,
+                    scheduled_date=datetime.combine(monday.date() + timedelta(days=offset), time(17, 0), tzinfo=UTC),
+                    topic=prompt["topic"],
+                    description=prompt["description"],
                 )
         session.commit()
     return created
@@ -93,4 +87,3 @@ def _add_if_missing(session, *, content_type: str, platform: str, subreddit: str
 def _week_start(now: datetime) -> datetime:
     midnight = datetime.combine(now.date(), time.min, tzinfo=UTC)
     return midnight - timedelta(days=midnight.weekday())
-

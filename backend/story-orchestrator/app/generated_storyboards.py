@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from .config import Settings
 from .generated_storyboard_models import (
@@ -20,10 +20,16 @@ from .generated_storyboard_models import (
 from .storyboard_media import (
     ChainImageGenerator,
     ChainSpeechGenerator,
+    LocalReferenceImageGenerator,
     PlaceholderImageGenerator,
     PlaceholderSpeechGenerator,
 )
-from .storyboard_provider_clients import ElevenLabsSpeechGenerator, GeminiImageGenerator
+from .storyboard_provider_clients import (
+    ElevenLabsSpeechGenerator,
+    GeminiImageGenerator,
+    OpenAIImageGenerator,
+    OpenAISpeechGenerator,
+)
 from .storyboard_llm_planner import OpenAIStoryboardPlanner, StoryboardPlannerChain
 from .storyboard_quality import QualityGatedImageGenerator
 from .storyboard_reference_library import StoryboardReferenceLibrary, StoryboardReferencePathResolver
@@ -91,6 +97,11 @@ class GeneratedStoryboardService:
                                 settings.gemini_image_fallback_model,
                             ],
                         ),
+                        OpenAIImageGenerator(
+                            api_key=settings.openai_api_key,
+                            model=settings.openai_image_model,
+                        ),
+                        LocalReferenceImageGenerator(),
                         PlaceholderImageGenerator(),
                     ]
                 ),
@@ -102,6 +113,11 @@ class GeneratedStoryboardService:
                         api_key=settings.elevenlabs_api_key,
                         model_id=settings.elevenlabs_model_id,
                     ),
+                    OpenAISpeechGenerator(
+                        api_key=settings.openai_api_key,
+                        model_id=settings.openai_speech_model,
+                        voice=settings.openai_speech_voice,
+                    ),
                     PlaceholderSpeechGenerator(),
                 ]
             ),
@@ -112,6 +128,8 @@ class GeneratedStoryboardService:
     def create_package(
         self,
         request: GeneratedStoryboardCutsceneRequest,
+        *,
+        progress_callback: Callable[[str], None] | None = None,
     ) -> GeneratedStoryboardPackageResult:
         resolved_request = self._resolve_request_context(request)
         _LOGGER.info(
@@ -134,19 +152,20 @@ class GeneratedStoryboardService:
             len(reference_image_paths),
             resolved_request.context.character_name,
         )
+        if progress_callback is not None:
+            progress_callback("generating_images")
         shots = []
         generated_assets: list[GeneratedStoryboardAssetRecord] = []
-        for index, shot in enumerate(plan.shots):
+        image_assets: list[GeneratedImageAsset] = []
+        image_resource_paths: list[str] = []
+
+        for shot in plan.shots:
             stem = base_asset_dir / shot.shot_id
             image_prompt = self._build_image_prompt(resolved_request, shot)
-            previous_text = plan.shots[index - 1].narration_text if index > 0 else ""
-            next_text = plan.shots[index + 1].narration_text if index + 1 < len(plan.shots) else ""
             _LOGGER.info(
-                "[GeneratedStoryBackend] storyboard shot start beat_id=%s shot_id=%s index=%s/%s",
+                "[GeneratedStoryBackend] storyboard image start beat_id=%s shot_id=%s",
                 plan.beat_id,
                 shot.shot_id,
-                index + 1,
-                len(plan.shots),
             )
             image_asset = self._image_generator.generate_image(
                 prompt=image_prompt,
@@ -155,27 +174,63 @@ class GeneratedStoryboardService:
                 aspect_ratio=resolved_request.aspect_ratio,
                 image_size=resolved_request.image_size,
             )
+            image_assets.append(image_asset)
+            image_resource_paths.append(self._to_resource_path(image_asset.output_path))
+            _LOGGER.info(
+                "[GeneratedStoryBackend] storyboard image complete beat_id=%s shot_id=%s image_provider=%s",
+                plan.beat_id,
+                shot.shot_id,
+                image_asset.provider_name,
+            )
+
+        if progress_callback is not None:
+            progress_callback("generating_audio")
+
+        speech_assets: list[GeneratedSpeechAsset] = []
+        audio_resource_paths: list[str] = []
+        for index, shot in enumerate(plan.shots):
+            stem = base_asset_dir / shot.shot_id
+            line_text = shot.subtitle_text.strip()
+            previous_text = plan.shots[index - 1].subtitle_text.strip() if index > 0 else ""
+            next_text = plan.shots[index + 1].subtitle_text.strip() if index + 1 < len(plan.shots) else ""
+            _LOGGER.info(
+                "[GeneratedStoryBackend] storyboard audio start beat_id=%s shot_id=%s",
+                plan.beat_id,
+                shot.shot_id,
+            )
             speech_asset = self._speech_generator.generate_speech(
-                text=shot.narration_text,
+                text=line_text,
                 voice_id=voice_id,
                 output_path=stem.with_suffix(".mp3"),
                 previous_text=previous_text,
                 next_text=next_text,
             )
+            speech_assets.append(speech_asset)
+            audio_resource_paths.append(self._to_resource_path(speech_asset.output_path))
             _LOGGER.info(
-                "[GeneratedStoryBackend] storyboard shot complete beat_id=%s shot_id=%s image_provider=%s audio_provider=%s",
+                "[GeneratedStoryBackend] storyboard audio complete beat_id=%s shot_id=%s audio_provider=%s",
                 plan.beat_id,
                 shot.shot_id,
-                image_asset.provider_name,
                 speech_asset.provider_name,
             )
-            image_resource_path = self._to_resource_path(image_asset.output_path)
-            audio_resource_path = self._to_resource_path(speech_asset.output_path)
+
+        if progress_callback is not None:
+            progress_callback("assembling_contract")
+
+        for shot, image_asset, speech_asset, image_resource_path, audio_resource_path in zip(
+            plan.shots,
+            image_assets,
+            speech_assets,
+            image_resource_paths,
+            audio_resource_paths,
+            strict=True,
+        ):
+            line_text = shot.subtitle_text.strip()
             shots.append(
                 {
                     "ShotId": shot.shot_id,
-                    "SubtitleText": shot.subtitle_text,
-                    "NarrationText": shot.narration_text,
+                    "SubtitleText": line_text,
+                    "NarrationText": line_text,
                     "ImageResourcePath": image_resource_path,
                     "AudioResourcePath": audio_resource_path,
                     "DurationSeconds": max(shot.duration_seconds, speech_asset.duration_seconds),
@@ -297,6 +352,12 @@ class GeneratedStoryboardService:
                     crop_name=crop_name,
                     focus_label=focus_label,
                     minigame_goal=minigame_goal,
+                    prior_story_summary=request.context.prior_story_summary,
+                    world_state=list(request.context.world_state),
+                    present_character_names=list(request.context.present_character_names),
+                    selected_generator_id=request.context.selected_generator_id,
+                    selected_generator_display_name=request.context.selected_generator_display_name,
+                    mission_configuration_summary=request.context.mission_configuration_summary,
                 )
             }
         )
@@ -313,10 +374,15 @@ class GeneratedStoryboardService:
             f"{style_prompt} Story brief: {request.story_brief}. "
             f"Character: {context.character_name}. Focus: {subject_label}. "
             f"Gameplay goal: {context.minigame_goal}. "
+            f"Previous context: {context.prior_story_summary or 'none'}. "
+            f"World state: {', '.join(context.world_state) if context.world_state else 'none'}. "
+            f"Present characters: {', '.join(context.present_character_names) if context.present_character_names else context.character_name}. "
+            f"Mission configuration: {context.mission_configuration_summary or 'none'}. "
             f"Frame direction: {shot.image_prompt}. "
             "Use any reference images only for character identity, outfit, palette, and overall art style. "
-            "Create a fresh composition for this beat and preserve character identity across shots. "
+            "Create a fresh composition for this beat as a full-bleed image and preserve character identity across shots. "
             "Do not copy camera angle, framing, background layout, staging, or pose from prior images. "
+            "The bottom third of the image must show scene content, not an empty dark band, lower-third plate, title card, or graphic panel. "
             "Do not draw subtitle boxes, caption panels, readable text, speech bubbles, UI overlays, labels, watermarks, or prompt text inside the image."
         )
 
@@ -466,7 +532,7 @@ def _build_plan_shots(context: GeneratedStoryboardContext) -> list[GeneratedStor
 
 
 def _pluralize_crop(crop_type: str) -> str:
-    irregular = {"tomato": "tomatoes"}
+    irregular = {"tomato": "tomatoes", "corn": "corn"}
     return irregular.get(crop_type, f"{crop_type}s")
 
 
@@ -476,7 +542,7 @@ def _append_goal_clause(goal: str, suffix: str) -> str:
 
 
 def _singularize_crop(crop_name: str) -> str:
-    irregular = {"tomatoes": "tomato"}
+    irregular = {"tomatoes": "tomato", "corn": "corn"}
     if crop_name in irregular:
         return irregular[crop_name]
     if crop_name.endswith("s") and len(crop_name) > 1:

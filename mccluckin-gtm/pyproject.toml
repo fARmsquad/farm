@@ -35,7 +35,7 @@ testpaths = ["tests"]
 asyncio_mode = "auto"
 
 [tool.setuptools]
-py-modules = ["cli", "config", "logging_utils"]
+py-modules = ["cli", "config", "logging_utils", "runtime", "web"]
 
 [tool.setuptools.packages.find]
 include = ["db*", "monitor*", "drafter*", "publisher*", "review*", "scheduler*"]

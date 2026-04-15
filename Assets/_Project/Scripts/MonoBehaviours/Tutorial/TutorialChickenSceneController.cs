@@ -21,6 +21,9 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         private void Start()
         {
             _manager = FindAnyObjectByType<ChickenGameManager>();
+            if (TryConfigureRuntimeMode())
+                return;
+
             TryConfigurePackageMode();
         }
 
@@ -62,6 +65,21 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             GUI.DrawTexture(new Rect(18f, 120f, 420f, height), Texture2D.whiteTexture);
             GUI.color = Color.white;
             GUI.Label(new Rect(30f, 126f, 396f, height - 12f), text, _style);
+        }
+
+        private bool TryConfigureRuntimeMode()
+        {
+            if (_manager == null)
+                return false;
+
+            if (!GenerativeTurnRuntimeState.TryGetMinigameContract(SceneManager.GetActiveScene().name, out var minigame))
+                return false;
+
+            if (minigame == null || !string.Equals(minigame.adapter_id, "tutorial.chicken_chase", System.StringComparison.Ordinal))
+                return false;
+
+            _manager.ApplyPackageConfig(GenerativeMinigameContractReader.ToLegacySnapshot(minigame));
+            return true;
         }
 
         private void TryConfigurePackageMode()

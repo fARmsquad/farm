@@ -6,7 +6,10 @@ namespace FarmSimVR.Core.Tutorial
 {
     public static class SceneWorkCatalog
     {
+        public const string TitleScreenSceneName = "TitleScreen";
         public const string TitleScreenScenePath = "Assets/_Project/Scenes/TitleScreen.unity";
+        public const string GenerativePlaythroughMenuSceneName = "GenerativePlaythroughMenu";
+        public const string GenerativePlaythroughMenuScenePath = "Assets/_Project/Scenes/GenerativePlaythroughMenu.unity";
         public const string WorldSandboxSceneName = "WorldMain";
         public const string WorldSandboxScenePath = "Assets/_Project/Scenes/WorldMain.unity";
         public const string HorseTrainingSceneName = "HorseTrainingGame";
@@ -119,6 +122,15 @@ namespace FarmSimVR.Core.Tutorial
                 FarmVegetableStatesScenePath,
                 "Farm Vegetable States",
                 "Own the dedicated crop-state review slice used to choose Scene 7 vegetable visuals before more lifecycle tuning.",
+                SceneWorkKind.Sandbox,
+                null));
+
+            launchableScenes.Add(Define(
+                13,
+                GenerativePlaythroughMenuSceneName,
+                GenerativePlaythroughMenuScenePath,
+                "Generative Playthroughs",
+                "Own the dedicated generated-playthrough library, tracker, and launch surface for runtime-created sessions.",
                 SceneWorkKind.Sandbox,
                 null));
 

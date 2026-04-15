@@ -10,9 +10,14 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload, sessionmaker
 
 from db.control import is_paused, log_api_call
-from db.models import ContentCalendarItem, DailyQuota, Draft, Lead, Published
+from db.models import ApiCallLog, ContentCalendarItem, DailyQuota, Draft, Lead, Published
 
 logger = logging.getLogger(__name__)
+
+TERMINAL_TWITTER_REPLY_ERRORS = (
+    "reply to this conversation is not allowed",
+    "you are not allowed to reply to this post",
+)
 
 
 async def publish_ready_drafts(
@@ -23,6 +28,7 @@ async def publish_ready_drafts(
     twitter_publisher=None,
     sleep_async=asyncio.sleep,
     now: datetime | None = None,
+    respect_terminal_errors: bool = True,
 ) -> dict[str, int]:
     current_time = now or datetime.now(UTC)
     published = 0
@@ -31,7 +37,11 @@ async def publish_ready_drafts(
             logger.info("Publishing paused by kill switch.")
             return {"published": 0}
 
-    for draft_id in _load_publishable_draft_ids(session_factory, settings):
+    for draft_id in _load_publishable_draft_ids(
+        session_factory,
+        settings,
+        respect_terminal_errors=respect_terminal_errors,
+    ):
         result = await publish_draft(
             session_factory,
             settings,
@@ -41,6 +51,7 @@ async def publish_ready_drafts(
             sleep_async=sleep_async,
             now=current_time,
             apply_delay=True,
+            respect_terminal_errors=respect_terminal_errors,
         )
         if result["published"]:
             published += 1
@@ -58,6 +69,7 @@ async def publish_draft(
     sleep_async=asyncio.sleep,
     now: datetime | None = None,
     apply_delay: bool = False,
+    respect_terminal_errors: bool = True,
 ) -> dict[str, object]:
     current_time = now or datetime.now(UTC)
     with session_factory() as session:
@@ -72,6 +84,8 @@ async def publish_draft(
         return {"published": False, "reason": "already_published", "draft_id": draft_id}
     if not _eligible_for_publish(draft, settings):
         return {"published": False, "reason": "not_ready", "draft_id": draft_id}
+    if respect_terminal_errors and _has_terminal_publish_error(session_factory, draft.id):
+        return {"published": False, "reason": "terminal_error", "draft_id": draft_id}
 
     try:
         if draft.lead is not None:
@@ -115,7 +129,12 @@ async def publish_draft(
     return result
 
 
-def _load_publishable_draft_ids(session_factory: sessionmaker, settings) -> list[str]:
+def _load_publishable_draft_ids(
+    session_factory: sessionmaker,
+    settings,
+    *,
+    respect_terminal_errors: bool,
+) -> list[str]:
     with session_factory() as session:
         drafted_query = (
             select(Draft)
@@ -123,7 +142,14 @@ def _load_publishable_draft_ids(session_factory: sessionmaker, settings) -> list
             .where(Draft.publication == None)  # noqa: E711
         )
         drafts = session.scalars(drafted_query.order_by(Draft.created_at)).all()
-        return [draft.id for draft in drafts if _eligible_for_publish(draft, settings)]
+        publishable_ids: list[str] = []
+        for draft in drafts:
+            if not _eligible_for_publish(draft, settings):
+                continue
+            if respect_terminal_errors and _has_terminal_publish_error(session_factory, draft.id):
+                continue
+            publishable_ids.append(draft.id)
+        return publishable_ids
 
 
 def _load_draft(session_factory: sessionmaker, draft_id: str) -> Draft | None:
@@ -136,6 +162,11 @@ def _load_draft(session_factory: sessionmaker, draft_id: str) -> Draft | None:
 
 
 def _eligible_for_publish(draft: Draft, settings) -> bool:
+    if draft.lead is not None:
+        return bool(
+            getattr(settings, "outbound_replies_enabled", True)
+            and draft.reviewer_action in {"approved", "edited"}
+        )
     if draft.reviewer_action in {"approved", "edited"}:
         return True
     item = draft.content_item
@@ -146,6 +177,34 @@ def _eligible_for_publish(draft: Draft, settings) -> bool:
         and item.content_type == "engagement"
         and item.status == "drafted"
     )
+
+
+def _has_terminal_publish_error(session_factory: sessionmaker, draft_id: str) -> bool:
+    error_message = _latest_publish_error_message(session_factory, draft_id)
+    if error_message is None:
+        return False
+    return _is_terminal_twitter_reply_error(error_message)
+
+
+def _latest_publish_error_message(session_factory: sessionmaker, draft_id: str) -> str | None:
+    with session_factory() as session:
+        log_entry = session.scalar(
+            select(ApiCallLog)
+            .where(
+                ApiCallLog.action == "publish.error",
+                ApiCallLog.succeeded == False,  # noqa: E712
+                ApiCallLog.payload["draft_id"].as_string() == draft_id,
+            )
+            .order_by(ApiCallLog.created_at.desc())
+        )
+    if log_entry is None:
+        return None
+    return str(log_entry.payload.get("error", "")).strip() or None
+
+
+def _is_terminal_twitter_reply_error(error_message: str) -> bool:
+    text = error_message.casefold()
+    return any(pattern in text for pattern in TERMINAL_TWITTER_REPLY_ERRORS)
 
 
 async def _publish_lead_draft(
@@ -262,6 +321,8 @@ async def _sleep_after_publish(settings, draft: Draft, sleep_async) -> None:
 async def _can_publish_reddit(session_factory, draft: Draft, settings, reddit_publisher, now: datetime) -> bool:
     if draft.lead is None:
         return False
+    if not getattr(settings, "outbound_replies_enabled", True):
+        return False
     with session_factory() as session:
         if _quota_exhausted(session, platform="reddit", content_kind="reply", limit=settings.reddit_daily_reply_limit, now=now):
             return False
@@ -288,6 +349,8 @@ def _can_publish_twitter(
     twitter_publisher,
 ) -> bool:
     if draft.lead is None:
+        return False
+    if not getattr(settings, "outbound_replies_enabled", True):
         return False
     if twitter_publisher is None or not getattr(settings, "x_publish_enabled", True):
         logger.info("Skipping X publish for draft %s; X publishing is disabled.", draft.id)

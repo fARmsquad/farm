@@ -30,6 +30,7 @@ namespace FarmSimVR.Tests.EditMode
         [SetUp]
         public void SetUp()
         {
+            ClearGenerativeRuntimePrefs();
             DestroyPersistentRuntimeControllers();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         }
@@ -37,6 +38,7 @@ namespace FarmSimVR.Tests.EditMode
         [TearDown]
         public void TearDown()
         {
+            ClearGenerativeRuntimePrefs();
             DestroyPersistentRuntimeControllers();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         }
@@ -118,10 +120,22 @@ namespace FarmSimVR.Tests.EditMode
                     "Assets/_Project/Scenes/HorseTrainingGame.unity",
                     "Assets/_Project/Scenes/Town.unity",
                     "Assets/_Project/Scenes/FarmVegetableStates.unity",
+                    "Assets/_Project/Scenes/GenerativePlaythroughMenu.unity",
                     "Assets/_Project/Scenes/Tutorial_PreFarmCutscene.unity",
                     "Assets/_Project/Scenes/FarmMain.unity",
                     "Assets/_Project/Scenes/WorldMain.unity",
                 }));
+        }
+
+        [Test]
+        public void GenerativePlaythroughMenuScene_ExistsAndDeclaresDedicatedController()
+        {
+            const string scenePath = "Assets/_Project/Scenes/GenerativePlaythroughMenu.unity";
+            Assert.That(File.Exists(scenePath), Is.True, "The dedicated menu scene asset should exist.");
+
+            var controllerType = typeof(TitleScreenManager).Assembly.GetType(
+                "FarmSimVR.MonoBehaviours.Cinematics.GenerativePlaythroughMenuController");
+            Assert.That(controllerType, Is.Not.Null, "The dedicated menu scene needs a controller type.");
         }
 
         [Test]
@@ -303,7 +317,7 @@ namespace FarmSimVR.Tests.EditMode
 
             Assert.That(
                 source,
-                Does.Contain("StorySequenceRuntimeController.GetOrCreate().EnsureLocalOrchestratorRunningInBackground();"));
+                Does.Contain("GenerativePlaythroughController.GetOrCreate().EnsureLocalOrchestratorRunningInBackground();"));
         }
 
         [Test]
@@ -360,14 +374,12 @@ namespace FarmSimVR.Tests.EditMode
 
             InvokePrivateInstance(manager, "Start");
 
-            var runtimeController = StorySequenceRuntimeController.GetOrCreate();
+            var runtimeController = GenerativePlaythroughController.GetOrCreate();
             SetPrivateField(runtimeController, "_activeSessionId", "session-title-diagnostics");
             SetPrivateField(runtimeController, "_preparedEntrySceneName", TutorialSceneCatalog.PostChickenCutsceneSceneName);
-
-            var imported = StoryPackageRuntimeCatalog.TrySetRuntimeOverride(
-                BuildGeneratedTitleDiagnosticsPackage(),
-                out var importError);
-            Assert.That(imported, Is.True, importError);
+            GenerativeTurnRuntimeState.SetPreparedTurn(
+                BuildGeneratedRuntimeDiagnosticsEnvelope(),
+                BuildGeneratedRuntimeDiagnosticsAssets());
 
             InvokePrivateInstance(manager, "HandleGeneratedStorySlicePrepared", TutorialSceneCatalog.PostChickenCutsceneSceneName);
 
@@ -384,7 +396,7 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(statusLabel.text, Does.Contain("ready").IgnoreCase);
             Assert.That(statusLabel.text, Does.Contain("State: Ready"));
             Assert.That(statusLabel.text, Does.Contain("Session: session-title-diagnostics"));
-            Assert.That(statusLabel.text, Does.Contain("Package: Generated Diagnostics Package"));
+            Assert.That(statusLabel.text, Does.Contain("Package: runtime/v1"));
             Assert.That(statusLabel.text, Does.Contain("Beat: Generated Diagnostics Bridge"));
             Assert.That(statusLabel.text, Does.Contain("Shots: 1"));
         }
@@ -402,14 +414,12 @@ namespace FarmSimVR.Tests.EditMode
 
             InvokePrivateInstance(manager, "Start");
 
-            var runtimeController = StorySequenceRuntimeController.GetOrCreate();
+            var runtimeController = GenerativePlaythroughController.GetOrCreate();
             SetPrivateField(runtimeController, "_activeSessionId", "session-runtime-recovery");
             SetPrivateField(runtimeController, "_preparedEntrySceneName", TutorialSceneCatalog.PostChickenCutsceneSceneName);
-
-            var imported = StoryPackageRuntimeCatalog.TrySetRuntimeOverride(
-                BuildGeneratedTitleDiagnosticsPackage(),
-                out var importError);
-            Assert.That(imported, Is.True, importError);
+            GenerativeTurnRuntimeState.SetPreparedTurn(
+                BuildGeneratedRuntimeDiagnosticsEnvelope(),
+                BuildGeneratedRuntimeDiagnosticsAssets());
 
             InvokePrivateInstance(manager, "Update");
 
@@ -428,6 +438,53 @@ namespace FarmSimVR.Tests.EditMode
         }
 
         [Test]
+        public void TitleScreenManager_Update_DoesNotEnablePlayWhileFreshGenerationIsStillRunning()
+        {
+            var canvasObject = new GameObject("Canvas");
+            canvasObject.AddComponent<Canvas>();
+            canvasObject.AddComponent<GraphicRaycaster>();
+
+            var managerObject = new GameObject("TitleScreenManager");
+            managerObject.AddComponent<AudioSource>();
+            var manager = managerObject.AddComponent<TitleScreenManager>();
+
+            InvokePrivateInstance(manager, "Start");
+            InvokePrivateInstance(manager, "SetGeneratedPlaythroughButtons", false, false);
+            InvokePrivateInstance(manager, "SetGeneratedStoryStatus", "Generating unique playthrough...");
+            InvokePrivateInstance(
+                manager,
+                "SetGeneratedStoryLifecycleState",
+                "Generating",
+                null,
+                true,
+                true,
+                false);
+
+            var runtimeController = GenerativePlaythroughController.GetOrCreate();
+            SetPrivateField(runtimeController, "_activeSessionId", "session-stale-ready");
+            SetPrivateField(runtimeController, "_preparedEntrySceneName", TutorialSceneCatalog.PostChickenCutsceneSceneName);
+            SetPrivateField(runtimeController, "_requestInFlight", true);
+            GenerativeTurnRuntimeState.SetPreparedTurn(
+                BuildGeneratedRuntimeDiagnosticsEnvelope(),
+                BuildGeneratedRuntimeDiagnosticsAssets());
+
+            InvokePrivateInstance(manager, "Update");
+
+            var generateButton = GameObject.Find("TutorialSlice_GenerateUniquePlaythrough")?.GetComponent<Button>();
+            var playButton = GameObject.Find("TutorialSlice_PlayUniquePlaythrough")?.GetComponent<Button>();
+            var statusLabel = GameObject.Find(TitleScreenManager.GeneratedStorySliceStatusName)?.GetComponent<Text>();
+
+            Assert.That(generateButton, Is.Not.Null);
+            Assert.That(generateButton.interactable, Is.False);
+            Assert.That(playButton, Is.Not.Null);
+            Assert.That(playButton.interactable, Is.False);
+            Assert.That(statusLabel, Is.Not.Null);
+            Assert.That(statusLabel.text, Does.Contain("State: Generating"));
+            Assert.That(statusLabel.text, Does.Not.Contain("State: Ready"));
+            Assert.That(ReadField<string>(manager, "generatedStoryLifecycleState"), Is.EqualTo("Generating"));
+        }
+
+        [Test]
         public void TitleScreenManager_TransitionToGame_UnlocksTitleWhenGeneratedSliceRequestDoesNotStart()
         {
             var canvasObject = new GameObject("Canvas");
@@ -440,7 +497,7 @@ namespace FarmSimVR.Tests.EditMode
 
             InvokePrivateInstance(manager, "Start");
 
-            var runtimeController = StorySequenceRuntimeController.GetOrCreate();
+            var runtimeController = GenerativePlaythroughController.GetOrCreate();
             SetPrivateField(runtimeController, "_requestInFlight", true);
             SetPrivateField(manager, "targetSceneName", TutorialSceneCatalog.PostChickenCutsceneSceneName);
             SetPrivateField(manager, "launchGeneratedStorySlice", true);
@@ -730,6 +787,15 @@ namespace FarmSimVR.Tests.EditMode
 
         private static void DestroyPersistentRuntimeControllers()
         {
+            GenerativeTurnRuntimeState.Clear();
+
+            foreach (var controller in Object.FindObjectsByType<GenerativePlaythroughController>(
+                         FindObjectsInactive.Include,
+                         FindObjectsSortMode.None))
+            {
+                Object.DestroyImmediate(controller.gameObject);
+            }
+
             foreach (var controller in Object.FindObjectsByType<StorySequenceRuntimeController>(
                          FindObjectsInactive.Include,
                          FindObjectsSortMode.None))
@@ -738,10 +804,84 @@ namespace FarmSimVR.Tests.EditMode
             }
         }
 
+        private static void ClearGenerativeRuntimePrefs()
+        {
+            PlayerPrefs.DeleteKey("FarmSimVR.GenerativeRuntime.SessionId");
+            PlayerPrefs.DeleteKey("FarmSimVR.GenerativeRuntime.BaseUrl");
+            PlayerPrefs.DeleteKey("FarmSimVR.GenerativeRuntime.JobId");
+            PlayerPrefs.Save();
+        }
+
         private static System.Collections.IEnumerator HoldForever()
         {
             while (true)
                 yield return null;
+        }
+
+        private static GenerativePlayableTurnEnvelope BuildGeneratedRuntimeDiagnosticsEnvelope()
+        {
+            return new GenerativePlayableTurnEnvelope
+            {
+                contract_version = "runtime/v1",
+                session_id = "session-title-diagnostics",
+                turn_id = "turn-title-diagnostics",
+                status = "ready",
+                entry_scene_name = TutorialSceneCatalog.PostChickenCutsceneSceneName,
+                cutscene = new GenerativeCutsceneContract
+                {
+                    beat_id = "sequence_turn_000_cutscene",
+                    display_name = "Generated Diagnostics Bridge",
+                    scene_name = TutorialSceneCatalog.PostChickenCutsceneSceneName,
+                    next_scene_name = TutorialSceneCatalog.FarmTutorialSceneName,
+                    style_preset_id = "farm_storybook_v1",
+                    shots = new[]
+                    {
+                        new GenerativeCutsceneShotContract
+                        {
+                            shot_id = "shot_01",
+                            subtitle_text = "Garrett points toward the next task.",
+                            narration_text = "Garrett points toward the next task.",
+                            duration_seconds = 3f,
+                            image_asset_id = "runtime_diag_image_01",
+                            audio_asset_id = "runtime_diag_audio_01",
+                            alignment_asset_id = "runtime_diag_alignment_01",
+                        },
+                    },
+                },
+                minigame = new GenerativeMinigameContract
+                {
+                    beat_id = "sequence_turn_000_minigame",
+                    display_name = "Plant Runtime Rows",
+                    scene_name = TutorialSceneCatalog.FarmTutorialSceneName,
+                    adapter_id = "tutorial.plant_rows",
+                    objective_text = "Plant 3 carrots in 5 minutes.",
+                    required_count = 3,
+                    time_limit_seconds = 300f,
+                    generator_id = "plant_rows_v1",
+                    minigame_id = "planting",
+                },
+            };
+        }
+
+        private static PreloadedGenerativeTurnAssets BuildGeneratedRuntimeDiagnosticsAssets()
+        {
+            var envelope = BuildGeneratedRuntimeDiagnosticsEnvelope();
+            var texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            texture.SetPixel(0, 0, Color.white);
+            texture.Apply();
+            var audioClip = AudioClip.Create("runtime-title-diagnostics", 8, 1, 8000, false);
+
+            var assets = new PreloadedGenerativeTurnAssets(
+                envelope.session_id,
+                envelope.turn_id,
+                "/tmp/runtime-title-diagnostics");
+            assets.RegisterImage("runtime_diag_image_01", texture, "/tmp/runtime-title-diagnostics/image.png");
+            assets.RegisterAudio("runtime_diag_audio_01", audioClip, "/tmp/runtime-title-diagnostics/audio.mp3");
+            assets.RegisterAlignment(
+                "runtime_diag_alignment_01",
+                "{\"characters\":[\"g\"]}",
+                "/tmp/runtime-title-diagnostics/alignment.json");
+            return assets;
         }
 
         private static StoryPackageSnapshot BuildGeneratedTitleDiagnosticsPackage()

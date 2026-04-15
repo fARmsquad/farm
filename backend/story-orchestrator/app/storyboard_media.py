@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import json
 import logging
+import random
 import textwrap
 import wave
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont
 
 _LOGGER = logging.getLogger("uvicorn.error")
 
@@ -104,6 +105,65 @@ class PlaceholderImageGenerator:
         )
 
 
+class LocalReferenceImageGenerator:
+    def generate_image(
+        self,
+        *,
+        prompt: str,
+        reference_image_paths: list[str],
+        output_path: Path,
+        aspect_ratio: str,
+        image_size: str,
+    ) -> Any:
+        width, height = _resolve_canvas_size(aspect_ratio)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        seed = abs(hash(f"{prompt}|{aspect_ratio}|{image_size}")) % (2**32)
+        rng = random.Random(seed)
+
+        base_image = _load_reference_image(reference_image_paths, width, height, rng)
+        base_image = ImageEnhance.Color(base_image).enhance(0.88 + (rng.random() * 0.24))
+        base_image = ImageEnhance.Contrast(base_image).enhance(1.04 + (rng.random() * 0.16))
+        base_image = ImageEnhance.Brightness(base_image).enhance(0.94 + (rng.random() * 0.12))
+
+        overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+        sky_tint = (
+            232,
+            202 + rng.randint(-18, 18),
+            146 + rng.randint(-18, 18),
+            56,
+        )
+        ground_tint = (
+            58 + rng.randint(-8, 12),
+            108 + rng.randint(-10, 16),
+            66 + rng.randint(-8, 12),
+            72,
+        )
+        draw.rectangle((0, 0, width, int(height * 0.48)), fill=sky_tint)
+        draw.rectangle((0, int(height * 0.58), width, height), fill=ground_tint)
+        _draw_story_accents(draw, width, height, prompt, rng)
+
+        remixed = Image.alpha_composite(base_image.convert("RGBA"), overlay)
+        remixed.save(output_path, format="PNG")
+
+        from .generated_storyboards import GeneratedImageAsset
+
+        return GeneratedImageAsset(
+            output_path=output_path,
+            mime_type="image/png",
+            provider_name="local-reference-remix",
+            provider_model="local-reference-remix-v1",
+            fallback_used=False,
+            source_metadata={
+                "prompt": prompt,
+                "reference_image_paths": list(reference_image_paths),
+                "aspect_ratio": aspect_ratio,
+                "image_size": image_size,
+                "seed": seed,
+            },
+        )
+
+
 class ChainSpeechGenerator:
     def __init__(self, generators: list[Any]) -> None:
         self._generators = generators
@@ -191,6 +251,103 @@ def _extract_caption(prompt: str) -> str:
         return prompt.split(marker, maxsplit=1)[1].strip()
 
     return prompt.strip()[:220]
+
+
+def _load_reference_image(
+    reference_image_paths: list[str],
+    width: int,
+    height: int,
+    rng: random.Random,
+) -> Image.Image:
+    for raw_path in reference_image_paths:
+        try:
+            path = Path(raw_path)
+            if not path.exists():
+                continue
+            with Image.open(path) as image:
+                rgb = image.convert("RGB")
+            return _resize_cover(rgb, width, height, rng)
+        except Exception:
+            continue
+
+    return _build_base_landscape(width, height, rng)
+
+
+def _resize_cover(image: Image.Image, width: int, height: int, rng: random.Random) -> Image.Image:
+    scale = max(width / image.width, height / image.height)
+    resized = image.resize(
+        (max(1, int(image.width * scale)), max(1, int(image.height * scale))),
+        Image.Resampling.LANCZOS,
+    )
+    max_x = max(0, resized.width - width)
+    max_y = max(0, resized.height - height)
+    left = rng.randint(0, max_x) if max_x > 0 else 0
+    top = rng.randint(0, max_y) if max_y > 0 else 0
+    return resized.crop((left, top, left + width, top + height))
+
+
+def _build_base_landscape(width: int, height: int, rng: random.Random) -> Image.Image:
+    image = Image.new("RGB", (width, height), "#7aa35a")
+    draw = ImageDraw.Draw(image)
+    sky_top = (118, 160 + rng.randint(-18, 18), 210 + rng.randint(-18, 18))
+    sky_bottom = (232, 204 + rng.randint(-16, 16), 150 + rng.randint(-14, 14))
+    for y in range(int(height * 0.62)):
+        t = y / max(int(height * 0.62) - 1, 1)
+        draw.line([(0, y), (width, y)], fill=_lerp_color(sky_top, sky_bottom, t))
+    draw.rectangle((0, int(height * 0.62), width, height), fill=(92, 138, 76))
+    draw.polygon(
+        [(0, height), (int(width * 0.22), int(height * 0.58)), (int(width * 0.48), height)],
+        fill=(83, 122, 72),
+    )
+    draw.polygon(
+        [(int(width * 0.34), height), (int(width * 0.72), int(height * 0.6)), (width, height)],
+        fill=(102, 151, 86),
+    )
+    return image
+
+
+def _draw_story_accents(
+    draw: ImageDraw.ImageDraw,
+    width: int,
+    height: int,
+    prompt: str,
+    rng: random.Random,
+) -> None:
+    prompt_lower = prompt.lower()
+    sun_x = int(width * (0.72 + rng.uniform(-0.08, 0.08)))
+    sun_y = int(height * (0.2 + rng.uniform(-0.05, 0.05)))
+    sun_r = int(height * 0.08)
+    draw.ellipse((sun_x - sun_r, sun_y - sun_r, sun_x + sun_r, sun_y + sun_r), fill=(250, 224, 154, 74))
+
+    for row in range(4):
+        y = int(height * (0.68 + (row * 0.06)))
+        draw.line(
+            [(int(width * 0.06), y), (int(width * 0.94), y + int(height * 0.02))],
+            fill=(56, 92, 54, 90),
+            width=4,
+        )
+
+    if "chicken" in prompt_lower:
+        for index in range(2):
+            x = int(width * (0.26 + (index * 0.08)))
+            y = int(height * 0.73)
+            draw.ellipse((x, y, x + 42, y + 28), fill=(250, 245, 234, 180))
+            draw.ellipse((x + 28, y - 10, x + 44, y + 6), fill=(250, 245, 234, 180))
+
+    if "tool" in prompt_lower or "hoe" in prompt_lower or "watering" in prompt_lower:
+        x = int(width * 0.8)
+        y = int(height * 0.62)
+        draw.line((x, y, x + 18, y + 120), fill=(126, 90, 56, 190), width=8)
+        draw.line((x - 20, y + 18, x + 14, y + 8), fill=(132, 142, 138, 200), width=6)
+
+    silhouette_x = int(width * (0.18 + rng.uniform(-0.05, 0.05)))
+    silhouette_y = int(height * 0.56)
+    draw.ellipse((silhouette_x, silhouette_y, silhouette_x + 40, silhouette_y + 46), fill=(38, 48, 44, 160))
+    draw.rectangle((silhouette_x + 10, silhouette_y + 34, silhouette_x + 30, silhouette_y + 126), fill=(38, 48, 44, 160))
+    draw.line((silhouette_x + 12, silhouette_y + 126, silhouette_x - 4, silhouette_y + 178), fill=(38, 48, 44, 160), width=6)
+    draw.line((silhouette_x + 28, silhouette_y + 126, silhouette_x + 44, silhouette_y + 178), fill=(38, 48, 44, 160), width=6)
+    draw.line((silhouette_x + 12, silhouette_y + 68, silhouette_x - 12, silhouette_y + 108), fill=(38, 48, 44, 160), width=6)
+    draw.line((silhouette_x + 28, silhouette_y + 68, silhouette_x + 60, silhouette_y + 102), fill=(38, 48, 44, 160), width=6)
 
 
 def _lerp_color(start: tuple[int, int, int], end: tuple[int, int, int], t: float) -> tuple[int, int, int]:

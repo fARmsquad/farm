@@ -1,14 +1,14 @@
 # Single Source of Truth — FarmSim VR
 
-Last updated: 2026-04-14
+Last updated: 2026-04-15
 
 ## Current State
 
 - **Current story**: none
 - **Story phase**: idle
-- **Recent fix**: Story-orchestrator bootstrap failures now explain the real local setup contract instead of collapsing into a generic "did not become healthy" timeout: `LocalStoryOrchestratorLauncher` now includes `backend/story-orchestrator/.env.local` guidance, venv bootstrap instructions, and relevant launcher-log summaries in Unity-side failure messages, while `backend/story-orchestrator/start_local_backend.sh` logs its own startup preflight, loads `.env.local`, and warns about missing provider keys. Focused EditMode coverage passed in `LocalStoryOrchestratorLauncherTests`. The standalone portal runtime bootstrap fix remains in place.
+- **Recent fix**: The generated-story runtime is now wired for an always-on Railway backend at `https://story-orchestrator-production.up.railway.app`. Unity request execution stays pinned to the readiness-resolved backend instead of re-probing dead localhost fallbacks, remote hosts are no longer treated as candidates for local bootstrap, the deployed service now runs with a persistent `/data` volume plus Railway-managed provider variables, provider request budgets are capped at 30 seconds, the quality gate accepts clean deterministic `local-reference-remix` fallback images while still rejecting placeholder assets, and the standalone runtime `POST /api/runtime/v1/sessions` contract now returns a queued job immediately instead of holding the HTTP request open through first-turn generation. Background workers now own turn execution, recovery replay no longer shares the same worker lane as fresh live jobs, and the current runtime playthrough is constrained to the real `FarmMain` planting game with varied farm parameters across the bounded 3-turn run. Sidecar note: `mccluckin-gtm` X publishing now prefers OAuth 2.0 PKCE user tokens, persists rotated access/refresh tokens for unattended runs, and the current access token was verified live against `GET /2/users/me`; `X_CLIENT_ID` is still required in the env before refresh can run automatically after token expiry.
 - **Scene work map**: `.ai/docs/scene-work-map.md`
-- **Tests**: EditMode 401 passed / 85 failed (legacy baseline still red outside this slice, plus unstable package-content expectations unrelated to this launcher fix); PlayMode not run for this slice
+- **Tests**: EditMode 421 passed / 84 failed / 1 skipped in the current repo-wide baseline (still red outside this slice). Backend Python: `./.venv/bin/python -m unittest tests.test_runtime_api` passed in `backend/story-orchestrator`. Live backend verification: public Railway `/health` returned `200`, live `POST /api/runtime/v1/sessions` now returns immediate `201` with `status: queued`, and the service logs show background turn generation running after the response. Full live Unity-to-Railway turn completion is still constrained by provider-side issues currently visible in Railway logs (`Gemini` image `429` throttling and `ElevenLabs` `401` fallback to OpenAI speech). PlayMode not run for this slice.
 - **Main status**: green
 - **Last push**: none yet
 - **Tech debt items**: 0 (see project-memory.md)

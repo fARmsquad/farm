@@ -20,7 +20,7 @@ namespace FarmSimVR.MonoBehaviours
         private const string LogPrefix = "[TownVoice]";
 
         [SerializeField] private LLMConversationController conversation;
-        [SerializeField] private string tokenServiceBaseUrl = "http://127.0.0.1:8000";
+        [SerializeField] private string tokenServiceBaseUrl = TownVoiceTokenServiceEndpointResolver.ProductionBaseUrl;
         [SerializeField] private bool voiceEnabled = true;
         [SerializeField] private StreamingPcmAudioPlayer pcmPlayer;
 

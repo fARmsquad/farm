@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, Callable
 
 from pydantic import BaseModel, Field
 
@@ -121,6 +121,8 @@ class GeneratedPackageAssemblyService:
     def create_package(
         self,
         request: GeneratedPackageAssemblyRequest,
+        *,
+        progress_callback: Callable[[str], None] | None = None,
     ) -> GeneratedPackageAssemblyResult:
         _LOGGER.info(
             "[GeneratedStoryBackend] package assembly start package_id=%s generator=%s cutscene_beat=%s",
@@ -158,7 +160,8 @@ class GeneratedPackageAssemblyService:
                 package_id=request.package_id,
                 package_display_name=request.package_display_name,
                 linked_minigame_beat_id=request.minigame.beat_id,
-            )
+            ),
+            progress_callback=progress_callback,
         )
         _LOGGER.info(
             "[GeneratedStoryBackend] storyboard generation complete package_id=%s beat_id=%s assets=%s",

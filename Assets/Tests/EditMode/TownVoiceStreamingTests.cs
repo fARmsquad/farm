@@ -79,6 +79,8 @@ namespace FarmSimVR.Tests.EditMode
                 Is.EqualTo(new[]
                 {
                     "http://127.0.0.1:8011",
+                    TownVoiceTokenServiceEndpointResolver.ProductionBaseUrl,
+                    "http://127.0.0.1:8012",
                     "http://127.0.0.1:8000"
                 }));
         }
@@ -91,6 +93,28 @@ namespace FarmSimVR.Tests.EditMode
                 null);
 
             Assert.That(candidates, Does.Contain("http://127.0.0.1:8011"));
+        }
+
+        [Test]
+        public void TownVoiceTokenServiceEndpointResolver_PrefersCurrentStoryOrchestratorPort_WhenNoOverrideExists()
+        {
+            var candidates = TownVoiceTokenServiceEndpointResolver.BuildCandidateBaseUrls(
+                null,
+                null);
+
+            Assert.That(candidates.Count, Is.GreaterThanOrEqualTo(1));
+            Assert.That(candidates[0], Is.EqualTo(TownVoiceTokenServiceEndpointResolver.ProductionBaseUrl));
+        }
+
+        [Test]
+        public void TownVoiceTokenServiceEndpointResolver_PrefersProductionServiceBeforeLegacyLoopbackSetting()
+        {
+            var candidates = TownVoiceTokenServiceEndpointResolver.BuildCandidateBaseUrls(
+                "http://127.0.0.1:8000",
+                null);
+
+            Assert.That(candidates[0], Is.EqualTo(TownVoiceTokenServiceEndpointResolver.ProductionBaseUrl));
+            Assert.That(candidates, Does.Contain("http://127.0.0.1:8000"));
         }
 
         [Test]

@@ -1,4 +1,5 @@
 from pathlib import Path
+from contextlib import asynccontextmanager
 
 import httpx
 from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
@@ -51,6 +52,19 @@ from .story_sequence_service import StorySequenceSessionService
 from .story_sequence_store import StorySequenceSessionStore
 from .story_sequence_turn_director import OpenAIStorySequenceTurnDirector, StorySequenceTurnDirector
 from .store import GeneratedStandingSliceJobStore, StoryJobStore
+from .runtime_models import (
+    PlayableTurnEnvelope,
+    RuntimeSessionCreateRequest,
+    RuntimeSessionCreateResponse,
+    RuntimeSessionDetail,
+    RuntimeTurnJob,
+    TurnOutcomeRequest,
+    TurnOutcomeResponse,
+)
+from .runtime_service import RuntimeSessionService
+from .runtime_store import RuntimeSessionStore
+from .runtime_tracker_routes import register_runtime_tracker_routes
+from .runtime_turn_generation import RuntimeTurnGenerationService
 from .storyboard_reference_library import StoryboardReferenceLibrary
 from .storyboard_reference_models import StoryboardReferenceAssetRecord, StoryboardReferenceRole
 
@@ -67,6 +81,9 @@ def create_app(
     story_sequence_session_store: StorySequenceSessionStore | None = None,
     story_sequence_turn_director: StorySequenceTurnDirector | None = None,
     story_sequence_session_service: StorySequenceSessionService | None = None,
+    runtime_session_store: RuntimeSessionStore | None = None,
+    runtime_generation_service: RuntimeTurnGenerationService | None = None,
+    runtime_session_service: RuntimeSessionService | None = None,
     storyboard_reference_library: StoryboardReferenceLibrary | None = None,
 ) -> FastAPI:
     resolved_settings = settings or get_settings()
@@ -116,10 +133,31 @@ def create_app(
         default_voice_id=resolved_settings.elevenlabs_voice_id or "voice-test",
         turn_director=story_sequence_turn_director or OpenAIStorySequenceTurnDirector.from_settings(resolved_settings),
     )
+    runtime_store = runtime_session_store or RuntimeSessionStore(database_path)
+    runtime_root = (base_dir / "data" / "runtime").resolve()
+    runtime_turn_director = story_sequence_turn_director or OpenAIStorySequenceTurnDirector.from_settings(resolved_settings)
+    runtime_generation_service = runtime_generation_service or RuntimeTurnGenerationService(
+        runtime_root=runtime_root,
+        storyboard_service=storyboard_service,
+        minigame_service=minigame_service,
+        default_voice_id=resolved_settings.elevenlabs_voice_id or "voice-test",
+        turn_director=runtime_turn_director,
+    )
+    runtime_service = runtime_session_service or RuntimeSessionService(
+        store=runtime_store,
+        generation_service=runtime_generation_service,
+    )
     minigame_generator_catalog = MinigameGeneratorCatalog.default()
     review_page_path = (base_dir / "app" / "static" / "standing_slice_review.html").resolve()
+    runtime_tracker_page_path = (base_dir / "app" / "static" / "runtime_tracker.html").resolve()
 
-    app = FastAPI(title="Story Orchestrator", version="0.1.0")
+    @asynccontextmanager
+    async def lifespan(_: FastAPI):
+        runtime_service.resume_incomplete_jobs()
+        yield
+        runtime_service.shutdown()
+
+    app = FastAPI(title="Story Orchestrator", version="0.1.0", lifespan=lifespan)
     app.state.settings = resolved_settings
     app.state.store = store
     app.state.generated_storyboard_service = storyboard_service
@@ -131,10 +169,19 @@ def create_app(
     app.state.minigame_generator_catalog = minigame_generator_catalog
     app.state.story_sequence_session_store = sequence_session_store
     app.state.story_sequence_session_service = sequence_session_service
+    app.state.runtime_session_store = runtime_store
+    app.state.runtime_session_service = runtime_service
     app.state.elevenlabs_token_provider = create_elevenlabs_tts_websocket_token
     app.state.storyboard_output_root = storyboard_output_root
     app.state.storyboard_reference_library = reference_library
     app.state.review_page_path = review_page_path
+    app.state.runtime_tracker_page_path = runtime_tracker_page_path
+
+    register_runtime_tracker_routes(
+        app,
+        runtime_service=runtime_service,
+        tracker_page_path=runtime_tracker_page_path,
+    )
 
     @app.get("/health")
     def health() -> dict[str, str]:
@@ -180,6 +227,77 @@ def create_app(
         if result is None:
             raise HTTPException(status_code=404, detail="Story sequence session not found.")
         return result
+
+    @app.post(
+        "/api/runtime/v1/sessions",
+        response_model=RuntimeSessionCreateResponse,
+        status_code=201,
+    )
+    def create_runtime_session(
+        request: RuntimeSessionCreateRequest,
+    ) -> RuntimeSessionCreateResponse:
+        return runtime_service.create_session(request)
+
+    @app.get(
+        "/api/runtime/v1/sessions/{session_id}",
+        response_model=RuntimeSessionDetail,
+    )
+    def get_runtime_session(session_id: str) -> RuntimeSessionDetail:
+        detail = runtime_service.get_session_detail(session_id)
+        if detail is None:
+            raise HTTPException(status_code=404, detail="Runtime session not found.")
+        return detail
+
+    @app.get(
+        "/api/runtime/v1/jobs/{job_id}",
+        response_model=RuntimeTurnJob,
+    )
+    def get_runtime_job(job_id: str) -> RuntimeTurnJob:
+        job = runtime_service.get_job(job_id)
+        if job is None:
+            raise HTTPException(status_code=404, detail="Runtime job not found.")
+        return job
+
+    @app.get(
+        "/api/runtime/v1/sessions/{session_id}/turns/{turn_id}",
+        response_model=PlayableTurnEnvelope,
+    )
+    def get_runtime_turn(session_id: str, turn_id: str) -> PlayableTurnEnvelope:
+        envelope = runtime_service.get_turn_envelope(session_id, turn_id)
+        if envelope is None:
+            raise HTTPException(status_code=404, detail="Runtime turn not found.")
+        return envelope
+
+    @app.post(
+        "/api/runtime/v1/sessions/{session_id}/turns/{turn_id}/outcome",
+        response_model=TurnOutcomeResponse,
+    )
+    def submit_runtime_outcome(
+        session_id: str,
+        turn_id: str,
+        request: TurnOutcomeRequest,
+    ) -> TurnOutcomeResponse:
+        response = runtime_service.submit_outcome(session_id, turn_id, request)
+        if response is None:
+            raise HTTPException(status_code=404, detail="Runtime session or turn not found.")
+        return response
+
+    @app.get("/api/runtime/v1/artifacts/{asset_id}/content")
+    def get_runtime_artifact_content(asset_id: str) -> FileResponse:
+        record = runtime_store.get_artifact(asset_id)
+        if record is None:
+            raise HTTPException(status_code=404, detail="Runtime artifact not found.")
+
+        asset_path = Path(record.stored_path).resolve()
+        try:
+            asset_path.relative_to(runtime_root)
+        except ValueError as exc:
+            raise HTTPException(status_code=404, detail="Runtime artifact is outside the runtime root.") from exc
+
+        if not asset_path.exists():
+            raise HTTPException(status_code=404, detail="Runtime artifact file not found.")
+
+        return FileResponse(asset_path, media_type=record.mime_type, filename=asset_path.name)
 
     @app.post(
         "/api/v1/generated-storyboards/cutscene",

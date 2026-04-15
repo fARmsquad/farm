@@ -113,6 +113,25 @@ class StorySequenceSessionServiceTests(unittest.TestCase):
             [continuity_images[0].output_path],
         )
 
+    def test_advance_session_populates_storyboard_context_from_session_and_parameters(self) -> None:
+        created = self.service.create_session(StorySequenceSessionCreateRequest())
+
+        advanced = self.service.advance_session(created.session_id)
+        context = advanced.turn.request.cutscene.context
+
+        self.assertEqual(context.character_name, "Old Garrett")
+        self.assertEqual(context.selected_generator_id, "plant_rows_v1")
+        self.assertEqual(context.selected_generator_display_name, "Plant Rows V1")
+        self.assertIn("Plant", context.mission_configuration_summary)
+        self.assertIn("carrot", context.mission_configuration_summary.lower())
+        self.assertIn("Old Garrett", context.present_character_names)
+        self.assertIn("Miss Clara", context.present_character_names)
+        self.assertIn("earliest_tutorial_bridge", context.world_state)
+        self.assertEqual(
+            context.prior_story_summary,
+            "No previous turn summary yet. Use the existing farm state and story brief to create the next conflict.",
+        )
+
 
 class StorySequenceSessionEndpointTests(unittest.TestCase):
     def setUp(self) -> None:

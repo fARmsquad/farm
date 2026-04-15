@@ -42,6 +42,24 @@ Rules:
 17. Output only the exact reply text. Never explain your reasoning, never say things like "looking at this tweet", and never describe the task.
 18. Most replies should work without mentioning McCluckin Farm. Mention it only when the person is open to recommendations, upcoming games, or a mechanic comparison where our game is genuinely relevant."""
 
+STANDALONE_SYSTEM_PROMPT = """You are writing standalone X posts for McCluckin Farm.
+
+Audience:
+- Stardew Valley players
+- Cozy farm game enthusiasts
+- People who care about farming-game mechanics, pacing, animals, villages, and cozy routines
+
+Rules:
+1. Write a standalone X post, never a reply.
+2. Keep it under 280 characters.
+3. Lead with a concrete observation, nuanced take, or vivid mechanic detail.
+4. Use a quirky farm personality: thoughtful, wry, a little dusty-boots, never generic.
+5. Do not mention VR, Quest, Meta, headsets, platforms, or motion controls.
+6. Usually do not mention McCluckin Farm by name. The post should stand on its own.
+7. Include a soft CTA to star the repo at github.com/fARmsquad/farm.
+8. Never say "check out". Never sound like ad copy.
+9. Output only the post text."""
+
 logger = logging.getLogger(__name__)
 
 
@@ -67,6 +85,23 @@ def build_user_prompt(lead: Lead) -> str:
 
 
 def build_calendar_prompt(item: ContentCalendarItem) -> str:
+    if item.platform == "twitter":
+        description = f"\nAngle: {item.description}" if item.description else ""
+        return (
+            f"Platform: {item.platform}\n"
+            f"Content type: {item.content_type}\n"
+            f"Topic: {item.topic}{description}\n\n"
+            "Write one standalone X post, not a reply.\n"
+            "Keep it under 280 characters.\n"
+            "Stay focused on Stardew Valley players, farm-game enthusiasts, and cozy-game mechanics.\n"
+            "Lead with a concrete observation or thoughtful take.\n"
+            "Give it a quirky farm voice with specific texture, not generic hype.\n"
+            "Do not mention VR, Quest, Meta, or platform specifics.\n"
+            "Usually avoid mentioning McCluckin Farm by name.\n"
+            "Work in a soft CTA inviting people to star the repo at github.com/fARmsquad/farm.\n"
+            "Never say \"check out\".\n"
+            "Output only the post text."
+        )
     subreddit_context = f"\nTarget subreddit: r/{item.subreddit}" if item.subreddit else ""
     description = f"\nDescription: {item.description}" if item.description else ""
     return (
@@ -189,7 +224,8 @@ async def _generate_lead_draft(session_factory, settings, client, lead: Lead) ->
 
 async def _generate_calendar_draft(session_factory, settings, client, item: ContentCalendarItem) -> tuple[str | None, str]:
     user_prompt = build_calendar_prompt(item)
-    prompt_hash = _hash_prompt(SYSTEM_PROMPT, user_prompt)
+    system_prompt = STANDALONE_SYSTEM_PROMPT if item.platform == "twitter" else SYSTEM_PROMPT
+    prompt_hash = _hash_prompt(system_prompt, user_prompt)
     with session_factory() as session:
         log_api_call(
             session,
@@ -200,7 +236,7 @@ async def _generate_calendar_draft(session_factory, settings, client, item: Cont
     response = await client.messages.create(
         model=settings.anthropic_model,
         max_tokens=300,
-        system=SYSTEM_PROMPT,
+        system=system_prompt,
         messages=[{"role": "user", "content": user_prompt}],
     )
     text = response.content[0].text.strip()

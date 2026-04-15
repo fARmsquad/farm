@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generated Experience Tracker</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --red: #e31837;
+      --blue: #006491;
+      --ink: #12212d;
+      --muted: #617180;
+      --line: #d7dde3;
+      --surface: #f5f7fb;
+      --paper: #ffffff;
+      --success: #127a49;
+      --warning: #ffb300;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .topband {
+      background:
+        linear-gradient(90deg, var(--red) 0 50%, var(--blue) 50% 100%);
+      color: white;
+      padding: 18px 20px;
+    }
+
+    .topband-inner,
+    .shell {
+      width: min(1200px, calc(100vw - 32px));
+      margin: 0 auto;
+    }
+
+    .brandline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      opacity: 0.84;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.02;
+    }
+
+    .subline {
+      margin: 6px 0 0;
+      max-width: 640px;
+      font-size: 15px;
+      opacity: 0.94;
+    }
+
+    .domino {
+      display: grid;
+      grid-template-columns: repeat(2, 14px);
+      gap: 8px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      min-width: 60px;
+      justify-content: center;
+    }
+
+    .pip {
+      width: 14px;
+      aspect-ratio: 1;
+      border-radius: 999px;
+      background: white;
+    }
+
+    .shell {
+      padding: 18px 0 36px;
+    }
+
+    .controls,
+    .summary,
+    .pipeline,
+    .layout {
+      margin-top: 18px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 16px;
+    }
+
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .panel h2,
+    .panel h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    input,
+    button {
+      border-radius: 8px;
+      font: inherit;
+    }
+
+    input {
+      flex: 1 1 280px;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      padding: 0 14px;
+      color: var(--ink);
+      background: white;
+    }
+
+    button {
+      min-height: 44px;
+      border: 0;
+      padding: 0 16px;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+      background: var(--blue);
+    }
+
+    button.secondary {
+      background: var(--red);
+    }
+
+    .recent-strip {
+      display: grid;
+      gap: 10px;
+    }
+
+    .recent-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      background: white;
+    }
+
+    .recent-item.active {
+      border-color: var(--blue);
+      box-shadow: inset 0 0 0 1px var(--blue);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: white;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .pipeline-rail {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .stage {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 12px;
+      background: white;
+      min-height: 108px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stage-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stage-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #e9eef3;
+      color: var(--ink);
+      font-weight: 800;
+      flex: none;
+    }
+
+    .stage.active {
+      border-color: var(--red);
+      box-shadow: inset 0 0 0 1px var(--red);
+      background: #fff3f5;
+    }
+
+    .stage.complete {
+      border-color: var(--success);
+      background: #f2fbf6;
+    }
+
+    .stage.issue {
+      border-color: var(--warning);
+      background: #fff8e6;
+    }
+
+    .stage.active .stage-number {
+      background: var(--red);
+      color: white;
+    }
+
+    .stage.complete .stage-number {
+      background: var(--success);
+      color: white;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+    }
+
+    .turns {
+      display: grid;
+      gap: 12px;
+    }
+
+    .turn {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: white;
+    }
+
+    .turn-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: #edf3f7;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .gallery img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #dde5ec;
+      display: block;
+    }
+
+    .step-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .step-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      border-bottom: 1px solid #eef2f5;
+      padding-bottom: 10px;
+    }
+
+    .step-row:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .status-pill {
+      min-width: 86px;
+      text-align: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      background: var(--muted);
+    }
+
+    .status-pill.running { background: var(--red); }
+    .status-pill.completed { background: var(--success); }
+    .status-pill.failed { background: #9a1c20; }
+
+    .empty {
+      padding: 18px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: white;
+      color: var(--muted);
+    }
+
+    @media (max-width: 920px) {
+      .controls,
+      .layout,
+      .summary-grid,
+      .pipeline-rail {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="topband">
+    <div class="topband-inner brandline">
+      <div>
+        <div class="eyebrow">Railway Runtime</div>
+        <h1>Generated Experience Tracker</h1>
+        <p class="subline">Watch each playthrough move from prep to ready, then inspect the farm turn it produced.</p>
+      </div>
+      <div class="domino" aria-hidden="true">
+        <span class="pip"></span>
+        <span class="pip"></span>
+        <span class="pip"></span>
+        <span class="pip"></span>
+      </div>
+    </div>
+  </section>
+
+  <main class="shell">
+    <section class="controls">
+      <div class="panel">
+        <h2>Find A Session</h2>
+        <div class="row">
+          <input id="sessionLookup" placeholder="Paste a runtime session id">
+          <button id="sessionLookupButton" class="secondary">Track Session</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Refresh</h2>
+        <div class="row">
+          <button id="refreshButton">Refresh Now</button>
+          <div id="pollStatus" class="muted">Polling every 4s while active.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary panel" id="summaryPanel">
+      <div class="empty">No runtime session selected yet.</div>
+    </section>
+
+    <section class="pipeline panel">
+      <h2>Pipeline</h2>
+      <div id="pipelineRail" class="pipeline-rail"></div>
+    </section>
+
+    <section class="layout">
+      <div class="panel">
+        <h2>Recent Sessions</h2>
+        <div id="recentSessions" class="recent-strip"></div>
+      </div>
+      <div class="panel">
+        <h2>Live Steps</h2>
+        <div id="stepList" class="step-list"></div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="panel">
+        <h2>Turns</h2>
+        <div id="turnList" class="turns"></div>
+      </div>
+      <div class="panel">
+        <h2>Frames</h2>
+        <div id="frameGallery" class="gallery"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const sessionLookup = document.getElementById("sessionLookup");
+    const sessionLookupButton = document.getElementById("sessionLookupButton");
+    const refreshButton = document.getElementById("refreshButton");
+    const recentSessions = document.getElementById("recentSessions");
+    const summaryPanel = document.getElementById("summaryPanel");
+    const pipelineRail = document.getElementById("pipelineRail");
+    const stepList = document.getElementById("stepList");
+    const turnList = document.getElementById("turnList");
+    const frameGallery = document.getElementById("frameGallery");
+    const pollStatus = document.getElementById("pollStatus");
+
+    const STAGES = [
+      { id: "planning", label: "Order Placed", detail: "Story plan locked" },
+      { id: "generating_images", label: "In The Kitchen", detail: "Frames cooking" },
+      { id: "generating_audio", label: "Sound Check", detail: "Voice and timing" },
+      { id: "assembling_contract", label: "Boxing It Up", detail: "Contract assembly" },
+      { id: "ready", label: "Out For Play", detail: "Experience ready" }
+    ];
+
+    let selectedSessionId = "";
+    let currentDetail = null;
+    let pollHandle = null;
+
+    function stageOrder(stageId) {
+      const explicit = ["planning", "generating_images", "generating_audio", "assembling_contract", "validating", "ready", "completed", "failed"];
+      return explicit.indexOf(stageId);
+    }
+
+    function trackerStage(detail) {
+      if (!detail) return "";
+      if (detail.current_stage === "validating") return "assembling_contract";
+      if (detail.current_stage === "completed") return "ready";
+      if (detail.current_stage === "failed") return "failed";
+      return detail.current_stage;
+    }
+
+    function currentTurn(detail) {
+      if (!detail || !detail.turns.length) return null;
+      return detail.turns[detail.turns.length - 1];
+    }
+
+    async function loadRecentSessions() {
+      const response = await fetch("/api/runtime/v1/tracker/sessions");
+      const sessions = await response.json();
+      renderRecentSessions(sessions);
+      if (!selectedSessionId && sessions.length) {
+        selectedSessionId = sessions[0].session_id;
+        sessionLookup.value = selectedSessionId;
+        await loadSessionDetail(selectedSessionId);
+      }
+    }
+
+    async function loadSessionDetail(sessionId) {
+      const response = await fetch(`/api/runtime/v1/tracker/sessions/${sessionId}`);
+      if (!response.ok) {
+        currentDetail = null;
+        renderEmptyState(`No runtime session found for ${sessionId}.`);
+        return;
+      }
+
+      currentDetail = await response.json();
+      selectedSessionId = currentDetail.session_id;
+      sessionLookup.value = selectedSessionId;
+      renderSummary(currentDetail);
+      renderPipeline(currentDetail);
+      renderSteps(currentDetail);
+      renderTurns(currentDetail);
+      renderGallery(currentDetail);
+      updatePolling(currentDetail);
+      await loadRecentSessions();
+    }
+
+    function renderEmptyState(message) {
+      summaryPanel.innerHTML = `<div class="empty">${message}</div>`;
+      pipelineRail.innerHTML = "";
+      stepList.innerHTML = `<div class="empty">Waiting for a live runtime session.</div>`;
+      turnList.innerHTML = `<div class="empty">No turns yet.</div>`;
+      frameGallery.innerHTML = `<div class="empty">No frames yet.</div>`;
+      pollStatus.textContent = "Polling paused.";
+    }
+
+    function renderRecentSessions(sessions) {
+      if (!sessions.length) {
+        recentSessions.innerHTML = `<div class="empty">No runtime sessions have been created yet.</div>`;
+        return;
+      }
+
+      recentSessions.innerHTML = sessions.map((session) => `
+        <button class="recent-item ${session.session_id === selectedSessionId ? "active" : ""}" data-session-id="${session.session_id}">
+          <div style="text-align:left;">
+            <div style="font-weight:800;">${session.package_display_name}</div>
+            <div class="muted" style="margin-top:4px;">${session.session_id}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="chip">${friendlyStage(session.current_stage)}</div>
+            <div class="muted" style="margin-top:6px;">${session.ready_turn_count}/${session.max_turns} turns</div>
+          </div>
+        </button>
+      `).join("");
+
+      recentSessions.querySelectorAll("[data-session-id]").forEach((button) => {
+        button.addEventListener("click", () => {
+          loadSessionDetail(button.dataset.sessionId);
+        });
+      });
+    }
+
+    function renderSummary(detail) {
+      const turn = currentTurn(detail);
+      summaryPanel.innerHTML = `
+        <div class="summary-grid">
+          <div class="stat">
+            <div class="stat-label">Session</div>
+            <div class="stat-value">${detail.session_id.slice(0, 8)}</div>
+            <div class="muted" style="margin-top:6px;">${detail.package_display_name}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Now Serving</div>
+            <div class="stat-value">${friendlyStage(detail.current_stage)}</div>
+            <div class="muted" style="margin-top:6px;">${detail.status}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Turns Ready</div>
+            <div class="stat-value">${detail.ready_turn_count}/${detail.max_turns}</div>
+            <div class="muted" style="margin-top:6px;">Beat cursor ${detail.beat_cursor}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Current Goal</div>
+            <div class="stat-value" style="font-size:18px;">${turn ? escapeHtml(turn.objective_text) : "Waiting..."}</div>
+            <div class="muted" style="margin-top:6px;">${turn ? escapeHtml(turn.character_name) : "Fresh session"}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPipeline(detail) {
+      const activeStage = trackerStage(detail);
+      const activeIndex = Math.max(stageOrder(activeStage), 0);
+      pipelineRail.innerHTML = STAGES.map((stage, index) => {
+        const classes = ["stage"];
+        if (detail.current_stage === "failed" && stage.id === "assembling_contract") classes.push("issue");
+        else if (activeStage === "failed" && index === STAGES.length - 1) classes.push("issue");
+        else if (index < activeIndex || detail.current_stage === "completed") classes.push("complete");
+        else if (stage.id === activeStage || (detail.current_stage === "failed" && stage.id === "assembling_contract")) classes.push("active");
+
+        return `
+          <div class="${classes.join(" ")}">
+            <div class="stage-top">
+              <span class="stage-number">${index + 1}</span>
+              <div>
+                <div style="font-weight:800;">${stage.label}</div>
+                <div class="muted" style="font-size:13px;">${stage.detail}</div>
+              </div>
+            </div>
+            <div class="muted" style="font-size:13px;">${stage.id}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderSteps(detail) {
+      if (!detail.active_job) {
+        stepList.innerHTML = `<div class="empty">This session has no active job.</div>`;
+        return;
+      }
+
+      stepList.innerHTML = detail.active_job.steps.map((step) => `
+        <div class="step-row">
+          <div>
+            <div style="font-weight:800;">${friendlyStage(step.step_name)}</div>
+            <div class="muted">${step.step_name}${step.error_message ? ` · ${escapeHtml(step.error_message)}` : ""}</div>
+          </div>
+          <span class="status-pill ${step.status}">${step.status}</span>
+        </div>
+      `).join("");
+    }
+
+    function renderTurns(detail) {
+      if (!detail.turns.length) {
+        turnList.innerHTML = `<div class="empty">No turns are ready yet.</div>`;
+        return;
+      }
+
+      turnList.innerHTML = detail.turns.map((turn) => `
+        <article class="turn">
+          <div class="turn-header">
+            <div>
+              <div style="font-weight:800;">Turn ${turn.turn_index + 1}</div>
+              <div class="muted">${escapeHtml(turn.character_name)} · ${escapeHtml(turn.generator_id)}</div>
+            </div>
+            <div class="chip">${escapeHtml(turn.scene_name)}</div>
+          </div>
+          <div style="margin-top:10px; font-weight:700;">${escapeHtml(turn.objective_text)}</div>
+          <div class="muted" style="margin-top:6px;">${escapeHtml(turn.summary)}</div>
+          <div class="row" style="margin-top:10px;">
+            <span class="chip">${turn.image_asset_ids.length} frames</span>
+            <span class="chip">${turn.artifact_count} artifacts</span>
+            <span class="chip">${turn.fallback_artifact_count} fallback</span>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderGallery(detail) {
+      const turn = currentTurn(detail);
+      if (!turn || !turn.image_asset_ids.length) {
+        frameGallery.innerHTML = `<div class="empty">Frames will show up here as soon as a turn lands.</div>`;
+        return;
+      }
+
+      frameGallery.innerHTML = turn.image_asset_ids.map((assetId, index) => `
+        <img src="/api/runtime/v1/artifacts/${assetId}/content" alt="Generated frame ${index + 1}">
+      `).join("");
+    }
+
+    function updatePolling(detail) {
+      const shouldPoll = detail.status === "active" && detail.current_stage !== "ready" && detail.current_stage !== "failed";
+      if (pollHandle) {
+        clearInterval(pollHandle);
+        pollHandle = null;
+      }
+
+      if (shouldPoll) {
+        pollStatus.textContent = `Live on ${friendlyStage(detail.current_stage)}. Refreshing every 4s.`;
+        pollHandle = setInterval(() => {
+          if (selectedSessionId) {
+            loadSessionDetail(selectedSessionId);
+          }
+        }, 4000);
+      } else {
+        pollStatus.textContent = detail.status === "completed"
+          ? "Session finished."
+          : "Waiting for the next generate request.";
+      }
+    }
+
+    function friendlyStage(stageId) {
+      const lookup = {
+        active: "Cooking",
+        planning: "Order Placed",
+        generating_images: "In The Kitchen",
+        generating_audio: "Sound Check",
+        assembling_contract: "Boxing It Up",
+        validating: "Boxing It Up",
+        ready: "Out For Play",
+        completed: "Delivered",
+        failed: "Issue In Store"
+      };
+      return lookup[stageId] || stageId;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    sessionLookupButton.addEventListener("click", () => {
+      const sessionId = sessionLookup.value.trim();
+      if (sessionId) {
+        loadSessionDetail(sessionId);
+      }
+    });
+
+    refreshButton.addEventListener("click", async () => {
+      if (selectedSessionId) {
+        await loadSessionDetail(selectedSessionId);
+      } else {
+        await loadRecentSessions();
+      }
+    });
+
+    loadRecentSessions().catch((error) => {
+      console.error(error);
+      renderEmptyState("The tracker could not load runtime sessions.");
+    });
+  </script>
+</body>
+</html>

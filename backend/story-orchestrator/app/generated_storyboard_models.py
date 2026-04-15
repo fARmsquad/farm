@@ -12,6 +12,12 @@ class GeneratedStoryboardContext(BaseModel):
     crop_name: str | None = None
     focus_label: str | None = None
     minigame_goal: str | None = None
+    prior_story_summary: str | None = None
+    world_state: list[str] = Field(default_factory=list)
+    present_character_names: list[str] = Field(default_factory=list)
+    selected_generator_id: str | None = None
+    selected_generator_display_name: str | None = None
+    mission_configuration_summary: str | None = None
 
 
 class GeneratedStoryboardCutsceneRequest(BaseModel):

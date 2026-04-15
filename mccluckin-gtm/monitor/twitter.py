@@ -74,7 +74,7 @@ def _collect_query(
             since_id=since_id or None,
             max_results=TWITTER_QUERY_MAX_RESULTS,
             expansions=["author_id"],
-            tweet_fields=["created_at", "author_id"],
+            tweet_fields=["created_at", "author_id", "reply_settings"],
             user_fields=["username"],
         )
     except HTTPException as exc:
@@ -94,6 +94,8 @@ def _collect_query(
     for tweet in response.data or []:
         username = users.get(str(tweet.author_id), "")
         if _is_own_tweet(username, settings.x_username):
+            continue
+        if not _is_open_reply_thread(tweet):
             continue
         if not should_store_twitter_lead(tweet.text, [query]):
             continue
@@ -165,3 +167,10 @@ def _get_user_field(user, field: str) -> str | None:
 
 def _is_own_tweet(author: str, username: str) -> bool:
     return bool(username) and author.casefold() == username.casefold()
+
+
+def _is_open_reply_thread(tweet) -> bool:
+    reply_settings = getattr(tweet, "reply_settings", None)
+    if reply_settings in (None, ""):
+        return True
+    return str(reply_settings).casefold() == "everyone"

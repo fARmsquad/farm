@@ -85,6 +85,27 @@ class GeneratedMinigameBeatServiceTests(unittest.TestCase):
         self.assertIn("cropType=tomato requires world state 'tomatoes_unlocked'.", result.errors)
         self.assertFalse(self.package_output_path.exists())
 
+    def test_create_package_uses_irregular_crop_plural_for_corn(self) -> None:
+        result = self.service.create_package(
+            build_request(
+                parameters={
+                    "cropType": "corn",
+                    "targetCount": 7,
+                    "timeLimitSeconds": 360,
+                    "rowCount": 3,
+                    "assistLevel": "medium",
+                },
+                context=MinigameGenerationContext(
+                    fit_tags=["intro"],
+                    world_state=["farm_plots_unlocked", "corn_unlocked"],
+                    difficulty_band="tutorial",
+                ),
+            )
+        )
+
+        self.assertTrue(result.is_valid, result.errors)
+        self.assertEqual(result.materialized_minigame["ObjectiveText"], "Plant 7 corn in 6 minutes.")
+
 
 class GeneratedMinigameBeatEndpointTests(unittest.TestCase):
     def setUp(self) -> None:

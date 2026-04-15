@@ -208,7 +208,7 @@ def _pluralize_crop(crop_type: str, count: int) -> str:
     if count == 1:
         return crop_type
 
-    irregular = {"tomato": "tomatoes"}
+    irregular = {"tomato": "tomatoes", "corn": "corn"}
     return irregular.get(crop_type, f"{crop_type}s")
 
 

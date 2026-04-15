@@ -270,6 +270,10 @@ class StorySequenceSessionService:
         turn_slug = f"sequence_turn_{turn_index:03d}"
         minigame_scene = _MINIGAME_SCENES[generator_id]
         continuity_reference_paths = self._select_continuity_reference_paths(session, character_name)
+        objective_text = self._objective_text_for(generator_id, parameters)
+        mission_configuration_summary = self._mission_configuration_summary(generator_id, parameters)
+        prior_story_summary = self._prior_story_summary(session)
+        present_character_names = self._present_character_names(session, character_name)
 
         return GeneratedPackageAssemblyRequest(
             package_id=session.package_id,
@@ -297,7 +301,13 @@ class StorySequenceSessionService:
                     character_name=character_name,
                     crop_name="",
                     focus_label="",
-                    minigame_goal="",
+                    minigame_goal=objective_text,
+                    prior_story_summary=prior_story_summary,
+                    world_state=list(session.state.world_state),
+                    present_character_names=present_character_names,
+                    selected_generator_id=generator_id,
+                    selected_generator_display_name=self._display_name_for(generator_id),
+                    mission_configuration_summary=mission_configuration_summary,
                 ),
             ),
         )
@@ -316,12 +326,83 @@ class StorySequenceSessionService:
         if session.state.last_minigame_goal:
             return (
                 f"{session.state.narrative_seed} {character_name} links the previous goal "
-                f"'{session.state.last_minigame_goal}' into {focus}. Keep the tone warm, brief, and forward-moving."
+                f"'{session.state.last_minigame_goal}' into {focus}. "
+                "A new interruption, discovery, or practical farm problem should force the next mission to happen now."
             )
         return (
             f"{session.state.narrative_seed} {character_name} sets up {focus}. "
-            "Keep the bridge concise, readable, and consistent with a cozy farm tutorial."
+            "Introduce a concrete farm conflict or event so the next mission feels earned."
         )
+
+    def _objective_text_for(self, generator_id: str, parameters: dict[str, Any]) -> str:
+        if generator_id == "plant_rows_v1":
+            crop_name = self._pluralize_crop(parameters["cropType"], int(parameters["targetCount"]))
+            return (
+                f"Plant {parameters['targetCount']} {crop_name} across "
+                f"{parameters['rowCount']} rows before time runs out."
+            )
+        if generator_id == "find_tools_cluster_v1":
+            return (
+                f"Recover {parameters['toolCount']} {parameters['targetToolSet']} tools "
+                f"around the {parameters['searchZone']}."
+            )
+        if generator_id == "chicken_chase_intro_v1":
+            return (
+                f"Catch {parameters['targetCaptureCount']} runaway chickens inside "
+                f"the {parameters['arenaPresetId']} pen."
+            )
+        return self._display_name_for(generator_id)
+
+    @staticmethod
+    def _pluralize_crop(crop_type: str, count: int) -> str:
+        if count == 1:
+            return crop_type
+
+        irregular = {"tomato": "tomatoes", "corn": "corn"}
+        return irregular.get(crop_type, f"{crop_type}s")
+
+    def _mission_configuration_summary(self, generator_id: str, parameters: dict[str, Any]) -> str:
+        if generator_id == "plant_rows_v1":
+            return (
+                f"Plant {parameters['targetCount']} {parameters['cropType']} seeds across "
+                f"{parameters['rowCount']} neat rows in {parameters['timeLimitSeconds']} seconds "
+                f"with {parameters['assistLevel']} guidance."
+            )
+        if generator_id == "find_tools_cluster_v1":
+            return (
+                f"Recover {parameters['toolCount']} {parameters['targetToolSet']} tools "
+                f"around the {parameters['searchZone'].replace('_', ' ')} with "
+                f"{parameters['hintStrength']} hints."
+            )
+        if generator_id == "chicken_chase_intro_v1":
+            return (
+                f"Catch {parameters['targetCaptureCount']} chickens from a flock of "
+                f"{parameters['chickenCount']} in the {parameters['arenaPresetId'].replace('_', ' ')} "
+                f"within {parameters['timeLimitSeconds']} seconds using {parameters['guidanceLevel']} guidance."
+            )
+        return self._display_name_for(generator_id)
+
+    def _prior_story_summary(self, session: StorySequenceSessionRecord) -> str:
+        detail = self._store.get_session_detail(session.session_id)
+        if detail is None or not detail.turns:
+            return "No previous turn summary yet. Use the existing farm state and story brief to create the next conflict."
+        recent = [turn.summary for turn in detail.turns[-2:] if turn.summary]
+        if not recent:
+            return "No previous turn summary yet. Use the existing farm state and story brief to create the next conflict."
+        return " ".join(recent)
+
+    def _present_character_names(
+        self,
+        session: StorySequenceSessionRecord,
+        selected_character_name: str,
+    ) -> list[str]:
+        ordered = [selected_character_name, *session.state.recent_character_names, *session.state.character_pool]
+        deduped: list[str] = []
+        for name in ordered:
+            if not name or name in deduped:
+                continue
+            deduped.append(name)
+        return deduped
 
     def _select_character_name(self, session: StorySequenceSessionRecord) -> str:
         pool = session.state.character_pool

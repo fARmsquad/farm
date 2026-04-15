@@ -19,7 +19,10 @@ class StoryboardImageQualityResult:
 
 class StoryboardImageQualityGate:
     def evaluate(self, asset: GeneratedImageAsset) -> StoryboardImageQualityResult:
-        if asset.fallback_used or asset.provider_name == "placeholder-image":
+        if asset.provider_name == "placeholder-image":
+            return StoryboardImageQualityResult(False, "provider_fallback")
+
+        if asset.fallback_used and asset.provider_name != "local-reference-remix":
             return StoryboardImageQualityResult(False, "provider_fallback")
 
         if not asset.output_path.exists():
@@ -113,8 +116,16 @@ def _has_large_dark_caption_panel(path: Path) -> bool:
     panel_luminance = _crop_mean_luminance(rgb_image, x0, panel_y0, x1, panel_y1)
     upper_luminance = _crop_mean_luminance(rgb_image, x0, upper_y0, x1, upper_y1)
     dark_ratio = _crop_dark_ratio(rgb_image, x0, panel_y0, x1, panel_y1)
+    transition_drop = _crop_transition_drop(rgb_image, x0, x1, panel_y0)
+    panel_stddev = _crop_luminance_stddev(rgb_image, x0, panel_y0, x1, panel_y1)
 
-    return dark_ratio >= 0.32 and panel_luminance <= 52 and (upper_luminance - panel_luminance) >= 18
+    return (
+        dark_ratio >= 0.32
+        and panel_luminance <= 52
+        and (upper_luminance - panel_luminance) >= 18
+        and transition_drop >= 30
+        and panel_stddev <= 40
+    )
 
 
 def _crop_mean_luminance(image: Image.Image, x0: int, y0: int, x1: int, y1: int) -> float:
@@ -134,6 +145,31 @@ def _crop_dark_ratio(image: Image.Image, x0: int, y0: int, x1: int, y1: int) -> 
 
     dark_pixels = sum(1 for pixel in pixels if _luminance(pixel) <= 38)
     return dark_pixels / len(pixels)
+
+
+def _crop_transition_drop(image: Image.Image, x0: int, x1: int, boundary_y: int) -> float:
+    height = image.size[1]
+    strip_height = max(8, min(24, height // 18))
+    above_y0 = max(0, boundary_y - strip_height)
+    above_y1 = max(above_y0 + 1, boundary_y)
+    below_y0 = min(height - 1, boundary_y)
+    below_y1 = min(height, below_y0 + strip_height)
+
+    above_luminance = _crop_mean_luminance(image, x0, above_y0, x1, above_y1)
+    below_luminance = _crop_mean_luminance(image, x0, below_y0, x1, below_y1)
+    return above_luminance - below_luminance
+
+
+def _crop_luminance_stddev(image: Image.Image, x0: int, y0: int, x1: int, y1: int) -> float:
+    crop = image.crop((x0, y0, x1, y1))
+    pixels = list(crop.getdata())
+    if not pixels:
+        return 0.0
+
+    luminances = [_luminance(pixel) for pixel in pixels]
+    mean = sum(luminances) / len(luminances)
+    variance = sum((value - mean) ** 2 for value in luminances) / len(luminances)
+    return variance ** 0.5
 
 
 def _luminance(pixel: tuple[int, int, int]) -> float:

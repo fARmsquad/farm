@@ -47,7 +47,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         }
         private void Start()
         {
-            _usePackageMode = TryConfigurePackageMode();
+            _usePackageMode = TryConfigureRuntimeMode() || TryConfigurePackageMode();
 
             // Only build procedural environment when the scene lacks its own.
             _sceneHasEnvironment = GameObject.Find("Environment") != null;
@@ -122,6 +122,30 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             BuildStyles();
             DrawObjectivePanel();
             DrawFeedback();
+        }
+        private bool TryConfigureRuntimeMode()
+        {
+            if (!GenerativeTurnRuntimeState.TryGetMinigameContract(SceneManager.GetActiveScene().name, out var minigame))
+                return false;
+
+            if (minigame == null || !string.Equals(minigame.adapter_id, "tutorial.find_tools", System.StringComparison.Ordinal))
+                return false;
+
+            var targetToolSet = "starter";
+            var searchZone = "yard";
+            var hintStrength = "strong";
+            GenerativeMinigameContractReader.TryGetStringParameter(minigame, "targetToolSet", out targetToolSet);
+            GenerativeMinigameContractReader.TryGetStringParameter(minigame, "searchZone", out searchZone);
+            GenerativeMinigameContractReader.TryGetStringParameter(minigame, "hintStrength", out hintStrength);
+
+            _packageMission.Configure(
+                minigame.objective_text,
+                targetToolSet,
+                minigame.required_count,
+                searchZone,
+                hintStrength,
+                minigame.time_limit_seconds);
+            return true;
         }
         private bool TryConfigurePackageMode()
         {

@@ -265,14 +265,14 @@
     },
     {
       "BeatId": "sequence_turn_000_cutscene",
-      "DisplayName": "Ready the Fields",
+      "DisplayName": "A Pledge to Grow",
       "Kind": "Cutscene",
       "SceneName": "PostChickenCutscene",
       "NextSceneName": "FarmMain",
       "SequenceSteps": [
         {
           "StepType": "ObjectivePopup",
-          "StringParam": "Awakening the Farm"
+          "StringParam": "A new day at the farm"
         }
       ],
       "Storyboard": {
@@ -280,35 +280,35 @@
         "Shots": [
           {
             "ShotId": "shot_01",
-            "SubtitleText": "Awakening the Farm",
-            "NarrationText": "The morning sun casts a warm glow on our farm, as Old Garrett wipes the dust off his cherished tools.",
+            "SubtitleText": "A new day at the farm",
+            "NarrationText": "As dawn broke over the fields, Old Garrett scanned the landscape, noticing empty patches of soil that needed attention.",
             "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_01",
             "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_01",
-            "DurationSeconds": 8.333333333333334
+            "DurationSeconds": 6.7857142857142865
           },
           {
             "ShotId": "shot_02",
-            "SubtitleText": "Setting the Stage",
-            "NarrationText": "Today, we're planting vibrant carrots! Let\u2019s prepare the soil and lay out our rows.",
+            "SubtitleText": "A call for action",
+            "NarrationText": "Old Garrett turned to Young Pip, urgency in his voice, 'Come here! We need to plant seeds to fill the empty rows.'",
             "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_02",
             "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_02",
-            "DurationSeconds": 5.833333333333334
+            "DurationSeconds": 7.857142857142858
           },
           {
             "ShotId": "shot_03",
-            "SubtitleText": "Time to Plant!",
-            "NarrationText": "We have limited time to make our farm flourish. Let\u2019s get those carrots in the ground!",
+            "SubtitleText": "A moment of doubt",
+            "NarrationText": "Miss Clara joined them, 'But which crops should we plant in this soil?' She looked anxiously at the dry patches, the sun rising higher.",
             "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_03",
             "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_03",
-            "DurationSeconds": 6.666666666666667
+            "DurationSeconds": 8.571428571428571
           },
           {
             "ShotId": "shot_04",
-            "SubtitleText": "Your Turn!",
-            "NarrationText": "Now it's your turn to plant five carrots before the sun sets. Let's make this farm beautiful!",
+            "SubtitleText": "Time to get planting!",
+            "NarrationText": "With a spark of determination, Garrett handed Young Pip the bag of seeds, urging, 'Let's plant those carrots now before the day slips away!'",
             "ImageResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_04",
             "AudioResourcePath": "GeneratedStoryboards/storypkg_intro_chicken_sample/sequence_turn_000_cutscene/shot_04",
-            "DurationSeconds": 7.083333333333334
+            "DurationSeconds": 8.571428571428571
           }
         ]
       }

@@ -1,4 +1,4 @@
-using FarmSimVR.Core.Story;
+using FarmSimVR.Core;
 
 namespace FarmSimVR.MonoBehaviours.Cinematics
 {
@@ -11,7 +11,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             string note,
             string error,
             string preparedAtUtc,
-            StorySequenceRuntimeController runtimeController)
+            GenerativePlaythroughController runtimeController)
         {
             var state = Sanitize(lifecycleState, "Idle");
             var sessionId = ResolveSessionId(state, runtimeController);
@@ -23,28 +23,22 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             var firstImage = "none";
             var firstAudio = "none";
 
-            if (runtimeController != null && runtimeController.HasActiveSession &&
-                StoryPackageRuntimeCatalog.TryGetPackage(out var package, out _))
+            if (runtimeController != null && runtimeController.HasPreparedSequence)
             {
-                packageLabel = ResolvePackageLabel(package);
-
-                if (!string.IsNullOrWhiteSpace(runtimeController.PreparedEntrySceneName) &&
-                    StoryPackageRuntimeCatalog.TryGetBeat(runtimeController.PreparedEntrySceneName, out var beat) &&
-                    beat != null)
+                var envelope = GenerativeTurnRuntimeState.PreparedTurn;
+                if (envelope != null)
                 {
-                    beatLabel = ResolveBeatLabel(beat);
-                }
+                    packageLabel = "runtime/v1";
+                    beatLabel = Sanitize(envelope.cutscene?.display_name, "none");
 
-                if (!string.IsNullOrWhiteSpace(runtimeController.PreparedEntrySceneName) &&
-                    StoryPackageRuntimeCatalog.TryGetStoryboard(runtimeController.PreparedEntrySceneName, out _, out var storyboard) &&
-                    storyboard?.Shots != null &&
-                    storyboard.Shots.Length > 0)
-                {
-                    shotCount = storyboard.Shots.Length.ToString();
-                    var firstShot = storyboard.Shots[0];
-                    firstSubtitle = Sanitize(firstShot?.SubtitleText, "none");
-                    firstImage = Sanitize(firstShot?.ImageResourcePath, "none");
-                    firstAudio = Sanitize(firstShot?.AudioResourcePath, "none");
+                    if (envelope.cutscene?.shots != null && envelope.cutscene.shots.Length > 0)
+                    {
+                        shotCount = envelope.cutscene.shots.Length.ToString();
+                        var firstShot = envelope.cutscene.shots[0];
+                        firstSubtitle = Sanitize(firstShot?.subtitle_text, "none");
+                        firstImage = Sanitize(firstShot?.image_asset_id, "none");
+                        firstAudio = Sanitize(firstShot?.audio_asset_id, "none");
+                    }
                 }
             }
 
@@ -73,7 +67,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
         private static string ResolveSessionId(
             string lifecycleState,
-            StorySequenceRuntimeController runtimeController)
+            GenerativePlaythroughController runtimeController)
         {
             if (runtimeController != null && runtimeController.HasActiveSession)
                 return Sanitize(runtimeController.ActiveSessionId, "none");
@@ -83,34 +77,12 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
         private static string ResolveEntrySceneName(
             string lifecycleState,
-            StorySequenceRuntimeController runtimeController)
+            GenerativePlaythroughController runtimeController)
         {
             if (runtimeController != null && runtimeController.HasPreparedSequence)
                 return Sanitize(runtimeController.PreparedEntrySceneName, "none");
 
             return lifecycleState == "Generating" ? "pending" : "none";
-        }
-
-        private static string ResolvePackageLabel(StoryPackageSnapshot package)
-        {
-            if (package == null)
-                return "none";
-
-            if (!string.IsNullOrWhiteSpace(package.DisplayName))
-                return Sanitize(package.DisplayName, "unnamed package");
-
-            return Sanitize(package.PackageId, "unnamed package");
-        }
-
-        private static string ResolveBeatLabel(StoryBeatSnapshot beat)
-        {
-            if (beat == null)
-                return "none";
-
-            if (!string.IsNullOrWhiteSpace(beat.DisplayName))
-                return Sanitize(beat.DisplayName, "unnamed beat");
-
-            return Sanitize(beat.BeatId, "unnamed beat");
         }
 
         private static string ResolveNextStep(string lifecycleState)
@@ -121,7 +93,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                 "Ready" => "Press Play Unique Playthrough to load the generated run.",
                 "Loading" => "Unity is fading into the generated entry scene.",
                 "Busy" => "A previous generation request is still running.",
-                "Failed" => "Check the Unity Console, /tmp/story-orchestrator-8012.log, and backend/story-orchestrator/.env.local.",
+                "Failed" => $"Check the Unity Console, {TownVoiceTokenServiceEndpointResolver.ProductionBaseUrl}, the FARMSIM_STORY_ORCHESTRATOR_URL override, or the local launcher log at /tmp/story-orchestrator-8012.log.",
                 _ => "Press Generate Unique Playthrough to request a fresh run.",
             };
         }

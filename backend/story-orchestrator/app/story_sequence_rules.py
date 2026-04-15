@@ -34,7 +34,7 @@ def _plant_rows_parameters(session: StorySequenceSessionRecord) -> dict[str, Any
     if "corn_unlocked" in set(session.state.world_state):
         crop_options.append("corn")
 
-    crop_type = _pick_preferred(crop_options, session.state.recent_crop_types[-1:])
+    crop_type = _pick_preferred(crop_options, session.state.recent_crop_types)
     target_count = min(8, 5 + session.state.beat_cursor)
     row_count = 3 if target_count >= 6 and rng.choice([False, True]) else 2
     assist_level = "high" if session.state.beat_cursor == 0 else "medium"

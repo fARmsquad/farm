@@ -57,11 +57,20 @@ class FakeReddit:
 
 
 class FakeTweet:
-    def __init__(self, tweet_id: str, text: str, author_id: str, created_at: datetime) -> None:
+    def __init__(
+        self,
+        tweet_id: str,
+        text: str,
+        author_id: str,
+        created_at: datetime,
+        *,
+        reply_settings: str = "everyone",
+    ) -> None:
         self.id = tweet_id
         self.text = text
         self.author_id = author_id
         self.created_at = created_at
+        self.reply_settings = reply_settings
 
 
 class FakeTwitterResponse:
@@ -199,6 +208,7 @@ def test_twitter_monitor_uses_since_id_and_stores_newest_id(session_factory, set
     assert inserted == 1
     assert client.calls[0]["since_id"] == "100"
     assert client.calls[0]["max_results"] == TWITTER_QUERY_MAX_RESULTS
+    assert "reply_settings" in client.calls[0]["tweet_fields"]
     assert leads[0].platform == "twitter"
     assert leads[0].platform_id == "101"
     assert leads[0].author == "vrfan"
@@ -309,3 +319,35 @@ def test_twitter_monitor_keeps_stardew_discussion_when_query_matches(session_fac
     assert inserted == 1
     assert leads[0].author == "farmfan"
     assert leads[0].platform_id == "301"
+
+
+def test_twitter_monitor_skips_threads_with_restricted_replies(session_factory, settings, now) -> None:
+    query = '("Stardew Valley" OR Stardew) (wish OR wishes OR update OR mechanic OR feature) -is:retweet lang:en'
+    response = FakeTwitterResponse(
+        data=[
+            FakeTweet(
+                "302",
+                "Stardew really should let Robin take quest items during builds.",
+                "user-3",
+                now,
+                reply_settings="mentionedUsers",
+            )
+        ],
+        includes={"users": [{"id": "user-3", "username": "farmfan"}]},
+        newest_id="302",
+    )
+    client = FakeTwitterClient(response)
+
+    inserted = collect_twitter_leads(
+        session_factory,
+        settings,
+        client=client,
+        now=now,
+        queries=[query],
+    )
+
+    with session_factory() as session:
+        leads = session.query(Lead).all()
+
+    assert inserted == 0
+    assert leads == []

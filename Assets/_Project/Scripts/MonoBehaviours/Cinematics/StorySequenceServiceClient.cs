@@ -40,62 +40,76 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
     internal static class StorySequenceServiceClient
     {
-        private const int RequestTimeoutSeconds = 240;
+        private const int RequestTimeoutSeconds = 360;
         private const string SessionRoute = "/api/v1/story-sequence-sessions";
 
         public static IEnumerator CreateSessionAndAdvance(
             string configuredBaseUrl,
             Action<StorySequenceAdvancePayload> onComplete)
         {
-            string environmentOverride = Environment.GetEnvironmentVariable(
-                TownVoiceTokenServiceEndpointResolver.EnvironmentVariableName);
-            string lastError = null;
-
-            foreach (string baseUrl in TownVoiceTokenServiceEndpointResolver.BuildCandidateBaseUrls(
-                         configuredBaseUrl,
-                         environmentOverride))
+            string baseUrl = ResolveRequestBaseUrl(configuredBaseUrl);
+            if (string.IsNullOrWhiteSpace(baseUrl))
             {
-                GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Creating story sequence session at '{baseUrl}'.");
-                using var createRequest = BuildJsonPostRequest(baseUrl + SessionRoute, "{}");
-                yield return createRequest.SendWebRequest();
+                onComplete?.Invoke(
+                    new StorySequenceAdvancePayload(
+                        string.Empty,
+                        string.Empty,
+                        string.Empty,
+                        null,
+                        "Generated story sequence is unavailable right now."));
+                yield break;
+            }
 
-                if (createRequest.result != UnityWebRequest.Result.Success)
-                {
-                    lastError = ReadErrorMessage(createRequest);
-                    GeneratedStorySliceDiagnostics.LogWarning(nameof(StorySequenceServiceClient), $"Create session request failed at '{baseUrl}': {lastError}");
-                    continue;
-                }
+            GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Creating story sequence session at '{baseUrl}'.");
+            using var createRequest = BuildJsonPostRequest(baseUrl + SessionRoute, "{}");
+            yield return createRequest.SendWebRequest();
 
-                if (!TryParseCreatedSession(createRequest.downloadHandler?.text, out var sessionId))
-                {
-                    lastError = "Story sequence session create response was invalid.";
-                    GeneratedStorySliceDiagnostics.LogWarning(nameof(StorySequenceServiceClient), $"Create session response parse failed at '{baseUrl}'.");
-                    continue;
-                }
+            if (createRequest.result != UnityWebRequest.Result.Success)
+            {
+                string createError = ReadErrorMessage(createRequest);
+                GeneratedStorySliceDiagnostics.LogWarning(nameof(StorySequenceServiceClient), $"Create session request failed at '{baseUrl}': {createError}");
+                onComplete?.Invoke(
+                    new StorySequenceAdvancePayload(
+                        string.Empty,
+                        string.Empty,
+                        string.Empty,
+                        null,
+                        createError));
+                yield break;
+            }
 
-                GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Created story sequence session '{sessionId}' at '{baseUrl}'.");
-                StorySequenceAdvancePayload payload = null;
-                yield return AdvanceSessionAtBaseUrl(baseUrl, sessionId, result => payload = result);
+            if (!TryParseCreatedSession(createRequest.downloadHandler?.text, out var sessionId))
+            {
+                const string parseError = "Story sequence session create response was invalid.";
+                GeneratedStorySliceDiagnostics.LogWarning(nameof(StorySequenceServiceClient), $"Create session response parse failed at '{baseUrl}'.");
+                onComplete?.Invoke(
+                    new StorySequenceAdvancePayload(
+                        string.Empty,
+                        string.Empty,
+                        string.Empty,
+                        null,
+                        parseError));
+                yield break;
+            }
 
-                if (payload != null && payload.Success)
-                {
-                    GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Create+advance succeeded for session '{payload.SessionId}' with entry scene '{payload.EntrySceneName}'.");
-                    onComplete?.Invoke(payload);
-                    yield break;
-                }
+            GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Created story sequence session '{sessionId}' at '{baseUrl}'.");
+            StorySequenceAdvancePayload payload = null;
+            yield return AdvanceSessionAtBaseUrl(baseUrl, sessionId, result => payload = result);
 
-                lastError = payload?.ErrorMessage ?? "Story sequence advance response was empty.";
+            if (payload != null && payload.Success)
+            {
+                GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Create+advance succeeded for session '{payload.SessionId}' with entry scene '{payload.EntrySceneName}'.");
+                onComplete?.Invoke(payload);
+                yield break;
             }
 
             onComplete?.Invoke(
-                new StorySequenceAdvancePayload(
+                payload ?? new StorySequenceAdvancePayload(
                     string.Empty,
-                    string.Empty,
+                    sessionId,
                     string.Empty,
                     null,
-                    string.IsNullOrWhiteSpace(lastError)
-                        ? "Generated story sequence is unavailable right now."
-                        : lastError));
+                    "Story sequence advance response was empty."));
         }
 
         public static IEnumerator AdvanceSession(
@@ -103,37 +117,37 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             string sessionId,
             Action<StorySequenceAdvancePayload> onComplete)
         {
-            string environmentOverride = Environment.GetEnvironmentVariable(
-                TownVoiceTokenServiceEndpointResolver.EnvironmentVariableName);
-            string lastError = null;
-
-            foreach (string baseUrl in TownVoiceTokenServiceEndpointResolver.BuildCandidateBaseUrls(
-                         configuredBaseUrl,
-                         environmentOverride))
+            string baseUrl = ResolveRequestBaseUrl(configuredBaseUrl);
+            if (string.IsNullOrWhiteSpace(baseUrl))
             {
-                GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Advancing story sequence session '{sessionId}' at '{baseUrl}'.");
-                StorySequenceAdvancePayload payload = null;
-                yield return AdvanceSessionAtBaseUrl(baseUrl, sessionId, result => payload = result);
+                onComplete?.Invoke(
+                    new StorySequenceAdvancePayload(
+                        string.Empty,
+                        sessionId,
+                        string.Empty,
+                        null,
+                        "Generated story sequence continuation is unavailable right now."));
+                yield break;
+            }
 
-                if (payload != null && payload.Success)
-                {
-                    GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Advance succeeded for session '{payload.SessionId}' with entry scene '{payload.EntrySceneName}'.");
-                    onComplete?.Invoke(payload);
-                    yield break;
-                }
+            GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Advancing story sequence session '{sessionId}' at '{baseUrl}'.");
+            StorySequenceAdvancePayload payload = null;
+            yield return AdvanceSessionAtBaseUrl(baseUrl, sessionId, result => payload = result);
 
-                lastError = payload?.ErrorMessage ?? "Story sequence advance response was empty.";
+            if (payload != null && payload.Success)
+            {
+                GeneratedStorySliceDiagnostics.Log(nameof(StorySequenceServiceClient), $"Advance succeeded for session '{payload.SessionId}' with entry scene '{payload.EntrySceneName}'.");
+                onComplete?.Invoke(payload);
+                yield break;
             }
 
             onComplete?.Invoke(
-                new StorySequenceAdvancePayload(
+                payload ?? new StorySequenceAdvancePayload(
                     string.Empty,
                     sessionId,
                     string.Empty,
                     null,
-                    string.IsNullOrWhiteSpace(lastError)
-                        ? "Generated story sequence continuation is unavailable right now."
-                        : lastError));
+                    "Story sequence advance response was empty."));
         }
 
         private static IEnumerator AdvanceSessionAtBaseUrl(
@@ -184,6 +198,19 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             request.timeout = RequestTimeoutSeconds;
             request.SetRequestHeader("Content-Type", "application/json");
             return request;
+        }
+
+        private static string ResolveRequestBaseUrl(string configuredBaseUrl)
+        {
+            string environmentOverride = Environment.GetEnvironmentVariable(
+                TownVoiceTokenServiceEndpointResolver.EnvironmentVariableName);
+
+            if (!string.IsNullOrWhiteSpace(environmentOverride))
+                return environmentOverride.Trim().TrimEnd('/');
+
+            return string.IsNullOrWhiteSpace(configuredBaseUrl)
+                ? string.Empty
+                : configuredBaseUrl.Trim().TrimEnd('/');
         }
 
         private static bool TryParseCreatedSession(string responseText, out string sessionId)

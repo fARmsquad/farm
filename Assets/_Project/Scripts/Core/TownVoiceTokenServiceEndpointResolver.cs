@@ -9,9 +9,12 @@ namespace FarmSimVR.Core
     public static class TownVoiceTokenServiceEndpointResolver
     {
         public const string EnvironmentVariableName = "FARMSIM_STORY_ORCHESTRATOR_URL";
+        public const string ProductionBaseUrl = "https://story-orchestrator-production.up.railway.app";
 
         private static readonly string[] DefaultBaseUrls =
         {
+            ProductionBaseUrl,
+            "http://127.0.0.1:8012",
             "http://127.0.0.1:8000",
             "http://127.0.0.1:8011"
         };
@@ -24,10 +27,15 @@ namespace FarmSimVR.Core
             var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             AddCandidate(environmentOverride, candidates, seen);
-            AddCandidate(configuredBaseUrl, candidates, seen);
+
+            if (!IsLoopbackAddress(configuredBaseUrl))
+                AddCandidate(configuredBaseUrl, candidates, seen);
 
             for (int i = 0; i < DefaultBaseUrls.Length; i++)
                 AddCandidate(DefaultBaseUrls[i], candidates, seen);
+
+            if (IsLoopbackAddress(configuredBaseUrl))
+                AddCandidate(configuredBaseUrl, candidates, seen);
 
             return candidates;
         }
@@ -57,6 +65,19 @@ namespace FarmSimVR.Core
                 return null;
 
             return rawValue.Trim().TrimEnd('/');
+        }
+
+        private static bool IsLoopbackAddress(string rawValue)
+        {
+            string normalized = Normalize(rawValue);
+            if (string.IsNullOrWhiteSpace(normalized))
+                return false;
+
+            if (!Uri.TryCreate(normalized, UriKind.Absolute, out Uri uri))
+                return false;
+
+            return string.Equals(uri.Host, "127.0.0.1", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(uri.Host, "localhost", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

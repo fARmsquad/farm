@@ -41,6 +41,9 @@ def _bootstrap():
 @monitor_app.command("reddit")
 def monitor_reddit(once: bool = typer.Option(False, "--once/--loop")) -> None:
     settings, session_factory = _bootstrap()
+    if not settings.reply_monitor_enabled:
+        typer.echo("Reddit monitor disabled: reply monitoring is turned off.")
+        return
     if not settings.reddit_enabled:
         typer.echo("Reddit monitor disabled: missing Reddit app credentials.")
         return
@@ -55,6 +58,9 @@ def monitor_reddit(once: bool = typer.Option(False, "--once/--loop")) -> None:
 @monitor_app.command("twitter")
 def monitor_twitter(once: bool = typer.Option(False, "--once/--loop")) -> None:
     settings, session_factory = _bootstrap()
+    if not settings.reply_monitor_enabled:
+        typer.echo("X monitor disabled: reply monitoring is turned off.")
+        return
     if not settings.x_monitor_enabled:
         typer.echo("X monitor disabled: missing bearer token.")
         return
@@ -69,6 +75,9 @@ def monitor_twitter(once: bool = typer.Option(False, "--once/--loop")) -> None:
 @monitor_app.command("run")
 def monitor_run(once: bool = typer.Option(False, "--once/--loop")) -> None:
     settings, session_factory = _bootstrap()
+    if not settings.reply_monitor_enabled:
+        typer.echo("Monitor loop disabled: reply monitoring is turned off.")
+        return
     if once:
         if settings.reddit_enabled:
             asyncio.run(collect_reddit_leads(session_factory, settings))
@@ -90,9 +99,14 @@ def monitor_run(once: bool = typer.Option(False, "--once/--loop")) -> None:
 @app.command()
 def draft() -> None:
     settings, session_factory = _bootstrap()
-    lead_result = asyncio.run(process_new_leads(session_factory, settings))
-    calendar_result = asyncio.run(draft_calendar_items(session_factory, settings))
-    typer.echo(json.dumps({"leads": lead_result, "calendar": calendar_result}, indent=2))
+    seeded = seed_content_calendar(session_factory, weeks=settings.default_seed_weeks) if settings.standalone_calendar_enabled else 0
+    lead_result = {"processed": 0, "drafted": 0, "skipped": 0}
+    if settings.outbound_replies_enabled:
+        lead_result = asyncio.run(process_new_leads(session_factory, settings))
+    calendar_result = {"drafted": 0}
+    if settings.standalone_calendar_enabled:
+        calendar_result = asyncio.run(draft_calendar_items(session_factory, settings))
+    typer.echo(json.dumps({"seeded": seeded, "leads": lead_result, "calendar": calendar_result}, indent=2))
 
 
 @app.command()
@@ -135,6 +149,8 @@ def calendar_seed(weeks: int = typer.Option(4, min=1)) -> None:
 @calendar_app.command("draft")
 def calendar_draft() -> None:
     settings, session_factory = _bootstrap()
+    if settings.standalone_calendar_enabled:
+        seed_content_calendar(session_factory, weeks=settings.default_seed_weeks)
     typer.echo(json.dumps(asyncio.run(draft_calendar_items(session_factory, settings)), indent=2))
 
 
@@ -154,16 +170,20 @@ def stats() -> None:
 @app.command("run-all")
 def run_all() -> None:
     settings, session_factory = _bootstrap()
-    if settings.reddit_enabled:
+    if settings.reply_monitor_enabled and settings.reddit_enabled:
         asyncio.run(collect_reddit_leads(session_factory, settings))
-    else:
+    elif settings.reply_monitor_enabled:
         typer.echo("Skipping Reddit monitor: missing Reddit app credentials.")
-    if settings.x_monitor_enabled:
+    if settings.reply_monitor_enabled and settings.x_monitor_enabled:
         collect_twitter_leads(session_factory, settings)
-    else:
+    elif settings.reply_monitor_enabled:
         typer.echo("Skipping X monitor: missing bearer token.")
-    asyncio.run(process_new_leads(session_factory, settings))
-    asyncio.run(draft_calendar_items(session_factory, settings))
+    if settings.standalone_calendar_enabled:
+        seed_content_calendar(session_factory, weeks=settings.default_seed_weeks)
+    if settings.outbound_replies_enabled:
+        asyncio.run(process_new_leads(session_factory, settings))
+    if settings.standalone_calendar_enabled:
+        asyncio.run(draft_calendar_items(session_factory, settings))
     result = asyncio.run(
         publish_ready_drafts(
             session_factory,

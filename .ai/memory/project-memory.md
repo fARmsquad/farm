@@ -117,9 +117,16 @@
 - DON'T assume backend consumers will receive the raw `ResolvedParameters` dictionary. Unity-facing story packages may only carry `ResolvedParameterEntries`, so cross-runtime readers need to support that contract shape too.
 - DON'T set a Unity-side timeout for a local proxy call lower than the backend's own upstream provider timeout when Town voice depends on that proxy.
 - DON'T present approval in an outbound-content UI as effectively published unless the publish step is actually triggered and visibly tracked.
+- DON'T hand off an X write flow based on stale OAuth assumptions. Verify the exact live auth mode and token family that the production publisher will use.
 - DON'T let a standing generated slice silently fall back into stale packaged content or publish visibly degraded storyboard frames after a live bootstrap failure.
+- DON'T treat `turn.result.is_valid == true` as sufficient for generated-story completion. The storyboard planner must still receive prior context and produce conflict-driven, non-repeating shots.
+- DON'T let request-normalization code rebuild `GeneratedStoryboardContext` without copying the extra narrative fields used by prompt construction.
 - DON'T hand off a generated-slice fail-closed change without one healthy end-to-end live launch against a running local orchestrator.
 - DON'T let an async title-screen launch set transition state unless the underlying request actually started, and don't leave long-running launches without an obvious loading state.
+- DON'T keep a cached local orchestrator base URL after a fresh readiness check fails; clear stale readiness immediately so later callers cannot reuse a dead localhost endpoint.
+- DON'T hand off a generated-slice backend fix with only `/health` evidence; prove at least one live `next-turn` returns `is_valid=true`.
+- DON'T make generated cutscene validity depend only on remote image providers if the local quality gate rejects placeholder fallback; keep a deterministic local image path available.
+- DON'T let story-sequence execution rediscover endpoints after readiness already resolved the active backend, and don't attempt local bootstrap for non-local hosts.
 
 ---
 
@@ -177,6 +184,27 @@ call ElevenLabs. A Unity timeout shorter than the backend provider timeout will
 create intermittent text-only fallback even when the happy path works. Keep the
 runtime proxy budget at or above the backend's upstream budget, or retry
 transient transport/5xx failures explicitly.
+
+### Remote Story Orchestrator Runtime Contract (2026-04-15)
+When the generated-story backend is deployed remotely, Unity should prefer the
+stable deployed URL before legacy localhost ports, request execution must stay
+pinned to the URL that readiness already proved healthy, and the launcher must
+never try to start a "local" backend for a non-local host. On the backend,
+deterministic `local-reference-remix` images are part of the valid deployed
+fallback chain and must remain acceptable to the quality gate, while remote
+provider timeouts should stay bounded enough for the Unity request budget.
+
+### Bounded Generated Sessions (2026-04-15)
+Keep the primary generated-playthrough contract bounded before attempting
+infinite continuation. The current production proof path should persist and
+resume a three-turn `cutscene -> minigame` session, complete cleanly after the
+third outcome, and avoid reviving completed runs on title-screen restart.
+
+### Gemini Image Defaults (2026-04-15)
+Prefer the stable Gemini image model first in production (`gemini-2.5-flash-image`)
+and do not rely on preview-model fallback by default. When rejecting generated
+images for lower-third caption panels, validate the heuristic against real
+provider outputs so dark foreground composition is not misclassified as trash.
 
 ### Global Codex Unity Skills (2026-04-11)
 When this repo wires external Codex Unity skills into `.ai` workflows, keep
@@ -353,6 +381,33 @@ failure messages must point directly at the repo-local env file and venv setup
 (`backend/story-orchestrator/.env.local`, `.venv`, `pip install -r requirements.txt`)
 instead of only saying the service never became healthy. Do not nudge the
 developer toward hardcoded Unity-side secrets.
+
+### Generated Story Reliability Must Survive Focus Loss (2026-04-15)
+If a player-facing dev flow depends on long-running local generation or network
+requests, do not leave desktop Unity at `runInBackground: 0`. Keep the project
+and runtime explicitly background-safe so `Generate Unique Playthrough` can
+finish even when the developer clicks away to another app.
+
+### Runtime Create-Session Must Be Truly Async (2026-04-15)
+If the runtime API advertises `POST /api/runtime/v1/sessions` as "create a
+session and return a job to poll," do not generate the first turn inline in
+that request. The create route must return before generation completes, and
+startup recovery replay must not consume the same worker lane that fresh live
+requests depend on.
+
+### Runtime Generated Playthrough Is Farm-Only For Now (2026-04-15)
+The standalone `/api/runtime/v1/*` flow is temporarily constrained to the real
+`FarmMain` planting gameplay. Keep runtime generator selection pinned to
+`plant_rows_v1` until the non-farm adapters are intentionally brought back.
+Current variety should come from bounded planting configuration changes such as
+crop rotation, row count, target count, time limit, and assist level, not from
+switching over to `FindToolsGame` or `ChickenChaseGame`.
+
+### Generated Readiness Must Be Scoped To The Current Runtime Operation (2026-04-15)
+Generated-playthrough readiness is not "any prepared turn exists." Only treat a
+turn as playable when the current runtime operation has fully finished. Late
+resume callbacks, persisted stale turns, or older async work must never
+re-enable `Play Unique Playthrough` during a fresh generation run.
 
 ---
 

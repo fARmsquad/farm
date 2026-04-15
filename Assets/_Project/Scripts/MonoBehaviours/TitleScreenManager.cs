@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using FarmSimVR.Core.Tutorial;
 using FarmSimVR.MonoBehaviours.Cinematics;
 using UnityEngine;
@@ -24,7 +25,7 @@ namespace FarmSimVR.MonoBehaviours
         private const string ReadyUniquePlaythroughMessage = "Unique playthrough ready. Press Play Unique Playthrough.";
         private const string GenerateUniquePlaythroughFirstMessage = "Generate a unique playthrough first.";
         private const string UniquePlaythroughAlreadyStartingMessage = "Unique playthrough generation is already starting. Please wait a moment.";
-        private const string DefaultGeneratedStoryDiagnosticsNote = "Generate a unique playthrough to inspect the next run.";
+        private const string DefaultGeneratedStoryDiagnosticsNote = "Open Generative Playthroughs to create, track, or replay a service-backed run.";
         private const string IdleGeneratedStoryState = "Idle";
         private const string GeneratingGeneratedStoryState = "Generating";
         private const string ReadyGeneratedStoryState = "Ready";
@@ -50,7 +51,8 @@ namespace FarmSimVR.MonoBehaviours
         private string generatedStoryPreparedAtUtc = string.Empty;
         private void Start()
         {
-            StorySequenceRuntimeController.GetOrCreate().EnsureLocalOrchestratorRunningInBackground();
+            Application.runInBackground = true;
+            GenerativePlaythroughController.GetOrCreate().EnsureLocalOrchestratorRunningInBackground();
             if (musicSource != null && !musicSource.isPlaying)
                 musicSource.Play();
             CreateTutorialSliceLauncher();
@@ -67,13 +69,15 @@ namespace FarmSimVR.MonoBehaviours
         {
             if (isTransitioning)
                 return;
-            StorySequenceRuntimeController.Instance?.ClearSequenceState();
+            var resolvedSceneName = ResolveTargetSceneName(sceneName);
+            if (!string.Equals(resolvedSceneName, SceneWorkCatalog.GenerativePlaythroughMenuSceneName, StringComparison.Ordinal))
+                GenerativePlaythroughController.Instance?.ClearSequenceState();
             HideGeneratedStoryLoading();
             SetGeneratedPlaythroughButtons(true, false);
             SetGeneratedStoryStatus(DefaultGeneratedStoryDiagnosticsNote);
             SetGeneratedStoryLifecycleState(IdleGeneratedStoryState, clearError: true, resetPreparedAt: true);
             launchGeneratedStorySlice = false;
-            targetSceneName = ResolveTargetSceneName(sceneName);
+            targetSceneName = resolvedSceneName;
             isTransitioning = true;
             StartCoroutine(TransitionToGame());
         }
@@ -81,7 +85,7 @@ namespace FarmSimVR.MonoBehaviours
         {
             if (isTransitioning) { GeneratedStorySliceDiagnostics.LogWarning(nameof(TitleScreenManager), "Generate requested while a transition is already in progress."); return; }
             GeneratedStorySliceDiagnostics.Log(nameof(TitleScreenManager), "Generate Unique Playthrough clicked.");
-            StorySequenceRuntimeController.GetOrCreate().ClearSequenceState();
+            GenerativePlaythroughController.GetOrCreate().ClearSequenceState();
             ShowGeneratedStoryLoading(GeneratingUniquePlaythroughMessage);
             SetGeneratedStoryStatus(GeneratingUniquePlaythroughMessage);
             SetGeneratedStoryLifecycleState(GeneratingGeneratedStoryState, clearError: true, resetPreparedAt: true);
@@ -95,7 +99,7 @@ namespace FarmSimVR.MonoBehaviours
         {
             if (isTransitioning) { GeneratedStorySliceDiagnostics.LogWarning(nameof(TitleScreenManager), "Play requested while a transition is already in progress."); return; }
             GeneratedStorySliceDiagnostics.Log(nameof(TitleScreenManager), "Play Unique Playthrough clicked.");
-            var runtimeController = StorySequenceRuntimeController.Instance;
+            var runtimeController = GenerativePlaythroughController.Instance;
             if (runtimeController == null || !runtimeController.HasPreparedSequence)
             {
                 GeneratedStorySliceDiagnostics.LogWarning(nameof(TitleScreenManager), "Play requested without a prepared generated sequence.");
@@ -121,7 +125,7 @@ namespace FarmSimVR.MonoBehaviours
             {
                 GeneratedStorySliceDiagnostics.Log(nameof(TitleScreenManager), "Transition entering generated playthrough preparation.");
                 launchGeneratedStorySlice = false;
-                var runtimeController = StorySequenceRuntimeController.GetOrCreate();
+                var runtimeController = GenerativePlaythroughController.GetOrCreate();
                 if (!runtimeController.BeginSequencePreparation(HandleGeneratedStorySlicePrepared, HandleGeneratedStorySliceUnavailable))
                 {
                     GeneratedStorySliceDiagnostics.LogWarning(nameof(TitleScreenManager), "Runtime controller refused to start generated sequence preparation because a request is already in flight.");
@@ -180,7 +184,7 @@ namespace FarmSimVR.MonoBehaviours
         }
         private void SyncPreparedGeneratedPlaythroughStateFromRuntimeController()
         {
-            var runtimeController = StorySequenceRuntimeController.Instance;
+            var runtimeController = GenerativePlaythroughController.Instance;
             if (runtimeController == null || !runtimeController.HasPreparedSequence)
                 return;
             if (generatedStoryLifecycleState == LoadingGeneratedStoryState)
@@ -217,7 +221,7 @@ namespace FarmSimVR.MonoBehaviours
             HideGeneratedStoryLoading();
             SetGeneratedPlaythroughButtons(true, false);
             RestoreTitlePresentation();
-            StorySequenceRuntimeController.Instance?.ClearSequenceState();
+            GenerativePlaythroughController.Instance?.ClearSequenceState();
             SetGeneratedStoryStatus(BuildGeneratedStorySliceStatus(errorMessage));
             SetGeneratedStoryLifecycleState(FailedGeneratedStoryState, errorMessage);
         }
@@ -265,7 +269,7 @@ namespace FarmSimVR.MonoBehaviours
                 generatedStoryLifecycleNote,
                 generatedStoryLifecycleError,
                 generatedStoryPreparedAtUtc,
-                StorySequenceRuntimeController.Instance);
+                GenerativePlaythroughController.Instance);
         }
         private void ShowGeneratedStoryLoading(string message)
         {
@@ -290,7 +294,7 @@ namespace FarmSimVR.MonoBehaviours
         }
         private static string BuildGeneratedStorySliceStatus(string errorMessage)
         {
-            const string prefix = "Unique playthrough unavailable. Unity could not reach or start the local story-orchestrator on 127.0.0.1:8012.";
+            const string prefix = "Unique playthrough unavailable. Unity could not reach the story-orchestrator service.";
             if (string.IsNullOrWhiteSpace(errorMessage))
                 return prefix;
             var singleLine = errorMessage.Replace('\r', ' ').Replace('\n', ' ').Trim();

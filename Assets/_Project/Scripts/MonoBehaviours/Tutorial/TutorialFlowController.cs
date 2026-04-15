@@ -91,6 +91,10 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             }
 
             var currentSceneName = SceneManager.GetActiveScene().name;
+            var generativeRuntime = GenerativePlaythroughController.Instance;
+            if (generativeRuntime != null && generativeRuntime.TryContinueGeneratedSequence(this, currentSceneName))
+                return;
+
             var nextScene = Flow.CompleteCurrentStep();
             if (StoryPackageRuntimeCatalog.TryGetNextScene(currentSceneName, out var packageNextScene))
                 nextScene = packageNextScene;
@@ -137,6 +141,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         public void ResetTutorial()
         {
+            GenerativePlaythroughController.Instance?.ClearSequenceState();
             StorySequenceRuntimeController.Instance?.ClearSequenceState();
             Flow.Reset();
             ToolRecovery = new ToolRecoveryService();
@@ -199,6 +204,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             if (scene.name == TutorialSceneCatalog.TitleScreenSceneName)
             {
+                GenerativePlaythroughController.Instance?.EnsureLocalOrchestratorRunningInBackground();
                 StorySequenceRuntimeController.Instance?.ClearSequenceState();
                 Flow.Reset();
                 return;

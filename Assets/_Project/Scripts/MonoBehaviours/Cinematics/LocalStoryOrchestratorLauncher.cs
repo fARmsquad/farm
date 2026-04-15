@@ -64,6 +64,22 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             string launchBaseUrl = candidates.Count > 0
                 ? candidates[0]
                 : string.Empty;
+            if (!IsLocalLaunchableBaseUrl(launchBaseUrl))
+            {
+                string remoteUnavailableMessage = string.IsNullOrWhiteSpace(launchBaseUrl)
+                    ? "Remote story-orchestrator is unavailable."
+                    : $"Remote story-orchestrator is unavailable at '{launchBaseUrl}'.";
+                onComplete?.Invoke(new LocalStoryOrchestratorReadyResult(
+                    launchBaseUrl,
+                    false,
+                    false,
+                    remoteUnavailableMessage));
+                GeneratedStorySliceDiagnostics.LogWarning(
+                    nameof(LocalStoryOrchestratorLauncher),
+                    remoteUnavailableMessage);
+                yield break;
+            }
+
             if (!TryLaunchLocalBackend(launchBaseUrl, out var logPath, out var launchError))
             {
                 GeneratedStorySliceDiagnostics.LogWarning(
@@ -135,6 +151,16 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                 request.result == UnityWebRequest.Result.Success &&
                 request.responseCode >= 200 &&
                 request.responseCode < 300);
+        }
+
+        private static bool IsLocalLaunchableBaseUrl(string baseUrl)
+        {
+            if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out var uri))
+                return false;
+
+            string host = uri.Host ?? string.Empty;
+            return string.Equals(host, "127.0.0.1", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(host, "localhost", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool TryLaunchLocalBackend(

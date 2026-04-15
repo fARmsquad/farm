@@ -2,6 +2,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 from fastapi.testclient import TestClient
 from PIL import Image, ImageDraw
@@ -13,11 +14,18 @@ from app.generated_storyboards import (
     GeneratedSpeechAsset,
     GeneratedStoryboardContext,
     GeneratedStoryboardCutsceneRequest,
+    GeneratedStoryboardPlan,
+    GeneratedStoryboardPlanShot,
     GeneratedStoryboardService,
     TemplateStoryboardPlanner,
 )
 from app.main import create_app
-from app.storyboard_media import PlaceholderSpeechGenerator
+from app.storyboard_media import LocalReferenceImageGenerator, PlaceholderSpeechGenerator
+from app.storyboard_provider_clients import (
+    OpenAIImageGenerator,
+    OpenAISpeechGenerator,
+    REQUEST_TIMEOUT_SECONDS,
+)
 
 
 class GeneratedStoryboardServiceTests(unittest.TestCase):
@@ -49,6 +57,8 @@ class GeneratedStoryboardServiceTests(unittest.TestCase):
         self.assertEqual(beat["SceneName"], "PostChickenCutscene")
         self.assertEqual(storyboard["StylePresetId"], "farm_storybook_v1")
         self.assertEqual(first_shot["SubtitleText"], "Nice work. The carrot beds are finally ready for you.")
+        self.assertGreaterEqual(len(storyboard["Shots"]), 3)
+        self.assertLessEqual(len(storyboard["Shots"]), 6)
         self.assertEqual(len(result.generated_assets), 6)
         self.assertEqual(first_asset.asset_type, "image")
         self.assertEqual(first_asset.provider_name, "fake-image")
@@ -62,6 +72,25 @@ class GeneratedStoryboardServiceTests(unittest.TestCase):
         written_package = json.loads(self.package_output_path.read_text(encoding="utf-8"))
         self.assertEqual(written_package["Beats"][0]["Storyboard"]["Shots"][2]["ShotId"], "shot_03")
 
+    def test_create_package_generates_speech_from_exact_subtitle_text_for_every_shot(self) -> None:
+        service = GeneratedStoryboardService(
+            output_root=self.output_root,
+            package_output_path=self.package_output_path,
+            planner=MismatchedNarrationPlanner(),
+            image_generator=FakeImageGenerator(),
+            speech_generator=FakeSpeechGenerator(),
+        )
+
+        result = service.create_package(build_request())
+
+        storyboard_shots = result.unity_package["Beats"][0]["Storyboard"]["Shots"]
+        audio_assets = [asset for asset in result.generated_assets if asset.asset_type == "audio"]
+
+        self.assertEqual(len(storyboard_shots), 3)
+        for index, shot in enumerate(storyboard_shots):
+            self.assertEqual(shot["NarrationText"], shot["SubtitleText"])
+            self.assertEqual(audio_assets[index].metadata["text"], shot["SubtitleText"])
+
     def test_create_package_writes_prompt_with_explicit_no_text_constraints(self) -> None:
         result = self.service.create_package(build_request())
 
@@ -73,6 +102,31 @@ class GeneratedStoryboardServiceTests(unittest.TestCase):
         self.assertIn("speech bubbles", prompt)
         self.assertIn("do not copy camera angle", prompt)
         self.assertIn("fresh composition", prompt)
+        self.assertIn("full-bleed image", prompt)
+        self.assertIn("bottom third of the image", prompt)
+
+    def test_create_package_preserves_story_context_in_resolved_image_prompt(self) -> None:
+        request = build_request(
+            context=GeneratedStoryboardContext(
+                character_name="Miss Clara",
+                crop_name="carrots",
+                minigame_goal="Recover the missing watering kit before planting begins",
+                prior_story_summary="Old Garrett just calmed the chicken pen, but a crash came from the shed.",
+                world_state=["tomatoes_unlocked", "watering_tools_unlocked"],
+                present_character_names=["Miss Clara", "Old Garrett"],
+                selected_generator_id="find_tools_cluster_v1",
+                selected_generator_display_name="Find Lost Tools",
+                mission_configuration_summary="Recover 2 watering tools around the field path with medium hints.",
+            )
+        )
+
+        result = self.service.create_package(request)
+
+        prompt = result.generated_assets[0].metadata["prompt"]
+        self.assertIn("Previous context: Old Garrett just calmed the chicken pen", prompt)
+        self.assertIn("World state: tomatoes_unlocked, watering_tools_unlocked", prompt)
+        self.assertIn("Present characters: Miss Clara, Old Garrett", prompt)
+        self.assertIn("Mission configuration: Recover 2 watering tools around the field path with medium hints.", prompt)
 
     def test_create_package_can_derive_minigame_goal_from_linked_materialized_beat(self) -> None:
         minigame_service = GeneratedMinigameBeatService(package_output_path=self.package_output_path)
@@ -253,6 +307,25 @@ class StoryboardImageQualityGateTests(unittest.TestCase):
         self.assertFalse(result.accepted)
         self.assertEqual(result.reason, "provider_fallback")
 
+    def test_quality_gate_accepts_local_reference_remix_when_image_is_clean(self) -> None:
+        from app.storyboard_quality import StoryboardImageQualityGate
+
+        output_path = self.output_root / "reference-remix.png"
+        _write_quality_test_image(output_path, include_caption_panel=False)
+        asset = GeneratedImageAsset(
+            output_path=output_path,
+            mime_type="image/png",
+            provider_name="local-reference-remix",
+            provider_model="local-reference-remix-v1",
+            fallback_used=True,
+            source_metadata={},
+        )
+
+        result = StoryboardImageQualityGate().evaluate(asset)
+
+        self.assertTrue(result.accepted)
+        self.assertEqual(result.reason, "")
+
     def test_quality_gated_generator_retries_rejected_caption_panel_asset(self) -> None:
         from app.storyboard_quality import QualityGatedImageGenerator
 
@@ -272,6 +345,38 @@ class StoryboardImageQualityGateTests(unittest.TestCase):
         self.assertEqual(sequence.path_exists_at_call_start, [False, False])
         self.assertEqual(asset.provider_name, "gemini-image")
         self.assertTrue(output_path.exists())
+
+    def test_quality_gate_accepts_dark_foreground_scene_without_caption_panel(self) -> None:
+        from app.storyboard_quality import StoryboardImageQualityGate
+
+        output_path = self.output_root / "dark-foreground-scene.png"
+        _write_dark_foreground_quality_test_image(output_path)
+        asset = GeneratedImageAsset(
+            output_path=output_path,
+            mime_type="image/png",
+            provider_name="gemini-image",
+            provider_model="gemini-2.5-flash-image",
+            fallback_used=False,
+            source_metadata={},
+        )
+
+        result = StoryboardImageQualityGate().evaluate(asset)
+
+        self.assertTrue(result.accepted, result.reason)
+        self.assertEqual(result.reason, "")
+
+
+class SettingsDefaultsTests(unittest.TestCase):
+    def test_default_settings_prefer_gemini_2_5_without_preview_fallback(self) -> None:
+        settings = Settings(_env_file=None)
+
+        self.assertEqual(settings.gemini_image_model, "gemini-2.5-flash-image")
+        self.assertEqual(settings.gemini_image_fallback_model, "")
+
+
+class StoryboardProviderClientTimeoutTests(unittest.TestCase):
+    def test_provider_request_timeout_stays_bounded_for_remote_story_sequence_turns(self) -> None:
+        self.assertLessEqual(REQUEST_TIMEOUT_SECONDS, 30)
 
 
 class PlaceholderSpeechGeneratorTests(unittest.TestCase):
@@ -301,6 +406,96 @@ class PlaceholderSpeechGeneratorTests(unittest.TestCase):
         self.assertTrue(result.output_path.exists())
         self.assertFalse(stale_mp3.exists())
         self.assertFalse(stale_meta.exists())
+
+
+class OpenAIProviderClientTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._temp_dir = tempfile.TemporaryDirectory()
+        self.output_root = Path(self._temp_dir.name)
+
+    def tearDown(self) -> None:
+        self._temp_dir.cleanup()
+
+    @patch("app.storyboard_provider_clients.httpx.post")
+    def test_openai_image_generator_writes_png_from_base64_payload(self, post_mock: Mock) -> None:
+        output_path = self.output_root / "shot_01.png"
+        response = Mock()
+        response.raise_for_status.return_value = None
+        response.json.return_value = {"data": [{"b64_json": _create_base64_png()}]}
+        post_mock.return_value = response
+
+        asset = OpenAIImageGenerator(api_key="test-key", model="gpt-image-1").generate_image(
+            prompt="Paint Old Garrett in the field at dawn.",
+            reference_image_paths=[],
+            output_path=output_path,
+            aspect_ratio="16:9",
+            image_size="1536x1024",
+        )
+
+        self.assertEqual(asset.provider_name, "openai-image")
+        self.assertEqual(asset.provider_model, "gpt-image-1")
+        self.assertTrue(output_path.exists())
+        self.assertGreater(output_path.stat().st_size, 0)
+
+    @patch("app.storyboard_provider_clients.httpx.post")
+    def test_openai_speech_generator_writes_audio_and_alignment(self, post_mock: Mock) -> None:
+        output_path = self.output_root / "shot_01.mp3"
+        response = Mock()
+        response.raise_for_status.return_value = None
+        response.content = b"fake-mp3-data"
+        post_mock.return_value = response
+
+        asset = OpenAISpeechGenerator(
+            api_key="test-key",
+            model_id="gpt-4o-mini-tts",
+            voice="alloy",
+        ).generate_speech(
+            text="The rows are ready, and the field is yours now.",
+            voice_id="ignored-elevenlabs-voice",
+            output_path=output_path,
+            previous_text="",
+            next_text="",
+        )
+
+        self.assertEqual(asset.provider_name, "openai-speech")
+        self.assertEqual(asset.provider_model, "gpt-4o-mini-tts")
+        self.assertTrue(output_path.exists())
+        self.assertTrue(asset.alignment_path.exists())
+        alignment = json.loads(asset.alignment_path.read_text(encoding="utf-8"))
+        self.assertEqual(
+            "".join(alignment["characters"]),
+            "The rows are ready, and the field is yours now.",
+        )
+
+
+class LocalReferenceImageGeneratorTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._temp_dir = tempfile.TemporaryDirectory()
+        self.output_root = Path(self._temp_dir.name)
+
+    def tearDown(self) -> None:
+        self._temp_dir.cleanup()
+
+    def test_local_reference_image_generator_remixes_reference_without_caption_panel(self) -> None:
+        from app.storyboard_quality import StoryboardImageQualityGate
+
+        reference_path = self.output_root / "reference.png"
+        _write_quality_test_image(reference_path, include_caption_panel=False)
+        output_path = self.output_root / "shot_01.png"
+
+        asset = LocalReferenceImageGenerator().generate_image(
+            prompt="Old Garrett points toward the carrot rows at sunrise.",
+            reference_image_paths=[str(reference_path)],
+            output_path=output_path,
+            aspect_ratio="16:9",
+            image_size="2K",
+        )
+
+        result = StoryboardImageQualityGate().evaluate(asset)
+
+        self.assertTrue(result.accepted, result.reason)
+        self.assertEqual(asset.provider_name, "local-reference-remix")
+        self.assertTrue(output_path.exists())
 
 
 def build_request(
@@ -354,6 +549,40 @@ class FakeImageGenerator:
         )
 
 
+class MismatchedNarrationPlanner:
+    def plan(self, request: GeneratedStoryboardCutsceneRequest):
+        return GeneratedStoryboardPlan(
+            beat_id=request.beat_id,
+            display_name=request.display_name,
+            scene_name=request.scene_name,
+            next_scene_name=request.next_scene_name or "",
+            style_preset_id=request.style_preset_id,
+            shots=[
+                GeneratedStoryboardPlanShot(
+                    shot_id="shot_01",
+                    subtitle_text="Garrett checks the first row.",
+                    narration_text="Garrett studies the weather vane instead.",
+                    image_prompt="Old Garrett checks the first carrot row at sunrise, cautious posture, warm storybook light.",
+                    duration_seconds=3.0,
+                ),
+                GeneratedStoryboardPlanShot(
+                    shot_id="shot_02",
+                    subtitle_text="The seed cart catches on broken wood.",
+                    narration_text="The cart wheel slips against broken wood.",
+                    image_prompt="A seed cart jams against a broken wooden handle beside the field path.",
+                    duration_seconds=3.1,
+                ),
+                GeneratedStoryboardPlanShot(
+                    shot_id="shot_03",
+                    subtitle_text="Clear it and take the field.",
+                    narration_text="Step forward and start the planting.",
+                    image_prompt="The field opens ahead as the player is waved toward the prepared plots.",
+                    duration_seconds=3.2,
+                ),
+            ],
+        )
+
+
 def _write_quality_test_image(output_path: Path, *, include_caption_panel: bool) -> None:
     width, height = 1280, 720
     image = Image.new("RGB", (width, height), "#87b36b")
@@ -368,6 +597,38 @@ def _write_quality_test_image(output_path: Path, *, include_caption_panel: bool)
         )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     image.save(output_path, format="PNG")
+
+
+def _write_dark_foreground_quality_test_image(output_path: Path) -> None:
+    width, height = 1280, 720
+    image = Image.new("RGB", (width, height), "#87b36b")
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0, 0, width, int(height * 0.58)), fill="#d8b46b")
+    draw.polygon(
+        [
+            (0, height),
+            (0, int(height * 0.73)),
+            (int(width * 0.16), int(height * 0.69)),
+            (int(width * 0.32), int(height * 0.79)),
+            (int(width * 0.52), int(height * 0.67)),
+            (int(width * 0.76), int(height * 0.82)),
+            (width, int(height * 0.71)),
+            (width, height),
+        ],
+        fill=(8, 12, 9),
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    image.save(output_path, format="PNG")
+
+
+def _create_base64_png() -> str:
+    import base64
+    from io import BytesIO
+
+    image = Image.new("RGB", (16, 16), "#7aa35a")
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    return base64.b64encode(buffer.getvalue()).decode("ascii")
 
 
 class SequenceImageGenerator:

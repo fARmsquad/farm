@@ -36,6 +36,127 @@
 
 ## Log
 
+### Generated Play Button Re-enabled From Stale Runtime State During A Fresh Generation Request (2026-04-15)
+- Status: Addressed
+- Related story/task: generated runtime tracker and title-screen generated playthrough flow
+- Original completion claim: The generated runtime flow was handed off with a working tracker, persisted resume, and title-screen generate/play gating.
+- Reported issue: The developer reported that the game-side generated slice became playable before the current generation run had actually finished.
+- Failing evidence: Developer report after tracker validation: the title-screen/game UI automatically enabled the playable generated slice before the in-flight generation completed.
+- Approach that produced the miss: I combined startup resume, persisted prepared-turn recovery, and fresh generation launch in the same runtime controller without proving that old async resume work could no longer repopulate readiness after a new generate request had already started.
+- Why it was mistaken for done: Verification focused on tracker visibility, backend job progress, and the happy-path enablement of Play once a turn is prepared, but it did not cover the race where stale prepared state appears while a fresh request is still running.
+- What should have been verified or stated differently: The handoff should have included an explicit regression for "generate in progress plus stale prepared turn present" and it should have stated whether startup resume work is cancelled or ignored when the player requests a fresh run.
+- Prevention rules for future work:
+  - Any resumable generated-playthrough flow must scope readiness to the current request, not just to any prepared turn visible in runtime state.
+  - Title-screen play enablement must stay locked while a fresh generation request is active, even if older prepared state still exists locally.
+- Follow-up actions:
+  - Added `TitleScreenManager_Update_DoesNotEnablePlayWhileFreshGenerationIsStillRunning`.
+  - Versioned async runtime operations so late resume/request callbacks are ignored after a clear or fresh generate starts.
+  - Tightened `HasPreparedSequence` so a turn is only considered ready when no runtime operation is still active.
+- Actual root cause after fix: Startup resume and fresh generation shared the same controller state without operation scoping. A late resume/request path could repopulate prepared-turn state while the current generation was still active, and the title screen trusted any prepared runtime turn as immediately playable.
+- Guardrail added: The runtime controller now versions async operations, ignores stale callbacks after a fresh operation starts or the sequence is cleared, exposes pending-operation state, and only reports `HasPreparedSequence` when no runtime work is still in flight. Edit-mode setup now also clears persisted generative-runtime prefs so title-screen readiness tests do not inherit stale session state across cases.
+- Distilled rule added to project-memory.md: `Generated-playthrough readiness must be scoped to the current runtime operation; late resume callbacks and stale prepared turns must never re-enable Play during a fresh generation run (2026-04-15)`
+
+### Runtime Story Generation Still Fell Into Fallback Or Rejected Valid Gemini Frames (2026-04-15)
+- Status: Addressed
+- Related story/task: standalone generative runtime service and generated playthrough media pipeline
+- Original completion claim: The runtime service was handed off as producing service-backed generated turns with Gemini/ElevenLabs media generation and Railway deployment working.
+- Reported issue: The developer reported that generated runs were still showing fallback-looking frames, and later asked to constrain the system because an endless sequence would keep running into provider limits.
+- Failing evidence: Railway deploy logs showed repeated Gemini `429`/timeout failures followed by `image generator fallback engaged provider=local-reference-remix`, while a later live probe showed `gemini-2.5-flash-image` succeeding but the runtime rejecting the result with `storyboard image rejected attempt=1/2 reason=caption_panel_detected provider=gemini-image`.
+- Approach that produced the miss: I optimized for keeping a turn alive through provider failures, left `gemini-3.1-flash-image-preview` first in the production chain even after it proved brittle, and treated the current caption-panel detector as sufficiently precise without validating it against real Gemini outputs or a finite sequence cap.
+- Why it was mistaken for done: The handoff focused on transport and provider reachability, but it did not prove that production runs were using true generated images end to end instead of remix fallback, nor that the runtime bounded provider exposure to a realistic session length.
+- What should have been verified or stated differently: The handoff should have distinguished between "a session can finish" and "the session is using accepted first-party generated media under a bounded runtime contract." It also should have included a live check that real Gemini frames survive the quality gate.
+- Prevention rules for future work:
+  - Production generated-playthrough handoff must prove which provider actually produced the final accepted image assets.
+  - Quality-gate heuristics for generated art must be checked against real provider outputs, not only synthetic placeholder fixtures.
+  - Infinite continuation should stay out of the primary contract until the bounded finite-sequence version is stable under real provider limits.
+- Follow-up actions:
+  - Reordered the production Gemini image chain around the working model and removed the preview-model fallback from the default runtime path.
+  - Tightened image prompts and caption-panel detection so clean dark-foreground Gemini frames are accepted while explicit panel-like lower thirds still fail.
+  - Capped the runtime session to a persisted 3-turn sequence and ended the session cleanly after the third minigame outcome, with Unity clearing completed runs instead of reviving them on restart.
+- Actual root cause after fix: The deployed runtime still prioritized a brittle preview Gemini model, accepted remix fallback as a way to keep turns alive, and used a caption-panel heuristic that could reject legitimate Gemini shots with dark foreground composition. On top of that, the endless continuation contract kept provider exposure open-ended even though the stable user-facing slice only needed a bounded proof run.
+- Guardrail added: The default image path now starts with `gemini-2.5-flash-image`, the prompt explicitly requires a full-bleed frame with real scene content in the bottom third, the caption-panel detector now requires both a sharp horizontal drop and low lower-third variance before rejecting an image, and the runtime contract now defaults to a persisted 3-turn session that marks itself completed after the third minigame outcome.
+- Distilled rule added to project-memory.md: `Use the stable Gemini image model first, validate caption-panel heuristics against real provider outputs, and keep the primary generated-playthrough contract bounded before attempting infinite continuation (2026-04-15)`
+
+### Generated Story Sequence Re-Probed Dead Fallback Ports After A Healthy Backend Had Already Been Resolved (2026-04-15)
+- Status: Addressed
+- Related story/task: generated playthrough local backend bootstrap and runtime sequence session bridge
+- Original completion claim: The generated-story runtime path was handed off as using the Unity-owned local backend bootstrap and the healthy local story-orchestrator on `127.0.0.1:8012`.
+- Reported issue: The developer reported renewed generated-story failures and asked for the fix plus the backend to be brought up, with Unity logs showing a timed-out `next-turn` on `127.0.0.1:8012` followed by failed create-session probes to `127.0.0.1:8000` and `127.0.0.1:8011`.
+- Failing evidence: Runtime logs showed `StorySequenceServiceClient` timing out on `http://127.0.0.1:8012` for `next-turn`, then emitting `Cannot connect to destination host` warnings while trying session creation on the dead fallback ports. A live shell check still showed the backend healthy on `http://127.0.0.1:8012/health`.
+- Approach that produced the miss: The runtime controller resolved a healthy orchestrator base URL first, but `StorySequenceServiceClient` still rebuilt the full localhost candidate list for create and advance requests instead of staying pinned to the resolved backend.
+- Why it was mistaken for done: Verification proved backend bootstrap, healthy endpoint resolution, and live generated turns, but it did not treat a slow request on the resolved backend as a separate case from endpoint discovery. That left the request layer free to fan back out across dead fallback ports and muddy the real failure.
+- What should have been verified or stated differently: The handoff should have verified that once Unity resolves a healthy orchestrator base URL, story-sequence requests remain pinned to that URL and do not retry unrelated localhost ports.
+- Prevention rules for future work:
+  - Story-sequence request execution must stay pinned to the backend URL that readiness just proved healthy.
+  - Endpoint discovery and request retry are separate concerns; a slow request on the resolved backend must not silently turn back into multi-port endpoint probing.
+- Follow-up actions:
+  - Add a regression that locks `StorySequenceServiceClient` to the resolved backend URL instead of rebuilding candidate localhost ports.
+  - Patch the runtime request path and re-verify the backend with a live session-create plus next-turn call.
+- Actual root cause after fix: `StorySequenceServiceClient` treated execution like discovery and rebuilt the full localhost candidate set even after `EnsureLocalOrchestratorReady()` had already resolved the live backend. For the deployed Railway path, the runtime also still assumed any unresolved target could be bootstrapped locally, and the deterministic `local-reference-remix` image fallback was still marked as a rejected provider fallback even though it was the intended valid last-resort image path.
+- Guardrail added: Story-sequence requests now stay pinned to the resolved backend URL, Unity's generated-story timeout budget now exceeds the old 240-second ceiling, the local launcher refuses to "bootstrap" non-local hosts, the deployed Railway service runs from its own Procfile with persistent `/data` storage and provider env vars, provider request budgets are capped at 30 seconds, and the image quality gate now accepts clean `local-reference-remix` outputs while still rejecting placeholder assets. The deployed Railway service at `https://story-orchestrator-production.up.railway.app` passed `/health`, and Railway runtime logs recorded a live `POST /api/v1/story-sequence-sessions/{id}/next-turn` finishing `valid=True`.
+- Distilled rule added to project-memory.md: `Once readiness resolves a story-orchestrator URL, execution must stay pinned to it; remote services are not candidates for local bootstrap, and deterministic local-reference remix images must remain quality-gate valid on deployed backends (2026-04-15)`
+
+### Generated Story Slice Produced Repetitive Storyboards Even When The Backend Returned A Valid Turn (2026-04-15)
+- Status: Addressed
+- Related story/task: generated story-sequence narrative quality and storyboard novelty
+- Original completion claim: The generated story slice was handed off as working end to end after the live backend turn path and media fallbacks were fixed.
+- Reported issue: The developer reported that the generated cutscene was technically working but kept playing the same art over and over instead of advancing the story with distinct shots.
+- Failing evidence: Live gameplay feedback showed the cutscene repeating visually similar frames and generic handoff beats even though Unity successfully received and played a generated package.
+- Approach that produced the miss: I optimized for transport validity and provider fallback, but I did not verify that the storyboard planner still received prior-turn context after request resolution, and I left the turn/storyboard prompts too generic to force conflict, progression, and shot variety.
+- Why it was mistaken for done: I treated `turn.result.is_valid == true` as equivalent to a satisfactory narrative result, even though story quality depended on context propagation and prompt guardrails that were not yet pinned by tests.
+- What should have been verified or stated differently: The handoff should have stated that endpoint health and valid media output do not prove narrative continuity or visual variety. It also should have included a check that prior context, mission configuration, and shot-diversity rules survive the full request path.
+- Prevention rules for future work:
+  - Generated-story verification must cover narrative validity as well as transport validity.
+  - Any request-normalization layer must preserve storyboard context fields used by prompt construction.
+  - Prompt-based cutscene generation needs explicit guardrails for conflict, shot progression, and non-repeating compositions.
+- Follow-up actions:
+  - Preserved enriched storyboard context in `GeneratedStoryboardService._resolve_request_context`.
+  - Added mission-configuration, world-state, prior-summary, and present-character context to the cutscene request builder.
+  - Tightened turn-director and storyboard-planner prompts around conflict, handoff, and 2-4 second distinct shots.
+  - Added focused tests for prompt content and context propagation.
+- Actual root cause after fix: The richer cutscene context was being built upstream but stripped during storyboard request resolution, and the surviving prompts were still permissive enough to generate generic repeated bridges.
+- Guardrail added: Context-preservation and prompt-guardrail tests now lock the intended narrative behavior, and the live media pipeline still falls back cleanly when provider auth drifts.
+- Distilled rule added to project-memory.md: `A valid generated turn is not done until the storyboard planner proves it sees prior context and is constrained to distinct conflict-driven shots (2026-04-15)`
+
+### Generated Story Slice Reused A Stale Healthy Backend Endpoint After The Backend Went Away (2026-04-15)
+- Status: Addressed
+- Related story/task: local backend bootstrap and generated playthrough preparation
+- Original completion claim: The generated slice runtime bridge and local backend bootstrap were handed off as fail-closed with clearer startup guidance.
+- Reported issue: The developer reported repeated `Cannot connect to destination host` warnings while the generated slice tried dead localhost endpoints during session creation.
+- Failing evidence: Unity logs from `StorySequenceServiceClient.CreateSessionAndAdvance` showed connection attempts against `http://127.0.0.1:8000` and `http://127.0.0.1:8011`, followed by `StorySequenceRuntimeController` rejecting the payload and resetting session state.
+- Approach that produced the miss: The runtime controller cached the last healthy orchestrator base URL and reused that readiness state while concurrent callers waited on an in-flight health check, but it did not prove the cached endpoint was still healthy when the current readiness pass failed.
+- Why it was mistaken for done: Verification covered healthy bootstrap and clearer launcher diagnostics, but it did not exercise the case where a previously healthy local backend goes away and a waiting generated-sequence request inherits that stale readiness cache.
+- What should have been verified or stated differently: The handoff should have included a regression for stale cached readiness after a failed re-check, especially because the title screen starts background readiness work before the generate button is pressed.
+- Prevention rules for future work:
+  - A cached local-backend readiness URL must be cleared as soon as a fresh readiness check fails.
+  - Any caller that waits on an in-flight readiness pass must receive the actual result of that pass, not a synthesized stale-success fallback.
+- Follow-up actions:
+  - Add a focused EditMode regression around stale readiness cache invalidation in `StorySequenceRuntimeBridgeTests`.
+  - Patch `StorySequenceRuntimeController` so failed readiness checks cannot feed stale healthy endpoints into generated-sequence requests.
+- Actual root cause after fix: `StorySequenceRuntimeController.EnsureLocalOrchestratorReady()` preserved `_lastOrchestratorReadyBaseUrl` after a failed readiness pass, so later callers could inherit a stale localhost endpoint and proceed into `CreateSessionAndAdvance` against a dead backend.
+- Guardrail added: `StorySequenceRuntimeBridgeTests.StorySequenceRuntimeController_EnsureLocalOrchestratorReady_ClearsStaleHealthyBaseUrlWhenCurrentCheckFails` now locks the stale-cache invalidation behavior, and the controller clears the cached healthy base URL whenever the current readiness pass fails.
+- Distilled rule added to project-memory.md: `Clear cached local-backend readiness immediately when a fresh orchestrator health check fails (2026-04-15)`
+
+### Generated Story Slice Still Failed End To End Because Remote Media Providers Were Brittle (2026-04-15)
+- Status: Addressed
+- Related story/task: live generated playthrough bootstrap and autonomous story-sequence turn generation
+- Original completion claim: The local story-orchestrator bootstrap and generated playthrough request path were handed off as working/fail-closed once the backend port drift was fixed.
+- Reported issue: The developer asked whether the API was really launching and working alongside Unity because generated playthroughs still failed in practice.
+- Failing evidence: Live backend inspection showed `uvicorn` healthy on `127.0.0.1:8012`, but prior generated turns still failed through Gemini image timeouts/empty-image responses and ElevenLabs `401 Unauthorized`, which caused the whole turn to come back invalid.
+- Approach that produced the miss: The system depended on remote image/audio providers being healthy on every run, with placeholder image fallback intentionally rejected by the quality gate and no deterministic local image provider capable of keeping the cutscene valid.
+- Why it was mistaken for done: Transport/bootstrap verification was treated as equivalent to end-to-end playthrough viability even though media generation still had provider-specific failure modes.
+- What should have been verified or stated differently: The handoff should have included at least one live `POST /api/v1/story-sequence-sessions/{id}/next-turn` success proving `turn.result.is_valid == true`, not only a healthy backend and a launched process.
+- Prevention rules for future work:
+  - A healthy local backend process is not enough; generated-slice fixes must prove one live valid turn through the actual media pipeline.
+  - Standing generated playthroughs need a deterministic local media path that preserves validity when remote providers drift or lose auth.
+- Follow-up actions:
+  - Added OpenAI-backed speech/image provider clients plus a deterministic `LocalReferenceImageGenerator`.
+  - Reordered generated storyboard media selection so the runtime no longer depends on Gemini/ElevenLabs success to return a valid turn.
+  - Verified two live session-create + next-turn runs against `127.0.0.1:8012`, both returning `is_valid=true`.
+- Actual root cause after fix: The backend process was reachable, but the media stack still relied on brittle remote providers. Gemini image generation could stall or return unusable payloads, ElevenLabs narration was unauthorized, and the only image fallback was a placeholder intentionally rejected by the quality gate.
+- Guardrail added: The generated slice now has a deterministic local-reference image path and OpenAI speech path, backed by new provider tests plus repeated live next-turn verification.
+- Distilled rule added to project-memory.md: `Generated-slice handoff requires one live valid turn through the real media pipeline, and that pipeline needs a deterministic local fallback for images (2026-04-15)`
+
 ### Generated Story Slice Button Became Inert After Title-Screen UX Change (2026-04-14)
 - Status: Addressed
 - Related story/task: generated-slice title-screen loading UX fix
@@ -92,23 +213,27 @@
 - Distilled rule added to project-memory.md: `Standing generated slices must fail closed on bootstrap errors and reject visibly degraded storyboard frames (2026-04-14)`
 
 ### GTM Approval Flow Did Not Publish Approved X Replies (2026-04-14)
-- Status: Open
+- Status: Addressed
 - Related story/task: McCluckin Farm GTM X-only monitor + review dashboard
 - Original completion claim: The X-only pipeline was described as working end to end for discovery and drafting, with the dashboard acting as the operator console for live monitoring and review.
 - Reported issue: The developer approved multiple X drafts in the dashboard and none of them were actually posted on X.
 - Failing evidence: The live GTM database contained 10 drafts with `reviewer_action in ('approved','edited')` and no matching row in `published`, while the active `gtm-x-monitor` automation only ran monitor + draft work and never invoked the publish path.
-- Approach that produced the miss: The implementation treated approval as a state transition only, left publishing to a separate CLI path, and created monitoring automations that summarized queue activity without actually driving approved replies through the publisher.
+- Approach that produced the miss: The implementation treated approval as a state transition only, left publishing to a separate CLI path, created monitoring automations that summarized queue activity without actually driving approved replies through the publisher, and continued using an OAuth 1.0a publish client even after the live X setup moved to OAuth 2.0 PKCE user tokens.
 - Why it was mistaken for done: Verification proved the mechanical pieces independently, but it did not verify the operator workflow the developer would actually use: approve in the dashboard, then expect the post to appear on X or at least become visibly ready or pending publication.
-- What should have been verified or stated differently: The handoff should have explicitly said that approval alone does not publish and that a separate publish run or automation was still required. The dashboard should also have exposed approved-but-unpublished items as a first-class operator state.
+- What should have been verified or stated differently: The handoff should have explicitly said that approval alone does not publish and that a separate publish run or automation was still required. The dashboard should also have exposed approved-but-unpublished items as a first-class operator state, and the publish handoff should have proven the exact live X auth mode used by the app instead of assuming older OAuth 1.0a credentials still matched the endpoint.
 - Prevention rules for future work:
   - When a review UI includes an approval action for outbound content, verify whether approval publishes immediately, schedules publication, or only marks readiness, and state that behavior explicitly in the handoff.
   - For automation-backed publishing systems, verify the live automation prompts against the intended operator workflow instead of assuming a separate command will be run later.
   - Make approved-but-unpublished content visible in the operator surface so queue state cannot masquerade as published state.
+  - For X publishing, verify the exact user-context auth path that production will use and do not hand off a write flow until that live auth mode succeeds against the real app configuration.
 - Follow-up actions:
   - Add focused tests for approved-but-unpublished dashboard visibility and publish actions.
   - Wire the dashboard and/or automation flow so approved X replies can actually publish through the intended operator path.
   - Add clearer publish logging so operator history distinguishes review approval from platform publication.
-- Distilled rule added to project-memory.md: `Approval flows for outbound content must make publish state explicit and verifiable (2026-04-14)`
+  - Add an OAuth 2.0 PKCE publish path for X, including refresh-token rotation and persistence for unattended runs.
+- Actual root cause after fix: The dashboard review flow was only marking drafts approved, while the active automation never invoked the publish path. After the dashboard gained an explicit publish action, the live publish client still failed because it used OAuth 1.0a tokens even though the active X app credentials had shifted to OAuth 2.0 PKCE user tokens. The publisher now prefers OAuth 2.0 access tokens, retries once after a 401 by refreshing via `POST /2/oauth2/token`, and persists the rotated tokens for later scheduled runs.
+- Guardrail added: GTM X publishing now has focused regression coverage for OAuth 2.0 `user_auth=False` publish calls and 401 refresh-and-retry handling.
+- Distilled rule added to project-memory.md: `Approval flows for outbound content must make publish state explicit and X write handoffs must verify the exact live auth mode in use (2026-04-15)`
 
 
 ### Town Voice Streaming Fell Back To Text On Intermittent Token Mint Delays (2026-04-14)
@@ -677,3 +802,45 @@
 - Actual root cause after fix: The backend launcher could fail for ordinary local setup reasons, but the Unity-side message collapsed those into a generic health failure. That made the operator guess about hardcoding keys instead of checking the repo-local backend env and venv setup.
 - Guardrail added: `LocalStoryOrchestratorLauncher` now builds actionable failure messages with `backend/story-orchestrator/.env.local` guidance, venv bootstrap instructions, and log summaries, while `start_local_backend.sh` writes its own startup diagnostics into the launcher log.
 - Distilled rule added to project-memory.md: `Unity-owned local backend bootstraps must explain env-file and venv setup directly when startup fails; do not leave secret/config diagnosis hidden in logs (2026-04-14)`
+
+### Generated Playthrough Could Stall When Unity Lost Focus (2026-04-15)
+- Status: Addressed
+- Related story/task: generated playthrough title-screen reliability
+- Original completion claim: The generated playthrough path was handed off as reliable once Unity owned local backend bootstrap and prepared-state recovery.
+- Reported issue: The developer asked for the flow to remain reliable even if they click away from the game window.
+- Failing evidence: Source inspection showed `ProjectSettings/ProjectSettings.asset` still had `runInBackground: 0`, and `TitleScreenManager.Start()` did not explicitly opt the app into background execution. That leaves long-running title-screen generation vulnerable to focus-loss stalls on desktop.
+- Approach that produced the miss: Earlier fixes focused on backend readiness, provider fallbacks, and prepared-state recovery, but they did not verify the desktop player-loop behavior while the app was unfocused.
+- Why it was mistaken for done: The happy path was exercised with the Unity window in focus, which masked the fact that losing focus could pause the request/coroutine loop even with a healthy backend.
+- What should have been verified or stated differently: The handoff should have included one explicit background-safety check for the title-screen generation path or called out that focus had to stay on the app.
+- Prevention rules for future work:
+  - If a developer-facing generation flow may take multiple seconds, verify it survives desktop focus loss.
+  - Do not rely only on `ProjectSettings.asset`; add a runtime guard on the actual entry path for the flow.
+- Follow-up actions:
+  - Added `GeneratedPlaythroughBackgroundReliabilityTests` to lock both the runtime guard and the project setting.
+  - Set `Application.runInBackground = true;` in `TitleScreenManager.Start()`.
+  - Flipped `ProjectSettings.asset` to `runInBackground: 1`.
+- Actual root cause after fix: The generated title-screen flow had become backend-safe but not background-safe. Unity still defaulted to pausing when unfocused, so generation could appear stuck if the developer clicked away mid-request.
+- Guardrail added: The project now enables background execution globally and the generated-story title-screen entry path reasserts that behavior at runtime.
+- Distilled rule added to project-memory.md: `Generated story reliability must survive focus loss (2026-04-15)`
+
+### Runtime Session Creation Still Blocked The First Turn Inside The HTTP Request (2026-04-15)
+- Status: Addressed
+- Related story/task: standalone Railway runtime service for generated playthroughs
+- Original completion claim: The standalone runtime API was handed off as a queued-job contract where Unity would `POST /api/runtime/v1/sessions`, receive a `job_id`, then poll `/jobs/{job_id}` until the first turn was ready.
+- Reported issue: A live Unity-to-Railway smoke timed out for the full request budget on `POST /api/runtime/v1/sessions`, even though the service later completed the turn server-side.
+- Failing evidence: The Unity smoke test failed after `330005 ms` with `Curl error 28` and no bytes received, while Railway HTTP logs showed the same route eventually returning `201` only after the generation work had finished. Source-level inspection of `RuntimeSessionService.create_session()` showed `_create_next_job()` calling `_run_job()` inline.
+- Approach that produced the miss: The public API shape was changed to look asynchronous, but the service implementation still generated the first turn synchronously in the request thread and only returned once the work was done.
+- Why it was mistaken for done: Earlier verification focused on backend health, payload validity, and a successful generated turn, but it did not prove that the runtime contract returned immediately and let Unity move into a poll-based state.
+- What should have been verified or stated differently: The handoff should have included one explicit regression proving that `POST /api/runtime/v1/sessions` returns a queued job before a deliberately slow generation service finishes, plus one live check that the deployed service behaves the same way over real HTTP.
+- Prevention rules for future work:
+  - If an API contract says "enqueue and poll," the create endpoint must be verified to return before generation completes.
+  - A local passing generation flow is not enough for Unity-facing runtime APIs; verify the live HTTP timing contract separately from the final media payload.
+  - Recovery replay must not consume the same worker capacity that fresh live requests depend on.
+- Follow-up actions:
+  - Added `RuntimeSessionCreateContractTests.test_runtime_session_create_returns_before_generation_finishes`.
+  - Moved runtime turn execution onto background workers in `RuntimeSessionService`.
+  - Split live job workers from recovery replay workers, and limited startup replay to interrupted non-queued jobs while queued jobs re-enter execution when polled.
+  - Redeployed the Railway service and verified that `POST /api/runtime/v1/sessions` now returns immediately with `status: queued`.
+- Actual root cause after fix: The runtime service had a false-async boundary. `create_session()` persisted the session and job, then executed `_run_job()` inline, which kept the HTTP request open for the entire first-turn generation. Startup replay also let older interrupted work consume the same worker lane that new live jobs needed.
+- Guardrail added: The runtime service now returns queued jobs immediately, executes turns in background workers, keeps recovery replay off the live worker lane, and has a backend test that fails if session creation blocks on generation again.
+- Distilled rule added to project-memory.md: `Runtime create-session endpoints must prove they return before generation completes, and recovery replay must not block fresh live jobs (2026-04-15)`

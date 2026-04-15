@@ -1,4 +1,5 @@
 using FarmSimVR.Core.Story;
+using FarmSimVR.MonoBehaviours.Cinematics;
 using UnityEngine;
 
 namespace FarmSimVR.MonoBehaviours.Tutorial
@@ -18,6 +19,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         private GUIStyle _subtitleStyle;
         private bool _stylesReady;
         private StoryStoryboardShotSnapshot[] _storyboardShots = System.Array.Empty<StoryStoryboardShotSnapshot>();
+        private RuntimeCutsceneShotHandle[] _runtimeShots = System.Array.Empty<RuntimeCutsceneShotHandle>();
         private string _currentSubtitle;
         private Texture2D _currentImage;
         private AudioSource _audioSource;
@@ -30,6 +32,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             _body = body;
             _autoAdvanceDelay = autoAdvanceDelay;
             _storyboardShots = System.Array.Empty<StoryStoryboardShotSnapshot>();
+            _runtimeShots = System.Array.Empty<RuntimeCutsceneShotHandle>();
             _currentShotIndex = -1;
             _currentSubtitle = string.Empty;
             _currentImage = null;
@@ -43,6 +46,21 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
             _body = string.Empty;
             _autoAdvanceDelay = autoAdvanceDelay;
             _storyboardShots = shots ?? System.Array.Empty<StoryStoryboardShotSnapshot>();
+            _runtimeShots = System.Array.Empty<RuntimeCutsceneShotHandle>();
+            _currentShotIndex = -1;
+            _currentSubtitle = string.Empty;
+            _currentImage = null;
+            _advanceAt = -1f;
+            _completionHandled = false;
+        }
+
+        public void ConfigureRuntimeStoryboard(string title, RuntimeCutsceneShotHandle[] shots, float autoAdvanceDelay)
+        {
+            _title = title;
+            _body = string.Empty;
+            _autoAdvanceDelay = autoAdvanceDelay;
+            _storyboardShots = System.Array.Empty<StoryStoryboardShotSnapshot>();
+            _runtimeShots = shots ?? System.Array.Empty<RuntimeCutsceneShotHandle>();
             _currentShotIndex = -1;
             _currentSubtitle = string.Empty;
             _currentImage = null;
@@ -101,7 +119,8 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         private bool HasStoryboard()
         {
-            return _storyboardShots != null && _storyboardShots.Length > 0;
+            return (_runtimeShots != null && _runtimeShots.Length > 0) ||
+                   (_storyboardShots != null && _storyboardShots.Length > 0);
         }
 
         private void UpdateStoryboardPlayback()
@@ -110,7 +129,10 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
                 return;
 
             var nextIndex = _currentShotIndex + 1;
-            if (nextIndex >= _storyboardShots.Length)
+            var shotCount = _runtimeShots != null && _runtimeShots.Length > 0
+                ? _runtimeShots.Length
+                : (_storyboardShots != null ? _storyboardShots.Length : 0);
+            if (nextIndex >= shotCount)
             {
                 CompleteScene();
                 return;
@@ -121,11 +143,25 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         private void BeginStoryboardShot(int index)
         {
+            _currentShotIndex = index;
+            if (_runtimeShots != null && index >= 0 && index < _runtimeShots.Length)
+            {
+                var runtimeShot = _runtimeShots[index];
+                _currentSubtitle = runtimeShot?.SubtitleText ?? string.Empty;
+                _currentImage = runtimeShot?.Image;
+                var runtimeAudioClip = runtimeShot?.AudioClip;
+                PlayAudio(runtimeAudioClip);
+                var runtimeShotDuration = runtimeShot == null
+                    ? 0f
+                    : Mathf.Max(runtimeShot.DurationSeconds, runtimeAudioClip != null ? runtimeAudioClip.length : 0f);
+                _advanceAt = Time.time + Mathf.Max(runtimeShotDuration, 0.1f);
+                return;
+            }
+
             if (_storyboardShots == null || index < 0 || index >= _storyboardShots.Length)
                 return;
 
             var shot = _storyboardShots[index];
-            _currentShotIndex = index;
             _currentSubtitle = shot?.SubtitleText ?? string.Empty;
             _currentImage = LoadResource<Texture2D>(shot?.ImageResourcePath);
             var audioClip = LoadResource<AudioClip>(shot?.AudioResourcePath);

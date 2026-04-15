@@ -32,6 +32,12 @@ Current implemented foundation:
 - `POST /api/v1/story-sequence-sessions`
 - `GET /api/v1/story-sequence-sessions/{session_id}`
 - `POST /api/v1/story-sequence-sessions/{session_id}/next-turn`
+- `POST /api/runtime/v1/sessions`
+- `GET /api/runtime/v1/sessions/{session_id}`
+- `GET /api/runtime/v1/jobs/{job_id}`
+- `GET /api/runtime/v1/sessions/{session_id}/turns/{turn_id}`
+- `POST /api/runtime/v1/sessions/{session_id}/turns/{turn_id}/outcome`
+- `GET /api/runtime/v1/artifacts/{asset_id}/content`
 - `POST /api/v1/generated-standing-slice-regenerations`
 - `POST /api/v1/generated-standing-slice-jobs`
 - `GET /api/v1/generated-standing-slice-jobs/{job_id}`
@@ -67,6 +73,11 @@ OpenAI output falls back to the existing bounded local planners.
 
 `GET /api/v1/story-sequence-sessions/{session_id}` returns the stored session
 plus its generated turn history in order.
+
+`/api/runtime/v1/*` is now the standalone Unity-facing runtime surface for the
+new generated playthrough flow. It returns a direct `PlayableTurnEnvelope`
+contract with one cutscene plus one minigame, serves generated artifacts, and
+creates the next runtime job when Unity posts a turn outcome.
 
 Story-sequence session state now also persists a bounded continuity-image
 ledger from successful generated cutscenes. When the next turn is planned, the
@@ -134,6 +145,40 @@ current slice expects at least:
 - `OPENAI_API_KEY` for LLM turn direction and storyboard writing
 - `GEMINI_API_KEY` plus Gemini project settings for storyboard image rendering
 - `ELEVENLABS_API_KEY` for narration audio generation
+
+## Railway deploy
+
+The checked-in deployment config now lives in:
+
+- `backend/story-orchestrator/Procfile`
+- `backend/story-orchestrator/railway.json`
+
+Railway should run:
+
+- `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+
+and healthcheck:
+
+- `GET /health`
+
+Recommended Railway variables:
+
+- `OPENAI_API_KEY`
+- `GEMINI_API_KEY`
+- `GEMINI_PROJECT_NAME`
+- `GEMINI_PROJECT_NUMBER`
+- `GEMINI_PROJECT_ID`
+- `ELEVENLABS_API_KEY`
+- `ELEVENLABS_VOICE_ID`
+- `DATABASE_PATH=data/story_orchestrator.db`
+
+If Unity needs to point at a non-default service, override it with:
+
+- `FARMSIM_STORY_ORCHESTRATOR_URL`
+
+The current checked-in production default in Unity is:
+
+- `https://story-orchestrator-production.up.railway.app`
 
 ## Local test
 

@@ -80,7 +80,11 @@ class OpenAIStorySequenceTurnDirector:
             "You are the narrative turn director for a cozy farm tutorial game. "
             "Choose exactly one allowed minigame generator and one allowed speaking character. "
             "Write a short cutscene title and a concise story brief that naturally leads into the next minigame. "
-            "Stay grounded, warm, readable, and forward-moving. Do not invent generator IDs, scenes, or characters outside the allowed lists."
+            "The cutscene must continue the existing story context, create a concrete conflict or change in the world, "
+            "and make the upcoming mission feel like a natural consequence. "
+            "Treat this like the next beat in an ongoing story, not a reset, recap card, or tutorial prompt. "
+            "Characters should notice something, want something, lose something, discover something, or interrupt each other. "
+            "Stay grounded, warm, readable, and forward-moving. Do not invent generator IDs, scenes, parameters, or characters outside the allowed lists."
         )
         user_prompt = json.dumps(
             {
@@ -99,6 +103,11 @@ class OpenAIStorySequenceTurnDirector:
                     "Pick one generator_id exactly from candidate_generators.",
                     "Pick one character_name exactly from candidate_character_names.",
                     "The story_brief must set up the next minigame in one to three sentences.",
+                    "The story_brief must acknowledge previous context or world state instead of feeling like a reset.",
+                    "The story_brief must introduce a concrete problem, interruption, discovery, or character motive before the player mission begins.",
+                    "The story_brief must imply what is special about the chosen generator configuration, as if the mission were a mad-libs style variation of the farm situation.",
+                    "The story_brief must feel like conflict and events are happening in the world, not like an instruction to the player.",
+                    "The final sentence should hand off into the mission as the natural next action for the player character.",
                     "Prefer variety relative to recent_turn_summaries when possible.",
                     "Keep the tone cozy, playable, and specific to the farm context.",
                 ],

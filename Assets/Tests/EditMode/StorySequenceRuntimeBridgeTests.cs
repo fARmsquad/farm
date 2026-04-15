@@ -354,6 +354,66 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(source, Does.Contain("yield return ensureRoutine;"));
         }
 
+        [Test]
+        public void StorySequenceServiceClient_UsesResolvedBackendUrlWithoutRebuildingFallbackCandidatePorts_FromSource()
+        {
+            var source = File.ReadAllText("Assets/_Project/Scripts/MonoBehaviours/Cinematics/StorySequenceServiceClient.cs");
+
+            Assert.That(source, Does.Contain("ResolveRequestBaseUrl("));
+            Assert.That(source, Does.Not.Contain("BuildCandidateBaseUrls("));
+        }
+
+        [Test]
+        public void StorySequenceServiceClient_TimeoutBudget_AllowsRailwayTurnCompletion()
+        {
+            Type clientType = typeof(StorySequenceRuntimeController).Assembly
+                .GetType("FarmSimVR.MonoBehaviours.Cinematics.StorySequenceServiceClient");
+
+            Assert.That(clientType, Is.Not.Null);
+
+            FieldInfo timeoutField = clientType.GetField(
+                "RequestTimeoutSeconds",
+                BindingFlags.Static | BindingFlags.NonPublic);
+
+            Assert.That(timeoutField, Is.Not.Null);
+            Assert.That((int)timeoutField.GetRawConstantValue(), Is.GreaterThan(240));
+        }
+
+        [Test]
+        public void StorySequenceRuntimeController_EnsureLocalOrchestratorReady_ClearsStaleHealthyBaseUrlWhenCurrentCheckFails()
+        {
+            var runtimeObject = new GameObject("StorySequenceRuntime");
+            var controller = runtimeObject.AddComponent<StorySequenceRuntimeController>();
+            LocalStoryOrchestratorReadyResult readyResult = null;
+
+            SetPrivateField(controller, "_lastOrchestratorReadyBaseUrl", "http://127.0.0.1:8000");
+            SetPrivateField(
+                controller,
+                "_ensureOrchestratorReadyOverride",
+                (Func<Action<LocalStoryOrchestratorReadyResult>, IEnumerator>)(callback =>
+                    CompleteImmediately(
+                        callback,
+                        new LocalStoryOrchestratorReadyResult(
+                            "http://127.0.0.1:8012",
+                            false,
+                            false,
+                            "Cannot connect to destination host"))));
+
+            var routine = InvokePrivate<IEnumerator>(
+                controller,
+                "EnsureLocalOrchestratorReady",
+                (Action<LocalStoryOrchestratorReadyResult>)(result => readyResult = result));
+
+            Drain(routine);
+
+            Assert.That(readyResult, Is.Not.Null);
+            Assert.That(readyResult.Success, Is.False);
+            Assert.That(readyResult.ErrorMessage, Is.EqualTo("Cannot connect to destination host"));
+            Assert.That(
+                ReadPrivateField<string>(controller, "_lastOrchestratorReadyBaseUrl"),
+                Is.EqualTo(string.Empty));
+        }
+
         private static StoryPackageSnapshot BuildPackage(
             string title,
             string beatId,

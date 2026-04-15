@@ -229,6 +229,16 @@
         return `<span class="chip status-${status}">${label || status}</span>`;
       }
 
+      function scheduledChip(item) {
+        if (!item.content_item?.scheduled_date) return "";
+        return `<span class="chip">${new Date(item.content_item.scheduled_date).toLocaleString()}</span>`;
+      }
+
+      function contentAngle(item) {
+        if (!item.content_item?.description) return "";
+        return `<div class="decision small"><strong>Angle</strong><div class="body">${item.content_item.description}</div></div>`;
+      }
+
       async function apiPost(path, payload) {
         const response = await fetch(path, {
           method: "POST",
@@ -266,9 +276,11 @@
           <h2>${sourceLabel(item)}</h2>
           <div class="meta-row">
             ${item.lead ? statusChip(item.lead.status, item.lead.status) : ""}
+            ${scheduledChip(item)}
             ${(item.lead?.matched_keywords || []).map((keyword) => `<span class="chip">${keyword}</span>`).join("")}
           </div>
           <div class="body">${bodyText(item)}</div>
+          ${contentAngle(item)}
           <div><strong>Draft</strong></div>
           <div class="body">${item.final_text}</div>
           ${publishError ? `<div class="decision error small"><strong>Latest publish error</strong><div class="body">${publishError.error}</div></div>` : ""}
@@ -278,6 +290,7 @@
             <button class="warn">Edit</button>
             <button class="danger">Reject</button>
             ${item.lead ? `<a class="button" href="${sourceUrl}" target="_blank" rel="noreferrer">Open source</a>` : ""}
+            ${item.content_item ? `<a class="button" href="https://github.com/fARmsquad/farm" target="_blank" rel="noreferrer">Star repo</a>` : ""}
           </div>
         `;
         const [approveButton, editButton, rejectButton] = card.querySelectorAll("button");
@@ -304,15 +317,18 @@
           <h2>${sourceLabel(item)}</h2>
           <div class="meta-row">
             ${statusChip("approved", item.reviewer_action || "approved")}
+            ${scheduledChip(item)}
             ${(item.lead?.matched_keywords || []).map((keyword) => `<span class="chip">${keyword}</span>`).join("")}
           </div>
           <div class="body">${bodyText(item)}</div>
+          ${contentAngle(item)}
           <div><strong>Ready text</strong></div>
           <div class="body">${item.final_text}</div>
           ${publishError ? `<div class="decision error small"><strong>Latest publish error</strong><div class="body">${publishError.error}</div><div class="meta">Last attempt ${new Date(publishError.created_at).toLocaleString()}</div></div>` : ""}
           <div class="actions">
             <button class="info">Publish now</button>
             ${item.lead ? `<a class="button" href="${sourceUrl}" target="_blank" rel="noreferrer">Open source</a>` : ""}
+            ${item.content_item ? `<a class="button" href="https://github.com/fARmsquad/farm" target="_blank" rel="noreferrer">Star repo</a>` : ""}
           </div>
         `;
         const [publishButton] = card.querySelectorAll("button");

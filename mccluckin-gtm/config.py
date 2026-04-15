@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     x_access_token: str = ""
     x_access_token_secret: str = ""
     x_username: str = ""
+    x_client_id: str = ""
+    x_client_secret: str = ""
+    x_oauth2_access_token: str = ""
+    x_oauth2_refresh_token: str = ""
 
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-sonnet-4-20250514"
@@ -30,6 +34,9 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./gtm.db"
     review_port: int = 8000
     auto_publish: bool = False
+    reply_monitor_enabled: bool = False
+    outbound_replies_enabled: bool = False
+    standalone_calendar_enabled: bool = True
     log_path: str = "gtm.log"
     reddit_daily_reply_limit: int = 5
     reddit_daily_post_limit: int = 1
@@ -45,6 +52,10 @@ class Settings(BaseSettings):
     twitter_publish_delay_max_minutes: int = 15
     review_refresh_seconds: int = 30
     app_name: str = "McCluckin GTM"
+    background_jobs_enabled: bool = True
+    monitor_interval_seconds: int = 1800
+    draft_interval_seconds: int = 300
+    publish_interval_seconds: int = 300
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -64,6 +75,10 @@ class Settings(BaseSettings):
         return Path(self.log_path)
 
     @property
+    def env_file_path(self) -> Path:
+        return Path(".env")
+
+    @property
     def reddit_enabled(self) -> bool:
         required = (
             self.reddit_client_id,
@@ -79,7 +94,7 @@ class Settings(BaseSettings):
         return bool(self.x_bearer_token.strip())
 
     @property
-    def x_publish_enabled(self) -> bool:
+    def x_oauth1_publish_enabled(self) -> bool:
         required = (
             self.x_api_key,
             self.x_api_secret,
@@ -87,6 +102,14 @@ class Settings(BaseSettings):
             self.x_access_token_secret,
         )
         return all(bool(value.strip()) for value in required)
+
+    @property
+    def x_oauth2_publish_enabled(self) -> bool:
+        return bool(self.x_oauth2_access_token.strip())
+
+    @property
+    def x_publish_enabled(self) -> bool:
+        return self.x_oauth2_publish_enabled or self.x_oauth1_publish_enabled
 
 
 @lru_cache(maxsize=1)

@@ -133,6 +133,7 @@ namespace FarmSimVR.Editor
         [MenuItem("FarmSimVR/Sync Title Screen Build Settings")]
         public static void SyncBuildSettings()
         {
+            CreateGenerativePlaythroughMenuScene.CreateIfMissing();
             AddScenesToBuild(GetOrderedBuildScenePaths());
         }
 

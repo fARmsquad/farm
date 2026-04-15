@@ -31,6 +31,8 @@ Codex agents (which have no internet) read this file to access research findings
 - [Unique Playthrough Generate Then Play Title Slice](#research-unique-playthrough-generate-then-play-title-slice) — 2026-04-14
 - [Generated Playthrough Title Diagnostics Surface](#research-generated-playthrough-title-diagnostics-surface) — 2026-04-14
 - [LLM-Directed Sequence Narrative Generation](#research-llm-directed-sequence-narrative-generation) — 2026-04-14
+- [Runtime Progress Tracker](#research-runtime-progress-tracker) — 2026-04-15
+- [Generative Playthrough Menu Scene](#research-generative-playthrough-menu-scene) — 2026-04-15
 
 ---
 
@@ -218,6 +220,52 @@ transport.BeginStream(
                 conversation.FailTurn(evt.Message);
                 break;
         }
+
+## Research: Runtime Progress Tracker
+**Date**: 2026-04-15
+**Queries**:
+- `FastAPI HTMLResponse official docs`
+- `FastAPI templates static files official docs`
+- `Domino's Tracker official history`
+
+### Recommended Packages
+No new packages found. The existing FastAPI + static HTML approach is enough.
+
+### Key Patterns Found
+- FastAPI supports returning custom HTML directly with `HTMLResponse`, which is
+  enough for a lightweight operator page without introducing a template engine
+  or separate frontend stack. Source:
+  https://fastapi.tiangolo.com/advanced/custom-response/
+- FastAPI's template/static guidance confirms that an operator page can stay
+  inside the same service boundary and read its own backend APIs without
+  splitting deployment. Source:
+  https://fastapi.tiangolo.com/advanced/templates/
+- Domino's public tracker story is built around clear staged progress that
+  reassures the customer while work is in flight. The useful product pattern
+  here is not pizza-specific copy, but explicit stage disclosure with one loud
+  current-state indicator. Source:
+  https://media.dominos.com/assets/files/story_60th-birthday_pepperoni-press.pdf
+
+### Recommended Approach
+Add a plain HTML/CSS/JS tracker page to the existing story-orchestrator
+service, back it with runtime-specific tracker JSON endpoints, and expose the
+current generation phase as a bold staged rail. Reuse persisted
+`runtime_sessions`, `runtime_jobs`, `runtime_job_steps`, and `runtime_turns`
+instead of creating a second store.
+
+### Gotchas & Pitfalls
+- A tracker page is only as useful as the phase updates behind it; if the
+  backend jumps from `planning` to `ready`, the UI will feel fake.
+- Avoid a second frontend app or build pipeline for this slice; Railway already
+  deploys the Python service cleanly.
+- Keep the page polling-based for now. The runtime contract already supports
+  short-interval polling, and SSE/WebSockets would add more moving pieces than
+  this operator surface needs.
+
+### Sources
+1. [FastAPI: Custom Response / HTMLResponse](https://fastapi.tiangolo.com/advanced/custom-response/) — Confirms a static HTML operator page can be served directly from the existing app.
+2. [FastAPI: Templates](https://fastapi.tiangolo.com/advanced/templates/) — Confirms same-service page rendering and static asset patterns.
+3. [Domino's 60th Birthday Press PDF](https://media.dominos.com/assets/files/story_60th-birthday_pepperoni-press.pdf) — Confirms the Tracker product pattern as staged order-progress disclosure.
     });
 ```
 
@@ -229,6 +277,86 @@ transport.BeginStream(
 
 ### Quest/Mobile Considerations
 - Text streaming itself is cheap; the real risk is per-token allocation, string rebuilding, and UI churn. Use a preallocated receive buffer and append-only visible text updates.
+
+## Research: Generative Playthrough Menu Scene
+**Date**: 2026-04-15
+**Queries**:
+- `site:docs.unity3d.com SceneManager.LoadScene Unity menu scene`
+- `site:docs.unity3d.com Application.runInBackground Unity`
+- `site:docs.unity3d.com Input System UI Input Module Unity`
+- `site:docs.unity3d.com PlayerPrefs Unity`
+
+### Recommended Packages
+No new packages found. The repo already has the Unity Input System package, and
+the current service-backed runtime path is enough for a dedicated menu scene.
+
+### Key Patterns Found
+- Route menu navigation through named scenes already present in Build Settings.
+  Unity's `SceneManager.LoadScene` works cleanly when the menu scene is a real
+  scene asset and the scene name/path stays aligned with Build Settings. Source:
+  https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadScene.html
+- Keep long-running desktop/editor generation UI alive by setting
+  `Application.runInBackground = true` while the menu scene is open. Unity's
+  scripting API documents this as the supported way to keep the player running
+  when it loses focus on desktop platforms. Source:
+  https://docs.unity3d.com/ScriptReference/Application-runInBackground.html
+- When the project uses the Input System, runtime uGUI scenes should keep
+  `InputSystemUIInputModule` on the `EventSystem` instead of the legacy
+  `StandaloneInputModule`. Unity's Input System UI docs explicitly describe the
+  newer module as the supported bridge for Unity UI and the shared
+  `EventSystem` stack. Source:
+  https://docs.unity3d.com/Packages/com.unity.inputsystem@1.13/manual/UISupport.html
+- Persist only the lightweight local resume keys in `PlayerPrefs` and let the
+  backend remain authoritative for full session history. Unity documents
+  `PlayerPrefs` as a small local key-value store suitable for non-sensitive
+  session restoration. Source:
+  https://docs.unity3d.com/ScriptReference/PlayerPrefs.html
+
+### Recommended Approach
+Create a dedicated `GenerativePlaythroughMenu` scene that acts as the single
+service-backed launcher for generated experiences. The scene should not invent a
+new persistence or history layer; it should use the existing runtime tracker
+API for previous sessions and the existing persisted `session_id/base_url/job_id`
+keys only for local resume.
+
+The menu should expose four concrete actions:
+- create a fresh playthrough
+- refresh history/status
+- play a ready playthrough
+- return to the title screen
+
+The menu should also show a pipeline-style tracker for the currently selected
+session so the player can tell whether the service is queued, planning,
+generating images, generating audio, assembling, validating, or ready.
+
+### Code Reference
+```csharp
+Application.runInBackground = true;
+runtimeController.EnsureLocalOrchestratorRunningInBackground();
+yield return trackerClient.ListSessions(limit: 8, OnSessionsLoaded);
+
+if (selectedTurnReady)
+{
+    runtimeController.PrepareExistingReadyTurn(baseUrl, sessionId, turnId, OnPrepared, OnError);
+}
+```
+
+### Gotchas & Pitfalls
+- Do not make Unity the source of truth for historical playthroughs. It should
+  cache the currently prepared turn locally, but previous sessions should come
+  from the service tracker API.
+- Do not let the new menu scene use the legacy `StandaloneInputModule`; this
+  project already runs on the Input System only.
+- Do not hardcode arbitrary scene names from backend text output. Keep scene
+  loading allowlisted through `SceneWorkCatalog`.
+- Do not auto-enable play just because a session exists. Play should require a
+  ready turn plus successfully preloaded local artifacts.
+
+### Sources
+1. [Unity Scripting API: SceneManager.LoadScene](https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadScene.html) — Supports routing the generated menu and ready playthroughs through real build-listed scenes.
+2. [Unity Scripting API: Application.runInBackground](https://docs.unity3d.com/ScriptReference/Application-runInBackground.html) — Supports keeping the desktop/editor runtime alive while the user clicks away during generation.
+3. [Unity Input System Manual: UI support](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.13/manual/UISupport.html) — Confirms `InputSystemUIInputModule` is the correct UI event bridge for this project.
+4. [Unity Scripting API: PlayerPrefs](https://docs.unity3d.com/ScriptReference/PlayerPrefs.html) — Supports lightweight local resume without moving session history ownership into Unity.
 
 ## Research: Town Optional Voice Input And Exit Gate
 **Date**: 2026-04-14

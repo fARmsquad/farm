@@ -68,6 +68,14 @@ class StoryOrchestratorAppTests(unittest.TestCase):
         self.assertIn("referenceUploadButton", response.text)
         self.assertIn("referencesPanel", response.text)
 
+    def test_runtime_tracker_page_loads(self) -> None:
+        response = self.client.get("/review/runtime-tracker")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Generated Experience Tracker", response.text)
+        self.assertIn("recentSessions", response.text)
+        self.assertIn("pipelineRail", response.text)
+
     def test_create_elevenlabs_tts_websocket_token_returns_single_use_token(self) -> None:
         captured: dict[str, str] = {}
 

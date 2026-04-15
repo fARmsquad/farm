@@ -72,7 +72,7 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
             CacheHeroPlotController();
             CacheAllPlotControllers();
-            if (TryConfigurePackagePlantRowsMode())
+            if (TryConfigureRuntimePlantRowsMode() || TryConfigurePackagePlantRowsMode())
             {
                 EnsurePackagePlantRowsPlots();
                 CacheAllPlotControllers();
@@ -335,6 +335,29 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
         private bool IsHeroPlot(CropPlotController plotController)
         {
             return plotController != null && plotController == _heroCropController;
+        }
+
+        private bool TryConfigureRuntimePlantRowsMode()
+        {
+            if (!GenerativeTurnRuntimeState.TryGetMinigameContract(SceneManager.GetActiveScene().name, out var minigame))
+                return false;
+
+            if (minigame == null || !string.Equals(minigame.adapter_id, "tutorial.plant_rows", System.StringComparison.Ordinal))
+                return false;
+
+            var cropType = "carrot";
+            var rowCount = 1;
+            GenerativeMinigameContractReader.TryGetStringParameter(minigame, "cropType", out cropType);
+            GenerativeMinigameContractReader.TryGetIntParameter(minigame, "rowCount", out rowCount);
+
+            _packagePlantRowsService.Configure(
+                minigame.objective_text,
+                cropType,
+                minigame.required_count,
+                rowCount,
+                minigame.time_limit_seconds);
+            _usePackagePlantRowsMode = true;
+            return true;
         }
 
         private bool TryConfigurePackagePlantRowsMode()

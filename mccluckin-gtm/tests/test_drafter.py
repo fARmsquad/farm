@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 import pytest
 
-from db.models import Draft, Lead
-from drafter.generate import SYSTEM_PROMPT, build_user_prompt, process_new_leads
+from db.models import ContentCalendarItem, Draft, Lead
+from drafter.generate import SYSTEM_PROMPT, build_calendar_prompt, build_user_prompt, process_new_leads
 
 
 @dataclass
@@ -185,6 +185,25 @@ def test_system_prompt_requires_specific_farm_voice_for_x_replies() -> None:
     assert "farmhand" in prompt
     assert "nuanced take" in prompt
     assert "\"we're working on\"" in prompt
+
+
+def test_build_calendar_prompt_targets_standalone_repo_star_posts() -> None:
+    item = ContentCalendarItem(
+        content_type="engagement",
+        platform="twitter",
+        topic="Why Stardew's morning routine works",
+        description="A grounded farm-game take with a soft GitHub star CTA.",
+        status="new",
+        scheduled_date=None,  # type: ignore[arg-type]
+    )
+
+    prompt = build_calendar_prompt(item)
+
+    assert "standalone x post" in prompt.lower()
+    assert "not a reply" in prompt.lower()
+    assert "star the repo" in prompt.lower()
+    assert "do not mention vr" in prompt.lower()
+    assert "github.com/fARmsquad/farm" in prompt
 
 
 @pytest.mark.asyncio

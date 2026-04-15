@@ -8,7 +8,7 @@ from datetime import UTC, datetime
 from db.models import ApiCallLog, Lead, Published
 from publisher.service import publish_ready_drafts
 from review.app import create_app
-from tests.conftest import create_draft, create_lead
+from tests.conftest import create_calendar_item, create_draft, create_lead
 
 
 class FakeTwitterPublisher:
@@ -26,6 +26,13 @@ async def noop_sleep(_: float) -> None:
 
 @pytest.mark.asyncio
 async def test_review_api_can_approve_and_publish(session_factory, settings, now) -> None:
+    reply_enabled_settings = settings.model_copy(
+        update={
+            "outbound_replies_enabled": True,
+            "x_oauth2_access_token": "oauth-token",
+        }
+    )
+
     with session_factory() as session:
         lead = create_lead(
             session,
@@ -40,7 +47,7 @@ async def test_review_api_can_approve_and_publish(session_factory, settings, now
         )
         draft = create_draft(session, lead=lead, draft_text="If you're open to in-dev picks, McCluckin Farm is one to watch.", reviewer_action=None)
 
-    app = create_app(session_factory, settings)
+    app = create_app(session_factory, reply_enabled_settings)
     transport = ASGITransport(app=app)
 
     async with AsyncClient(transport=transport, base_url="http://testserver") as client:
@@ -59,7 +66,7 @@ async def test_review_api_can_approve_and_publish(session_factory, settings, now
     publisher = FakeTwitterPublisher()
     result = await publish_ready_drafts(
         session_factory,
-        settings,
+        reply_enabled_settings,
         twitter_publisher=publisher,
         sleep_async=noop_sleep,
         now=now,
@@ -135,6 +142,13 @@ async def test_dashboard_history_and_activity_show_skip_reasons_and_errors(sessi
 
 @pytest.mark.asyncio
 async def test_review_api_lists_ready_drafts_and_can_publish_them(session_factory, settings, now) -> None:
+    reply_enabled_settings = settings.model_copy(
+        update={
+            "outbound_replies_enabled": True,
+            "x_oauth2_access_token": "oauth-token",
+        }
+    )
+
     with session_factory() as session:
         lead = create_lead(
             session,
@@ -155,7 +169,7 @@ async def test_review_api_lists_ready_drafts_and_can_publish_them(session_factor
         )
 
     publisher = FakeTwitterPublisher()
-    app = create_app(session_factory, settings, twitter_publisher=publisher)
+    app = create_app(session_factory, reply_enabled_settings, twitter_publisher=publisher)
     transport = ASGITransport(app=app)
 
     async with AsyncClient(transport=transport, base_url="http://testserver") as client:
@@ -178,6 +192,13 @@ async def test_review_api_lists_ready_drafts_and_can_publish_them(session_factor
 
 @pytest.mark.asyncio
 async def test_ready_endpoint_surfaces_publish_errors_and_stats(session_factory, settings) -> None:
+    reply_enabled_settings = settings.model_copy(
+        update={
+            "outbound_replies_enabled": True,
+            "x_oauth2_access_token": "oauth-token",
+        }
+    )
+
     with session_factory() as session:
         lead = create_lead(
             session,
@@ -207,7 +228,7 @@ async def test_ready_endpoint_surfaces_publish_errors_and_stats(session_factory,
         )
         session.commit()
 
-    app = create_app(session_factory, settings)
+    app = create_app(session_factory, reply_enabled_settings)
     transport = ASGITransport(app=app)
 
     async with AsyncClient(transport=transport, base_url="http://testserver") as client:
@@ -221,3 +242,72 @@ async def test_ready_endpoint_surfaces_publish_errors_and_stats(session_factory,
 
     assert stats_response.status_code == 200
     assert stats_response.json()["publish_errors"] == 1
+
+
+@pytest.mark.asyncio
+async def test_review_api_hides_reply_backlog_when_reply_mode_is_disabled(session_factory, settings, now) -> None:
+    with session_factory() as session:
+        lead_pending = create_lead(
+            session,
+            platform="twitter",
+            platform_id="reply-hidden-pending",
+            subreddit=None,
+            author="farmfan",
+            title=None,
+            body="A reply draft that should stay out of the queue.",
+            url="https://x.com/farmfan/status/reply-hidden-pending",
+            status="drafted",
+        )
+        create_draft(session, lead=lead_pending, draft_text="Hidden pending reply")
+
+        lead_ready = create_lead(
+            session,
+            platform="twitter",
+            platform_id="reply-hidden-ready",
+            subreddit=None,
+            author="farmfan",
+            title=None,
+            body="An approved reply draft that should stay out of ready.",
+            url="https://x.com/farmfan/status/reply-hidden-ready",
+            status="approved",
+        )
+        create_draft(session, lead=lead_ready, draft_text="Hidden ready reply", reviewer_action="approved")
+
+        calendar_pending = create_calendar_item(
+            session,
+            topic="Standalone pending post",
+            description="Visible pending standalone post.",
+            scheduled_date=now,
+        )
+        create_draft(session, content_item=calendar_pending, draft_text="Visible pending standalone")
+
+        calendar_ready = create_calendar_item(
+            session,
+            topic="Standalone ready post",
+            description="Visible ready standalone post.",
+            status="approved",
+            scheduled_date=now,
+        )
+        create_draft(
+            session,
+            content_item=calendar_ready,
+            draft_text="Visible ready standalone",
+            reviewer_action="approved",
+        )
+
+    app = create_app(session_factory, settings)
+    transport = ASGITransport(app=app)
+
+    async with AsyncClient(transport=transport, base_url="http://testserver") as client:
+        queue_response = await client.get("/api/queue")
+        ready_response = await client.get("/api/ready")
+
+    assert queue_response.status_code == 200
+    queue_payload = queue_response.json()
+    assert queue_payload["count"] == 1
+    assert queue_payload["items"][0]["content_item"]["topic"] == "Standalone pending post"
+
+    assert ready_response.status_code == 200
+    ready_payload = ready_response.json()
+    assert ready_payload["count"] == 1
+    assert ready_payload["items"][0]["content_item"]["topic"] == "Standalone ready post"

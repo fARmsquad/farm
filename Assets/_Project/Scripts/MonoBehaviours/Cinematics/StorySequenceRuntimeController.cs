@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using FarmSimVR.Core;
 using FarmSimVR.Core.Tutorial;
 using FarmSimVR.MonoBehaviours.Tutorial;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         private const string ControllerObjectName = "StorySequenceRuntimeController";
         private const string GeneratedBeatPrefix = "sequence_turn_";
 
-        [SerializeField] private string orchestratorBaseUrl = "http://127.0.0.1:8012";
+        [SerializeField] private string orchestratorBaseUrl = TownVoiceTokenServiceEndpointResolver.ProductionBaseUrl;
 
         private string _activeSessionId = string.Empty;
         private string _activeBaseUrl = string.Empty;
@@ -158,10 +159,13 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             }
 
             StorySequenceAdvancePayload payload = null;
+            string requestBaseUrl = string.IsNullOrWhiteSpace(readyResult.BaseUrl)
+                ? orchestratorBaseUrl
+                : readyResult.BaseUrl;
             var request = _beginSequenceRequestOverride != null
                 ? _beginSequenceRequestOverride(result => payload = result)
                 : StorySequenceServiceClient.CreateSessionAndAdvance(
-                    orchestratorBaseUrl,
+                    requestBaseUrl,
                     result => payload = result);
 
             yield return request;
@@ -204,12 +208,15 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             }
 
             StorySequenceAdvancePayload payload = null;
+            string requestBaseUrl = string.IsNullOrWhiteSpace(readyResult.BaseUrl)
+                ? (string.IsNullOrWhiteSpace(_activeBaseUrl) ? orchestratorBaseUrl : _activeBaseUrl)
+                : readyResult.BaseUrl;
             var request = _advanceSequenceRequestOverride != null
                 ? _advanceSequenceRequestOverride(
                     ActiveSessionId,
                     result => payload = result)
                 : StorySequenceServiceClient.AdvanceSession(
-                    string.IsNullOrWhiteSpace(_activeBaseUrl) ? orchestratorBaseUrl : _activeBaseUrl,
+                    requestBaseUrl,
                     ActiveSessionId,
                     result => payload = result);
 
@@ -286,6 +293,10 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
             {
                 _lastOrchestratorReadyBaseUrl = readyResult.BaseUrl;
                 orchestratorBaseUrl = readyResult.BaseUrl;
+            }
+            else if (readyResult != null && !readyResult.Success)
+            {
+                _lastOrchestratorReadyBaseUrl = string.Empty;
             }
 
             onComplete?.Invoke(readyResult ?? BuildCachedOrchestratorReadyResult());

@@ -60,11 +60,21 @@ namespace FarmSimVR.Tests.EditMode
                 SceneWorkCatalog.HorseTrainingSceneName,
                 SceneWorkCatalog.TownSceneName,
                 SceneWorkCatalog.FarmVegetableStatesSceneName,
+                "GenerativePlaythroughMenu",
             }));
 
             Assert.That(TutorialSceneCatalog.SceneOrder, Does.Not.Contain(SceneWorkCatalog.HorseTrainingSceneName));
             Assert.That(TutorialSceneCatalog.SceneOrder, Does.Not.Contain(SceneWorkCatalog.TownSceneName));
             Assert.That(TutorialSceneCatalog.SceneOrder, Does.Not.Contain(SceneWorkCatalog.FarmVegetableStatesSceneName));
+            Assert.That(TutorialSceneCatalog.SceneOrder, Does.Not.Contain("GenerativePlaythroughMenu"));
+        }
+
+        [Test]
+        public void TitleScreenBuildScenePaths_IncludeDedicatedGenerativePlaythroughMenuScene()
+        {
+            Assert.That(
+                SceneWorkCatalog.TitleScreenBuildScenePaths,
+                Does.Contain("Assets/_Project/Scenes/GenerativePlaythroughMenu.unity"));
         }
 
         [Test]
@@ -97,6 +107,12 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(vegetables.DisplayName, Is.EqualTo("Farm Vegetable States"));
             Assert.That(vegetables.Kind, Is.EqualTo(SceneWorkKind.Sandbox));
             Assert.That(vegetables.ScenePath, Is.EqualTo(SceneWorkCatalog.FarmVegetableStatesScenePath));
+
+            Assert.That(SceneWorkCatalog.TryGetBySceneName("GenerativePlaythroughMenu", out var generativeMenu), Is.True);
+            Assert.That(generativeMenu.Number, Is.EqualTo(13));
+            Assert.That(generativeMenu.DisplayName, Is.EqualTo("Generative Playthroughs"));
+            Assert.That(generativeMenu.Kind, Is.EqualTo(SceneWorkKind.Sandbox));
+            Assert.That(generativeMenu.ScenePath, Is.EqualTo("Assets/_Project/Scenes/GenerativePlaythroughMenu.unity"));
 
             Assert.That(SceneWorkCatalog.TryGetBySceneName("UnknownScene", out _), Is.False);
         }
