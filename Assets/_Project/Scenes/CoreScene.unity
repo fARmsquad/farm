@@ -47657,8 +47657,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.TownCameraFollow
   target: {fileID: 1745786244}
   distance: 6
-  shoulderHeight: 1.4
-  lookAtHeight: 1.2
+  shoulderHeight: 2.2
+  lookAtHeight: 1.6
   smoothSpeed: 4
 --- !u!81 &1694839380
 AudioListener:
@@ -48916,6 +48916,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 95663820981796124, guid: a3981b0f4b9c4bb489dce3db59ee32b5, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: df577d69473b47198d04ef1b835108b0, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

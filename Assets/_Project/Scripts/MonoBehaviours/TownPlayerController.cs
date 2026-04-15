@@ -65,7 +65,6 @@ namespace FarmSimVR.MonoBehaviours
         private void Start()
         {
             RefreshInteractables();
-            EnableControl();
         }
 
         private void Update()
@@ -109,7 +108,7 @@ namespace FarmSimVR.MonoBehaviours
 
         private void UpdateAnimator()
         {
-            if (_animator == null) return;
+            if (_animator == null || !_controlEnabled) return;
             var kb = Keyboard.current;
             bool moving = kb != null && (
                 kb.wKey.isPressed || kb.sKey.isPressed ||

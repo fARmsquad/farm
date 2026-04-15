@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace FarmSimVR.MonoBehaviours
@@ -73,6 +74,10 @@ namespace FarmSimVR.MonoBehaviours
 
         private void Start()
         {
+            // CoreScene loads before Town.unity — subscribe to sceneLoaded so we can
+            // pick up LLMConversationController once Town is loaded additively.
+            SceneManager.sceneLoaded += OnSceneLoaded;
+
             InitializeAdaptiveHud();
             ResolveVoiceInputController();
             if (dialoguePanel != null)
@@ -83,6 +88,31 @@ namespace FarmSimVR.MonoBehaviours
             ClearButtons();
             HideStatusBadge();
             RestoreDefaultHint();
+        }
+
+        private void OnDestroy()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (conversation != null) return;
+
+            conversation = FindFirstObjectByType<LLMConversationController>();
+            if (conversation == null) return;
+
+            ResolveVoiceInputController();
+            conversation.OnStreamStarted         += HandleStreamStarted;
+            conversation.OnStreamChunk           += HandleStreamChunk;
+            conversation.OnNPCResponse           += HandleResponse;
+            conversation.OnOptionsReady          += HandleOptions;
+            conversation.OnWaiting               += HandleWaiting;
+            conversation.OnConversationEnded     += HandleEnded;
+            conversation.OnError                 += HandleError;
+            conversation.OnPlayerPromptSubmitted += HandlePlayerPromptSubmitted;
+            conversation.OnExitBlocked           += HandleExitBlocked;
+            SubscribeVoiceInputStatus();
         }
 
         private void HandleStreamStarted(string npcName)
