@@ -21,7 +21,26 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
         [SerializeField] private TownPlayerController playerController;
 
         private CharacterController _characterController;
+        private Animator _animator;
         private float _verticalVelocity;
+
+        private void Awake()
+        {
+            // Player lives in CoreScene (persistent) so Inspector cross-scene refs are null.
+            // Resolve them at runtime — CoreScene is already loaded by the time Awake fires.
+            if (playerTransform == null || playerController == null)
+            {
+                var controller = FindFirstObjectByType<TownPlayerController>();
+                if (controller != null)
+                {
+                    if (playerTransform == null)  playerTransform  = controller.transform;
+                    if (playerController == null) playerController = controller;
+                }
+            }
+
+            if (playerTransform != null)
+                _animator = playerTransform.GetComponent<Animator>();
+        }
 
         protected override IEnumerator RunDemo()
         {
@@ -76,6 +95,7 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
             if (playerTransform == null || targetNpc == null) yield break;
 
             _characterController = playerTransform.GetComponent<CharacterController>();
+            if (_animator != null) _animator.SetFloat("Speed", 1f);
 
             while (true)
             {
@@ -89,6 +109,7 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
                 yield return null;
             }
 
+            if (_animator != null) _animator.SetFloat("Speed", 0f);
             if (_characterController != null)
                 _characterController.Move(Vector3.zero);
         }

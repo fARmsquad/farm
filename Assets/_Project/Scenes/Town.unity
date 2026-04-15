@@ -1731,7 +1731,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4587504480050528, guid: 9b8394eac4bf88c488a52119460b3820, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4587504480050528, guid: 9b8394eac4bf88c488a52119460b3820, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1739,7 +1739,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4587504480050528, guid: 9b8394eac4bf88c488a52119460b3820, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2
+      value: -8
       objectReference: {fileID: 0}
     - target: {fileID: 4587504480050528, guid: 9b8394eac4bf88c488a52119460b3820, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3850,6 +3850,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.LLMConversationController
   openAIClient: {fileID: 920750516}
+  enableVoiceInput: 1
 --- !u!114 &920750516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3862,7 +3863,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b21e8e39b3ab409080d4f12ab74454a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.OpenAIClient
-  apiKey: 
+  apiKey:
   model: gpt-4o-mini
   temperature: 0.8
   maxTokens: 140
