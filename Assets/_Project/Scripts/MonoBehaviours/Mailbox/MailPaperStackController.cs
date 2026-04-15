@@ -17,9 +17,10 @@ namespace FarmSimVR.MonoBehaviours.Mailbox
     /// </summary>
     public class MailPaperStackController : MonoBehaviour
     {
-        [SerializeField] private GameObject panelRoot;
-        [SerializeField] private GameObject paperPrefab;
-        [SerializeField] private Transform  stackRoot;
+        [SerializeField] private GameObject    panelRoot;
+        [SerializeField] private GameObject    paperPrefab;
+        [SerializeField] private Transform     stackRoot;
+        [SerializeField] private TMP_FontAsset letterFont;
 
         public bool IsOpen { get; private set; }
 
@@ -100,6 +101,10 @@ namespace FarmSimVR.MonoBehaviours.Mailbox
             if (labels.Length >= 1) labels[0].text = msg.Sender;
             if (labels.Length >= 2) labels[1].text = msg.Subject;
             if (labels.Length >= 3) labels[2].text = msg.Body;
+
+            if (letterFont != null)
+                foreach (var label in labels)
+                    label.font = letterFont;
 
             var seal = paper.transform.Find("WaxSeal");
             if (seal != null) seal.gameObject.SetActive(!msg.IsRead);
