@@ -31,7 +31,10 @@ namespace FarmSimVR.MonoBehaviours.Mailbox
             "Use a slightly old-fashioned letter style. " +
             "Gentle mystery is fine (a kind stranger, an unknown admirer of the farm) but never unsettling. " +
             "Junk mail should be cheerful, absurd in-world advertisements. " +
-            "Real mail should feel personal and warm.\n\n" +
+            "Real mail should feel personal and warm. " +
+            "IMPORTANT: Use plain ASCII text only — no emoji, no special Unicode symbols, no bullet points. " +
+            "Format the body as a proper letter: a greeting line, 1-3 short paragraphs, then a sign-off. " +
+            "Separate each paragraph with a blank line (two newlines).\n\n" +
             "Respond ONLY with a JSON object:\n" +
             "{\"messages\":[{\"sender\":\"...\",\"subject\":\"...\",\"body\":\"...\",\"type\":\"real|junk\",\"attachmentItemId\":null,\"attachmentQuantity\":0}]}";
 
@@ -103,6 +106,35 @@ namespace FarmSimVR.MonoBehaviours.Mailbox
         private static string EscapeJson(string s) =>
             s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "");
 
+        // Strip emoji and non-ASCII symbols so TMP doesn't render them as boxes
+        private static string StripEmoji(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return s;
+            var sb = new StringBuilder(s.Length);
+            int i = 0;
+            while (i < s.Length)
+            {
+                // Surrogate pairs = emoji above U+FFFF — skip both chars
+                if (char.IsHighSurrogate(s[i]) && i + 1 < s.Length && char.IsLowSurrogate(s[i + 1]))
+                {
+                    i += 2;
+                    continue;
+                }
+                char c = s[i];
+                // Skip common symbol/emoji ranges in BMP
+                if ((c >= '\u2600' && c <= '\u27FF') ||   // Misc symbols, dingbats
+                    (c >= '\uFE00' && c <= '\uFEFF') ||   // Variation selectors, BOM
+                    c == '\u200D' || c == '\uFFFD')        // ZWJ, replacement char
+                {
+                    i++;
+                    continue;
+                }
+                sb.Append(c);
+                i++;
+            }
+            return sb.ToString().Trim();
+        }
+
         private static List<MailMessage> ParseResponse(string rawJson)
         {
             try
@@ -122,7 +154,7 @@ namespace FarmSimVR.MonoBehaviours.Mailbox
                         attachment = new MailAttachment(dto.attachmentItemId, dto.attachmentQuantity);
 
                     result.Add(new MailMessage(
-                        dto.sender, dto.subject, dto.body,
+                        StripEmoji(dto.sender), StripEmoji(dto.subject), StripEmoji(dto.body),
                         dto.type == "junk" ? MailType.Junk : MailType.Real,
                         attachment));
                 }

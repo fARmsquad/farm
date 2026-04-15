@@ -36,9 +36,6 @@ namespace FarmSimVR.MonoBehaviours.Mailbox
 
             if (countLabel != null)
                 countLabel.text = unread > 0 ? unread.ToString() : string.Empty;
-
-            if (Keyboard.current != null && Keyboard.current[Key.M].wasPressedThisFrame)
-                panel?.Toggle();
         }
 
         private void OnClick() => panel?.Toggle();

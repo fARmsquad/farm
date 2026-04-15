@@ -59,20 +59,6 @@ namespace FarmSimVR.MonoBehaviours.Mailbox
 
         private void OnNewDay(int dayCount) => GenerateMail(dayCount);
 
-        [Header("Debug UI")]
-        [SerializeField] private bool showDebugOverlay = true;
-
-        private void OnGUI()
-        {
-            if (!showDebugOverlay) return;
-            var service = MailboxService;
-            if (service == null) return;
-            int unread = service.UnreadCount;
-            GUI.Box(new Rect(Screen.width - 130, 10, 120, 65), $"MAIL ({unread} unread)");
-            if (GUI.Button(new Rect(Screen.width - 125, 40, 110, 28), "Open Mailbox"))
-                FindAnyObjectByType<MailboxPanelController>()?.Toggle();
-        }
-
         private void GenerateMail(int dayNumber)
         {
             if (llmClient == null)
