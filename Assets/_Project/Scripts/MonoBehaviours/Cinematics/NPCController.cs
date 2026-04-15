@@ -18,6 +18,9 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         [Header("Dialogue")]
         [SerializeField] private DialogueData dialogueData;
 
+        [Header("Animation")]
+        [SerializeField] private Animator animator;
+
         [Header("Interaction")]
         [SerializeField] private float interactionRange = 5f;
         [SerializeField] private float turnSpeed = 5f;
@@ -80,6 +83,8 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
             if (promptCanvas != null)
                 promptCanvas.SetActive(false);
+
+            animator?.SetFloat("Speed", 0f);
         }
 
         private void Update()
