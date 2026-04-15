@@ -39,6 +39,7 @@ namespace FarmSimVR.MonoBehaviours
         private float _verticalVelocity;
         private float _pitch;
         private bool _controlEnabled;
+        private bool _suspended;
         private bool _wasInConversation;
 
         private List<NPCController> _npcs = new();
@@ -73,7 +74,7 @@ namespace FarmSimVR.MonoBehaviours
                 EnableControl();
             }
 
-            if (!_controlEnabled) return;
+            if (!_controlEnabled || _suspended) return;
 
             bool inConversation = conversationController != null && conversationController.IsInConversation;
 
@@ -111,6 +112,29 @@ namespace FarmSimVR.MonoBehaviours
             Cursor.visible   = false;
 
             ShowHint("WASD to move  |  Mouse to look  |  E to talk");
+        }
+
+        /// <summary>
+        /// Temporarily freezes movement and releases the cursor. Called by UI panels.
+        /// </summary>
+        public void SuspendControl()
+        {
+            _suspended       = true;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible   = true;
+        }
+
+        /// <summary>
+        /// Restores movement after a UI panel closes.
+        /// </summary>
+        public void ResumeControl()
+        {
+            _suspended = false;
+            if (_controlEnabled)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible   = false;
+            }
         }
 
         /// <summary>

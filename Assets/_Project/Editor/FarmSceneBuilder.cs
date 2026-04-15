@@ -493,7 +493,7 @@ namespace FarmSimVR.Editor
         {
             // Remove existing probes from our hierarchy
             foreach (var existing in Object.FindObjectsByType<ReflectionProbe>(
-                FindObjectsInactive.Exclude))
+                FindObjectsInactive.Exclude, FindObjectsSortMode.None))
             {
                 if (existing.gameObject.name == "FarmReflectionProbe")
                     Object.DestroyImmediate(existing.gameObject);
@@ -559,7 +559,7 @@ namespace FarmSimVR.Editor
         private static void RemoveExistingDirectionalLights()
         {
             foreach (var existingLight in Object.FindObjectsByType<Light>(
-                FindObjectsInactive.Exclude))
+                FindObjectsInactive.Exclude, FindObjectsSortMode.None))
             {
                 if (existingLight.type == LightType.Directional)
                     Object.DestroyImmediate(existingLight.gameObject);

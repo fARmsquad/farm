@@ -20,7 +20,7 @@ namespace FarmSimVR.MonoBehaviours
         private void Start()
         {
             // Find all plot controllers and register them
-            var plots = FindObjectsByType<CropPlotController>();
+            var plots = FindObjectsByType<CropPlotController>(FindObjectsSortMode.None);
             var calculator = new CropGrowthCalculator();
 
             foreach (var plotCtrl in plots)

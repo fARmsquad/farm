@@ -32,7 +32,7 @@ namespace FarmSimVR.Editor
             cam.clearFlags = CameraClearFlags.Skybox;
             camGO.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
             // Remove any existing AudioListeners to avoid duplicates
-            foreach (var existing in Object.FindObjectsByType<AudioListener>())
+            foreach (var existing in Object.FindObjectsByType<AudioListener>(FindObjectsSortMode.None))
                 Object.DestroyImmediate(existing);
             camGO.AddComponent<AudioListener>();
 
