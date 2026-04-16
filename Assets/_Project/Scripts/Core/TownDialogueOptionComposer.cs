@@ -146,11 +146,11 @@ namespace FarmSimVR.Core
             AddKeywordOptions(
                 options,
                 responseText,
-                new[] { "Pip", "delivery", "deliveries" },
+                new[] { "Pip", "stall", "produce", "vegetable", "fruit", "grocer" },
                 new[]
                 {
-                    "What kind of trouble does Pip find?",
-                    "Why does Pip know so much about everybody?"
+                    "What fruit is best at Pip's stall this week?",
+                    "How does Pip choose his vegetables?"
                 },
                 allowGoodbye,
                 recentQuestions);

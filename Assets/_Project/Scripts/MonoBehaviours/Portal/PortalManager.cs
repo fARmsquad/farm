@@ -15,6 +15,11 @@ namespace FarmSimVR.MonoBehaviours.Portal
     {
         private const float DEFAULT_FADE_DURATION = 0.5f;
         private const float DEFAULT_HOLD_BLACK_DURATION = 0.3f;
+        /// <summary>
+        /// After teleport, nudge the player slightly above the floor so the CharacterController
+        /// does not start intersecting the ground mesh (avoids tunneling / fall-through).
+        /// </summary>
+        private const float TeleportGroundClearancePadding = 0.15f;
 
         /// <summary>Singleton accessor.</summary>
         public static PortalManager Instance { get; private set; }
@@ -278,11 +283,14 @@ namespace FarmSimVR.MonoBehaviours.Portal
             if (playerCharacterController != null)
                 playerCharacterController.enabled = false;
 
-            playerTransform.position = position;
-            playerTransform.rotation = rotation;
+            position += Vector3.up * TeleportGroundClearancePadding;
+            playerTransform.SetPositionAndRotation(position, rotation);
 
             if (playerCharacterController != null)
+            {
                 playerCharacterController.enabled = true;
+                Physics.SyncTransforms();
+            }
         }
 
         /// <summary>

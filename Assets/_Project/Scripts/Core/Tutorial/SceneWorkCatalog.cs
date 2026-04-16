@@ -112,7 +112,8 @@ namespace FarmSimVR.Core.Tutorial
                 TownSceneName,
                 TownScenePath,
                 "Town Conversation",
-                "Own the standalone town interaction slice with NPC conversation, autoplay approach, and free-roam follow-up.",
+                "Own the standalone town interaction slice with NPC conversation, autoplay approach, and free-roam follow-up. " +
+                "Main player rig (TownPlayerController) lives in CoreScene: use hub + additive Town, or a bootstrap that loads CoreScene first.",
                 SceneWorkKind.Gameplay,
                 null));
 

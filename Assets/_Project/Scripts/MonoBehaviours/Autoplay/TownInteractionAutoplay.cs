@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using System.Collections;
+using FarmSimVR.Core.Tutorial;
 using FarmSimVR.MonoBehaviours.Cinematics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace FarmSimVR.MonoBehaviours.Autoplay
 {
@@ -24,6 +27,15 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
         private CharacterController _characterController;
         private Animator _animator;
         private float _verticalVelocity;
+
+        protected override bool ShouldBeginAutoplay()
+        {
+            var names = new List<string>(SceneManager.sceneCount);
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+                names.Add(SceneManager.GetSceneAt(i).name);
+
+            return !TownAutoplayPolicy.ShouldSkipTownInteractionDemo(names);
+        }
 
         private void Awake()
         {

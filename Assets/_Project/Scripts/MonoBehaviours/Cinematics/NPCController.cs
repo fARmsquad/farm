@@ -1,3 +1,4 @@
+using FarmSimVR.MonoBehaviours;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,6 +14,8 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
         [Header("Identity")]
         [SerializeField] private string npcName;
+        [Tooltip("Shown on the overhead name card under the display name, e.g. \"The baker\".")]
+        [SerializeField] private string npcRole;
         [SerializeField] private Color capsuleColor = Color.cyan;
 
         [Header("Dialogue")]
@@ -39,6 +42,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
         #region Public Properties
 
         public string NpcName => npcName;
+        public string NpcRole => npcRole ?? string.Empty;
         public DialogueData DialogueData => dialogueData;
 
         /// <summary>
@@ -71,9 +75,7 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
 
         private void Start()
         {
-            var playerGO = GameObject.FindWithTag("Player");
-            if (playerGO != null)
-                playerTransform = playerGO.transform;
+            ResolvePlayerTransform();
 
             if (capsuleRenderer != null)
                 capsuleRenderer.material.color = capsuleColor;
@@ -85,6 +87,23 @@ namespace FarmSimVR.MonoBehaviours.Cinematics
                 promptCanvas.SetActive(false);
 
             animator?.SetFloat("Speed", 0f);
+        }
+
+        /// <summary>
+        /// Prefer the Player tag; CoreScene rigs are often left Untagged, so fall back to TownPlayerController.
+        /// </summary>
+        private void ResolvePlayerTransform()
+        {
+            var playerGO = GameObject.FindWithTag("Player");
+            if (playerGO != null)
+            {
+                playerTransform = playerGO.transform;
+                return;
+            }
+
+            var townPlayer = Object.FindAnyObjectByType<TownPlayerController>();
+            if (townPlayer != null)
+                playerTransform = townPlayer.transform;
         }
 
         private void Update()

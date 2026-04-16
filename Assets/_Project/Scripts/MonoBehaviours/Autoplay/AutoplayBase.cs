@@ -19,8 +19,20 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
 
         protected abstract IEnumerator RunDemo();
 
+        /// <summary>
+        /// When false, skips the demo coroutine and invokes <see cref="OnDemoComplete"/> once.
+        /// </summary>
+        protected virtual bool ShouldBeginAutoplay() => true;
+
         private void Start()
         {
+            if (!ShouldBeginAutoplay())
+            {
+                finished = true;
+                OnDemoComplete();
+                return;
+            }
+
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             StartCoroutine(RunWrapper());

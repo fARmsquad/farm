@@ -1,21 +1,24 @@
 using System.Collections.Generic;
+using FarmSimVR.Core.Town;
 using FarmSimVR.MonoBehaviours.Cinematics;
 using FarmSimVR.MonoBehaviours.Interaction;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace FarmSimVR.MonoBehaviours
 {
     /// <summary>
     /// Free-roam player controller for the Town scene.
-    /// Starts disabled and is activated by TownInteractionAutoplay.OnDemoComplete.
+    /// Control is enabled from Start; Tab also calls <see cref="EnableControl"/>.
     ///
     /// Controls:
     ///   Mouse X  → turns the character (yaw).
-    ///   WASD     → camera-relative movement.
+    ///   W/S      → move forward/back along facing (forward walk animation).
+    ///   A/D      → yaw (steer); pairs with forward-only walk clips.
     ///   Shift    → run.
-    ///   E        → interact with nearest NPC or interactable object in range.
+    ///   E or gamepad south face (A) → interact with nearest NPC or interactable in range.
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
     public class TownPlayerController : MonoBehaviour
@@ -33,6 +36,9 @@ namespace FarmSimVR.MonoBehaviours
 
         [Header("Interaction UI")]
         [SerializeField] private TextMeshProUGUI interactPromptLabel;
+
+        [Header("Locomotion")]
+        [SerializeField] private float keyboardYawDegreesPerSecond = 100f;
 
         private CharacterController _cc;
         private Animator _animator;
@@ -60,11 +66,27 @@ namespace FarmSimVR.MonoBehaviours
 
             if (interactPromptLabel != null)
                 interactPromptLabel.gameObject.SetActive(false);
+
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        private void OnDestroy()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (mode != LoadSceneMode.Additive)
+                return;
+
+            RefreshInteractables();
         }
 
         private void Start()
         {
             RefreshInteractables();
+            EnableControl();
         }
 
         private void Update()
@@ -76,7 +98,9 @@ namespace FarmSimVR.MonoBehaviours
                 EnableControl();
             }
 
-            UpdateAnimator();
+            Vector2 wasd = ReadWasdKeyboard();
+
+            UpdateAnimator(wasd);
 
             if (!_controlEnabled || _suspended) return;
 
@@ -101,21 +125,15 @@ namespace FarmSimVR.MonoBehaviours
 
             UpdateInteractPrompt();
             HandleMouseLook();
-            HandleMovement();
+            HandleSteeringMovement(wasd);
         }
 
         // ── Animator ──────────────────────────────────────────────────────────
 
-        private void UpdateAnimator()
+        private void UpdateAnimator(Vector2 wasd)
         {
             if (_animator == null || !_controlEnabled) return;
-            var kb = Keyboard.current;
-            bool moving = kb != null && (
-                kb.wKey.isPressed || kb.sKey.isPressed ||
-                kb.aKey.isPressed || kb.dKey.isPressed ||
-                kb.upArrowKey.isPressed || kb.downArrowKey.isPressed ||
-                kb.leftArrowKey.isPressed || kb.rightArrowKey.isPressed);
-            _animator.SetFloat("Speed", moving ? 1f : 0f);
+            _animator.SetFloat("Speed", TownLocomotionAnimPolicy.GetWalkSpeedParameter(wasd.y));
         }
 
         // ── Public API ────────────────────────────────────────────────────────
@@ -129,7 +147,7 @@ namespace FarmSimVR.MonoBehaviours
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible   = false;
 
-            ShowHint("WASD to move  |  Mouse to look  |  E to talk");
+            ShowHint("W/S move  |  A/D turn  |  Mouse look  |  E or A button to talk");
         }
 
         /// <summary>
@@ -161,6 +179,9 @@ namespace FarmSimVR.MonoBehaviours
         /// </summary>
         public void RefreshInteractables()
         {
+            if (conversationController == null)
+                conversationController = FindAnyObjectByType<LLMConversationController>();
+
             _npcs.Clear();
             _npcs.AddRange(FindObjectsByType<NPCController>(FindObjectsSortMode.None));
 
@@ -173,19 +194,21 @@ namespace FarmSimVR.MonoBehaviours
         /// <summary>
         /// Shows "Press E to talk/interact" when the player is within range of any NPC or interactable.
         /// NPCs take priority over interactable objects when both are in range.
+        /// Interaction works even if <see cref="interactPromptLabel"/> is unassigned (no prompt text).
         /// </summary>
         private void UpdateInteractPrompt()
         {
-            if (interactPromptLabel == null) return;
-
             // Check NPCs first (they take priority)
             NPCController nearestNpc = GetNearestNPCInRange();
             if (nearestNpc != null)
             {
-                interactPromptLabel.text = $"Press E to talk to {nearestNpc.NpcName}";
-                interactPromptLabel.gameObject.SetActive(true);
+                if (interactPromptLabel != null)
+                {
+                    interactPromptLabel.text = $"Press E / A to talk to {nearestNpc.NpcName}";
+                    interactPromptLabel.gameObject.SetActive(true);
+                }
 
-                if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+                if (WasInteractPressed())
                     nearestNpc.TriggerInteraction();
                 return;
             }
@@ -194,16 +217,30 @@ namespace FarmSimVR.MonoBehaviours
             InteractableObject nearestInteractable = GetNearestInteractableInRange();
             if (nearestInteractable != null)
             {
-                interactPromptLabel.text = nearestInteractable.InteractionPrompt;
-                interactPromptLabel.gameObject.SetActive(true);
+                if (interactPromptLabel != null)
+                {
+                    interactPromptLabel.text = nearestInteractable.InteractionPrompt;
+                    interactPromptLabel.gameObject.SetActive(true);
+                }
 
-                if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+                if (WasInteractPressed())
                     nearestInteractable.OnInteract();
                 return;
             }
 
-            if (interactPromptLabel.gameObject.activeSelf)
+            if (interactPromptLabel != null && interactPromptLabel.gameObject.activeSelf)
                 interactPromptLabel.gameObject.SetActive(false);
+        }
+
+        /// <summary>Keyboard E or gamepad south button (Quest / Xbox A / PlayStation Cross).</summary>
+        private static bool WasInteractPressed()
+        {
+            var kb = Keyboard.current;
+            if (kb != null && kb.eKey.wasPressedThisFrame)
+                return true;
+
+            var pad = Gamepad.current;
+            return pad != null && pad.buttonSouth.wasPressedThisFrame;
         }
 
         private NPCController GetNearestNPCInRange()
@@ -268,23 +305,31 @@ namespace FarmSimVR.MonoBehaviours
                 _cameraFollow.SetPitch(_pitch);
         }
 
-        // ── WASD movement (player-relative) ───────────────────────────────────
+        // ── Steering movement (forward/back translate; A/D yaw) ───────────────
 
-        private void HandleMovement()
+        private static Vector2 ReadWasdKeyboard()
         {
             var kb = Keyboard.current;
-            if (kb == null) return;
-
-            float speed = kb.leftShiftKey.isPressed ? RUN_SPEED : MOVE_SPEED;
+            if (kb == null) return Vector2.zero;
 
             Vector2 wasd = Vector2.zero;
             if (kb.wKey.isPressed || kb.upArrowKey.isPressed)    wasd.y += 1f;
             if (kb.sKey.isPressed || kb.downArrowKey.isPressed)  wasd.y -= 1f;
             if (kb.aKey.isPressed || kb.leftArrowKey.isPressed)  wasd.x -= 1f;
             if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) wasd.x += 1f;
-            wasd = Vector2.ClampMagnitude(wasd, 1f);
+            return Vector2.ClampMagnitude(wasd, 1f);
+        }
 
-            Vector3 move = (transform.forward * wasd.y + transform.right * wasd.x) * speed;
+        private void HandleSteeringMovement(Vector2 wasd)
+        {
+            var kb = Keyboard.current;
+            if (kb == null) return;
+
+            float speed = kb.leftShiftKey.isPressed ? RUN_SPEED : MOVE_SPEED;
+
+            transform.Rotate(0f, wasd.x * keyboardYawDegreesPerSecond * Time.deltaTime, 0f);
+
+            Vector3 move = transform.forward * wasd.y * speed;
 
             if (_cc.isGrounded && _verticalVelocity < 0f)
             {
