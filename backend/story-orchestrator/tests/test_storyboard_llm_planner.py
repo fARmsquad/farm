@@ -257,6 +257,25 @@ class OpenAIStoryboardPlannerTests(unittest.TestCase):
         ):
             self.assertIn(phrase, sp, f"missing coherence guardrail phrase: {phrase}")
 
+    def test_plan_user_prompt_includes_prior_hero_shot_paths_when_provided(self) -> None:
+        client = CapturingStructuredOutputClient(_valid_payload())
+        planner = OpenAIStoryboardPlanner(client=client)
+
+        planner.plan(build_request(prior_hero_shot_paths=["/abs/path/to/prior/shot_01.png"]))
+
+        assert client.last_user_prompt is not None
+        self.assertIn("prior_hero_shot_paths", client.last_user_prompt)
+        self.assertIn("/abs/path/to/prior/shot_01.png", client.last_user_prompt)
+
+    def test_plan_user_prompt_handles_empty_prior_hero_shot_paths_without_crashing(self) -> None:
+        client = CapturingStructuredOutputClient(_valid_payload())
+        planner = OpenAIStoryboardPlanner(client=client)
+
+        planner.plan(build_request(prior_hero_shot_paths=[]))
+
+        assert client.last_user_prompt is not None
+        self.assertIn('"prior_hero_shot_paths": []', client.last_user_prompt)
+
     def test_openai_storyboard_planner_rejects_mismatched_narration_text(self) -> None:
         planner = OpenAIStoryboardPlanner(
             client=FakeStructuredOutputClient(
@@ -412,7 +431,11 @@ def _valid_payload(image_prompts: list[str] | None = None) -> dict:
     return payload
 
 
-def build_request(*, style_preset_id: str = "farm_storybook_v1") -> GeneratedStoryboardCutsceneRequest:
+def build_request(
+    *,
+    style_preset_id: str = "farm_storybook_v1",
+    prior_hero_shot_paths: list[str] | None = None,
+) -> GeneratedStoryboardCutsceneRequest:
     return GeneratedStoryboardCutsceneRequest(
         package_id="storypkg_intro_chicken_sample",
         package_display_name="Intro Chicken Sample",
@@ -429,6 +452,7 @@ def build_request(*, style_preset_id: str = "farm_storybook_v1") -> GeneratedSto
             crop_name="carrots",
             minigame_goal="Recover the missing watering kit before planting begins",
             prior_story_summary="Old Garrett settled the chicken pen, but the tool rack is still in disarray.",
+            prior_hero_shot_paths=list(prior_hero_shot_paths or []),
             world_state=["tomatoes_unlocked", "watering_tools_unlocked"],
             present_character_names=["Miss Clara", "Old Garrett"],
             selected_generator_id="find_tools_cluster_v1",

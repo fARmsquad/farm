@@ -353,6 +353,7 @@ class GeneratedStoryboardService:
                     focus_label=focus_label,
                     minigame_goal=minigame_goal,
                     prior_story_summary=request.context.prior_story_summary,
+                    prior_hero_shot_paths=list(request.context.prior_hero_shot_paths),
                     world_state=list(request.context.world_state),
                     present_character_names=list(request.context.present_character_names),
                     selected_generator_id=request.context.selected_generator_id,

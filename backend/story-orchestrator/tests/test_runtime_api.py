@@ -359,6 +359,101 @@ class RuntimeSessionEndpointTests(unittest.TestCase):
         self.fail(f"Runtime job '{job_id}' did not reach a terminal state. Last payload: {last_payload}")
 
 
+class RuntimeVisualContinuityTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._temp_dir = tempfile.TemporaryDirectory()
+        database_path = Path(self._temp_dir.name) / "story_orchestrator.db"
+        output_root = Path(self._temp_dir.name) / "Assets" / "_Project" / "Resources"
+        package_output_path = output_root / "StoryPackages" / "StoryPackage_IntroChickenSample.json"
+        settings = Settings(
+            gemini_api_key="test-gemini",
+            elevenlabs_api_key="test-eleven",
+            openai_api_key="test-openai",
+            database_path=str(database_path),
+            elevenlabs_voice_id="voice-test",
+        )
+        self.recording_planner = RecordingTemplatePlanner()
+        storyboard_service = GeneratedStoryboardService(
+            output_root=output_root,
+            package_output_path=package_output_path,
+            planner=self.recording_planner,
+            image_generator=RuntimeFakeImageGenerator(),
+            speech_generator=RuntimeFakeSpeechGenerator(),
+            default_voice_id="voice-test",
+        )
+        minigame_service = GeneratedMinigameBeatService(package_output_path=package_output_path)
+        self.client = TestClient(
+            create_app(
+                settings,
+                generated_storyboard_service=storyboard_service,
+                generated_minigame_service=minigame_service,
+            )
+        )
+
+    def tearDown(self) -> None:
+        self.client.close()
+        self._temp_dir.cleanup()
+
+    def test_second_turn_planner_request_carries_prior_hero_shot_path(self) -> None:
+        created = self.client.post("/api/runtime/v1/sessions", json={}).json()
+        first_job = self._wait_for_terminal_job(created["job_id"])
+        first_envelope = self.client.get(
+            f"/api/runtime/v1/sessions/{created['session_id']}/turns/{first_job['turn_id']}"
+        ).json()
+        first_shot_image_asset_id = first_envelope["cutscene"]["shots"][0]["image_asset_id"]
+        first_shot_artifact = next(
+            artifact for artifact in first_envelope["artifacts"]
+            if artifact["asset_id"] == first_shot_image_asset_id
+        )
+        first_shot_stored_path = first_shot_artifact["stored_path"]
+
+        outcome_response = self.client.post(
+            f"/api/runtime/v1/sessions/{created['session_id']}/turns/{first_job['turn_id']}/outcome",
+            json={
+                "result": "success",
+                "score": 1.0,
+                "completed_objective_count": 1,
+                "notes": "First turn done.",
+            },
+        )
+        self.assertEqual(outcome_response.status_code, 200)
+        next_job = self._wait_for_terminal_job(outcome_response.json()["next_job_id"])
+        self.assertEqual(next_job["status"], "ready")
+
+        second_turn_request = self.recording_planner.requests[-1]
+        self.assertIn(first_shot_stored_path, second_turn_request.context.prior_hero_shot_paths)
+
+    def test_first_turn_planner_request_has_empty_prior_hero_shot_paths(self) -> None:
+        created = self.client.post("/api/runtime/v1/sessions", json={}).json()
+        first_job = self._wait_for_terminal_job(created["job_id"])
+        self.assertEqual(first_job["status"], "ready")
+
+        first_turn_request = self.recording_planner.requests[0]
+        self.assertEqual(first_turn_request.context.prior_hero_shot_paths, [])
+
+    def _wait_for_terminal_job(self, job_id: str) -> dict:
+        last_payload = None
+        for _ in range(60):
+            response = self.client.get(f"/api/runtime/v1/jobs/{job_id}")
+            self.assertEqual(response.status_code, 200)
+            last_payload = response.json()
+            if last_payload["status"] in {"ready", "failed", "cancelled"}:
+                return last_payload
+            time.sleep(0.05)
+
+        self.fail(f"Runtime job '{job_id}' did not reach a terminal state. Last payload: {last_payload}")
+
+
+class RecordingTemplatePlanner:
+    def __init__(self) -> None:
+        self._inner = TemplateStoryboardPlanner()
+        self.requests: list = []
+
+    def plan(self, request):
+        self.requests.append(request)
+        return self._inner.plan(request)
+
+
 class RuntimeSessionCreateContractTests(unittest.TestCase):
     def setUp(self) -> None:
         self._temp_dir = tempfile.TemporaryDirectory()

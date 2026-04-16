@@ -13,6 +13,7 @@ class GeneratedStoryboardContext(BaseModel):
     focus_label: str | None = None
     minigame_goal: str | None = None
     prior_story_summary: str | None = None
+    prior_hero_shot_paths: list[str] = Field(default_factory=list)
     world_state: list[str] = Field(default_factory=list)
     present_character_names: list[str] = Field(default_factory=list)
     selected_generator_id: str | None = None

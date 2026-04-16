@@ -123,6 +123,22 @@ def display_name_for(catalog: MinigameGeneratorCatalog, generator_id: str) -> st
     return definition.display_name
 
 
+def prior_hero_shot_paths(prior_turns: list[RuntimeTurnRecord]) -> list[str]:
+    if not prior_turns:
+        return []
+    last_turn = prior_turns[-1]
+    shots = last_turn.envelope.cutscene.shots
+    if not shots:
+        return []
+    hero_image_asset_id = shots[0].image_asset_id
+    if not hero_image_asset_id:
+        return []
+    for artifact in last_turn.envelope.artifacts:
+        if artifact.asset_id == hero_image_asset_id and artifact.stored_path:
+            return [artifact.stored_path]
+    return []
+
+
 def prior_story_summary(prior_turns: list[RuntimeTurnRecord]) -> str:
     if not prior_turns:
         return "No previous turn summary yet. Use the existing farm state and story brief to create the next conflict."

@@ -134,6 +134,7 @@ class OpenAIStoryboardPlanner:
                 "minigame_goal": request.context.minigame_goal,
                 "mission_configuration_summary": request.context.mission_configuration_summary,
                 "prior_story_summary": request.context.prior_story_summary,
+                "prior_hero_shot_paths": list(request.context.prior_hero_shot_paths),
                 "world_state": request.context.world_state,
                 "selected_generator_id": request.context.selected_generator_id,
                 "selected_generator_display_name": request.context.selected_generator_display_name,
