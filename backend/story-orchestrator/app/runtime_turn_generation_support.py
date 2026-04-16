@@ -6,33 +6,28 @@ from typing import Any
 from .generated_package_assembly import GeneratedPackageAssemblyResult
 from .minigame_generators import MinigameGeneratorCatalog
 from .runtime_models import RuntimeContinuityImageRecord, RuntimeSession, RuntimeTurnRecord
+from .story_mode_config import MINIGAME_SCENES
 from .story_sequence_turn_director import StorySequenceGeneratorOption, StorySequenceTurnDirector
 
 PROOF_CUTSCENE_SCENE = "PostChickenCutscene"
-RUNTIME_FARM_ONLY_GENERATOR_IDS = ("plant_rows_v1",)
-MINIGAME_SCENES = {
-    "plant_rows_v1": "FarmMain",
-    "find_tools_cluster_v1": "FindToolsGame",
-    "chicken_chase_intro_v1": "ChickenChaseGame",
-}
+LEGACY_RUNTIME_DEFAULT_GENERATOR_IDS = ("plant_rows_v1",)
 
 
-def build_story_brief(session: RuntimeSession, generator_id: str, character_name: str) -> str:
-    focus = {
-        "plant_rows_v1": "guiding the first planting rhythm",
-        "find_tools_cluster_v1": "recovering the right tools around the farm",
-        "chicken_chase_intro_v1": "bringing playful chaos back under control",
-    }[generator_id]
+def build_story_brief(
+    session: RuntimeSession,
+    *,
+    story_seed: str,
+    character_name: str,
+    story_hook: str,
+    prompt_structure_description: str,
+) -> str:
     if session.state.last_minigame_goal:
         return (
-            f"{session.state.narrative_seed} {character_name} links the previous goal "
-            f"'{session.state.last_minigame_goal}' into {focus}. "
-            "A new interruption, discovery, or practical farm problem should force the next mission to happen now."
+            f"{story_seed} {character_name} links the previous goal "
+            f"'{session.state.last_minigame_goal}' into the next beat. "
+            f"{story_hook} Shape the turn so it {prompt_structure_description.lower()}."
         )
-    return (
-        f"{session.state.narrative_seed} {character_name} sets up {focus}. "
-        "Introduce a concrete farm conflict or event so the next mission feels earned."
-    )
+    return f"{story_seed} {story_hook} Shape the turn so it {prompt_structure_description.lower()}."
 
 
 def objective_text_for(generator_id: str, parameters: dict[str, Any]) -> str:
@@ -53,13 +48,21 @@ def mission_configuration_summary(generator_id: str, parameters: dict[str, Any])
 
 
 def ordered_generator_ids(catalog: MinigameGeneratorCatalog, session: RuntimeSession) -> list[str]:
-    farm_only = [
+    allowed = [
         generator_id
-        for generator_id in RUNTIME_FARM_ONLY_GENERATOR_IDS
+        for generator_id in session.state.allowed_generator_ids
         if catalog.get_definition(generator_id) is not None
     ]
-    if farm_only:
-        return farm_only
+    if allowed:
+        return allowed
+
+    legacy_default = [
+        generator_id
+        for generator_id in LEGACY_RUNTIME_DEFAULT_GENERATOR_IDS
+        if catalog.get_definition(generator_id) is not None
+    ]
+    if legacy_default:
+        return legacy_default
 
     definitions = catalog.list_definitions()
     start_index = session.state.beat_cursor % len(definitions)
@@ -69,12 +72,18 @@ def ordered_generator_ids(catalog: MinigameGeneratorCatalog, session: RuntimeSes
 
 def choose_directed_turn(
     turn_director: StorySequenceTurnDirector | None,
-    catalog: MinigameGeneratorCatalog,
     session: RuntimeSession,
     prior_turns: list[RuntimeTurnRecord],
-    candidate_ids: list[str],
+    candidate_generators: list[StorySequenceGeneratorOption],
     default_generator_id: str,
     default_character_name: str,
+    *,
+    story_type_id: str = "",
+    story_type_display_name: str = "",
+    story_type_prompt_directives: list[str] | None = None,
+    prompt_structure_id: str = "",
+    prompt_structure_display_name: str = "",
+    prompt_structure_directives: list[str] | None = None,
 ):
     if turn_director is None:
         return None
@@ -87,17 +96,13 @@ def choose_directed_turn(
             difficulty_band=session.state.difficulty_band,
             last_minigame_goal=session.state.last_minigame_goal,
             recent_turn_summaries=[turn.summary for turn in prior_turns[-3:]],
-            candidate_generators=[
-                StorySequenceGeneratorOption(
-                    generator_id=definition.generator_id,
-                    display_name=definition.display_name,
-                    minigame_id=definition.minigame_id,
-                    fit_tags=list(definition.fit_tags),
-                    preview_text_template=definition.preview_text_template,
-                )
-                for definition in catalog.list_definitions()
-                if definition.generator_id in candidate_ids
-            ],
+            story_type_id=story_type_id,
+            story_type_display_name=story_type_display_name,
+            story_type_prompt_directives=list(story_type_prompt_directives or []),
+            prompt_structure_id=prompt_structure_id,
+            prompt_structure_display_name=prompt_structure_display_name,
+            prompt_structure_directives=list(prompt_structure_directives or []),
+            candidate_generators=candidate_generators,
             candidate_character_names=list(session.state.character_pool),
             default_generator_id=default_generator_id,
             default_character_name=default_character_name,
@@ -116,6 +121,22 @@ def display_name_for(catalog: MinigameGeneratorCatalog, generator_id: str) -> st
     if definition is None:
         raise RuntimeError(f"Generator definition '{generator_id}' was not found.")
     return definition.display_name
+
+
+def prior_hero_shot_paths(prior_turns: list[RuntimeTurnRecord]) -> list[str]:
+    if not prior_turns:
+        return []
+    last_turn = prior_turns[-1]
+    shots = last_turn.envelope.cutscene.shots
+    if not shots:
+        return []
+    hero_image_asset_id = shots[0].image_asset_id
+    if not hero_image_asset_id:
+        return []
+    for artifact in last_turn.envelope.artifacts:
+        if artifact.asset_id == hero_image_asset_id and artifact.stored_path:
+            return [artifact.stored_path]
+    return []
 
 
 def prior_story_summary(prior_turns: list[RuntimeTurnRecord]) -> str:

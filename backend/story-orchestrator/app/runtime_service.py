@@ -20,6 +20,8 @@ from .runtime_models import (
     TurnOutcomeRequest,
     TurnOutcomeResponse,
 )
+from .story_mode_config import RuntimeStoryModeConfigCatalog
+from .story_mode_config_models import RuntimeStoryModeConfiguration
 from .runtime_store import RuntimeSessionStore
 from .runtime_turn_generation import RuntimeGeneratedTurn, RuntimeTurnGenerationService
 
@@ -51,23 +53,51 @@ class RuntimeSessionService:
         *,
         store: RuntimeSessionStore,
         generation_service: RuntimeTurnGenerationService,
+        story_mode_catalog: RuntimeStoryModeConfigCatalog | None = None,
         max_workers: int = 2,
     ) -> None:
         self._store = store
         self._generation_service = generation_service
+        self._story_mode_catalog = story_mode_catalog or RuntimeStoryModeConfigCatalog.default()
         self._live_executor = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="runtime-turn-live")
         self._recovery_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="runtime-turn-recovery")
         self._scheduled_job_ids: set[str] = set()
         self._scheduled_job_ids_lock = Lock()
 
     def create_session(self, request: RuntimeSessionCreateRequest) -> RuntimeSessionCreateResponse:
-        session = self._store.create_session(RuntimeSession.create_active(request))
+        selection = self._story_mode_catalog.resolve_selection(
+            story_type_id=request.story_type_id,
+            prompt_structure_id=request.prompt_structure_id,
+            fit_tags=list(request.fit_tags),
+            world_state=list(request.world_state),
+            character_pool=list(request.character_pool),
+            narrative_seed=request.narrative_seed,
+        )
+        resolved_request = request.model_copy(
+            update={
+                "story_type_id": selection.story_type.story_type_id,
+                "prompt_structure_id": selection.prompt_structure.prompt_structure_id,
+                "fit_tags": selection.fit_tags,
+                "world_state": selection.world_state,
+                "character_pool": selection.character_pool,
+                "narrative_seed": selection.narrative_seed,
+            }
+        )
+        session = self._store.create_session(
+            RuntimeSession.create_active(
+                resolved_request,
+                allowed_generator_ids=selection.allowed_generator_ids,
+            )
+        )
         job = self._create_next_job(session)
         return RuntimeSessionCreateResponse(
             session_id=session.session_id,
             job_id=job.job_id,
             status=job.status,
         )
+
+    def get_configuration(self) -> RuntimeStoryModeConfiguration:
+        return self._story_mode_catalog.configuration()
 
     def get_session_detail(self, session_id: str) -> RuntimeSessionDetail | None:
         detail = self._store.get_session_detail(session_id)

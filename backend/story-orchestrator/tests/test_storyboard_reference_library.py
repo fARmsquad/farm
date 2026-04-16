@@ -1,14 +1,59 @@
 import tempfile
 import unittest
+from io import BytesIO
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+from PIL import Image
 
 from app.config import Settings
 from app.generated_storyboard_models import GeneratedStoryboardContext, GeneratedStoryboardCutsceneRequest
 from app.generated_storyboards import GeneratedImageAsset, GeneratedSpeechAsset, GeneratedStoryboardService, TemplateStoryboardPlanner
 from app.main import create_app
-from app.storyboard_reference_library import StoryboardReferenceLibrary
+from app.storyboard_reference_library import StoryboardReferenceLibrary, StoryboardReferencePathResolver
+
+
+def _png_bytes() -> bytes:
+    buffer = BytesIO()
+    Image.new("RGB", (32, 32), (0, 0, 0)).save(buffer, format="PNG")
+    return buffer.getvalue()
+
+
+def _make_request(
+    *,
+    style_preset_id: str = "farm_storybook_v1",
+    character_name: str = "Old Garrett",
+    max_style_anchors: int = 0,
+    max_reference_images: int = 4,
+    reference_image_paths: list[str] | None = None,
+    continuity_reference_mode: str = "auto",
+) -> GeneratedStoryboardCutsceneRequest:
+    request = GeneratedStoryboardCutsceneRequest(
+        package_id="storypkg_intro_chicken_sample",
+        package_display_name="Intro Chicken Sample",
+        beat_id="post_chicken_bridge",
+        display_name="Post Chicken Bridge",
+        scene_name="PostChickenCutscene",
+        next_scene_name="MidpointPlaceholder",
+        linked_minigame_beat_id=None,
+        story_brief="Bridge the chicken chase into the first planting task.",
+        style_preset_id=style_preset_id or "placeholder_preset",
+        voice_id="voice-test",
+        reference_image_paths=list(reference_image_paths or []),
+        continuity_reference_mode=continuity_reference_mode,
+        max_reference_images=max_reference_images,
+        max_style_anchors=max_style_anchors,
+        context=GeneratedStoryboardContext(
+            character_name=character_name or "Placeholder",
+            crop_name="carrots",
+            minigame_goal="Plant 3 carrots in 5 minutes",
+        ),
+    )
+    if not style_preset_id:
+        # Pydantic field has min_length=1; mutate post-construction to test the
+        # resolver's "no preset" branch without tripping the constructor validator.
+        request.style_preset_id = ""
+    return request
 
 
 class StoryboardReferenceLibraryTests(unittest.TestCase):
@@ -34,7 +79,7 @@ class StoryboardReferenceLibraryTests(unittest.TestCase):
 
         self.assertEqual(record.reference_role, "character")
         self.assertEqual(record.character_name, "Old Garrett")
-        self.assertTrue(Path(record.stored_path).exists())
+        self.assertTrue(self.library.resolve_stored_path(record.stored_path).exists())
         self.assertEqual(len(listed), 1)
         self.assertEqual(listed[0].reference_id, record.reference_id)
         self.assertEqual(listed[0].tags, ["hero", "storybook"])
@@ -76,7 +121,8 @@ class StoryboardReferenceContinuityTests(unittest.TestCase):
         first_image_asset = result.generated_assets[0]
         reference_paths = first_image_asset.metadata["reference_image_paths"]
 
-        self.assertIn(character_reference.stored_path, reference_paths)
+        resolved_character_path = str(self.reference_library.resolve_stored_path(character_reference.stored_path))
+        self.assertIn(resolved_character_path, reference_paths)
         self.assertIn(str(prior_image.resolve()), reference_paths)
 
 
@@ -102,7 +148,8 @@ class StoryboardReferenceContinuityTests(unittest.TestCase):
 
         reference_paths = result.generated_assets[0].metadata["reference_image_paths"]
 
-        self.assertEqual(reference_paths[0], character_reference.stored_path)
+        resolved_character_path = str(self.reference_library.resolve_stored_path(character_reference.stored_path))
+        self.assertEqual(reference_paths[0], resolved_character_path)
         self.assertIn(str(explicit_image.resolve()), reference_paths)
 
     def test_create_package_skips_generic_package_sweep_when_explicit_reference_paths_exist(self) -> None:
@@ -128,8 +175,9 @@ class StoryboardReferenceContinuityTests(unittest.TestCase):
         first_image_asset = result.generated_assets[0]
         reference_paths = first_image_asset.metadata["reference_image_paths"]
 
+        resolved_character_path = str(self.reference_library.resolve_stored_path(character_reference.stored_path))
         self.assertIn(str(explicit_image.resolve()), reference_paths)
-        self.assertIn(character_reference.stored_path, reference_paths)
+        self.assertIn(resolved_character_path, reference_paths)
         self.assertNotIn(str(prior_image.resolve()), reference_paths)
 
 
@@ -294,3 +342,99 @@ class FakeSpeechGenerator:
                 "next_text": next_text,
             },
         )
+
+
+def test_resolve_paths_prepends_style_anchors_when_style_preset_matches(tmp_path):
+    library = StoryboardReferenceLibrary(output_root=tmp_path)
+    style_a = library.import_reference(
+        filename="style_a.png", content=_png_bytes(), reference_role="style",
+        label="style_a", tags=["watercolor_intro_v1", "intro_panels"], mime_type="image/png",
+    )
+    style_b = library.import_reference(
+        filename="style_b.png", content=_png_bytes(), reference_role="style",
+        label="style_b", tags=["watercolor_intro_v1", "intro_panels"], mime_type="image/png",
+    )
+    char_ref = library.import_reference(
+        filename="char.png", content=_png_bytes(), reference_role="character",
+        label="char", character_name="Garrett", tags=["character"], mime_type="image/png",
+    )
+    resolver = StoryboardReferencePathResolver(output_root=tmp_path, reference_library=library)
+    request = _make_request(
+        style_preset_id="watercolor_intro_v1",
+        character_name="Garrett",
+        max_style_anchors=2,
+        max_reference_images=4,
+    )
+
+    paths = resolver.resolve_paths(request)
+
+    style_a_path = str(library.resolve_stored_path(style_a.stored_path))
+    style_b_path = str(library.resolve_stored_path(style_b.stored_path))
+    char_path = str(library.resolve_stored_path(char_ref.stored_path))
+    assert len(paths) == 3
+    assert paths[0] in {style_a_path, style_b_path}
+    assert paths[1] in {style_a_path, style_b_path}
+    assert paths[0] != paths[1]
+    assert paths[2] == char_path
+
+
+def test_resolve_paths_omits_style_anchors_when_style_preset_id_empty(tmp_path):
+    library = StoryboardReferenceLibrary(output_root=tmp_path)
+    library.import_reference(
+        filename="style_a.png", content=_png_bytes(), reference_role="style",
+        label="style_a", tags=["watercolor_intro_v1"], mime_type="image/png",
+    )
+    library.import_reference(
+        filename="char.png", content=_png_bytes(), reference_role="character",
+        label="char", character_name="Garrett", tags=["character"], mime_type="image/png",
+    )
+    resolver = StoryboardReferencePathResolver(output_root=tmp_path, reference_library=library)
+    request = _make_request(
+        style_preset_id="",
+        character_name="Garrett",
+        max_style_anchors=2,
+        max_reference_images=4,
+    )
+
+    paths = resolver.resolve_paths(request)
+
+    assert len(paths) == 1
+
+
+def test_resolve_paths_respects_max_style_anchors_config(tmp_path):
+    library = StoryboardReferenceLibrary(output_root=tmp_path)
+    for i in range(5):
+        library.import_reference(
+            filename=f"style_{i}.png", content=_png_bytes(), reference_role="style",
+            label=f"style_{i}", tags=["watercolor_intro_v1"], mime_type="image/png",
+        )
+    resolver = StoryboardReferencePathResolver(output_root=tmp_path, reference_library=library)
+    request = _make_request(
+        style_preset_id="watercolor_intro_v1",
+        character_name="",
+        max_style_anchors=3,
+        max_reference_images=4,
+    )
+
+    paths = resolver.resolve_paths(request)
+
+    assert len(paths) == 3
+
+
+def test_resolve_paths_skips_style_refs_with_non_matching_preset_tag(tmp_path):
+    library = StoryboardReferenceLibrary(output_root=tmp_path)
+    library.import_reference(
+        filename="other_style.png", content=_png_bytes(), reference_role="style",
+        label="other", tags=["pixel_art_v1"], mime_type="image/png",
+    )
+    resolver = StoryboardReferencePathResolver(output_root=tmp_path, reference_library=library)
+    request = _make_request(
+        style_preset_id="watercolor_intro_v1",
+        character_name="",
+        max_style_anchors=2,
+        max_reference_images=4,
+    )
+
+    paths = resolver.resolve_paths(request)
+
+    assert paths == []

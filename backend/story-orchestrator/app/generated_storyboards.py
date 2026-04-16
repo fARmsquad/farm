@@ -13,10 +13,10 @@ from .generated_storyboard_models import (
     GeneratedStoryboardPackageResult,
     GeneratedStoryboardPlan,
     GeneratedStoryboardPlanShot,
-    ImageGenerator,
     SpeechGenerator,
     StoryboardPlanner,
 )
+from .image_generator_protocol import ImageGenerator
 from .storyboard_media import (
     ChainImageGenerator,
     ChainSpeechGenerator,
@@ -67,7 +67,7 @@ class GeneratedStoryboardService:
         self._output_root = output_root
         self._package_output_path = package_output_path
         self._planner = planner
-        self._image_generator = image_generator
+        self._image_generator: ImageGenerator = image_generator
         self._speech_generator = speech_generator
         self._reference_library = reference_library
         self._reference_path_resolver = StoryboardReferencePathResolver(output_root, reference_library)
@@ -353,11 +353,20 @@ class GeneratedStoryboardService:
                     focus_label=focus_label,
                     minigame_goal=minigame_goal,
                     prior_story_summary=request.context.prior_story_summary,
+                    prior_hero_shot_paths=list(request.context.prior_hero_shot_paths),
                     world_state=list(request.context.world_state),
                     present_character_names=list(request.context.present_character_names),
                     selected_generator_id=request.context.selected_generator_id,
                     selected_generator_display_name=request.context.selected_generator_display_name,
                     mission_configuration_summary=request.context.mission_configuration_summary,
+                    story_type_id=request.context.story_type_id,
+                    story_type_display_name=request.context.story_type_display_name,
+                    story_type_prompt_directives=list(request.context.story_type_prompt_directives),
+                    prompt_structure_id=request.context.prompt_structure_id,
+                    prompt_structure_display_name=request.context.prompt_structure_display_name,
+                    prompt_structure_directives=list(request.context.prompt_structure_directives),
+                    minigame_story_hook=request.context.minigame_story_hook,
+                    minigame_prompt_directives=list(request.context.minigame_prompt_directives),
                 )
             }
         )
@@ -378,6 +387,12 @@ class GeneratedStoryboardService:
             f"World state: {', '.join(context.world_state) if context.world_state else 'none'}. "
             f"Present characters: {', '.join(context.present_character_names) if context.present_character_names else context.character_name}. "
             f"Mission configuration: {context.mission_configuration_summary or 'none'}. "
+            f"Story type: {context.story_type_display_name or context.story_type_id or 'none'}. "
+            f"Prompt structure: {context.prompt_structure_display_name or context.prompt_structure_id or 'none'}. "
+            f"Minigame story hook: {context.minigame_story_hook or 'none'}. "
+            f"Story directives: {', '.join(context.story_type_prompt_directives) if context.story_type_prompt_directives else 'none'}. "
+            f"Prompt structure directives: {', '.join(context.prompt_structure_directives) if context.prompt_structure_directives else 'none'}. "
+            f"Minigame prompt directives: {', '.join(context.minigame_prompt_directives) if context.minigame_prompt_directives else 'none'}. "
             f"Frame direction: {shot.image_prompt}. "
             "Use any reference images only for character identity, outfit, palette, and overall art style. "
             "Create a fresh composition for this beat as a full-bleed image and preserve character identity across shots. "

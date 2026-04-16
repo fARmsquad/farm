@@ -63,6 +63,131 @@ class OpenAIStorySequenceTurnDirectorTests(unittest.TestCase):
         self.assertIn('"candidate_generators": [', client.last_user_prompt)
         self.assertIn('"default_character_name": "Miss Clara"', client.last_user_prompt)
 
+    def test_choose_turn_system_prompt_demands_prior_context_reference_for_continuity_guardrail(self) -> None:
+        client = CapturingStructuredOutputClient(
+            {
+                "generator_id": "find_tools_cluster_v1",
+                "character_name": "Miss Clara",
+                "cutscene_display_name": "Clara Hears the Shed Rattle",
+                "story_brief": (
+                    "Miss Clara hears a crash from the shed roof and spots muddy tracks near the missing watering kit. "
+                    "She asks the player to recover the scattered tools before the first planting lesson can begin."
+                ),
+            }
+        )
+        director = OpenAIStorySequenceTurnDirector(client=client)
+
+        director.choose_turn(
+            narrative_seed="The farm is waking up after a messy first morning.",
+            beat_cursor=1,
+            fit_tags=["tutorial"],
+            world_state=["watering_tools_unlocked"],
+            difficulty_band="intro",
+            last_minigame_goal="Catch the last runaway chicken in the pen",
+            recent_turn_summaries=["Old Garrett: Catch the last runaway chicken in the pen."],
+            candidate_generators=[
+                StorySequenceGeneratorOption(
+                    generator_id="find_tools_cluster_v1",
+                    display_name="Find Lost Tools",
+                    minigame_id="find_tools",
+                    fit_tags=["search", "tutorial"],
+                    preview_text_template="Recover missing tools around the farmyard.",
+                )
+            ],
+            candidate_character_names=["Old Garrett", "Miss Clara"],
+            default_generator_id="find_tools_cluster_v1",
+            default_character_name="Miss Clara",
+        )
+
+        assert client.last_system_prompt is not None
+        sp = client.last_system_prompt.lower()
+        for phrase in (
+            "prior_story_summary",
+            "explicitly reference earlier characters",
+            "continuity over novelty",
+        ):
+            self.assertIn(phrase, sp, f"missing continuity guardrail phrase: {phrase}")
+
+    def _make_choose_turn_kwargs(
+        self,
+        *,
+        candidate_generators: list[StorySequenceGeneratorOption],
+    ) -> dict:
+        return dict(
+            narrative_seed="The farm is waking up after a messy first morning.",
+            beat_cursor=1,
+            fit_tags=["tutorial"],
+            world_state=["watering_tools_unlocked"],
+            difficulty_band="intro",
+            last_minigame_goal="Catch the last runaway chicken in the pen",
+            recent_turn_summaries=["Old Garrett: Catch the last runaway chicken in the pen."],
+            candidate_generators=candidate_generators,
+            candidate_character_names=["Old Garrett", "Miss Clara"],
+            default_generator_id=candidate_generators[0].generator_id if candidate_generators else "plant_rows_v1",
+            default_character_name="Old Garrett",
+        )
+
+    def test_choose_turn_raises_when_generator_outside_candidate_list_after_retry(self):
+        fake = FakeStructuredOutputClient.with_responses([
+            {"generator_id": "banned_v1", "character_name": "Garrett",
+             "cutscene_display_name": "X", "story_brief": "x"},
+            {"generator_id": "banned_v1", "character_name": "Garrett",
+             "cutscene_display_name": "X", "story_brief": "x"},
+        ])
+        director = OpenAIStorySequenceTurnDirector(client=fake)
+        request = self._make_choose_turn_kwargs(
+            candidate_generators=[
+                StorySequenceGeneratorOption(
+                    generator_id="plant_rows_v1", display_name="Plant Rows",
+                    minigame_id="plant_rows", fit_tags=[], preview_text_template="Plant.",
+                ),
+            ],
+        )
+        with self.assertRaises(ValueError) as ctx:
+            director.choose_turn(**request)
+        self.assertIn("after retry", str(ctx.exception))
+
+    def test_choose_turn_retries_with_directive_nudge_when_first_response_invalid(self):
+        fake = FakeStructuredOutputClient.with_responses([
+            {"generator_id": "banned_v1", "character_name": "Garrett",
+             "cutscene_display_name": "First", "story_brief": "first"},
+            {"generator_id": "plant_rows_v1", "character_name": "Garrett",
+             "cutscene_display_name": "Second", "story_brief": "second"},
+        ])
+        director = OpenAIStorySequenceTurnDirector(client=fake)
+        request = self._make_choose_turn_kwargs(
+            candidate_generators=[
+                StorySequenceGeneratorOption(
+                    generator_id="plant_rows_v1", display_name="Plant Rows",
+                    minigame_id="plant_rows", fit_tags=[], preview_text_template="Plant.",
+                ),
+            ],
+        )
+        directive = director.choose_turn(**request)
+        self.assertEqual(directive.generator_id, "plant_rows_v1")
+        self.assertEqual(len(fake.calls), 2)
+        second_user_prompt = fake.calls[1]["user_prompt"]
+        self.assertIn("invalid generator_id", second_user_prompt)
+        self.assertIn("banned_v1", second_user_prompt)
+
+    def test_choose_turn_succeeds_first_try_when_response_is_valid(self):
+        fake = FakeStructuredOutputClient.with_responses([
+            {"generator_id": "plant_rows_v1", "character_name": "Garrett",
+             "cutscene_display_name": "OK", "story_brief": "ok"},
+        ])
+        director = OpenAIStorySequenceTurnDirector(client=fake)
+        request = self._make_choose_turn_kwargs(
+            candidate_generators=[
+                StorySequenceGeneratorOption(
+                    generator_id="plant_rows_v1", display_name="Plant Rows",
+                    minigame_id="plant_rows", fit_tags=[], preview_text_template="Plant.",
+                ),
+            ],
+        )
+        directive = director.choose_turn(**request)
+        self.assertEqual(directive.generator_id, "plant_rows_v1")
+        self.assertEqual(len(fake.calls), 1)
+
 
 class StorySequenceTurnDirectorIntegrationTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -189,6 +314,29 @@ class CapturingStructuredOutputClient:
         self.last_system_prompt = system_prompt
         self.last_user_prompt = user_prompt
         return response_model.model_validate(self._payload)
+
+
+class FakeStructuredOutputClient:
+    def __init__(self, responses: list[dict]) -> None:
+        self._responses = list(responses)
+        self.calls: list[dict] = []
+
+    @classmethod
+    def with_responses(cls, responses: list[dict]) -> "FakeStructuredOutputClient":
+        return cls(responses)
+
+    def generate(self, *, response_model, schema_name: str, system_prompt: str, user_prompt: str):
+        self.calls.append(
+            {
+                "schema_name": schema_name,
+                "system_prompt": system_prompt,
+                "user_prompt": user_prompt,
+            }
+        )
+        if not self._responses:
+            raise RuntimeError("FakeStructuredOutputClient exhausted")
+        payload = self._responses.pop(0)
+        return response_model.model_validate(payload)
 
 
 class FakeImageGenerator:

@@ -109,3 +109,5 @@ mccluckin-gtm/**/__pycache__/
 
 # Node (e.g. MCP Unity Server~)
 **/node_modules/
+
+eval_output/

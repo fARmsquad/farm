@@ -65,6 +65,8 @@ from .runtime_service import RuntimeSessionService
 from .runtime_store import RuntimeSessionStore
 from .runtime_tracker_routes import register_runtime_tracker_routes
 from .runtime_turn_generation import RuntimeTurnGenerationService
+from .story_mode_config import RuntimeStoryModeConfigCatalog
+from .story_mode_config_models import RuntimeStoryModeConfiguration
 from .storyboard_reference_library import StoryboardReferenceLibrary
 from .storyboard_reference_models import StoryboardReferenceAssetRecord, StoryboardReferenceRole
 
@@ -133,6 +135,8 @@ def create_app(
         default_voice_id=resolved_settings.elevenlabs_voice_id or "voice-test",
         turn_director=story_sequence_turn_director or OpenAIStorySequenceTurnDirector.from_settings(resolved_settings),
     )
+    minigame_generator_catalog = MinigameGeneratorCatalog.default()
+    runtime_story_mode_catalog = RuntimeStoryModeConfigCatalog.default(catalog=minigame_generator_catalog)
     runtime_store = runtime_session_store or RuntimeSessionStore(database_path)
     runtime_root = (base_dir / "data" / "runtime").resolve()
     runtime_turn_director = story_sequence_turn_director or OpenAIStorySequenceTurnDirector.from_settings(resolved_settings)
@@ -140,14 +144,16 @@ def create_app(
         runtime_root=runtime_root,
         storyboard_service=storyboard_service,
         minigame_service=minigame_service,
+        catalog=minigame_generator_catalog,
         default_voice_id=resolved_settings.elevenlabs_voice_id or "voice-test",
         turn_director=runtime_turn_director,
+        story_mode_catalog=runtime_story_mode_catalog,
     )
     runtime_service = runtime_session_service or RuntimeSessionService(
         store=runtime_store,
         generation_service=runtime_generation_service,
+        story_mode_catalog=runtime_story_mode_catalog,
     )
-    minigame_generator_catalog = MinigameGeneratorCatalog.default()
     review_page_path = (base_dir / "app" / "static" / "standing_slice_review.html").resolve()
     runtime_tracker_page_path = (base_dir / "app" / "static" / "runtime_tracker.html").resolve()
 
@@ -171,6 +177,7 @@ def create_app(
     app.state.story_sequence_session_service = sequence_session_service
     app.state.runtime_session_store = runtime_store
     app.state.runtime_session_service = runtime_service
+    app.state.runtime_story_mode_catalog = runtime_story_mode_catalog
     app.state.elevenlabs_token_provider = create_elevenlabs_tts_websocket_token
     app.state.storyboard_output_root = storyboard_output_root
     app.state.storyboard_reference_library = reference_library
@@ -236,7 +243,17 @@ def create_app(
     def create_runtime_session(
         request: RuntimeSessionCreateRequest,
     ) -> RuntimeSessionCreateResponse:
-        return runtime_service.create_session(request)
+        try:
+            return runtime_service.create_session(request)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get(
+        "/api/runtime/v1/configuration",
+        response_model=RuntimeStoryModeConfiguration,
+    )
+    def get_runtime_configuration() -> RuntimeStoryModeConfiguration:
+        return runtime_service.get_configuration()
 
     @app.get(
         "/api/runtime/v1/sessions/{session_id}",
@@ -357,7 +374,7 @@ def create_app(
         if record is None:
             raise HTTPException(status_code=404, detail="Storyboard reference asset not found.")
 
-        asset_path = Path(record.stored_path).resolve()
+        asset_path = reference_library.resolve_stored_path(record.stored_path)
         try:
             asset_path.relative_to(reference_library.asset_root)
         except ValueError as exc:

@@ -38,8 +38,7 @@ namespace FarmSimVR.MonoBehaviours
         [SerializeField] private float fadeDuration = 1.2f;
         private Canvas fadeCanvas;
         private Image fadeImage;
-        private bool isTransitioning;
-        private bool launchGeneratedStorySlice;
+        private bool isTransitioning, launchGeneratedStorySlice;
         private Text generatedStoryStatusLabel;
         private GameObject generatedStoryLoadingOverlay;
         private Text generatedStoryLoadingLabel;
@@ -49,6 +48,7 @@ namespace FarmSimVR.MonoBehaviours
         private string generatedStoryLifecycleNote = DefaultGeneratedStoryDiagnosticsNote;
         private string generatedStoryLifecycleError = string.Empty;
         private string generatedStoryPreparedAtUtc = string.Empty;
+        private bool _autoPlayGeneratedSliceWhenReady;
         private void Start()
         {
             Application.runInBackground = true;
@@ -61,9 +61,12 @@ namespace FarmSimVR.MonoBehaviours
             GeneratedStorySliceDiagnostics.Log(nameof(TitleScreenManager), "Title screen initialized.");
         }
         private void Update() => SyncPreparedGeneratedPlaythroughStateFromRuntimeController();
-        public void StartGame()
+        public void StartGame() => StartScene(SceneWorkCatalog.FirstTutorialSceneName);
+        public void StartGameStorySlice()
         {
-            StartScene(SceneWorkCatalog.FirstTutorialSceneName);
+            _autoPlayGeneratedSliceWhenReady = true;
+            var c = GenerativePlaythroughController.Instance;
+            if (c != null && c.HasPreparedSequence) PlayGeneratedStorySlice(); else StartGeneratedStorySlice();
         }
         public void StartScene(string sceneName)
         {
@@ -212,6 +215,7 @@ namespace FarmSimVR.MonoBehaviours
             SetGeneratedPlaythroughButtons(true, true);
             SetGeneratedStoryStatus(ReadyUniquePlaythroughMessage);
             SetGeneratedStoryLifecycleState(ReadyGeneratedStoryState, clearError: true, stampPreparedAt: true);
+            if (_autoPlayGeneratedSliceWhenReady) { _autoPlayGeneratedSliceWhenReady = false; PlayGeneratedStorySlice(); }
         }
         private void HandleGeneratedStorySliceUnavailable(string errorMessage)
         {

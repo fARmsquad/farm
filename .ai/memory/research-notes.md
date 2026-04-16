@@ -33,6 +33,7 @@ Codex agents (which have no internet) read this file to access research findings
 - [LLM-Directed Sequence Narrative Generation](#research-llm-directed-sequence-narrative-generation) — 2026-04-14
 - [Runtime Progress Tracker](#research-runtime-progress-tracker) — 2026-04-15
 - [Generative Playthrough Menu Scene](#research-generative-playthrough-menu-scene) — 2026-04-15
+- [Personal Story Mode Configuration Surfaces](#research-personal-story-mode-configuration-surfaces) — 2026-04-15
 
 ---
 
@@ -258,6 +259,62 @@ instead of creating a second store.
   backend jumps from `planning` to `ready`, the UI will feel fake.
 - Avoid a second frontend app or build pipeline for this slice; Railway already
   deploys the Python service cleanly.
+
+## Research: Personal Story Mode Configuration Surfaces
+**Date**: 2026-04-15
+**Queries**:
+- `OpenAI structured outputs official documentation schema constrained outputs`
+- `Pydantic 2 JSON Schema official docs`
+- `FastAPI response model nested models official docs`
+
+### Recommended Packages
+No new packages found. The existing FastAPI + Pydantic runtime stack is enough
+for this slice.
+
+### Key Patterns Found
+- OpenAI's current API docs keep structured outputs as a first-class model
+  capability. That supports treating story types, prompt structures, and
+  per-minigame prompt surfaces as explicit schema-backed fields instead of
+  ad hoc prompt-string concatenation. Source:
+  https://developers.openai.com/api/docs/models/gpt-5.4
+- Pydantic v2 is aligned with the current JSON Schema specification, which
+  fits a single source of truth for runtime config objects that need both
+  validation and API serialization. Source:
+  https://docs.pydantic.dev/latest/why/
+- FastAPI's response-model and nested-model guidance supports returning one
+  composed runtime configuration document made of nested Pydantic models,
+  while keeping validation and OpenAPI generation automatic. Sources:
+  https://fastapi.tiangolo.com/tutorial/response-model/
+  and https://fastapi.tiangolo.com/tutorial/body-nested-models/
+
+### Recommended Approach
+Keep the personal-story-mode configuration layer as typed backend models,
+not loose dictionaries. Define three explicit surfaces:
+
+1. story-type presets
+2. prompt-structure presets
+3. per-minigame narrative surfaces that wrap the bounded generator definitions
+
+Expose those through a runtime API endpoint, persist only the selected IDs on
+the session, and feed the resolved config back into the existing turn-director
+and storyboard-planner prompts as structured context fields.
+
+### Gotchas & Pitfalls
+- Do not hide important story-mode logic inside handwritten prompt strings only.
+  If story type, prompt shape, or minigame narrative guidance matters to
+  generation, it should exist as validated data first and prompt text second.
+- Do not fork the generator catalog. The current bounded minigame definitions
+  already own defaults, parameter bounds, and coupling rules; the new config
+  layer should reference and enrich them, not duplicate the gameplay contract.
+- Keep the runtime session state on stable IDs and merged tags/world-state,
+  not on copied prompt blobs that will drift across turns or across service
+  restarts.
+
+### Sources
+1. [OpenAI API Docs: GPT-5.4 model capabilities](https://developers.openai.com/api/docs/models/gpt-5.4) — Confirms structured outputs remain a supported model capability for schema-constrained generation.
+2. [Pydantic Docs: Why use Pydantic](https://docs.pydantic.dev/latest/why/) — Confirms Pydantic v2 aligns with modern JSON Schema for validated config objects.
+3. [FastAPI Docs: Response Model](https://fastapi.tiangolo.com/tutorial/response-model/) — Supports exposing validated config documents through typed response models.
+4. [FastAPI Docs: Body - Nested Models](https://fastapi.tiangolo.com/tutorial/body-nested-models/) — Supports composing the runtime config surface from nested Pydantic models.
 - Keep the page polling-based for now. The runtime contract already supports
   short-interval polling, and SSE/WebSockets would add more moving pieces than
   this operator surface needs.

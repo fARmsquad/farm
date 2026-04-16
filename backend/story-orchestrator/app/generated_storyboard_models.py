@@ -13,11 +13,20 @@ class GeneratedStoryboardContext(BaseModel):
     focus_label: str | None = None
     minigame_goal: str | None = None
     prior_story_summary: str | None = None
+    prior_hero_shot_paths: list[str] = Field(default_factory=list)
     world_state: list[str] = Field(default_factory=list)
     present_character_names: list[str] = Field(default_factory=list)
     selected_generator_id: str | None = None
     selected_generator_display_name: str | None = None
     mission_configuration_summary: str | None = None
+    story_type_id: str | None = None
+    story_type_display_name: str | None = None
+    story_type_prompt_directives: list[str] = Field(default_factory=list)
+    prompt_structure_id: str | None = None
+    prompt_structure_display_name: str | None = None
+    prompt_structure_directives: list[str] = Field(default_factory=list)
+    minigame_story_hook: str | None = None
+    minigame_prompt_directives: list[str] = Field(default_factory=list)
 
 
 class GeneratedStoryboardCutsceneRequest(BaseModel):
@@ -34,6 +43,7 @@ class GeneratedStoryboardCutsceneRequest(BaseModel):
     reference_image_paths: list[str] = Field(default_factory=list)
     continuity_reference_mode: Literal["auto", "explicit_only", "character_priority"] = "auto"
     max_reference_images: int = Field(default=4, ge=0, le=8)
+    max_style_anchors: int = Field(default=2, ge=0, le=8)
     aspect_ratio: str = Field(default="16:9", min_length=1)
     image_size: str = Field(default="2K", min_length=1)
     context: GeneratedStoryboardContext

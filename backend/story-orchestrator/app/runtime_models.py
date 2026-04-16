@@ -47,6 +47,8 @@ class RuntimeSessionCreateRequest(BaseModel):
         default="Continue the farm story through cozy teaching beats.",
         min_length=1,
     )
+    story_type_id: str = Field(default="farm_cozy_starter_v1", min_length=1)
+    prompt_structure_id: str = Field(default="conflict_escalation_handoff_v1", min_length=1)
     fit_tags: list[str] = Field(default_factory=_default_fit_tags)
     world_state: list[str] = Field(default_factory=_default_world_state)
     difficulty_band: str | None = Field(default="tutorial")
@@ -82,6 +84,9 @@ class RuntimeSessionState(BaseModel):
     difficulty_band: str | None = None
     character_pool: list[str] = Field(default_factory=list)
     narrative_seed: str = ""
+    story_type_id: str = "farm_cozy_starter_v1"
+    prompt_structure_id: str = "conflict_escalation_handoff_v1"
+    allowed_generator_ids: list[str] = Field(default_factory=list)
     seed: str = ""
     max_turns: int = 3
     max_recent_generators: int = 2
@@ -104,7 +109,12 @@ class RuntimeSession(BaseModel):
     updated_at: str
 
     @classmethod
-    def create_active(cls, request: RuntimeSessionCreateRequest) -> "RuntimeSession":
+    def create_active(
+        cls,
+        request: RuntimeSessionCreateRequest,
+        *,
+        allowed_generator_ids: list[str] | None = None,
+    ) -> "RuntimeSession":
         now = datetime.now(UTC).isoformat()
         session_id = str(uuid4())
         state = RuntimeSessionState(
@@ -114,6 +124,9 @@ class RuntimeSession(BaseModel):
             difficulty_band=request.difficulty_band,
             character_pool=list(request.character_pool),
             narrative_seed=request.narrative_seed,
+            story_type_id=request.story_type_id,
+            prompt_structure_id=request.prompt_structure_id,
+            allowed_generator_ids=list(allowed_generator_ids or []),
             seed=request.seed or session_id,
             max_turns=request.max_turns,
         )
@@ -226,6 +239,8 @@ class RuntimeDebugContract(BaseModel):
     job_id: str
     generator_id: str
     character_name: str
+    story_type_id: str = ""
+    prompt_structure_id: str = ""
     package_id: str
     package_display_name: str
     fallback_generator_ids: list[str] = Field(default_factory=list)
