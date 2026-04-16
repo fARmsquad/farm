@@ -165,12 +165,13 @@ class OpenAIStoryboardPlanner:
             system_prompt=system_prompt,
             user_prompt=user_prompt,
         )
+        image_prompt_suffix = preset.image_prompt_suffix if preset is not None else ""
         shots = [
             GeneratedStoryboardPlanShot(
                 shot_id=f"shot_{index + 1:02d}",
                 subtitle_text=shot.subtitle_text,
                 narration_text=shot.narration_text,
-                image_prompt=shot.image_prompt,
+                image_prompt=f"{shot.image_prompt}{image_prompt_suffix}",
                 duration_seconds=shot.duration_seconds,
             )
             for index, shot in enumerate(output.shots)

@@ -198,6 +198,50 @@ class OpenAIStoryboardPlannerTests(unittest.TestCase):
         assert client_with_cat.last_user_prompt is not None
         self.assertNotIn("style_descriptor_text", client_with_cat.last_user_prompt)
 
+    def test_plan_appends_image_prompt_suffix_to_every_shot_when_preset_present(self) -> None:
+        from app.style_preset_catalog import StylePresetCatalog
+
+        client = CapturingStructuredOutputClient(
+            _valid_payload(
+                image_prompts=[
+                    "A girl in a barn at dawn",
+                    "A chicken on a roof",
+                    "A field of carrots",
+                ]
+            )
+        )
+        planner = OpenAIStoryboardPlanner(
+            client=client,
+            style_preset_catalog=StylePresetCatalog.default(),
+        )
+
+        plan = planner.plan(build_request(style_preset_id="watercolor_intro_v1"))
+
+        suffix = StylePresetCatalog.default().get("watercolor_intro_v1").image_prompt_suffix
+        for shot in plan.shots:
+            self.assertTrue(
+                shot.image_prompt.endswith(suffix),
+                f"shot.image_prompt {shot.image_prompt!r} does not end with suffix {suffix!r}",
+            )
+
+    def test_plan_omits_image_prompt_suffix_when_no_preset(self) -> None:
+        client = CapturingStructuredOutputClient(
+            _valid_payload(
+                image_prompts=[
+                    "A barn",
+                    "A chicken",
+                    "A field",
+                ]
+            )
+        )
+        planner = OpenAIStoryboardPlanner(client=client, style_preset_catalog=None)
+
+        plan = planner.plan(build_request(style_preset_id="watercolor_intro_v1"))
+
+        self.assertEqual(plan.shots[0].image_prompt, "A barn")
+        self.assertEqual(plan.shots[1].image_prompt, "A chicken")
+        self.assertEqual(plan.shots[2].image_prompt, "A field")
+
     def test_openai_storyboard_planner_rejects_mismatched_narration_text(self) -> None:
         planner = OpenAIStoryboardPlanner(
             client=FakeStructuredOutputClient(
@@ -320,8 +364,8 @@ class FakeSpeechGenerator:
         )
 
 
-def _valid_payload() -> dict:
-    return {
+def _valid_payload(image_prompts: list[str] | None = None) -> dict:
+    payload = {
         "shots": [
             {
                 "subtitle_text": "Garrett lowers the seed basket over the first furrow.",
@@ -343,6 +387,14 @@ def _valid_payload() -> dict:
             },
         ]
     }
+    if image_prompts is not None:
+        if len(image_prompts) != len(payload["shots"]):
+            raise ValueError(
+                f"image_prompts length {len(image_prompts)} must match shot count {len(payload['shots'])}."
+            )
+        for shot, prompt in zip(payload["shots"], image_prompts):
+            shot["image_prompt"] = prompt
+    return payload
 
 
 def build_request(*, style_preset_id: str = "farm_storybook_v1") -> GeneratedStoryboardCutsceneRequest:
