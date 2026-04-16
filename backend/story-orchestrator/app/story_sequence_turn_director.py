@@ -17,6 +17,10 @@ class StorySequenceGeneratorOption(BaseModel):
     minigame_id: str = Field(min_length=1)
     fit_tags: list[str] = Field(default_factory=list)
     preview_text_template: str = Field(min_length=1)
+    story_purposes: list[str] = Field(default_factory=list)
+    story_hook_template: str = Field(default="")
+    llm_prompt_directives: list[str] = Field(default_factory=list)
+    parameter_prompt_hints: list[str] = Field(default_factory=list)
 
 
 class StorySequenceTurnDirective(BaseModel):

@@ -82,6 +82,39 @@ class RuntimeSessionEndpointTests(unittest.TestCase):
         self.assertTrue(envelope["minigame"]["adapter_id"])
         self.assertGreaterEqual(len(envelope["artifacts"]), 3)
 
+    def test_runtime_configuration_endpoint_returns_story_mode_catalog(self) -> None:
+        response = self.client.get("/api/runtime/v1/configuration")
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["contract_version"], "runtime-story-mode/v1")
+        self.assertEqual(payload["default_story_type_id"], "farm_cozy_starter_v1")
+        self.assertEqual(payload["default_prompt_structure_id"], "conflict_escalation_handoff_v1")
+        self.assertEqual(
+            {item["story_type_id"] for item in payload["story_types"]},
+            {
+                "farm_cozy_starter_v1",
+                "tool_hunt_detour_v1",
+                "chicken_ruckus_intro_v1",
+                "mixed_tutorial_arc_v1",
+            },
+        )
+        self.assertEqual(
+            {item["prompt_structure_id"] for item in payload["prompt_structures"]},
+            {
+                "conflict_escalation_handoff_v1",
+                "character_request_payoff_v1",
+                "discovery_pressure_release_v1",
+            },
+        )
+        plant_surface = next(
+            item for item in payload["minigame_surfaces"] if item["generator"]["generator_id"] == "plant_rows_v1"
+        )
+        self.assertEqual(plant_surface["adapter_id"], "tutorial.plant_rows")
+        self.assertEqual(plant_surface["scene_name"], "FarmMain")
+        self.assertTrue(plant_surface["story_purposes"])
+        self.assertTrue(plant_surface["parameter_prompt_hints"])
+
     def test_runtime_session_detail_reports_active_job_and_last_ready_turn(self) -> None:
         created = self.client.post("/api/runtime/v1/sessions", json={}).json()
         job = self._wait_for_terminal_job(created["job_id"])
@@ -151,6 +184,33 @@ class RuntimeSessionEndpointTests(unittest.TestCase):
             next_envelope["continuity"]["reference_image_asset_ids"],
             [first_image_asset_ids[0]],
         )
+
+    def test_runtime_session_can_target_tool_hunt_story_type_and_prompt_structure(self) -> None:
+        created = self.client.post(
+            "/api/runtime/v1/sessions",
+            json={
+                "story_type_id": "tool_hunt_detour_v1",
+                "prompt_structure_id": "character_request_payoff_v1",
+            },
+        ).json()
+
+        job = self._wait_for_terminal_job(created["job_id"])
+        self.assertEqual(job["status"], "ready")
+
+        session = self.client.get(f"/api/runtime/v1/sessions/{created['session_id']}").json()
+        self.assertEqual(session["state"]["story_type_id"], "tool_hunt_detour_v1")
+        self.assertEqual(session["state"]["prompt_structure_id"], "character_request_payoff_v1")
+        self.assertEqual(session["state"]["allowed_generator_ids"], ["find_tools_cluster_v1"])
+
+        envelope = self.client.get(
+            f"/api/runtime/v1/sessions/{created['session_id']}/turns/{job['turn_id']}"
+        ).json()
+
+        self.assertEqual(envelope["minigame"]["generator_id"], "find_tools_cluster_v1")
+        self.assertEqual(envelope["minigame"]["scene_name"], "FindToolsGame")
+        self.assertEqual(envelope["minigame"]["adapter_id"], "tutorial.find_tools")
+        self.assertEqual(envelope["debug"]["story_type_id"], "tool_hunt_detour_v1")
+        self.assertEqual(envelope["debug"]["prompt_structure_id"], "character_request_payoff_v1")
 
     def test_runtime_session_completes_after_third_turn_outcome(self) -> None:
         created = self.client.post("/api/runtime/v1/sessions", json={}).json()

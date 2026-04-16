@@ -18,6 +18,14 @@ class GeneratedStoryboardContext(BaseModel):
     selected_generator_id: str | None = None
     selected_generator_display_name: str | None = None
     mission_configuration_summary: str | None = None
+    story_type_id: str | None = None
+    story_type_display_name: str | None = None
+    story_type_prompt_directives: list[str] = Field(default_factory=list)
+    prompt_structure_id: str | None = None
+    prompt_structure_display_name: str | None = None
+    prompt_structure_directives: list[str] = Field(default_factory=list)
+    minigame_story_hook: str | None = None
+    minigame_prompt_directives: list[str] = Field(default_factory=list)
 
 
 class GeneratedStoryboardCutsceneRequest(BaseModel):

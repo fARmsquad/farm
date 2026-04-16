@@ -31,6 +31,8 @@ from .runtime_models import (
     RuntimeSession,
     RuntimeTurnRecord,
 )
+from .story_mode_config import RuntimeStoryModeConfigCatalog, render_story_hook
+from .story_mode_config_models import MinigameStorySurface, PromptStructureDefinition, StoryTypeDefinition
 from .runtime_turn_generation_support import (
     MINIGAME_SCENES,
     PROOF_CUTSCENE_SCENE,
@@ -50,7 +52,7 @@ from .runtime_turn_generation_support import (
     select_continuity_reference_paths,
 )
 from .story_sequence_rules import build_turn_parameters, updated_world_state
-from .story_sequence_turn_director import StorySequenceTurnDirector
+from .story_sequence_turn_director import StorySequenceGeneratorOption, StorySequenceTurnDirector
 
 
 @dataclass(frozen=True)
@@ -64,6 +66,10 @@ class _TurnPlan:
     generator_id: str
     character_name: str
     parameters: dict[str, Any]
+    story_hook: str
+    story_type: StoryTypeDefinition
+    prompt_structure: PromptStructureDefinition
+    minigame_surface: MinigameStorySurface
     request: GeneratedPackageAssemblyRequest
 
 
@@ -77,11 +83,15 @@ class RuntimeTurnGenerationService:
         catalog: MinigameGeneratorCatalog | None = None,
         default_voice_id: str = "",
         turn_director: StorySequenceTurnDirector | None = None,
+        story_mode_catalog: RuntimeStoryModeConfigCatalog | None = None,
     ) -> None:
         self._runtime_root = runtime_root
         self._storyboard_service = storyboard_service
         self._minigame_service = minigame_service
         self._catalog = catalog or MinigameGeneratorCatalog.default()
+        self._story_mode_catalog = story_mode_catalog or RuntimeStoryModeConfigCatalog.default(
+            catalog=self._catalog
+        )
         self._default_voice_id = default_voice_id or getattr(storyboard_service, "_default_voice_id", "")
         self._turn_director = turn_director
 
@@ -138,20 +148,40 @@ class RuntimeTurnGenerationService:
         return RuntimeGeneratedTurn(turn=turn, session=next_session)
 
     def _plan_turn(self, session: RuntimeSession, prior_turns: list[RuntimeTurnRecord]) -> _TurnPlan:
+        story_type = self._require_story_type(session)
+        prompt_structure = self._require_prompt_structure(session)
         candidate_ids = ordered_generator_ids(self._catalog, session)
-        plans = [plan for generator_id in candidate_ids if (plan := self._build_plan(session, prior_turns, generator_id))]
+        plans = [
+            plan
+            for generator_id in candidate_ids
+            if (
+                plan := self._build_plan(
+                    session,
+                    prior_turns,
+                    generator_id,
+                    story_type=story_type,
+                    prompt_structure=prompt_structure,
+                )
+            )
+        ]
         if not plans:
             raise RuntimeError("No valid runtime generator is available for the current session state.")
 
         default_plan = self._select_preferred_plan(session, plans)
+        candidate_generators = [self._to_generator_option(plan) for plan in plans]
         directive = choose_directed_turn(
             self._turn_director,
-            self._catalog,
             session,
             prior_turns,
-            candidate_ids,
+            candidate_generators,
             default_plan.generator_id,
             default_plan.character_name,
+            story_type_id=story_type.story_type_id,
+            story_type_display_name=story_type.display_name,
+            story_type_prompt_directives=list(story_type.prompt_directives),
+            prompt_structure_id=prompt_structure.prompt_structure_id,
+            prompt_structure_display_name=prompt_structure.display_name,
+            prompt_structure_directives=list(prompt_structure.director_prompt_directives),
         )
         if directive is None:
             return default_plan
@@ -165,6 +195,8 @@ class RuntimeTurnGenerationService:
             session,
             prior_turns,
             directive.generator_id,
+            story_type=story_type,
+            prompt_structure=prompt_structure,
             character_name=directive.character_name,
             story_brief=directive.story_brief.strip() or default_plan.request.cutscene.story_brief,
             cutscene_display_name=directive.cutscene_display_name.strip() or default_plan.request.cutscene.display_name,
@@ -177,6 +209,8 @@ class RuntimeTurnGenerationService:
         prior_turns: list[RuntimeTurnRecord],
         generator_id: str,
         *,
+        story_type: StoryTypeDefinition,
+        prompt_structure: PromptStructureDefinition,
         character_name: str | None = None,
         story_brief: str | None = None,
         cutscene_display_name: str | None = None,
@@ -192,8 +226,22 @@ class RuntimeTurnGenerationService:
         if not validation.is_valid:
             return None
 
+        minigame_surface = self._require_minigame_surface(generator_id)
         selected_character_name = character_name or select_character_name(session)
-        selected_story_brief = story_brief or build_story_brief(session, generator_id, selected_character_name)
+        objective_text = objective_text_for(generator_id, validation.resolved_parameters)
+        story_hook = render_story_hook(
+            minigame_surface,
+            character_name=selected_character_name,
+            objective_text=objective_text,
+            parameters=validation.resolved_parameters,
+        )
+        selected_story_brief = story_brief or build_story_brief(
+            session,
+            story_seed=story_type.narrative_seed,
+            character_name=selected_character_name,
+            story_hook=story_hook,
+            prompt_structure_description=prompt_structure.description,
+        )
         selected_display_name = cutscene_display_name or f"Sequence Bridge {turn_index + 1}"
         request = self._build_request(
             session=session,
@@ -204,11 +252,19 @@ class RuntimeTurnGenerationService:
             context=context,
             story_brief=selected_story_brief,
             cutscene_display_name=selected_display_name,
+            story_type=story_type,
+            prompt_structure=prompt_structure,
+            minigame_surface=minigame_surface,
+            story_hook=story_hook,
         )
         return _TurnPlan(
             generator_id=generator_id,
             character_name=selected_character_name,
             parameters=validation.resolved_parameters,
+            story_hook=story_hook,
+            story_type=story_type,
+            prompt_structure=prompt_structure,
+            minigame_surface=minigame_surface,
             request=request,
         )
 
@@ -223,6 +279,10 @@ class RuntimeTurnGenerationService:
         context: MinigameGenerationContext,
         story_brief: str,
         cutscene_display_name: str,
+        story_type: StoryTypeDefinition,
+        prompt_structure: PromptStructureDefinition,
+        minigame_surface: MinigameStorySurface,
+        story_hook: str,
     ) -> GeneratedPackageAssemblyRequest:
         turn_slug = f"sequence_turn_{session.state.beat_cursor:03d}"
         minigame_scene = MINIGAME_SCENES[generator_id]
@@ -261,8 +321,53 @@ class RuntimeTurnGenerationService:
                     selected_generator_id=generator_id,
                     selected_generator_display_name=display_name_for(self._catalog, generator_id),
                     mission_configuration_summary=mission_configuration_summary(generator_id, parameters),
+                    story_type_id=story_type.story_type_id,
+                    story_type_display_name=story_type.display_name,
+                    story_type_prompt_directives=list(story_type.prompt_directives),
+                    prompt_structure_id=prompt_structure.prompt_structure_id,
+                    prompt_structure_display_name=prompt_structure.display_name,
+                    prompt_structure_directives=list(prompt_structure.storyboard_prompt_directives),
+                    minigame_story_hook=story_hook,
+                    minigame_prompt_directives=list(minigame_surface.llm_prompt_directives)
+                    + [hint.llm_guidance for hint in minigame_surface.parameter_prompt_hints],
                 ),
             ),
+        )
+
+    def _require_story_type(self, session: RuntimeSession) -> StoryTypeDefinition:
+        story_type = self._story_mode_catalog.get_story_type(session.state.story_type_id)
+        if story_type is None:
+            raise RuntimeError(f"Runtime story type '{session.state.story_type_id}' is not configured.")
+        return story_type
+
+    def _require_prompt_structure(self, session: RuntimeSession) -> PromptStructureDefinition:
+        prompt_structure = self._story_mode_catalog.get_prompt_structure(session.state.prompt_structure_id)
+        if prompt_structure is None:
+            raise RuntimeError(
+                f"Runtime prompt structure '{session.state.prompt_structure_id}' is not configured."
+            )
+        return prompt_structure
+
+    def _require_minigame_surface(self, generator_id: str) -> MinigameStorySurface:
+        minigame_surface = self._story_mode_catalog.get_minigame_surface(generator_id)
+        if minigame_surface is None:
+            raise RuntimeError(f"Runtime minigame surface for '{generator_id}' is not configured.")
+        return minigame_surface
+
+    def _to_generator_option(self, plan: _TurnPlan) -> StorySequenceGeneratorOption:
+        return StorySequenceGeneratorOption(
+            generator_id=plan.generator_id,
+            display_name=plan.minigame_surface.generator.display_name,
+            minigame_id=plan.minigame_surface.generator.minigame_id,
+            fit_tags=list(plan.minigame_surface.generator.fit_tags),
+            preview_text_template=plan.minigame_surface.generator.preview_text_template,
+            story_purposes=list(plan.minigame_surface.story_purposes),
+            story_hook_template=plan.story_hook,
+            llm_prompt_directives=list(plan.minigame_surface.llm_prompt_directives),
+            parameter_prompt_hints=[
+                f"{hint.parameter_name}: {hint.llm_guidance}"
+                for hint in plan.minigame_surface.parameter_prompt_hints
+            ],
         )
 
     def _create_package(
@@ -453,6 +558,8 @@ class RuntimeTurnGenerationService:
                 job_id=job_id,
                 generator_id=plan.generator_id,
                 character_name=plan.character_name,
+                story_type_id=plan.story_type.story_type_id,
+                prompt_structure_id=plan.prompt_structure.prompt_structure_id,
                 package_id=session.package_id,
                 package_display_name=session.package_display_name,
                 fallback_generator_ids=list(result.fallback_generator_ids),
