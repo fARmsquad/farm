@@ -83,7 +83,7 @@ namespace FarmSimVR.Tests.EditMode
             if (PortalManager.Instance != null)
                 Object.DestroyImmediate(PortalManager.Instance.gameObject);
 
-            foreach (var bootstrap in Object.FindObjectsByType<PortalManager>(FindObjectsInactive.Include))
+            foreach (var bootstrap in Object.FindObjectsByType<PortalManager>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 Object.DestroyImmediate(bootstrap.gameObject);
 
             typeof(PortalManager)

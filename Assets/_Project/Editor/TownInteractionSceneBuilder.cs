@@ -1,6 +1,8 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using TMPro;
@@ -21,10 +23,13 @@ namespace FarmSimVR.Editor
         private const string DialogueDataPath = "Assets/_Project/Data/TownChat_DialogueData.asset";
 
         // ── NPC spawn positions around a central market square ──────
+        // Index 0 is Old Garrett (background NPC).
+        // Index 1 is Mira the Baker — the demo auto-walks here so the player
+        // meets the baker immediately and can sell eggs.
         private static readonly (Vector3 pos, float yRot, string name)[] NpcSlots =
         {
             (new Vector3( 6f, 0f,  4f),  200f, "Old Garrett"),
-            (new Vector3(-5f, 0f,  3f),  150f, "Mira the Baker"),
+            (new Vector3(-5.5f, 0f, 4f), 150f, "Mira the Baker"),   // in front of Bread Stall
             (new Vector3( 0f, 0f,  8f),  180f, "Young Pip"),
         };
 
@@ -33,6 +38,9 @@ namespace FarmSimVR.Editor
         {
             // ── Open / create the scene ──────────────────────────────
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+            // ── Input system event routing (required for mouse clicks on UGUI) ──
+            EnsureEventSystem();
 
             // ── Environment ──────────────────────────────────────────
             BuildGround();
@@ -52,11 +60,12 @@ namespace FarmSimVR.Editor
             BuildFollowCamera(player.transform);
 
             // ── Dialogue UI ──────────────────────────────────────────
-            var (dialogueMgr, _) = BuildDialogueUI();
+            BuildDialogueUI();
 
             // ── Autoplay controller ──────────────────────────────────
-            var targetNpc = npcs.Length > 0 ? npcs[0] : null;
-            BuildAutoplay(player, targetNpc, dialogueMgr, dialogueData);
+            // Walk to Mira the Baker (index 1) so the player lands at the baker's stall.
+            var targetNpc = npcs.Length > 1 ? npcs[1] : (npcs.Length > 0 ? npcs[0] : null);
+            BuildAutoplay(player, targetNpc);
 
             // ── Save ─────────────────────────────────────────────────
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -251,12 +260,15 @@ namespace FarmSimVR.Editor
                 var npc = npcGo.GetComponent<NPCController>() ?? npcGo.AddComponent<NPCController>();
 
                 var so = new SerializedObject(npc);
-                so.FindProperty("npcName").stringValue       = npcName;
+                so.FindProperty("npcName").stringValue         = npcName;
                 so.FindProperty("interactionRange").floatValue = 3.5f;
-                // Only assign dialogue to the first NPC — the auto-walk target
+                // Only assign scripted dialogue to Old Garrett (index 0) as a fallback.
                 if (i == 0 && dialogueData != null)
                     so.FindProperty("dialogueData").objectReferenceValue = dialogueData;
                 so.ApplyModifiedPropertiesWithoutUndo();
+
+                // Floating world-space name label — NPCController picks this up automatically.
+                AddNameLabel(npcGo, npcName);
 
                 result[i] = npc;
             }
@@ -428,19 +440,49 @@ namespace FarmSimVR.Editor
 
         private static void BuildAutoplay(
             GameObject player,
-            NPCController targetNpc,
-            DialogueManager dialogueMgr,
-            DialogueData dialogueData)
+            NPCController targetNpc)
         {
-            var go = new GameObject("TownInteractionAutoplay");
+            var go       = new GameObject("TownInteractionAutoplay");
             var autoplay = go.AddComponent<TownInteractionAutoplay>();
+            var skip     = go.AddComponent<SkipPrompt>();
+
+            // Quick skip: visible immediately, single short hold.
+            var skipSo = new SerializedObject(skip);
+            skipSo.FindProperty("showDelay").floatValue    = 0f;    // visible from first frame
+            skipSo.FindProperty("holdDuration").floatValue = 0.3f;  // tap-and-hold to skip
+            skipSo.ApplyModifiedPropertiesWithoutUndo();
 
             var so = new SerializedObject(autoplay);
-            so.FindProperty("playerTransform").objectReferenceValue  = player.transform;
-            so.FindProperty("targetNpc").objectReferenceValue        = targetNpc;
-            so.FindProperty("dialogueManager").objectReferenceValue  = dialogueMgr;
-            so.FindProperty("conversationData").objectReferenceValue = dialogueData;
+            so.FindProperty("playerTransform").objectReferenceValue = player.transform;
+            so.FindProperty("targetNpc").objectReferenceValue       = targetNpc;
+            so.FindProperty("skipPrompt").objectReferenceValue      = skip;
             so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void AddNameLabel(GameObject npcGo, string npcName)
+        {
+            var labelGO = new GameObject("NameTag");
+            labelGO.transform.SetParent(npcGo.transform, false);
+            labelGO.transform.localPosition = new Vector3(0f, 2.6f, 0f);
+
+            var mesh = labelGO.AddComponent<TextMesh>();
+            mesh.text          = npcName;
+            mesh.characterSize = 0.09f;
+            mesh.fontSize      = 32;
+            mesh.anchor        = TextAnchor.MiddleCenter;
+            mesh.alignment     = TextAlignment.Center;
+            mesh.color         = new Color(1f, 0.92f, 0.55f);
+        }
+
+        // ── Event system ──────────────────────────────────────────────
+
+        private static void EnsureEventSystem()
+        {
+            if (Object.FindAnyObjectByType<EventSystem>() != null) return;
+
+            var go = new GameObject("EventSystem");
+            go.AddComponent<EventSystem>();
+            go.AddComponent<InputSystemUIInputModule>();
         }
 
         // ── DialogueData asset ────────────────────────────────────────

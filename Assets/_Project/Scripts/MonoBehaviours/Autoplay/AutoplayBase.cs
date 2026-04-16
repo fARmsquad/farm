@@ -41,6 +41,19 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
         /// </summary>
         protected virtual void OnDemoComplete() { }
 
+        /// <summary>
+        /// Immediately ends the demo (e.g. called by a SkipPrompt callback).
+        /// Stops all running coroutines and invokes OnDemoComplete.
+        /// </summary>
+        public void ForceSkip()
+        {
+            if (finished) return;
+            StopAllCoroutines();
+            finished     = true;
+            currentLabel = "Skipped.";
+            OnDemoComplete();
+        }
+
         protected void Step(string label)
         {
             currentStep++;

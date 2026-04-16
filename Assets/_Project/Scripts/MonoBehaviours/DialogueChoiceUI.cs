@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using FarmSimVR.MonoBehaviours.Economy;
 
 namespace FarmSimVR.MonoBehaviours
 {
@@ -26,10 +27,13 @@ namespace FarmSimVR.MonoBehaviours
         [SerializeField] private TextMeshProUGUI loadingText;
         [SerializeField] private TextMeshProUGUI hintText;
 
+        private const string BakerNpcName = "Mira the Baker";
+
         private readonly List<GameObject> _buttons = new();
         private readonly StringBuilder _visibleText = new();
         private string _defaultHintText;
         private string _lastPlayerPrompt;
+        private string _activeNpcName;
         private bool _choicesVisible;
         private bool _layoutInitialized;
         private TownVoiceInputController _voiceInputController;
@@ -120,6 +124,7 @@ namespace FarmSimVR.MonoBehaviours
             InitializeAdaptiveHud();
             _visibleText.Clear();
             _choicesVisible = false;
+            _activeNpcName = npcName;
 
             ShowCanvas(true);
             if (dialoguePanel != null)
@@ -155,9 +160,33 @@ namespace FarmSimVR.MonoBehaviours
             ResolveVoiceInputController();
             ClearButtons();
             BuildOptionButtons(options);
+            TryInjectSellEggsButton();
             _choicesVisible = true;
             RefreshVoiceInputStatus();
             RefreshAdaptiveLayout();
+        }
+
+        private void TryInjectSellEggsButton()
+        {
+            if (_activeNpcName != BakerNpcName) return;
+            if (EconomyManager.Instance == null) return;
+
+            int eggCount = EconomyManager.Instance.Inventory?.GetCount("egg") ?? 0;
+            if (eggCount <= 0) return;
+
+            int coins  = eggCount * EconomyManager.EggSellPrice;
+            string label = $"Sell {eggCount} egg{(eggCount == 1 ? "" : "s")} ({coins} Chicken Coins)";
+
+            var button = BuildButton(label);
+            button.GetComponent<Button>().onClick.AddListener(() => OnSellEggs(eggCount));
+            _buttons.Add(button);
+        }
+
+        private void OnSellEggs(int eggCountAtPress)
+        {
+            if (EconomyManager.Instance == null) return;
+            EconomyManager.Instance.TrySellAllEggs(out _);
+            conversation?.SelectOption($"I'll sell you all my eggs — that's {eggCountAtPress}.");
         }
 
         private void HandleWaiting()
@@ -185,6 +214,7 @@ namespace FarmSimVR.MonoBehaviours
             ShowCanvas(false);
             ClearButtons();
             _lastPlayerPrompt = null;
+            _activeNpcName = null;
             _visibleText.Clear();
             _choicesVisible = false;
             HideStatusBadge();

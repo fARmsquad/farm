@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using FarmSimVR.Core;
+using FarmSimVR.Core.Inventory;
 using FarmSimVR.MonoBehaviours.Cinematics;
+using FarmSimVR.MonoBehaviours.Economy;
 using UnityEngine;
 
 namespace FarmSimVR.MonoBehaviours
@@ -149,7 +151,8 @@ namespace FarmSimVR.MonoBehaviours
             bool streamStartedFired = false;
             string fullText = null;
             string error    = null;
-            TownConversationContextWindow requestContext = _conversationMemory.BuildContextWindow(_activeNpc);
+            string inventorySummary = BuildInventorySummary();
+            TownConversationContextWindow requestContext = _conversationMemory.BuildContextWindow(_activeNpc, inventorySummary);
 
             yield return openAIClient.ChatStream(
                 BuildRequestMessages(requestContext),
@@ -187,7 +190,7 @@ namespace FarmSimVR.MonoBehaviours
             int turnIndex = CountAssistantMessages(_history);
             _conversationMemory.RecordNpcResponse(_activeNpc, parsed.response);
             _history.Add(new ChatMessage("assistant", parsed.response));
-            TownConversationContextWindow responseContext = _conversationMemory.BuildContextWindow(_activeNpc);
+            TownConversationContextWindow responseContext = _conversationMemory.BuildContextWindow(_activeNpc, inventorySummary);
             string[] displayOptions = TownDialogueOptionComposer.BuildOptions(
                 _activeNpc,
                 turnIndex,
@@ -226,6 +229,32 @@ namespace FarmSimVR.MonoBehaviours
         }
 
         // ── Helpers ───────────────────────────────────────────────────────────
+
+        private string BuildInventorySummary()
+        {
+            IInventorySystem inventory = EconomyManager.Instance?.Inventory;
+
+            if (inventory == null)
+                return null;
+
+            var counts = new Dictionary<string, int>();
+            foreach (var slot in inventory.Slots)
+            {
+                if (slot.IsEmpty) continue;
+                counts.TryGetValue(slot.ItemId, out int existing);
+                counts[slot.ItemId] = existing + slot.Quantity;
+            }
+
+            if (counts.Count == 0)
+                return "Player's inventory is currently empty.";
+
+            var sb = new StringBuilder("Player currently has:");
+            foreach (var kvp in counts)
+                sb.Append(' ').Append(kvp.Value).Append(' ').Append(kvp.Key).Append(',');
+
+            sb[sb.Length - 1] = '.';
+            return sb.ToString();
+        }
 
         private static LLMResponse TryParseResponse(string text)
         {

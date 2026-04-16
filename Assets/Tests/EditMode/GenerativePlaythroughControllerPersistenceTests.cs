@@ -88,7 +88,7 @@ namespace FarmSimVR.Tests.EditMode
 
         private static void DestroyControllers()
         {
-            foreach (var controller in Object.FindObjectsByType<GenerativePlaythroughController>(FindObjectsInactive.Include))
+            foreach (var controller in Object.FindObjectsByType<GenerativePlaythroughController>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 Object.DestroyImmediate(controller.gameObject);
             }
