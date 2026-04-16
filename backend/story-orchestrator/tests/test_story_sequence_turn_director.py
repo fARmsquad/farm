@@ -63,6 +63,51 @@ class OpenAIStorySequenceTurnDirectorTests(unittest.TestCase):
         self.assertIn('"candidate_generators": [', client.last_user_prompt)
         self.assertIn('"default_character_name": "Miss Clara"', client.last_user_prompt)
 
+    def test_choose_turn_system_prompt_demands_prior_context_reference_for_continuity_guardrail(self) -> None:
+        client = CapturingStructuredOutputClient(
+            {
+                "generator_id": "find_tools_cluster_v1",
+                "character_name": "Miss Clara",
+                "cutscene_display_name": "Clara Hears the Shed Rattle",
+                "story_brief": (
+                    "Miss Clara hears a crash from the shed roof and spots muddy tracks near the missing watering kit. "
+                    "She asks the player to recover the scattered tools before the first planting lesson can begin."
+                ),
+            }
+        )
+        director = OpenAIStorySequenceTurnDirector(client=client)
+
+        director.choose_turn(
+            narrative_seed="The farm is waking up after a messy first morning.",
+            beat_cursor=1,
+            fit_tags=["tutorial"],
+            world_state=["watering_tools_unlocked"],
+            difficulty_band="intro",
+            last_minigame_goal="Catch the last runaway chicken in the pen",
+            recent_turn_summaries=["Old Garrett: Catch the last runaway chicken in the pen."],
+            candidate_generators=[
+                StorySequenceGeneratorOption(
+                    generator_id="find_tools_cluster_v1",
+                    display_name="Find Lost Tools",
+                    minigame_id="find_tools",
+                    fit_tags=["search", "tutorial"],
+                    preview_text_template="Recover missing tools around the farmyard.",
+                )
+            ],
+            candidate_character_names=["Old Garrett", "Miss Clara"],
+            default_generator_id="find_tools_cluster_v1",
+            default_character_name="Miss Clara",
+        )
+
+        assert client.last_system_prompt is not None
+        sp = client.last_system_prompt.lower()
+        for phrase in (
+            "prior_story_summary",
+            "explicitly reference earlier characters",
+            "continuity over novelty",
+        ):
+            self.assertIn(phrase, sp, f"missing continuity guardrail phrase: {phrase}")
+
 
 class StorySequenceTurnDirectorIntegrationTests(unittest.TestCase):
     def setUp(self) -> None:

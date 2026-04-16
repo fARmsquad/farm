@@ -84,7 +84,11 @@ class OpenAIStorySequenceTurnDirector:
             "and make the upcoming mission feel like a natural consequence. "
             "Treat this like the next beat in an ongoing story, not a reset, recap card, or tutorial prompt. "
             "Characters should notice something, want something, lose something, discover something, or interrupt each other. "
-            "Stay grounded, warm, readable, and forward-moving. Do not invent generator IDs, scenes, parameters, or characters outside the allowed lists."
+            "Stay grounded, warm, readable, and forward-moving. Do not invent generator IDs, scenes, parameters, or characters outside the allowed lists.\n\n"
+            "Continuity rules:\n"
+            "- Read the prior_story_summary field carefully and explicitly reference earlier characters, locations, or unresolved threads in your cutscene_display_name and story_brief.\n"
+            "- Choose continuity over novelty: when in doubt, extend an existing thread rather than starting a new one.\n"
+            "- The story_brief must connect to what just happened, not pretend it didn't."
         )
         user_prompt = json.dumps(
             {
