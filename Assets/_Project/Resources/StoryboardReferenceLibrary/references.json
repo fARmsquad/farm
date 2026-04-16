@@ -1,0 +1,317 @@
+[
+  {
+    "reference_id": "09f73b96-23a7-4038-b042-3a78f0a655dd",
+    "reference_role": "style",
+    "label": "intro_intro_01_town",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "Intro"
+    ],
+    "source_filename": "intro_01_town.png",
+    "stored_path": "assets/09f73b96-23a7-4038-b042-3a78f0a655dd.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:28.502444+00:00"
+  },
+  {
+    "reference_id": "f0b4ba5a-eb28-4149-a53d-f1be9be00443",
+    "reference_role": "style",
+    "label": "intro_intro_02_sleeping",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "Intro"
+    ],
+    "source_filename": "intro_02_sleeping.png",
+    "stored_path": "assets/f0b4ba5a-eb28-4149-a53d-f1be9be00443.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:28.599559+00:00"
+  },
+  {
+    "reference_id": "966bb310-eaaa-4f59-b43a-e930b1be320e",
+    "reference_role": "style",
+    "label": "intro_intro_03_wokenup",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "Intro"
+    ],
+    "source_filename": "intro_03_wokenup.png",
+    "stored_path": "assets/966bb310-eaaa-4f59-b43a-e930b1be320e.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:28.700216+00:00"
+  },
+  {
+    "reference_id": "32bf785c-6fb8-40e3-b730-5f99d693f9c8",
+    "reference_role": "style",
+    "label": "intro_intro_04_getsup",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "Intro"
+    ],
+    "source_filename": "intro_04_getsup.png",
+    "stored_path": "assets/32bf785c-6fb8-40e3-b730-5f99d693f9c8.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:28.997597+00:00"
+  },
+  {
+    "reference_id": "af305f94-ef5e-4671-93c2-7f6d0ca76abb",
+    "reference_role": "style",
+    "label": "intro_intro_05_spots_chicken",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "Intro"
+    ],
+    "source_filename": "intro_05_spots_chicken.png",
+    "stored_path": "assets/af305f94-ef5e-4671-93c2-7f6d0ca76abb.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:29.170306+00:00"
+  },
+  {
+    "reference_id": "1c4cdea5-d1ef-43b5-957d-6be3e71a7102",
+    "reference_role": "style",
+    "label": "intro_intro_06_chases_neighborhood",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "Intro"
+    ],
+    "source_filename": "intro_06_chases_neighborhood.png",
+    "stored_path": "assets/1c4cdea5-d1ef-43b5-957d-6be3e71a7102.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:29.637315+00:00"
+  },
+  {
+    "reference_id": "ac522e5f-4c0f-415a-8293-bd7f939b6b0c",
+    "reference_role": "style",
+    "label": "intro_intro_07_chases_farm",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "Intro"
+    ],
+    "source_filename": "intro_07_chases_farm.png",
+    "stored_path": "assets/ac522e5f-4c0f-415a-8293-bd7f939b6b0c.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:30.065421+00:00"
+  },
+  {
+    "reference_id": "1c5bb648-b8f5-414e-aa4d-b6115f512c3f",
+    "reference_role": "style",
+    "label": "intro_intro_08_coop",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "Intro"
+    ],
+    "source_filename": "intro_08_coop.png",
+    "stored_path": "assets/1c5bb648-b8f5-414e-aa4d-b6115f512c3f.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:30.331096+00:00"
+  },
+  {
+    "reference_id": "a3df7fb7-0b8d-42a4-8a27-eb37e358b59b",
+    "reference_role": "style",
+    "label": "intro_1",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "CaughtChickenCutscene"
+    ],
+    "source_filename": "1.png",
+    "stored_path": "assets/a3df7fb7-0b8d-42a4-8a27-eb37e358b59b.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:30.433739+00:00"
+  },
+  {
+    "reference_id": "4f5741d9-b9e9-4c46-af13-6e19534b93dd",
+    "reference_role": "style",
+    "label": "intro_2",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "CaughtChickenCutscene"
+    ],
+    "source_filename": "2.png",
+    "stored_path": "assets/4f5741d9-b9e9-4c46-af13-6e19534b93dd.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:30.530928+00:00"
+  },
+  {
+    "reference_id": "a74aadbc-27ff-470a-9b98-f832c8942602",
+    "reference_role": "style",
+    "label": "intro_3",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "CaughtChickenCutscene"
+    ],
+    "source_filename": "3.png",
+    "stored_path": "assets/a74aadbc-27ff-470a-9b98-f832c8942602.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:30.616616+00:00"
+  },
+  {
+    "reference_id": "0c5c9da0-b492-48e6-bf50-73c1b7cdbfde",
+    "reference_role": "style",
+    "label": "intro_4",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "CaughtChickenCutscene"
+    ],
+    "source_filename": "4.png",
+    "stored_path": "assets/0c5c9da0-b492-48e6-bf50-73c1b7cdbfde.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:30.695090+00:00"
+  },
+  {
+    "reference_id": "f49c1d4c-7957-44cb-8fde-0f7c2d66b39e",
+    "reference_role": "style",
+    "label": "intro_5",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "CaughtChickenCutscene"
+    ],
+    "source_filename": "5.png",
+    "stored_path": "assets/f49c1d4c-7957-44cb-8fde-0f7c2d66b39e.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:31.002373+00:00"
+  },
+  {
+    "reference_id": "aff107c8-48f9-42b2-91e0-99df7e837d43",
+    "reference_role": "style",
+    "label": "intro_6",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "CaughtChickenCutscene"
+    ],
+    "source_filename": "6.png",
+    "stored_path": "assets/aff107c8-48f9-42b2-91e0-99df7e837d43.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:31.315177+00:00"
+  },
+  {
+    "reference_id": "f989c529-027c-4ee2-ab31-d6ff42d02261",
+    "reference_role": "style",
+    "label": "intro_7",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "CaughtChickenCutscene"
+    ],
+    "source_filename": "7.png",
+    "stored_path": "assets/f989c529-027c-4ee2-ab31-d6ff42d02261.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:31.620496+00:00"
+  },
+  {
+    "reference_id": "d633e9c0-b143-4727-89b9-2bd2113bacde",
+    "reference_role": "style",
+    "label": "intro_8",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "CaughtChickenCutscene"
+    ],
+    "source_filename": "8.png",
+    "stored_path": "assets/d633e9c0-b143-4727-89b9-2bd2113bacde.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:31.923145+00:00"
+  },
+  {
+    "reference_id": "c3d88d1d-76bc-4210-9a7e-baa03d4c4a0e",
+    "reference_role": "style",
+    "label": "intro_SeedScene1",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "SeedCutscene"
+    ],
+    "source_filename": "SeedScene1.png",
+    "stored_path": "assets/c3d88d1d-76bc-4210-9a7e-baa03d4c4a0e.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:32.084742+00:00"
+  },
+  {
+    "reference_id": "fa1f5408-7725-4891-9dab-5939e303494c",
+    "reference_role": "style",
+    "label": "intro_SeedScene2",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "SeedCutscene"
+    ],
+    "source_filename": "SeedScene2.png",
+    "stored_path": "assets/fa1f5408-7725-4891-9dab-5939e303494c.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:32.248635+00:00"
+  },
+  {
+    "reference_id": "caf34a0a-8328-43d8-9855-0cd32d3c592b",
+    "reference_role": "style",
+    "label": "intro_SeedScene3",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "SeedCutscene"
+    ],
+    "source_filename": "SeedScene3.png",
+    "stored_path": "assets/caf34a0a-8328-43d8-9855-0cd32d3c592b.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:32.413752+00:00"
+  },
+  {
+    "reference_id": "3982e7ef-1900-4acc-ba5c-e78da13e3614",
+    "reference_role": "style",
+    "label": "intro_SeedScene4",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "SeedCutscene"
+    ],
+    "source_filename": "SeedScene4.png",
+    "stored_path": "assets/3982e7ef-1900-4acc-ba5c-e78da13e3614.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:32.577488+00:00"
+  },
+  {
+    "reference_id": "fa02c0a9-7b9c-4479-8681-d697be852e9a",
+    "reference_role": "style",
+    "label": "intro_SeedScene5",
+    "character_name": "",
+    "tags": [
+      "intro_panels",
+      "watercolor_intro_v1",
+      "SeedCutscene"
+    ],
+    "source_filename": "SeedScene5.png",
+    "stored_path": "assets/fa02c0a9-7b9c-4479-8681-d697be852e9a.png",
+    "mime_type": "image/png",
+    "created_at": "2026-04-16T18:08:32.873773+00:00"
+  }
+]
