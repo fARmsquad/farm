@@ -101,8 +101,14 @@ class StoryboardReferencePathResolver:
 
     def resolve_paths(self, request: "GeneratedStoryboardCutsceneRequest") -> list[str]:
         resolved: list[str] = []
+        style_paths = self._collect_style_reference_paths(
+            getattr(request, "style_preset_id", "") or "",
+            getattr(request, "max_style_anchors", 0),
+        )
+        self._append_paths(resolved, style_paths)
         explicit_paths = self._normalize_paths(request.reference_image_paths)
         character_paths = self._collect_character_reference_paths(request.context.character_name)
+        slice_budget = request.max_reference_images + getattr(request, "max_style_anchors", 0)
 
         if request.continuity_reference_mode == "character_priority":
             self._append_paths(resolved, character_paths)
@@ -110,21 +116,35 @@ class StoryboardReferencePathResolver:
             self._append_paths(resolved, continuity_paths)
             if not explicit_paths and not character_paths:
                 self._append_recent_generated_images(resolved, request.package_id)
-            return resolved[: request.max_reference_images]
+            return resolved[:slice_budget]
 
         self._append_paths(resolved, explicit_paths)
-        explicit_reference_count = len(resolved)
+        explicit_reference_count = len(explicit_paths)
         if request.continuity_reference_mode != "explicit_only":
             self._append_paths(resolved, character_paths)
             if explicit_reference_count == 0:
                 self._append_recent_generated_images(resolved, request.package_id)
-        return resolved[: request.max_reference_images]
+        return resolved[:slice_budget]
 
     def _collect_character_reference_paths(self, character_name: str) -> list[str]:
         if self._reference_library is None or not character_name:
             return []
         records = self._reference_library.list_references(character_name=character_name, reference_role="character")
         return [str(self._reference_library.resolve_stored_path(record.stored_path)) for record in reversed(records)]
+
+    def _collect_style_reference_paths(self, style_preset_id: str, limit: int) -> list[str]:
+        if self._reference_library is None or not style_preset_id or limit <= 0:
+            return []
+        records = self._reference_library.list_references(reference_role="style")
+        matched: list[str] = []
+        for record in records:
+            if style_preset_id not in record.tags:
+                continue
+            resolved = str(self._reference_library.resolve_stored_path(record.stored_path))
+            matched.append(resolved)
+            if len(matched) >= limit:
+                break
+        return matched
 
     def _append_recent_generated_images(self, resolved: list[str], package_id: str) -> None:
         package_root = self._output_root / "GeneratedStoryboards" / package_id

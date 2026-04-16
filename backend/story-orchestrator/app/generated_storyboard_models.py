@@ -34,6 +34,7 @@ class GeneratedStoryboardCutsceneRequest(BaseModel):
     reference_image_paths: list[str] = Field(default_factory=list)
     continuity_reference_mode: Literal["auto", "explicit_only", "character_priority"] = "auto"
     max_reference_images: int = Field(default=4, ge=0, le=8)
+    max_style_anchors: int = Field(default=2, ge=0, le=8)
     aspect_ratio: str = Field(default="16:9", min_length=1)
     image_size: str = Field(default="2K", min_length=1)
     context: GeneratedStoryboardContext
