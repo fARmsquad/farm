@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mcp-unity": {
+      "command": "node",
+      "args": ["/Users/olivia/farm/Packages/com.gamelovers.mcp-unity/Server~/build/index.js"]
+    }
+  }
+}
