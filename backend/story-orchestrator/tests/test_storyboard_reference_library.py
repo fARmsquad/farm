@@ -34,7 +34,7 @@ class StoryboardReferenceLibraryTests(unittest.TestCase):
 
         self.assertEqual(record.reference_role, "character")
         self.assertEqual(record.character_name, "Old Garrett")
-        self.assertTrue(Path(record.stored_path).exists())
+        self.assertTrue(self.library.resolve_stored_path(record.stored_path).exists())
         self.assertEqual(len(listed), 1)
         self.assertEqual(listed[0].reference_id, record.reference_id)
         self.assertEqual(listed[0].tags, ["hero", "storybook"])
@@ -76,7 +76,8 @@ class StoryboardReferenceContinuityTests(unittest.TestCase):
         first_image_asset = result.generated_assets[0]
         reference_paths = first_image_asset.metadata["reference_image_paths"]
 
-        self.assertIn(character_reference.stored_path, reference_paths)
+        resolved_character_path = str(self.reference_library.resolve_stored_path(character_reference.stored_path))
+        self.assertIn(resolved_character_path, reference_paths)
         self.assertIn(str(prior_image.resolve()), reference_paths)
 
 
@@ -102,7 +103,8 @@ class StoryboardReferenceContinuityTests(unittest.TestCase):
 
         reference_paths = result.generated_assets[0].metadata["reference_image_paths"]
 
-        self.assertEqual(reference_paths[0], character_reference.stored_path)
+        resolved_character_path = str(self.reference_library.resolve_stored_path(character_reference.stored_path))
+        self.assertEqual(reference_paths[0], resolved_character_path)
         self.assertIn(str(explicit_image.resolve()), reference_paths)
 
     def test_create_package_skips_generic_package_sweep_when_explicit_reference_paths_exist(self) -> None:
@@ -128,8 +130,9 @@ class StoryboardReferenceContinuityTests(unittest.TestCase):
         first_image_asset = result.generated_assets[0]
         reference_paths = first_image_asset.metadata["reference_image_paths"]
 
+        resolved_character_path = str(self.reference_library.resolve_stored_path(character_reference.stored_path))
         self.assertIn(str(explicit_image.resolve()), reference_paths)
-        self.assertIn(character_reference.stored_path, reference_paths)
+        self.assertIn(resolved_character_path, reference_paths)
         self.assertNotIn(str(prior_image.resolve()), reference_paths)
 
 

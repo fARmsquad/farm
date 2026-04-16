@@ -45,11 +45,18 @@ class StoryboardReferenceLibrary:
         )
         stored_path = self._assets_root / f"{placeholder.reference_id}{suffix}"
         stored_path.write_bytes(content)
-        record = placeholder.model_copy(update={"stored_path": str(stored_path.resolve())})
+        relative_stored_path = f"assets/{placeholder.reference_id}{suffix}"
+        record = placeholder.model_copy(update={"stored_path": relative_stored_path})
         records = self._read_manifest()
         records.append(record)
         self._write_manifest(records)
         return record
+
+    def resolve_stored_path(self, stored_path: str) -> Path:
+        candidate = Path(stored_path)
+        if candidate.is_absolute():
+            return candidate
+        return (self._library_root / candidate).resolve()
 
     def list_references(
         self,
@@ -117,7 +124,7 @@ class StoryboardReferencePathResolver:
         if self._reference_library is None or not character_name:
             return []
         records = self._reference_library.list_references(character_name=character_name, reference_role="character")
-        return [record.stored_path for record in reversed(records)]
+        return [str(self._reference_library.resolve_stored_path(record.stored_path)) for record in reversed(records)]
 
     def _append_recent_generated_images(self, resolved: list[str], package_id: str) -> None:
         package_root = self._output_root / "GeneratedStoryboards" / package_id

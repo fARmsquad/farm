@@ -357,7 +357,7 @@ def create_app(
         if record is None:
             raise HTTPException(status_code=404, detail="Storyboard reference asset not found.")
 
-        asset_path = Path(record.stored_path).resolve()
+        asset_path = reference_library.resolve_stored_path(record.stored_path)
         try:
             asset_path.relative_to(reference_library.asset_root)
         except ValueError as exc:
