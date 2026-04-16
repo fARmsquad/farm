@@ -19,6 +19,8 @@
 | 2026-04-06 | Assembly definitions enforce boundaries | `FarmSimVR.Core` (no engine refs), `FarmSimVR.MonoBehaviours`, `FarmSimVR.Interfaces` (no engine refs), `FarmSimVR.Editor` |
 | 2026-04-06 | New Input System only (legacy disabled) | `activeInputHandler: 1` — `UnityEngine.Input` returns 0/false always |
 | 2026-04-07 | Codex gets Unity MCP parity via relay binary | Same relay, same tools as CC. Both agents can manipulate scenes. |
+| 2026-04-16 | Generative cutscene art style fixed via Gemini reference anchors + `StylePresetCatalog` (no in-engine 3D pivot) | Phase A brainstorming decision: minimal change to runtime pipeline; anchor the 2D storyboard look via reference images + prompt suffix instead of re-authoring cutscenes in 3D |
+| 2026-04-16 | `style_preset_id` stays on `GeneratedStoryboardCutsceneRequest` (status quo plumbing) rather than moving to `StoryTypeDefinition` | Minimum churn; preserves backwards compat with existing Unity client; orphan-field smell traded for fewer migration surfaces |
 
 ---
 
@@ -77,6 +79,20 @@
 ### Scene Art Review
 - When the developer is still choosing the look of a mechanic, place curated asset options directly in the scene and get a pick before adding more lifecycle-specific logic or polish.
 
+### Generative Cutscene Style
+- `style_preset_id` is the authoritative key across the whole pipeline. `StylePresetCatalog.default()` (`backend/story-orchestrator/app/style_preset_catalog.py`) owns per-preset descriptor text (injected into planner system prompt + user prompt JSON), `image_prompt_suffix` (appended to every shot's image_prompt), and `preferred_provider` (used by the B3 router later). Don't invent parallel style mechanisms.
+- `StoryboardReferenceLibrary.references.json` stores `stored_path` **relative** to the library root (e.g., `assets/<uuid>.png`). Resolve at read time via `library.resolve_stored_path(stored_path)` — which handles both the new relative form and any legacy absolute paths. Never commit absolute paths back into the manifest.
+- Style anchor PNGs imported via `scripts/seed_style_reference_library.py` must be downscaled to ≤768px max edge before manifest import. Gemini embeds anchors base64 in every call; unconstrained anchor sizes produce 30MB+ request payloads and hit the Quest perf budget indirectly via latency.
+- Style anchors and continuity references have **separate budgets**: `max_style_anchors` is additive on top of `max_reference_images` in `StoryboardReferencePathResolver.resolve_paths`. Don't let them share one budget — they serve orthogonal purposes (style teaches visual look; continuity refs anchor character/world identity).
+
+### Title Screen Buttons
+- Sibling buttons intended to ship (player-facing) are authored via `Assets/_Project/Editor/CreateTitleScene.cs` so they live in saved `TitleScreen.unity` YAML. Do NOT add them via runtime code in `TitleScreenManager.CreateTutorialSliceLauncher()` — that method is the runtime-only dev launcher panel and its children never persist to the scene asset.
+- Regenerate the title scene via Unity batch-mode: `/Applications/Unity/Hub/Editor/6000.4.1f1/Unity.app/Contents/MacOS/Unity -batchmode -quit -projectPath "$(pwd)" -executeMethod FarmSimVR.Editor.CreateTitleScene.Create`. This same code path runs in CI and local dev — no "works on my machine" drift from manual menu clicks.
+
+### Integration-Boundary Assertions
+- Any Pydantic field that flows through N intermediate layers before emerging in a contract boundary (e.g., `GeneratedStoryboardContext` → `GeneratedStoryboardCutsceneRequest` → planner user_prompt → envelope `cutscene`) needs an end-to-end test that asserts the *value* survives round-trip. Unit tests at each layer miss silent-drop bugs like `_resolve_request_context()` rebuilding the model from scratch and dropping the new field.
+- When a hardcoded default determines which catalog entry / anchor set / preset a runtime uses, pin its *live-running value* in a test. Phase A's entire prompt chain was inert at runtime because `runtime_turn_generation.py` hardcoded `style_preset_id="farm_storybook_v1"` and every unit test explicitly set `watercolor_intro_v1` — the production default was never asserted.
+
 ### Git
 - Feature branches: `feature/<story-id>-<slug>`
 - Commit prefix: `[cc]` for Claude Code, `[codex]` for Codex
@@ -127,6 +143,9 @@
 - DON'T hand off a generated-slice backend fix with only `/health` evidence; prove at least one live `next-turn` returns `is_valid=true`.
 - DON'T make generated cutscene validity depend only on remote image providers if the local quality gate rejects placeholder fallback; keep a deterministic local image path available.
 - DON'T let story-sequence execution rediscover endpoints after readiness already resolved the active backend, and don't attempt local bootstrap for non-local hosts.
+- DON'T add a new field to `GeneratedStoryboardContext` (or any Pydantic model reconstructed downstream) without also updating `_resolve_request_context()` in `generated_storyboards.py`. That function rebuilds the context from scratch field-by-field and silently drops anything not explicitly re-listed.
+- DON'T declare a Pydantic model `extra="forbid"` and then let a separate WIP pass new fields to it without updating both sides in the same commit. The field will be accepted by static type checks and `git diff` but Pydantic will reject it at runtime, producing deterministic-looking integration test failures that masquerade as unrelated regressions.
+- DON'T leave a hardcoded default in a runtime pipeline's request-construction site pointing to a preset/catalog-key that has no matching entries in the downstream catalog or anchor library. The pipeline will silently no-op — unit tests won't catch it because they set the field explicitly.
 
 ---
 
@@ -176,6 +195,42 @@ entry must explain the original claim, the failing behavior, the approach that
 produced it, why verification missed it, and what future work must verify or
 phrase differently. Completion summaries must also separate verified facts from
 unverified assumptions so "done" has a clear boundary.
+
+### Ghost Field Wiring (Phase A, 2026-04-16)
+Phase A's whole point was to activate `style_preset_id` across the planner and
+Gemini reference resolver. Exploration found the field threaded from
+`RuntimeSessionCreateRequest` → `GeneratedStoryboardCutsceneRequest` → image
+generator call but never consumed by any prompt. That diagnosis was partly
+right: the field existed in `GeneratedStoryboardCutsceneRequest` and was
+ignored there. But **`RuntimeSessionCreateRequest` didn't carry it at all**
+and `runtime_turn_generation.py:310` hardcoded `"farm_storybook_v1"` — a
+preset with no catalog entry and no matching anchors. A1–A9 wired the field
+correctly, but because the hardcoded default never matched what Phase A
+seeded, the whole chain was inert at runtime. Caught only because the A10
+eval harness asserted the field's end-to-end value.
+
+**Rule:** When "wiring a ghost field," audit the full path including every
+intermediate **hardcoded default**. Any hardcoded value that names a catalog
+key, preset id, generator id, or similar lookup token must be listed in the
+relevant catalog/library, or it will silently no-op in production even with
+fully green unit tests.
+
+### GSO-026 Completion Interlock (2026-04-16)
+Phase A was blocked partway through by 10 `test_runtime_api.py` failures
+caused by uncommitted GSO-026 WIP. The WIP added construction-site code that
+passed four new fields (`story_purposes`, `story_hook_template`,
+`llm_prompt_directives`, `parameter_prompt_hints`) to
+`StorySequenceGeneratorOption`, but the model itself (declared
+`extra="forbid"`) was never updated to accept them. Every runtime end-to-end
+test that exercised the new code path failed with a Pydantic
+`extra_forbidden` validation error. Parallel subagents running full-suite
+tests gave inconsistent counts because the latent failure was deterministic
+but I hadn't run the suite myself to establish ground truth.
+
+**Rule:** Before dispatching parallel subagents on any codebase with
+uncommitted WIP, run the full test suite in the main session first to
+establish a known baseline. Two parallel "no regressions" reports cannot be
+reconciled against each other without external ground truth.
 
 ### Town Voice Token Proxy Budgets (2026-04-14)
 When Unity asks the local story-orchestrator to mint a Town voice token, the
