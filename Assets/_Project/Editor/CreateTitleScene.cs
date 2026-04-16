@@ -116,6 +116,52 @@ namespace FarmSimVR.Editor
                 btn.onClick,
                 mgr.StartGame);
 
+            // --- START MY STORY SIBLING BUTTON ---
+            // Shift the existing StartGameButton to the LEFT of bottom-center so the two
+            // buttons live side by side at matching offsets.
+            btnRect.anchoredPosition = new Vector2(-200f, 80f);
+
+            // Create StartMyStoryButton as a sibling to the RIGHT of bottom-center.
+            var smsGO = new GameObject("StartMyStoryButton");
+            smsGO.transform.SetParent(canvasGO.transform, false);
+            var smsRect = smsGO.AddComponent<RectTransform>();
+            smsRect.anchorMin = new Vector2(0.5f, 0f);
+            smsRect.anchorMax = new Vector2(0.5f, 0f);
+            smsRect.pivot = new Vector2(0.5f, 0.5f);
+            smsRect.sizeDelta = new Vector2(360f, 80f);
+            smsRect.anchoredPosition = new Vector2(200f, 80f);
+
+            var smsImg = smsGO.AddComponent<Image>();
+            smsImg.color = new Color(0.13f, 0.55f, 0.13f);
+            var smsBtn = smsGO.AddComponent<Button>();
+            smsBtn.targetGraphic = smsImg;
+            var smsColors = smsBtn.colors;
+            smsColors.normalColor = new Color(0.13f, 0.55f, 0.13f);
+            smsColors.highlightedColor = new Color(0.18f, 0.72f, 0.18f);
+            smsColors.pressedColor = new Color(0.09f, 0.38f, 0.09f);
+            smsBtn.colors = smsColors;
+
+            // Label child
+            var smsLblGO = new GameObject("Label");
+            smsLblGO.transform.SetParent(smsGO.transform, false);
+            var smsLblRect = smsLblGO.AddComponent<RectTransform>();
+            smsLblRect.anchorMin = Vector2.zero;
+            smsLblRect.anchorMax = Vector2.one;
+            smsLblRect.sizeDelta = Vector2.zero;
+            smsLblRect.anchoredPosition = Vector2.zero;
+            var smsTxt = smsLblGO.AddComponent<Text>();
+            smsTxt.text = "START MY STORY";
+            smsTxt.fontSize = 36;
+            smsTxt.fontStyle = FontStyle.Bold;
+            smsTxt.color = Color.white;
+            smsTxt.alignment = TextAnchor.MiddleCenter;
+            smsTxt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+
+            // Wire OnClick to TitleScreenManager.StartGameStorySlice
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(
+                smsBtn.onClick,
+                mgr.StartGameStorySlice);
+
             // EventSystem
             var esGO = new GameObject("EventSystem");
             esGO.AddComponent<EventSystem>();
