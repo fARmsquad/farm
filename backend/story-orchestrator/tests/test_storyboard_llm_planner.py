@@ -77,6 +77,7 @@ class OpenAIStoryboardPlannerTests(unittest.TestCase):
         assert client.last_user_prompt is not None
         self.assertIn("actual story beat", client.last_system_prompt)
         self.assertIn("distinct visual moment", client.last_system_prompt)
+        self.assertIn("story type, prompt structure, and minigame story hook", client.last_system_prompt)
         self.assertIn("Every shot must last between 2 and 4 seconds.", client.last_user_prompt)
         self.assertIn("Write 3 to 6 storyboard shots.", client.last_user_prompt)
         self.assertIn("Narration text must exactly match the subtitle text", client.last_user_prompt)
@@ -84,6 +85,12 @@ class OpenAIStoryboardPlannerTests(unittest.TestCase):
         self.assertIn("never more than 14 words", client.last_user_prompt)
         self.assertIn("Do not repeat the same camera angle", client.last_user_prompt)
         self.assertIn("not by showing a tutorial card", client.last_user_prompt)
+        self.assertIn('"story_type_id": "tool_hunt_detour_v1"', client.last_user_prompt)
+        self.assertIn('"prompt_structure_id": "character_request_payoff_v1"', client.last_user_prompt)
+        self.assertIn('"minigame_story_hook": "Miss Clara hears the shed rattle and realizes the watering kit is missing."', client.last_user_prompt)
+        self.assertIn('"story_type_prompt_directives": [', client.last_user_prompt)
+        self.assertIn('"prompt_structure_directives": [', client.last_user_prompt)
+        self.assertIn('"minigame_prompt_directives": [', client.last_user_prompt)
         self.assertIn('"mission_configuration_summary": "Recover 2 watering tools around the field path with medium hints."', client.last_user_prompt)
         self.assertIn('"prior_story_summary": "Old Garrett settled the chicken pen, but the tool rack is still in disarray."', client.last_user_prompt)
 
@@ -137,6 +144,59 @@ class OpenAIStoryboardPlannerTests(unittest.TestCase):
 
         with self.assertRaises(ValidationError):
             planner.plan(build_request())
+
+    def test_plan_appends_style_descriptor_to_system_prompt_when_preset_present(self) -> None:
+        from app.style_preset_catalog import StylePresetCatalog
+
+        client = CapturingStructuredOutputClient(_valid_payload())
+        planner = OpenAIStoryboardPlanner(
+            client=client,
+            style_preset_catalog=StylePresetCatalog.default(),
+        )
+
+        planner.plan(build_request(style_preset_id="watercolor_intro_v1"))
+
+        assert client.last_system_prompt is not None
+        self.assertIn("watercolor", client.last_system_prompt.lower())
+        self.assertIn("painterly", client.last_system_prompt.lower())
+        self.assertIn("Style direction:", client.last_system_prompt)
+
+    def test_plan_includes_style_descriptor_in_user_prompt_json_when_preset_present(self) -> None:
+        from app.style_preset_catalog import StylePresetCatalog
+
+        client = CapturingStructuredOutputClient(_valid_payload())
+        planner = OpenAIStoryboardPlanner(
+            client=client,
+            style_preset_catalog=StylePresetCatalog.default(),
+        )
+
+        planner.plan(build_request(style_preset_id="watercolor_intro_v1"))
+
+        assert client.last_user_prompt is not None
+        self.assertIn("style_descriptor_text", client.last_user_prompt)
+        self.assertIn("watercolor", client.last_user_prompt.lower())
+
+    def test_plan_omits_style_descriptor_when_no_catalog_or_unknown_preset(self) -> None:
+        from app.style_preset_catalog import StylePresetCatalog
+
+        client_no_cat = CapturingStructuredOutputClient(_valid_payload())
+        planner_no_cat = OpenAIStoryboardPlanner(client=client_no_cat, style_preset_catalog=None)
+        planner_no_cat.plan(build_request(style_preset_id="watercolor_intro_v1"))
+        assert client_no_cat.last_system_prompt is not None
+        self.assertNotIn("Style direction:", client_no_cat.last_system_prompt)
+        assert client_no_cat.last_user_prompt is not None
+        self.assertNotIn("style_descriptor_text", client_no_cat.last_user_prompt)
+
+        client_with_cat = CapturingStructuredOutputClient(_valid_payload())
+        planner_with_cat = OpenAIStoryboardPlanner(
+            client=client_with_cat,
+            style_preset_catalog=StylePresetCatalog.default(),
+        )
+        planner_with_cat.plan(build_request(style_preset_id="unknown_preset"))
+        assert client_with_cat.last_system_prompt is not None
+        self.assertNotIn("Style direction:", client_with_cat.last_system_prompt)
+        assert client_with_cat.last_user_prompt is not None
+        self.assertNotIn("style_descriptor_text", client_with_cat.last_user_prompt)
 
     def test_openai_storyboard_planner_rejects_mismatched_narration_text(self) -> None:
         planner = OpenAIStoryboardPlanner(
@@ -260,7 +320,32 @@ class FakeSpeechGenerator:
         )
 
 
-def build_request() -> GeneratedStoryboardCutsceneRequest:
+def _valid_payload() -> dict:
+    return {
+        "shots": [
+            {
+                "subtitle_text": "Garrett lowers the seed basket over the first furrow.",
+                "narration_text": "Garrett lowers the seed basket over the first furrow.",
+                "image_prompt": "Old Garrett kneels beside the first carrot furrow at sunrise, holding a seed basket with a patient teaching gesture.",
+                "duration_seconds": 3.4,
+            },
+            {
+                "subtitle_text": "Plant 3 carrots and keep the row steady.",
+                "narration_text": "Plant 3 carrots and keep the row steady.",
+                "image_prompt": "A close farm-row view showing marked carrot plots, hand tools, and a clear inviting path into the planting task.",
+                "duration_seconds": 3.6,
+            },
+            {
+                "subtitle_text": "The morning is ready. Step in and answer the field.",
+                "narration_text": "The morning is ready. Step in and answer the field.",
+                "image_prompt": "A forward-looking sunrise composition from the row edge into the open carrot plots, with warm storybook depth and no UI text.",
+                "duration_seconds": 3.2,
+            },
+        ]
+    }
+
+
+def build_request(*, style_preset_id: str = "farm_storybook_v1") -> GeneratedStoryboardCutsceneRequest:
     return GeneratedStoryboardCutsceneRequest(
         package_id="storypkg_intro_chicken_sample",
         package_display_name="Intro Chicken Sample",
@@ -270,7 +355,7 @@ def build_request() -> GeneratedStoryboardCutsceneRequest:
         next_scene_name="MidpointPlaceholder",
         linked_minigame_beat_id=None,
         story_brief="Old Garrett turns the player from the chicken pen toward the first planting task.",
-        style_preset_id="farm_storybook_v1",
+        style_preset_id=style_preset_id,
         voice_id="voice-test",
         context=GeneratedStoryboardContext(
             character_name="Miss Clara",
@@ -282,6 +367,23 @@ def build_request() -> GeneratedStoryboardCutsceneRequest:
             selected_generator_id="find_tools_cluster_v1",
             selected_generator_display_name="Find Lost Tools",
             mission_configuration_summary="Recover 2 watering tools around the field path with medium hints.",
+            story_type_id="tool_hunt_detour_v1",
+            story_type_display_name="Tool Hunt Detour",
+            story_type_prompt_directives=[
+                "Center the beat on a practical interruption caused by misplaced equipment.",
+                "Keep the tone grounded and mildly urgent.",
+            ],
+            prompt_structure_id="character_request_payoff_v1",
+            prompt_structure_display_name="Character Request Payoff",
+            prompt_structure_directives=[
+                "Open with an NPC request.",
+                "Land on the mission as the payoff for helping.",
+            ],
+            minigame_story_hook="Miss Clara hears the shed rattle and realizes the watering kit is missing.",
+            minigame_prompt_directives=[
+                "Make the missing tools the direct reason the mission happens now.",
+                "Use the field path as a visible clue trail.",
+            ],
         ),
     )
 
