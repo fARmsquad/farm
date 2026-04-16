@@ -147,5 +147,50 @@ namespace FarmSimVR.Tests.EditMode
             Assert.That(method, Is.Not.Null, $"Missing private method '{methodName}'.");
             return (T)method.Invoke(target, args);
         }
+
+        // ── Inventory context injection ───────────────────────────────────────
+
+        [Test]
+        public void BuildContextWindow_WithInventorySummary_IncludesSummaryInAdditionalInstructions()
+        {
+            var store = new TownConversationMemoryStore();
+            const string summary = "Player currently has: 3 egg.";
+
+            TownConversationContextWindow context = store.BuildContextWindow("Mira the Baker", summary);
+
+            Assert.That(context.AdditionalInstructions, Does.Contain("3 egg"));
+        }
+
+        [Test]
+        public void BuildContextWindow_WithNullInventorySummary_DoesNotMentionInventory()
+        {
+            var store = new TownConversationMemoryStore();
+
+            TownConversationContextWindow context = store.BuildContextWindow("Mira the Baker", null);
+
+            Assert.That(context.AdditionalInstructions, Does.Not.Contain("egg"));
+            Assert.That(context.AdditionalInstructions, Does.Not.Contain("inventory"));
+        }
+
+        [Test]
+        public void BuildContextWindow_WithEmptyInventorySummary_DoesNotMentionInventory()
+        {
+            var store = new TownConversationMemoryStore();
+
+            TownConversationContextWindow context = store.BuildContextWindow("Mira the Baker", string.Empty);
+
+            Assert.That(context.AdditionalInstructions, Does.Not.Contain("inventory"));
+        }
+
+        [Test]
+        public void BuildContextWindow_ExistingCallWithoutInventory_StillWorks()
+        {
+            // Regression guard: callers that omit the inventory arg get unchanged behaviour.
+            var store = new TownConversationMemoryStore();
+
+            TownConversationContextWindow context = store.BuildContextWindow("Old Garrett");
+
+            Assert.That(context.AdditionalInstructions, Does.Contain("newcomer"));
+        }
     }
 }

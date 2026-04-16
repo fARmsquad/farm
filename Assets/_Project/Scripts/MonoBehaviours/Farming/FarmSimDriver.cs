@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using FarmSimVR.Core.Farming;
 using FarmSimVR.Core.Inventory;
+using FarmSimVR.MonoBehaviours.Economy;
 using FarmSimVR.MonoBehaviours.UI;
 
 namespace FarmSimVR.MonoBehaviours.Farming
@@ -65,16 +66,26 @@ namespace FarmSimVR.MonoBehaviours.Farming
         private void Start()
         {
             _db = ItemDatabase.CreateStarterDatabase();
-            _inv = new InventorySystem(_db, 24);
-            _progression = GetComponent<WorldFarmProgressionController>();
-            foreach (var id in SeedIds)
-                _inv.AddItem(id, starterSeeds);
 
-            // Add starter tools to inventory
-            _inv.AddItem("tool_watering_can", 1);
-            _inv.AddItem("tool_basket", 1);
-            _inv.AddItem("tool_hoe", 1);
-            _inv.AddItem("tool_seed_pouch", 1);
+            // Share the persistent inventory owned by EconomyManager (CoreScene) so items
+            // survive scene transitions. Fall back to a local inventory for scenes that run
+            // without EconomyManager (e.g. standalone test scenes).
+            _inv = EconomyManager.Instance?.Inventory ?? new InventorySystem(_db, 24);
+
+            _progression = GetComponent<WorldFarmProgressionController>();
+
+            // Only seed starter items on the very first farm load — EconomyManager's inventory
+            // persists across reloads, so guard against duplicating seeds and tools.
+            if (!_inv.HasItem("tool_watering_can"))
+            {
+                foreach (var id in SeedIds)
+                    _inv.AddItem(id, starterSeeds);
+
+                _inv.AddItem("tool_watering_can", 1);
+                _inv.AddItem("tool_basket", 1);
+                _inv.AddItem("tool_hoe", 1);
+                _inv.AddItem("tool_seed_pouch", 1);
+            }
 
             // Initialize tool equip state
             _toolEquip = new ToolEquipState();

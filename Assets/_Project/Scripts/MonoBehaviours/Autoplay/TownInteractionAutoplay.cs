@@ -19,6 +19,7 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
         [SerializeField] private NPCController targetNpc;
         [SerializeField] private LLMConversationController conversationController;
         [SerializeField] private TownPlayerController playerController;
+        [SerializeField] private SkipPrompt skipPrompt;
 
         private CharacterController _characterController;
         private Animator _animator;
@@ -26,8 +27,8 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
 
         private void Awake()
         {
-            // Player lives in CoreScene (persistent) so Inspector cross-scene refs are null.
-            // Resolve them at runtime — CoreScene is already loaded by the time Awake fires.
+            // Player/controller/conversation all live in CoreScene (persistent) so
+            // Inspector cross-scene refs may be null — resolve at runtime.
             if (playerTransform == null || playerController == null)
             {
                 var controller = FindFirstObjectByType<TownPlayerController>();
@@ -38,6 +39,15 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
                 }
             }
 
+            if (conversationController == null)
+                conversationController = FindAnyObjectByType<LLMConversationController>();
+
+            if (skipPrompt == null)
+                skipPrompt = FindAnyObjectByType<SkipPrompt>();
+
+            if (skipPrompt != null)
+                skipPrompt.OnSkipRequested.AddListener(ForceSkip);
+
             if (playerTransform != null)
                 _animator = playerTransform.GetComponent<Animator>();
         }
@@ -47,6 +57,8 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
             specId     = "TOWN-001";
             specTitle  = "Town Interaction – Autoplay";
             totalSteps = 4;
+
+            skipPrompt?.Activate();
 
             Step("Spotting the town person...");
             yield return TurnTowardNpc(1.2f);
@@ -66,13 +78,13 @@ namespace FarmSimVR.MonoBehaviours.Autoplay
         }
 
         /// <summary>
-        /// Called by AutoplayBase when the demo finishes.
-        /// Enables free-roam player control.
+        /// Called by AutoplayBase when the demo finishes (or is skipped).
+        /// Deactivates the skip prompt and enables free-roam player control.
         /// </summary>
         protected override void OnDemoComplete()
         {
-            if (playerController != null)
-                playerController.EnableControl();
+            skipPrompt?.Deactivate();
+            playerController?.EnableControl();
         }
 
         // ── Walk helpers ─────────────────────────────────────────────────────

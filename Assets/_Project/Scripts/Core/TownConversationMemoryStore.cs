@@ -50,19 +50,22 @@ namespace FarmSimVR.Core
             }
         }
 
-        public TownConversationContextWindow BuildContextWindow(string npcName)
+        public TownConversationContextWindow BuildContextWindow(string npcName, string inventorySummary = null)
         {
             NpcMemoryState state = GetState(npcName);
-            string instructions = BuildInstructions(npcName, state);
+            string instructions = BuildInstructions(npcName, state, inventorySummary);
             string[] relayPrompts = BuildRelayPrompts(npcName, state);
             return new TownConversationContextWindow(instructions, relayPrompts);
         }
 
-        private string BuildInstructions(string npcName, NpcMemoryState state)
+        private string BuildInstructions(string npcName, NpcMemoryState state, string inventorySummary = null)
         {
             var builder = new StringBuilder(768);
             builder.Append("Dynamic session context:\n");
             builder.Append("- ").Append(PlayerBaseContext).Append('\n');
+
+            if (!string.IsNullOrWhiteSpace(inventorySummary))
+                builder.Append("- ").Append(inventorySummary).Append('\n');
 
             AppendKnownFacts(builder);
             AppendNpcExplainedFacts(builder, state);

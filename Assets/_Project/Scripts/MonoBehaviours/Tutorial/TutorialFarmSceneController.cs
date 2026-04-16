@@ -388,15 +388,8 @@ namespace FarmSimVR.MonoBehaviours.Tutorial
 
         private void EnsurePackagePlantRowsPlots()
         {
-            if (!_usePackagePlantRowsMode || _heroCropPlot == null)
+            if (!_usePackagePlantRowsMode || _packagePlotsRegistered)
                 return;
-
-            PackagePlantRowsPlotSpawner.EnsurePlots(
-                _heroCropPlot,
-                _packagePlantRowsService.DesiredPlotCount,
-                _packageRowCount);
-            if (_allPlotControllers.Length < _packagePlantRowsService.DesiredPlotCount)
-                CacheAllPlotControllers();
 
             if (_driver == null)
                 _driver = FindAnyObjectByType<FarmSimDriver>();

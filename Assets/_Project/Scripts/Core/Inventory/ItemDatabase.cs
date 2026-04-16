@@ -62,6 +62,9 @@ namespace FarmSimVR.Core.Inventory
                 new ItemData("crop_carrot",   "Carrot",       ItemCategory.Crop, 10, 10, "A fresh carrot."),
                 new ItemData("crop_lettuce",  "Lettuce",      ItemCategory.Crop, 10, 8,  "A crisp lettuce head."),
 
+                // Animal produce
+                new ItemData("egg", "Egg", ItemCategory.Produce, 24, 5, "A fresh egg from the chicken coop."),
+
                 // Tools (stack of 1 each)
                 new ItemData("tool_watering_can", "Watering Can", ItemCategory.Tool, 1, 0, "Waters crop plots to boost growth."),
                 new ItemData("tool_basket",        "Harvest Basket", ItemCategory.Tool, 1, 0, "Used to collect harvested crops."),

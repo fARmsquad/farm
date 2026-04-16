@@ -5,6 +5,7 @@ namespace FarmSimVR.Core.Inventory
         Seed,
         Crop,
         Tool,
-        Material
+        Material,
+        Produce
     }
 }
