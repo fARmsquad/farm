@@ -13,10 +13,10 @@ from .generated_storyboard_models import (
     GeneratedStoryboardPackageResult,
     GeneratedStoryboardPlan,
     GeneratedStoryboardPlanShot,
-    ImageGenerator,
     SpeechGenerator,
     StoryboardPlanner,
 )
+from .image_generator_protocol import ImageGenerator
 from .storyboard_media import (
     ChainImageGenerator,
     ChainSpeechGenerator,
@@ -67,7 +67,7 @@ class GeneratedStoryboardService:
         self._output_root = output_root
         self._package_output_path = package_output_path
         self._planner = planner
-        self._image_generator = image_generator
+        self._image_generator: ImageGenerator = image_generator
         self._speech_generator = speech_generator
         self._reference_library = reference_library
         self._reference_path_resolver = StoryboardReferencePathResolver(output_root, reference_library)
