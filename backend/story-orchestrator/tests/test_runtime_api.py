@@ -81,6 +81,12 @@ class RuntimeSessionEndpointTests(unittest.TestCase):
         )
         self.assertTrue(envelope["minigame"]["adapter_id"])
         self.assertGreaterEqual(len(envelope["artifacts"]), 3)
+        self.assertEqual(
+            envelope["cutscene"]["style_preset_id"],
+            "watercolor_intro_v1",
+            "Generated cutscene must carry watercolor_intro_v1 so the style anchor library "
+            "and StylePresetCatalog descriptor/suffix actually apply at runtime.",
+        )
 
     def test_runtime_configuration_endpoint_returns_story_mode_catalog(self) -> None:
         response = self.client.get("/api/runtime/v1/configuration")

@@ -307,7 +307,7 @@ class RuntimeTurnGenerationService:
                 scene_name=PROOF_CUTSCENE_SCENE,
                 next_scene_name=minigame_scene,
                 story_brief=story_brief,
-                style_preset_id="farm_storybook_v1",
+                style_preset_id="watercolor_intro_v1",
                 voice_id=self._default_voice_id,
                 reference_image_paths=select_continuity_reference_paths(session, character_name),
                 continuity_reference_mode="character_priority",
