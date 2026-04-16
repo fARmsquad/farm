@@ -122,9 +122,53 @@ class OpenAIStorySequenceTurnDirector:
             },
             indent=2,
         )
-        return self._client.generate(
+        directive = self._client.generate(
             response_model=StorySequenceTurnDirective,
             schema_name="farm_story_turn_directive",
             system_prompt=system_prompt,
             user_prompt=user_prompt,
         )
+        if _is_valid_directive(directive, candidate_generators):
+            return directive
+        return self._retry_with_nudge(
+            invalid_directive=directive,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            candidate_generators=candidate_generators,
+        )
+
+    def _retry_with_nudge(
+        self,
+        *,
+        invalid_directive: StorySequenceTurnDirective,
+        system_prompt: str,
+        user_prompt: str,
+        candidate_generators: list[StorySequenceGeneratorOption],
+    ) -> StorySequenceTurnDirective:
+        allowed_ids_csv = ", ".join(option.generator_id for option in candidate_generators)
+        nudge = (
+            f"You previously returned an invalid generator_id \"{invalid_directive.generator_id}\". "
+            f"You MUST choose a generator_id from this list ONLY: {allowed_ids_csv}.\n\n"
+        )
+        retry_prompt = nudge + user_prompt
+        retry_directive = self._client.generate(
+            response_model=StorySequenceTurnDirective,
+            schema_name="farm_story_turn_directive",
+            system_prompt=system_prompt,
+            user_prompt=retry_prompt,
+        )
+        if _is_valid_directive(retry_directive, candidate_generators):
+            return retry_directive
+        raise ValueError(
+            f"generator_id not in allowed_generator_ids after retry: {retry_directive.generator_id!r}"
+        )
+
+
+def _is_valid_directive(
+    directive: StorySequenceTurnDirective,
+    candidate_generators: list[StorySequenceGeneratorOption],
+) -> bool:
+    if not candidate_generators:
+        return True
+    allowed_ids = {option.generator_id for option in candidate_generators}
+    return directive.generator_id in allowed_ids
