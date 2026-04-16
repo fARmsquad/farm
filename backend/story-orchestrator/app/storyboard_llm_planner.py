@@ -100,6 +100,14 @@ class OpenAIStoryboardPlanner:
             "Respect the provided story type, prompt structure, and minigame story hook when shaping the beat. "
             "Write like a storyboard artist: show what changes from shot to shot, make the conflict legible, and end on a handoff into action instead of explanation."
         )
+        system_prompt = (
+            f"{system_prompt}\n\nCoherence rules:\n"
+            "- Tag each shot with a per-shot purpose tag (anchor / escalate / payoff / handoff).\n"
+            "- Use no repeated camera angle across shots within the same cutscene.\n"
+            "- Build escalation: every shot raises the stakes or visibly changes the situation.\n"
+            "- Land on end-on-handoff: the final shot must transition into the next playable mission.\n"
+            "- Each shot must reference earlier shots through continuity of character, prop, or setting."
+        )
         preset = (
             self._style_preset_catalog.get(request.style_preset_id)
             if self._style_preset_catalog

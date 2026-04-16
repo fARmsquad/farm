@@ -242,6 +242,21 @@ class OpenAIStoryboardPlannerTests(unittest.TestCase):
         self.assertEqual(plan.shots[1].image_prompt, "A chicken")
         self.assertEqual(plan.shots[2].image_prompt, "A field")
 
+    def test_plan_system_prompt_contains_coherence_guardrails(self) -> None:
+        client = CapturingStructuredOutputClient(_valid_payload())
+        planner = OpenAIStoryboardPlanner(client=client)
+        planner.plan(build_request())
+        assert client.last_system_prompt is not None
+        sp = client.last_system_prompt.lower()
+        for phrase in (
+            "per-shot purpose tag",
+            "no repeated camera angle",
+            "escalation",
+            "end-on-handoff",
+            "reference earlier shots",
+        ):
+            self.assertIn(phrase, sp, f"missing coherence guardrail phrase: {phrase}")
+
     def test_openai_storyboard_planner_rejects_mismatched_narration_text(self) -> None:
         planner = OpenAIStoryboardPlanner(
             client=FakeStructuredOutputClient(
