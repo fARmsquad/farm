@@ -7,7 +7,7 @@ namespace FarmSimVR.Core
     /// </summary>
     public static class TownConversationExitGate
     {
-        public const int GoodbyeUnlockTurn = 2;
+        public const int GoodbyeUnlockTurn = 0;
         public const string ExitOptionLabel = "I should get going. Goodbye.";
 
         private const string EarlyExitBlockedMessage = "Let's talk a little longer before you head out.";
