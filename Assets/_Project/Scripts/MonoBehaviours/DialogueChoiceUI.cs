@@ -4,6 +4,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using FarmSimVR.Core.Economy;
+using FarmSimVR.Core.Hunting;
 using FarmSimVR.MonoBehaviours.Economy;
 
 namespace FarmSimVR.MonoBehaviours
@@ -28,6 +30,14 @@ namespace FarmSimVR.MonoBehaviours
         [SerializeField] private TextMeshProUGUI hintText;
 
         private const string BakerNpcName = "Mira the Baker";
+        private const string LivestockNpcName = "Old Garrett";
+
+        private static readonly AnimalType[] LivestockForSale =
+        {
+            AnimalType.Chicken,
+            AnimalType.Pig,
+            AnimalType.Horse,
+        };
 
         private readonly List<GameObject> _buttons = new();
         private readonly StringBuilder _visibleText = new();
@@ -161,6 +171,7 @@ namespace FarmSimVR.MonoBehaviours
             ClearButtons();
             BuildOptionButtons(options);
             TryInjectSellEggsButton();
+            TryInjectBuyAnimalButtons();
             _choicesVisible = true;
             RefreshVoiceInputStatus();
             RefreshAdaptiveLayout();
@@ -187,6 +198,43 @@ namespace FarmSimVR.MonoBehaviours
             if (EconomyManager.Instance == null) return;
             EconomyManager.Instance.TrySellAllEggs(out _);
             conversation?.SelectOption($"I'll sell you all my eggs — that's {eggCountAtPress}.");
+        }
+
+        private void TryInjectBuyAnimalButtons()
+        {
+            if (_activeNpcName != LivestockNpcName) return;
+            if (EconomyManager.Instance == null) return;
+
+            int balance = EconomyManager.Instance.Wallet.Balance;
+
+            foreach (AnimalType type in LivestockForSale)
+            {
+                int price = LivestockPrices.Get(type);
+                bool canAfford = balance >= price;
+                string name = type.ToString().ToLower();
+                string btnLabel = canAfford
+                    ? $"Buy a {name} ({price}c)"
+                    : $"{name} ({price}c) — not enough coins";
+
+                var button = BuildButton(btnLabel);
+                var btn = button.GetComponent<Button>();
+                btn.interactable = canAfford;
+
+                if (canAfford)
+                {
+                    AnimalType captured = type;
+                    btn.onClick.AddListener(() => OnBuyAnimal(captured));
+                }
+
+                _buttons.Add(button);
+            }
+        }
+
+        private void OnBuyAnimal(AnimalType type)
+        {
+            if (EconomyManager.Instance == null) return;
+            if (!EconomyManager.Instance.TryBuyAnimal(type, out _)) return;
+            conversation?.SelectOption($"I'd like to buy a {type.ToString().ToLower()}.");
         }
 
         private void HandleWaiting()

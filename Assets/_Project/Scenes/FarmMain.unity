@@ -441,6 +441,74 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4287685557304317653, guid: 9244c272a3cbc564caa3db40d6a1a75f, type: 3}
   m_PrefabInstance: {fileID: 69564975}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &73160678
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 73160681}
+  - component: {fileID: 73160680}
+  - component: {fileID: 73160679}
+  m_Layer: 0
+  m_Name: AnimalPenHost
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &73160679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 73160678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 565c5abbf5dbd41a4bccbe2a26086218, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.Hunting.FarmPenSpawner
+--- !u!114 &73160680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 73160678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1046aeb4a08554e17b8cb6064ca9a04e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.Hunting.AnimalPen
+  penAnimalPrefabs:
+  - type: 0
+    prefab: {fileID: 6495016731904725274, guid: ea33bd8823e6843c7965ebf1c37825a1, type: 3}
+  - type: 3
+    prefab: {fileID: 369260227351055570, guid: 99d42a818342442f89b8518a38e05013, type: 3}
+  - type: 2
+    prefab: {fileID: 4889761742098207204, guid: dc63804d5ad264addbab0e8c57407508, type: 3}
+  penCenter: {x: 13, y: 0, z: 22}
+  penRadius: 5
+  buildFenceOnStart: 0
+  fencePostCount: 12
+--- !u!4 &73160681
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 73160678}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &85725146
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11981,3 +12049,4 @@ SceneRoots:
   - {fileID: 994786269}
   - {fileID: 120842055}
   - {fileID: 2092876651}
+  - {fileID: 73160681}

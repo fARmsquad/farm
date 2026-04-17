@@ -61,7 +61,7 @@ namespace FarmSimVR.MonoBehaviours.Hunting
                 }
                 else
                 {
-                    Debug.LogError("[AnimalPen] No BarnDropOff found in scene!");
+                    Debug.Log("[AnimalPen] No BarnDropOff in scene — pen will use registry spawning only.");
                 }
             }
 
@@ -73,6 +73,15 @@ namespace FarmSimVR.MonoBehaviours.Hunting
         {
             if (_barnDropOff != null)
                 _barnDropOff.OnAnimalsDeposited -= HandleAnimalsDeposited;
+        }
+
+        /// <summary>
+        /// Spawns an animal of the given type directly into the pen.
+        /// Used by FarmPenSpawner to restore purchased animals on scene load.
+        /// </summary>
+        public void AddAnimal(AnimalType type)
+        {
+            SpawnPenAnimal(new CaughtAnimalRecord(type, Time.time));
         }
 
         private void HandleAnimalsDeposited(IReadOnlyList<CaughtAnimalRecord> records)

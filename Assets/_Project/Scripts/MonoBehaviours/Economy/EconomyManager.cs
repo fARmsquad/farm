@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using FarmSimVR.Core.Economy;
+using FarmSimVR.Core.Hunting;
 using FarmSimVR.Core.Inventory;
 using FarmSimVR.MonoBehaviours.Farming;
 
@@ -10,6 +11,7 @@ namespace FarmSimVR.MonoBehaviours.Economy
     /// Central coordinator for the farm economy loop.
     /// Owns the player's persistent inventory (survives scene transitions).
     /// Eggs are produced each morning and sold in town by talking to Mira the Baker.
+    /// Animals are purchased from Old Garrett in town and stored in LivestockRegistry.
     /// </summary>
     public class EconomyManager : MonoBehaviour
     {
@@ -23,16 +25,19 @@ namespace FarmSimVR.MonoBehaviours.Economy
         private EggService _eggService;
         private WalletService _walletService;
         private InventorySystem _inventory;
+        private LivestockRegistry _livestock;
 
-        public WalletService Wallet       => _walletService;
-        public InventorySystem Inventory  => _inventory;
+        public WalletService Wallet            => _walletService;
+        public InventorySystem Inventory       => _inventory;
+        public LivestockRegistry Livestock     => _livestock;
 
         private void Awake()
         {
-            Instance      = this;
-            _eggService   = new EggService();
+            Instance       = this;
+            _eggService    = new EggService();
             _walletService = new WalletService();
-            _inventory    = new InventorySystem(ItemDatabase.CreateStarterDatabase(), 24);
+            _inventory     = new InventorySystem(ItemDatabase.CreateStarterDatabase(), 24);
+            _livestock     = new LivestockRegistry();
         }
 
         private void Start()
@@ -54,6 +59,25 @@ namespace FarmSimVR.MonoBehaviours.Economy
         private void HandleNewDay(int dayCount)
         {
             _eggService.ProduceMorningEggs(1, _inventory);
+        }
+
+        /// <summary>
+        /// Deducts the animal's price and registers it in LivestockRegistry.
+        /// Returns false with a reason if the player can't afford it.
+        /// </summary>
+        public bool TryBuyAnimal(AnimalType type, out string message)
+        {
+            int price = LivestockPrices.Get(type);
+
+            if (!_walletService.SpendCoins(price))
+            {
+                message = $"Not enough coins. You need {price}c to buy a {type.ToString().ToLower()}.";
+                return false;
+            }
+
+            _livestock.Add(type);
+            message = $"You bought a {type.ToString().ToLower()} for {price}c!";
+            return true;
         }
 
         /// <summary>
