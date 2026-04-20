@@ -654,11 +654,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: FarmSimVR.MonoBehaviours::FarmSimVR.MonoBehaviours.Hunting.AnimalPen
   penAnimalPrefabs:
   - type: 0
-    prefab: {fileID: 6495016731904725274, guid: ea33bd8823e6843c7965ebf1c37825a1, type: 3}
+    prefab: {fileID: 4424461213063070902, guid: 87bcaceac037e4a55a7d7638742a87f6, type: 3}
   - type: 3
-    prefab: {fileID: 369260227351055570, guid: 99d42a818342442f89b8518a38e05013, type: 3}
+    prefab: {fileID: 5168531153025346133, guid: 8f138a1ca93944d2bbdc7c4ee4d98774, type: 3}
   - type: 2
-    prefab: {fileID: 4889761742098207204, guid: dc63804d5ad264addbab0e8c57407508, type: 3}
+    prefab: {fileID: 2907400476753837811, guid: c4cdecfde627b4bd58229d9afb0b26a3, type: 3}
   penCenter: {x: 13, y: 0, z: 22}
   penRadius: 5
   buildFenceOnStart: 0
@@ -672,7 +672,7 @@ Transform:
   m_GameObject: {fileID: 73160678}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -13, y: 0, z: -14}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

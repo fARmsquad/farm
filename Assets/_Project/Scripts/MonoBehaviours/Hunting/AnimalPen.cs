@@ -23,7 +23,7 @@ namespace FarmSimVR.MonoBehaviours.Hunting
         private BarnDropOff _barnDropOff;
 
         public IReadOnlyList<PenAnimal> PenAnimals => _penAnimals;
-        public Vector3 PenCenter => penCenter;
+        public Vector3 PenCenter => transform.position + penCenter;
         public float PenRadius => penRadius;
 
         public void ConfigureRuntime(PenAnimalEntry[] entries, Vector3 center, float radius, bool buildFence)
@@ -100,12 +100,7 @@ namespace FarmSimVR.MonoBehaviours.Hunting
                 return;
             }
 
-            // Random position inside pen
-            Vector2 rnd = Random.insideUnitCircle * penRadius * 0.7f;
-            Vector3 spawnPos = penCenter + new Vector3(rnd.x, 0, rnd.y);
-            float randomYRot = Random.Range(0f, 360f);
-
-            GameObject animal = Instantiate(prefab, spawnPos, Quaternion.Euler(0, randomYRot, 0), transform);
+            GameObject animal = Instantiate(prefab, transform.position, transform.rotation, transform);
             animal.name = $"Pen_{record.Type}";
 
             // Strip wild-animal components if present
@@ -118,7 +113,7 @@ namespace FarmSimVR.MonoBehaviours.Hunting
             var wander = animal.GetComponent<AnimalWander>();
             if (wander == null)
                 wander = animal.AddComponent<AnimalWander>();
-            wander.SetBounds(penCenter, penRadius);
+            wander.SetBounds(PenCenter, penRadius);
 
             // Add identity component
             var penAnimal = animal.AddComponent<PenAnimal>();
@@ -145,7 +140,7 @@ namespace FarmSimVR.MonoBehaviours.Hunting
 
             var fenceParent = new GameObject("Fence");
             fenceParent.transform.SetParent(transform);
-            fenceParent.transform.position = penCenter;
+            fenceParent.transform.position = PenCenter;
 
             var shader = Shader.Find("Universal Render Pipeline/Lit");
             Material postMat = null;
@@ -161,7 +156,7 @@ namespace FarmSimVR.MonoBehaviours.Hunting
             for (int i = 0; i < fencePostCount; i++)
             {
                 float angle = (i / (float)fencePostCount) * Mathf.PI * 2;
-                Vector3 pos = penCenter + new Vector3(
+                Vector3 pos = PenCenter + new Vector3(
                     Mathf.Cos(angle) * penRadius,
                     0.4f,
                     Mathf.Sin(angle) * penRadius);
